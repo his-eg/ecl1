@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="h1modules.hisinoneModule"
+            name="HISinOne">
+      </category>
+      <wizard
+            category="h1modules.hisinoneModule"
+            class="h1modules.wizards.NewModuleProjectWizard"
+            id="h1modules.moduleProjectWizard"
+            name="moduleProjectWizard">
+      </wizard>
+   </extension>
+
+</plugin>

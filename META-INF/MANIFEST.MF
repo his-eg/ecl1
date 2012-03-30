@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: H1modules
+Bundle-SymbolicName: h1modules;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: h1modules.Activator
+Bundle-Vendor: HIS GmbH
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.ui.ide;bundle-version="3.7.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
