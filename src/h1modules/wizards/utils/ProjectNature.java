@@ -1,8 +1,10 @@
 package h1modules.wizards.utils;
 
+import org.eclipse.jdt.core.JavaCore;
+
 public enum ProjectNature {
 	
-	JAVA("org.eclipse.jdt.core.javanature"),
+	JAVA(JavaCore.NATURE_ID),
 	
 	MACKER("de.his.core.tools.cs.sys.quality.eclipsemacker.mackerNature");
 	
