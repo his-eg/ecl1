@@ -1,7 +1,11 @@
 package h1modules.wizards;
 
+import h1modules.wizards.utils.ProjectSupport;
+
+import java.net.URI;
+
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
@@ -16,24 +20,29 @@ public class NewModuleProjectWizard extends Wizard implements INewWizard {
 	private WizardNewProjectCreationPage firstPage;
 
 	public NewModuleProjectWizard() {
-		// TODO Auto-generated constructor stub
+		setWindowTitle("HISinOne Module Project Wizard");
 	}
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		// TODO Auto-generated method stub
-
+		// Do nothing yet
 	}
 
 	@Override
 	public boolean performFinish() {
+		String projectName = firstPage.getProjectName();
+		URI location = null;
+		if(!firstPage.useDefaults()) {
+			location = firstPage.getLocationURI();
+		}
+		IProject project = ProjectSupport.createProject(projectName, location);
 		return true;
 	}
 
 	@Override
 	public void addPages() {
 		super.addPages();
-		firstPage = new WizardNewProjectCreationPage("HISinOne Module Project Wizard");
+		firstPage = new WizardNewProjectCreationPage("New HISinOne Module Project");
 		firstPage.setDescription("Unterstützung bei der Erstellung eines neuen HISinOne Modul Projekts");
 		addPage(firstPage);
 	}
