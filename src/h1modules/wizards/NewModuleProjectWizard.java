@@ -1,10 +1,12 @@
 package h1modules.wizards;
 
 import h1modules.wizards.utils.ProjectSupport;
+import h1modules.wizards.utils.ResourceSupport;
 
 import java.net.URI;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -36,6 +38,11 @@ public class NewModuleProjectWizard extends Wizard implements INewWizard {
 			location = firstPage.getLocationURI();
 		}
 		IProject project = ProjectSupport.createProject(projectName, location);
+		try {
+			ResourceSupport.createModuleBeanFile(project);
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
 		return true;
 	}
 
