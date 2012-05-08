@@ -1,4 +1,4 @@
-package h1modules.wizards.utils;
+package de.his.cs.sys.extensions.wizards.utils;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 public class ResourceSupport {
 	
 	public static void createModuleBeanFile(IProject project) throws CoreException {
-		IFile file = project.getFile("/src/java/"+project.getName()+".module.beans.spring.xml");
+		IFile file = project.getFile("/src/java/module.beans.spring.xml");
 		InputStream is = ResourceSupport.class.getResourceAsStream("templates/modulebeanstemplate.xml");
 		try {
 			file.create(is, true, null);

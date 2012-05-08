@@ -1,4 +1,4 @@
-package h1modules.wizards.utils;
+package de.his.cs.sys.extensions.wizards.utils;
 
 import java.lang.reflect.Array;
 import java.net.URI;

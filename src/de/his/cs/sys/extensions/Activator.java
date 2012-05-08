@@ -1,4 +1,4 @@
-package h1modules;
+package de.his.cs.sys.extensions;
 
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -9,7 +9,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "h1modules"; //$NON-NLS-1$
+	public static final String PLUGIN_ID = "de.his.h1moduleswizard"; //$NON-NLS-1$
 
 	// The shared instance
 	private static Activator plugin;
