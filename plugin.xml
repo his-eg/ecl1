@@ -9,7 +9,7 @@
       </category>
       <wizard
             category="h1modules.hisinoneModule"
-            class="h1modules.wizards.NewModuleProjectWizard"
+            class="de.his.cs.sys.extensions.wizards.NewModuleProjectWizard"
             id="h1modules.moduleProjectWizard"
             name="moduleProjectWizard">
       </wizard>
