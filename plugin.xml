@@ -10,6 +10,7 @@
       <wizard
             category="de.his.cs.sys.extensions.hisinoneModule"
             class="de.his.cs.sys.extensions.wizards.NewModuleProjectWizard"
+            finalPerspective="org.eclipse.jdt.ui.JavaPerspective"
             icon="META-INF/resource/his_modul.gif"
             id="de.his.cs.sys.extensions.moduleProjectWizard"
             name="moduleProjectWizard"
