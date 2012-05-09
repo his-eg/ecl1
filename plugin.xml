@@ -4,13 +4,13 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <category
-            id="h1modules.hisinoneModule"
+            id="de.his.cs.sys.extensions.hisinoneModule"
             name="HISinOne">
       </category>
       <wizard
             category="h1modules.hisinoneModule"
             class="de.his.cs.sys.extensions.wizards.NewModuleProjectWizard"
-            id="h1modules.moduleProjectWizard"
+            id="de.his.cs.sys.extensions.moduleProjectWizard"
             name="moduleProjectWizard">
       </wizard>
    </extension>
