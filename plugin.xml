@@ -8,10 +8,12 @@
             name="HISinOne">
       </category>
       <wizard
-            category="h1modules.hisinoneModule"
+            category="HISinOne"
             class="de.his.cs.sys.extensions.wizards.NewModuleProjectWizard"
+            icon="META-INF/resource/his_modul.gif"
             id="de.his.cs.sys.extensions.moduleProjectWizard"
-            name="moduleProjectWizard">
+            name="moduleProjectWizard"
+            project="true">
       </wizard>
    </extension>
 
