@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: H1 Modules Wizard
 Bundle-SymbolicName: de.his.h1moduleswizard;singleton:=true
-Bundle-Version: 0.0.1.2012-05-09
+Bundle-Version: 0.0.1.2012-05-11
 Bundle-Activator: de.his.cs.sys.extensions.Activator
 Bundle-Vendor: HIS GmbH
-Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
+Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
+ org.eclipse.core.runtime;bundle-version="3.7.0",
  org.eclipse.ui.ide;bundle-version="3.7.0",
  org.eclipse.jdt.core;bundle-version="3.7.0",
- org.eclipse.core.resources;bundle-version="3.7.100"
+ org.eclipse.core.resources;bundle-version="3.7.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
