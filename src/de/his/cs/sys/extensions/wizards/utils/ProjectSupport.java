@@ -40,6 +40,7 @@ public class ProjectSupport {
 		addToProjectStructure(project, PATHS);
 		setSourceFolders(project);
 		addProjectDependencies(project);
+		setJreEnvironment(project);
 		} catch (CoreException e) {
 		e.printStackTrace();
 		project = null;
@@ -48,10 +49,19 @@ public class ProjectSupport {
 		return project;
 		}
 
+	private static void setJreEnvironment(IProject project) throws JavaModelException {
+		IJavaProject javaProject = createJavaProject(project);
+		IClasspathEntry containerEntry = JavaCore.newContainerEntry(new Path("org.eclipse.jdt.launching.JRE_CONTAINER"), false);
+		IClasspathEntry[] oldClassPath = javaProject.getRawClasspath();
+		ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>(Arrays.asList(oldClassPath));
+		list.add(containerEntry);
+		javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
+	}
+
 	private static void addProjectDependencies(IProject project) throws JavaModelException {
 		IJavaProject javaProject = createJavaProject(project);
 		IPath path = new Path("/"+WEBAPPS);
-		IClasspathEntry projectEntry = JavaCore.newProjectEntry(path );
+		IClasspathEntry projectEntry = JavaCore.newProjectEntry(path);
 		IClasspathEntry[] oldClassPath = javaProject.getRawClasspath();
 		ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>(Arrays.asList(oldClassPath));
 		list.add(projectEntry);
