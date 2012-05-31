@@ -1,6 +1,7 @@
 package de.his.cs.sys.extensions.wizards;
 
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 
 import org.eclipse.core.resources.IProject;
@@ -44,8 +45,10 @@ public class NewModuleProjectWizard extends Wizard implements INewWizard {
 		}
 		IProject project = ProjectSupport.createProject(projectName, location);
 		try {
-			ResourceSupport.createModuleBeanFile(project);
+			new ResourceSupport(project).createFiles();
 		} catch (CoreException e) {
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
 		return true;
