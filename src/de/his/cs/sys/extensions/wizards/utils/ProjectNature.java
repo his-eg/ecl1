@@ -9,7 +9,7 @@ import org.eclipse.jdt.core.JavaCore;
  */
 public enum ProjectNature {
 
-    /** a java project */
+	/** a java project */
 	JAVA(JavaCore.NATURE_ID),
 
 	/** a project with macker support */
@@ -17,11 +17,11 @@ public enum ProjectNature {
 
 	private final String nature;
 
-    private ProjectNature(String nature) {
-        this.nature = nature;
-    }
+	private ProjectNature(String nature) {
+		this.nature = nature;
+	}
 
-    /**
+	/**
 	 * gets the nature string
 	 *
 	 * @return nature string

@@ -62,6 +62,4 @@ public class NewModuleProjectWizard extends Wizard implements INewWizard {
 		addPage(firstPage);
 	}
 
-
-
 }
