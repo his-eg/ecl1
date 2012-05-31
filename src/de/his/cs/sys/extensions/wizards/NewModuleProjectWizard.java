@@ -13,15 +13,19 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
 import de.his.cs.sys.extensions.wizards.utils.ProjectSupport;
 import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
+
 /**
  * Wizard für das Anlegen eines neuen Modulprojekts
- * 
+ *
  * @author keunecke
  */
 public class NewModuleProjectWizard extends Wizard implements INewWizard {
-	
+
 	private WizardNewProjectCreationPage firstPage;
 
+	/**
+	 * creates a NewModuleProjectWizard
+	 */
 	public NewModuleProjectWizard() {
 		setWindowTitle("HISinOne Module Project Wizard");
 	}
@@ -54,7 +58,7 @@ public class NewModuleProjectWizard extends Wizard implements INewWizard {
 		firstPage.setDescription("Unterstützung bei der Erstellung eines neuen HISinOne Modul Projekts");
 		addPage(firstPage);
 	}
-	
-	
+
+
 
 }

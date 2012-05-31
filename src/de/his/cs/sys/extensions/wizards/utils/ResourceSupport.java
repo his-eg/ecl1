@@ -10,11 +10,17 @@ import org.eclipse.core.runtime.CoreException;
 
 /**
  * Simple Resource access support
- * 
+ *
  * @author keunecke
  */
 public class ResourceSupport {
-	
+
+    /**
+     * creates the spring bean configuration file for the extension
+     *
+     * @param project eclipse project
+     * @throws CoreException if the fail creation fails
+     */
 	public static void createModuleBeanFile(IProject project) throws CoreException {
 		IFile file = project.getFile("/src/java/module.beans.spring.xml");
 		InputStream is = ResourceSupport.class.getResourceAsStream("templates/modulebeanstemplate.xml");
@@ -25,7 +31,7 @@ public class ResourceSupport {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
-		} 
+		}
 	}
 
 }

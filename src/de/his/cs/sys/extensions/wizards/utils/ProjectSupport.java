@@ -20,23 +20,30 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
 /**
- * 
+ * manages project creation
+ *
  * @author keunecke
- * 
  */
 public class ProjectSupport {
-	
+
 	private static final String WEBAPPS = "webapps";
 	private static final String[] PATHS = { "src/java", "src/test", "src/generated", "resource" };
 
+	/**
+	 * creates a new project with a skeleton
+	 *
+	 * @param projectName name of project
+	 * @param location location
+	 * @return IProject instance
+	 */
 	public static IProject createProject(String projectName, URI location) {
 		Assert.isNotNull(projectName);
 		Assert.isTrue(projectName.trim().length() > 0);
-		
+
 		IProject project = createBaseProject(projectName, location);
 		try {
 		addNatures(project);
-		
+
 		addToProjectStructure(project, PATHS);
 		setSourceFolders(project);
 		addProjectDependencies(project);
@@ -45,7 +52,7 @@ public class ProjectSupport {
 		e.printStackTrace();
 		project = null;
 		}
-		
+
 		return project;
 		}
 
@@ -124,7 +131,7 @@ public class ProjectSupport {
 	/**
 	 * Create a folder structure with a parent root, overlay, and a few child
 	 * folders.
-	 * 
+	 *
 	 * @param newProject
 	 * @param paths
 	 * @throws CoreException
