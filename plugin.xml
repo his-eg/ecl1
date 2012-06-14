@@ -13,7 +13,7 @@
             finalPerspective="org.eclipse.jdt.ui.JavaPerspective"
             icon="META-INF/resource/his_modul.gif"
             id="de.his.cs.sys.extensions.moduleProjectWizard"
-            name="extensionProjectWizard"
+            name="HISinOne Extension"
             project="true">
       </wizard>
    </extension>
