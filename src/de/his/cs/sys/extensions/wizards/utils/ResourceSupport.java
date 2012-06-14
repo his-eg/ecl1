@@ -35,12 +35,12 @@ public class ResourceSupport {
 	 * @throws UnsupportedEncodingException
 	 */
 	public void createFiles() throws CoreException, UnsupportedEncodingException {
-		String filename = "/src/java/module.beans.spring.xml";
-		InputStream is = ResourceSupport.class.getResourceAsStream("templates/modulebeanstemplate.xml");
+		String filename = "/src/java/extension.beans.spring.xml";
+		InputStream is = ResourceSupport.class.getResourceAsStream("templates/src/java/extension.beans.spring.xml.template");
 		writeProjectFile(filename, is);
 
-		is = new ByteArrayInputStream(("module.name=" + project.getName()).getBytes("UTF-8"));
-		writeProjectFile("/module.ant.properties", is);
+		is = new ByteArrayInputStream(("extension.name=" + project.getName()).getBytes("UTF-8"));
+		writeProjectFile("/extension.ant.properties", is);
 
 		is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build").getBytes("UTF-8"));
 		writeProjectFile("/.gitignore", is);
