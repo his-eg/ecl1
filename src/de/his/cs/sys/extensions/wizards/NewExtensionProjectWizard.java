@@ -20,14 +20,14 @@ import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
  *
  * @author keunecke
  */
-public class NewModuleProjectWizard extends Wizard implements INewWizard {
+public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 
 	private WizardNewProjectCreationPage firstPage;
 
 	/**
 	 * creates a NewModuleProjectWizard
 	 */
-	public NewModuleProjectWizard() {
+	public NewExtensionProjectWizard() {
 		setWindowTitle("HISinOne Module Project Wizard");
 	}
 
