@@ -4,17 +4,25 @@
    <extension
          point="org.eclipse.ui.newWizards">
       <category
-            id="de.his.cs.sys.extensions.hisinoneModule"
+            id="de.his.cs.sys.extensions"
             name="HISinOne">
       </category>
       <wizard
-            category="de.his.cs.sys.extensions.hisinoneModule"
+            category="de.his.cs.sys.extensions"
             class="de.his.cs.sys.extensions.wizards.NewExtensionProjectWizard"
             finalPerspective="org.eclipse.jdt.ui.JavaPerspective"
             icon="META-INF/resource/his_modul.gif"
             id="de.his.cs.sys.extensions.moduleProjectWizard"
-            name="HISinOne Extension"
+            name="HISinOne Extension Project"
             project="true">
+      </wizard>
+      <wizard
+            category="de.his.cs.sys.extensions"
+            class="de.his.cs.sys.extensions.wizards.NewEnrollCheckerWizard"
+            icon="icons/sample.gif"
+            id="de.his.cs.sys.extensions.wizards.NewEnrollCheckerWizard"
+            name="New EnrollChecker"
+            project="false">
       </wizard>
    </extension>
 

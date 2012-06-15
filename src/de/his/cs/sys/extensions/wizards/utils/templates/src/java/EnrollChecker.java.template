@@ -1,0 +1,106 @@
+package [package];
+
+import java.util.List;
+
+import com.google.common.collect.Lists;
+
+import de.his.appclient.jsf.cm.exa.enrollment.allocation.AggregationNode;
+import de.his.appclient.jsf.cm.exa.enrollment.dialog.PlanelementAggregate;
+import de.his.appserver.model.cm.exa.eventprocess.Planelement;
+import de.his.appserver.model.psv.Person;
+import de.his.appserver.persistence.dao.iface.cm.exa.eventprocess.PlanelementDao;
+import de.his.appserver.persistence.dao.iface.psv.his.PersonDao;
+import de.his.appserver.service.iface.cm.exa.enrollment.checker.UnitcheckerInvoker;
+import de.his.appserver.service.iface.common.message.MessageType;
+import de.his.appserver.service.impl.cm.exa.enrollment.checker.UcheckerBase;
+
+public class [name] extends UcheckerBase implements UnitcheckerInvoker {
+    private PlanelementDao planelementDao;
+    private PersonDao personDao;
+
+    /**
+     * Checks whether booking is allowed
+     *
+     * @param aggregationNode Unit information with all bookings
+     * @return true, if booking is allowed, false otherwise
+     */
+    @Override
+    public boolean check(AggregationNode aggregationNode) {
+        List<PlanelementAggregate> forbiddenElements = Lists.newLinkedList();
+        Person person = personDao.findById(super.getPersonId());
+
+        // Iterate over all planelements. Remove the ones that are disallowed
+        // by adding them to the forbiddenElements list
+        for (PlanelementAggregate planelementAggregate : aggregationNode.getPlanelements()) {
+            Planelement planelement = planelementDao.findById(planelementAggregate.getPlanelementId());
+
+            // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+            // TODO: replace this example with your own logic
+            if (planelement.getGender() != null){
+                Long personGender = person.getGender().getHiskeyId();
+                Long elementGender = planelement.getGender().getHiskeyId();
+
+                if (!personGender.equals(elementGender)) {
+                    forbiddenElements.add(planelementAggregate);
+                }
+            }
+
+        }
+
+        return processForbiddenElements(aggregationNode, forbiddenElements,
+             "cm.exa.enrollment.wrongGender", MessageType.ERROR, person.getGender().getDefaulttext());
+
+        // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    }
+
+
+    /**
+     * Removes the disallowed elements. If no element is left, create an
+     * error message.
+     *
+     * @param aggregationNode   Unit information with bookings
+     * @param forbiddenElements list of elements to remove
+     * @param message           message key
+     * @param type              type of message (error, warning)
+     * @param params            optional parameters for the message
+     * @return true, if booking is allowed; false otherwise
+     */
+    private boolean processForbiddenElements(AggregationNode aggregationNode, List<PlanelementAggregate> forbiddenElements, String message, MessageType type, String... params) {
+        // remove disallowed elements
+        for (PlanelementAggregate planelementAggregate : forbiddenElements) {
+            aggregationNode.removeFromPlanelementAggregate(planelementAggregate);
+        }
+
+        // create error message, if no elements are left
+        if (aggregationNode.getPlanelements().isEmpty()) {
+            if (!forbiddenElements.isEmpty()) {
+               aggregationNode.addMessage(message, type, (Object[]) params);
+            }
+            aggregationNode.setForbidden(true);
+            return false;
+        }
+
+
+        return true;
+    }
+
+
+    // injection methods
+
+
+    /**
+     * @param planelementDao the planelementDao to set
+     */
+    public void setPlanelementDao(PlanelementDao planelementDao) {
+        this.planelementDao = planelementDao;
+    }
+
+    /**
+     * @param personDao
+     */
+    public void setPersonDao(PersonDao personDao) {
+        this.personDao = personDao;
+    }
+
+}
