@@ -28,7 +28,7 @@ public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 	 * creates a NewModuleProjectWizard
 	 */
 	public NewExtensionProjectWizard() {
-		setWindowTitle("HISinOne Module Project Wizard");
+		setWindowTitle("HISinOne Extension Project Wizard");
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 	public void addPages() {
 		super.addPages();
 		firstPage = new WizardNewProjectCreationPage("New HISinOne Module Project");
-		firstPage.setDescription("Unterstützung bei der Erstellung eines neuen HISinOne Modul Projekts");
+		firstPage.setDescription("Unterstützung bei der Erstellung eines neuen HISinOne Extension Projekts");
 		addPage(firstPage);
 	}
 
