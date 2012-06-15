@@ -42,15 +42,15 @@ public class ProjectSupport {
 
 		IProject project = createBaseProject(projectName, location);
 		try {
-		addNatures(project);
-
-		addToProjectStructure(project, PATHS);
-		setSourceFolders(project);
-		addProjectDependencies(project);
-		setJreEnvironment(project);
+			addNatures(project);
+	
+			addToProjectStructure(project, PATHS);
+			setSourceFolders(project);
+			addProjectDependencies(project);
+			setJreEnvironment(project);
 		} catch (CoreException e) {
-		e.printStackTrace();
-		project = null;
+			e.printStackTrace();
+			project = null;
 		}
 
 		return project;
