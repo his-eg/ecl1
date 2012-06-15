@@ -142,6 +142,7 @@ public class ProjectSupport {
 			IFolder etcFolders = newProject.getFolder(path);
 			createFolder(etcFolders);
 		}
+		createFolder(newProject.getFolder("/src/java/" + newProject.getName().replace('.', '/')));
 	}
 
 	private static void addNatures(IProject project) throws CoreException {
