@@ -19,7 +19,7 @@
       <wizard
             category="de.his.cs.sys.extensions"
             class="de.his.cs.sys.extensions.wizards.NewEnrollCheckerWizard"
-            icon="icons/sample.gif"
+            icon="META-INF/resource/enroll.gif"
             id="de.his.cs.sys.extensions.wizards.NewEnrollCheckerWizard"
             name="New EnrollChecker"
             project="false">
