@@ -19,10 +19,10 @@ public class [name] extends UcheckerBase implements UnitcheckerInvoker {
     private PersonDao personDao;
 
     /**
-     * Checks whether booking is allowed
+     * Checks whether enrollment is allowed
      *
-     * @param aggregationNode Unit information with all bookings
-     * @return true, if booking is allowed, false otherwise
+     * @param aggregationNode Unit information with all enrollments
+     * @return true, if enrollment is allowed, false otherwise
      */
     @Override
     public boolean check(AggregationNode aggregationNode) {
@@ -59,12 +59,12 @@ public class [name] extends UcheckerBase implements UnitcheckerInvoker {
      * Removes the disallowed elements. If no element is left, create an
      * error message.
      *
-     * @param aggregationNode   Unit information with bookings
+     * @param aggregationNode   Unit information with enrollments
      * @param forbiddenElements list of elements to remove
      * @param message           message key
      * @param type              type of message (error, warning)
      * @param params            optional parameters for the message
-     * @return true, if booking is allowed; false otherwise
+     * @return true, if enrollment is allowed; false otherwise
      */
     private boolean processForbiddenElements(AggregationNode aggregationNode, List<PlanelementAggregate> forbiddenElements, String message, MessageType type, String... params) {
         // remove disallowed elements
