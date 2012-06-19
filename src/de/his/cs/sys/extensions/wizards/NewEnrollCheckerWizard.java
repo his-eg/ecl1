@@ -1,6 +1,12 @@
 package de.his.cs.sys.extensions.wizards;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -52,7 +58,7 @@ public class NewEnrollCheckerWizard extends Wizard implements INewWizard {
 	    this.selection = selection;
 	}
 
-	static class NewEnrollCheckerWizardPage extends WizardNewFileCreationPage {
+	class NewEnrollCheckerWizardPage extends WizardNewFileCreationPage {
 
 	    public NewEnrollCheckerWizardPage (IStructuredSelection selection) {
 	        super("NewConfigFileWizardPage", selection);
@@ -63,9 +69,29 @@ public class NewEnrollCheckerWizard extends Wizard implements INewWizard {
 
 	    @Override
 	    protected InputStream getInitialContents() {
-	    	// TODO add entry to extension.beans.spring.xml
-	    	// TODO replace variables
-	    	return ResourceSupport.class.getResourceAsStream("templates/src/java/EnrollChecker.java.template");
+
+	    	// guess package and name
+	    	String name = this.getFileName().replace(".java", "");
+	    	String packageName = this.getContainerFullPath().toPortableString();
+	    	int pos = packageName.indexOf("/src/java/");
+	    	packageName = packageName.substring(pos + 10).replace('/', '.');
+
+	    	// write file with replaced variables
+	    	ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+	    	PrintStream writer = new PrintStream(buffer);
+	    	InputStream is = ResourceSupport.class.getResourceAsStream("templates/src/java/EnrollChecker.java.template");
+	    	BufferedReader br = new BufferedReader(new InputStreamReader(is));
+	    	try {
+		    	String line = br.readLine();
+		    	while (line != null) {
+		    		String temp = line.replace("[name]", name).replace("[package]", packageName);
+		    		writer.println(temp);
+		    		line = br.readLine();
+		    	}
+	    	} catch (IOException e) {
+	    		e.printStackTrace();
+	    	}
+	    	return new ByteArrayInputStream(buffer.toByteArray());
 	    }
 	}
 }
