@@ -11,7 +11,7 @@
             category="de.his.cs.sys.extensions"
             class="de.his.cs.sys.extensions.wizards.NewExtensionProjectWizard"
             finalPerspective="org.eclipse.jdt.ui.JavaPerspective"
-            icon="META-INF/resource/his_modul.gif"
+            icon="META-INF/resource/his1_favicon.gif"
             id="de.his.cs.sys.extensions.moduleProjectWizard"
             name="HISinOne Extension Project"
             project="true">
@@ -19,9 +19,9 @@
       <wizard
             category="de.his.cs.sys.extensions"
             class="de.his.cs.sys.extensions.wizards.NewEnrollCheckerWizard"
-            icon="META-INF/resource/enroll.gif"
+            icon="META-INF/resource/door_in.gif"
             id="de.his.cs.sys.extensions.wizards.NewEnrollCheckerWizard"
-            name="New EnrollChecker"
+            name="EnrollChecker"
             project="false">
       </wizard>
    </extension>
