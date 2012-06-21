@@ -16,6 +16,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
 import de.his.cs.sys.extensions.wizards.utils.WorkspaceSupport;
@@ -28,7 +29,7 @@ import de.his.cs.sys.extensions.wizards.utils.WorkspaceSupport;
  */
 public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 
-	private Combo projectCombo;
+	private List projectCombo;
 
 	/**
 	 * @param pageName
@@ -46,7 +47,7 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		projectChoice.setLayout(gl);
 		Label projectChoiceLabel = new Label(projectChoice, NONE);
 		projectChoiceLabel.setText("Referenced Projects");
-		projectCombo = new Combo(projectChoice, NONE);
+		projectCombo = new List(projectChoice, NONE);
 		Collection<String> references = new WorkspaceSupport().getPossibleProjectsToReference();
 		for (String ref : references) {
 			projectCombo.add(ref);
