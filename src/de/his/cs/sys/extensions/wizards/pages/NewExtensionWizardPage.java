@@ -9,9 +9,11 @@
  */
 package de.his.cs.sys.extensions.wizards.pages;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -29,7 +31,7 @@ import de.his.cs.sys.extensions.wizards.utils.WorkspaceSupport;
  */
 public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 
-	private List projectCombo;
+	private List projectList;
 
 	/**
 	 * @param pageName
@@ -47,11 +49,20 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		projectChoice.setLayout(gl);
 		Label projectChoiceLabel = new Label(projectChoice, NONE);
 		projectChoiceLabel.setText("Referenced Projects");
-		projectCombo = new List(projectChoice, NONE);
+		projectList = new List(projectChoice, SWT.MULTI);
 		Collection<String> references = new WorkspaceSupport().getPossibleProjectsToReference();
 		for (String ref : references) {
-			projectCombo.add(ref);
+			projectList.add(ref);
 		}
+	}
+	
+	public Collection<String> getToProjectsToReference() {
+		Collection<String> result = new ArrayList<String>();
+		String[] selection = projectList.getSelection();
+		for (String project : selection) {
+			result.add(project);
+		}
+		return result;
 	}
 
 }
