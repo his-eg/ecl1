@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -23,6 +25,7 @@ import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
+import de.his.cs.sys.extensions.wizards.utils.templates.TemplateVariableReplacer;
 
 /**
  * creates a new EnrollChecker
@@ -83,28 +86,13 @@ public class NewEnrollCheckerWizard extends Wizard implements INewWizard {
 			String packageName = this.getContainerFullPath().toPortableString();
 			int pos = packageName.indexOf("/src/java/");
 			packageName = packageName.substring(pos + 10).replace('/', '.');
-
 			writeSpringEntry(packageName, name);
-
 			// write file with replaced variables
-			ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-			PrintStream writer = new PrintStream(buffer);
-			InputStream is = ResourceSupport.class
-					.getResourceAsStream("templates/src/java/EnrollChecker.java.template");
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			try {
-				String line = br.readLine();
-				while (line != null) {
-					String temp = line.replace("[name]", name).replace("[package]", packageName);
-					writer.println(temp);
-					line = br.readLine();
-				}
-				br.close();
-				writer.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return new ByteArrayInputStream(buffer.toByteArray());
+			Map<String, String> variables = new HashMap<String, String>();
+			variables.put("[name]", name);
+			variables.put("[package]", packageName);
+			String content = new TemplateVariableReplacer("src/java/EnrollChecker.java.template", variables).replace();
+			return new ByteArrayInputStream(content.getBytes());
 		}
 
 		private void writeSpringEntry(String packageName, String name) {
