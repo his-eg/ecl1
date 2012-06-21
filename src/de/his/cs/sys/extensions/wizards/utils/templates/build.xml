@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="extension" default="jar">
+	<description>
+            Build Script for HISinOne Extension
+    </description>
+
+	<!-- Lokal können per Propertiesdatei Werte überschrieben werden -->
+	<property file="${user.name}.ant.properties" />
+	
+	<!-- 
+	Parameter, die modulspezifisch sind, werden in der modul.ant.properties gepflegt:
+	- Modulname: extension.name
+	-->
+	<property file="extension.ant.properties" />
+
+	<property name="build" value="build" />
+
+	<property name="dist" value="dist" />
+
+	<property name="target-file" value="${dist}/${extension.name}.jar" />
+
+	<condition property="webapps" value="../webapps" else="../../webapps">
+		<resourceexists>
+		  <file file="../webapps" />
+		</resourceexists>
+	</condition>
+
+	<property name="qisserver" value="${webapps}/qisserver" />
+
+	<property name="qisserver-webinf" value="${qisserver}/WEB-INF" />
+
+	<property name="qisserver-lib" value="${qisserver-webinf}/lib" />
+
+	<property name="qisserver-lib-compile" value="${qisserver-webinf}/lib-compile" />
+
+	<property name="qisserver-classes" value="${qisserver-webinf}/classes" />
+	
+	<property name="classes-target" value="${build}/classes" />
+	
+	<property name="test-target" value="${build}/test" />
+	
+	<property name="resources-target" value="${classes-target}/META-INF/resources" />
+	
+	<property name="build-results" value="${build}/results"/>
+	
+	<path id="compile-classpath">
+		<pathelement location="${qisserver-classes}"/>
+		<fileset dir="${qisserver-lib}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${qisserver-lib-compile}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="lib" erroronmissingdir="false">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+	
+	<path id="compile-sourcepath">
+		<dirset dir="src">
+			<include name="java" />
+			<include name="generated" />
+		</dirset>
+	</path>
+	
+	<path id="compile-test-classpath">
+		<pathelement location="${qisserver-classes}"/>
+		<dirset dir="${classes-target}" />
+		<dirset dir="${test-target}" />
+		<fileset dir="${qisserver-lib}">
+			<include name="*.jar" />
+			<exclude name="ant-1.8.1.jar"/>
+		</fileset>
+		<fileset dir="${qisserver-lib-compile}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="lib" erroronmissingdir="false">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+	
+	<path id="compile-test-sourcepath">
+		<dirset dir="src">
+			<include name="test" />
+		</dirset>
+	</path>
+	
+	<target name="debug">
+		<echo>Debuginformationen</echo>
+		<echo>Liste aller Properties:</echo>
+		<echoproperties />
+	</target>
+
+	<target name="clean">
+		<delete failonerror="false">
+			<fileset dir="${build-results}" />
+			<fileset dir="${test-target}" />
+			<fileset dir="${classes-target}" />
+			<fileset dir="${resources-target}" />
+			<fileset dir="${build}" />
+			<fileset dir="${dist}" />
+		</delete>
+	</target>
+
+	<target name="init" depends="clean">
+		<mkdir dir="${build}" />
+		<mkdir dir="${build-results}" />
+		<mkdir dir="${test-target}" />
+		<mkdir dir="${classes-target}" />
+		<mkdir dir="${resources-target}" />
+		<mkdir dir="${dist}" />
+	</target>
+
+	<target name="compile" depends="init">
+		<javac srcdir="src/java" destdir="${classes-target}" debug="on" includeantruntime="false">
+			<classpath refid="compile-classpath" />
+			<sourcepath refid="compile-sourcepath" />
+		</javac>
+		<copy todir="${classes-target}" verbose="true">
+			<fileset dir="src/java">
+				<filename name="**/*.java" negate="true" />
+			</fileset>
+		</copy>
+		<copy todir="${resources-target}">
+			<fileset dir="resource" />
+		</copy>
+	</target>
+
+	<target name="jar" depends="compile" description="Extension JAR für die Distribution erzeugen">
+		<jar destfile="${target-file}" basedir="${classes-target}" index="true" >
+			<manifest>
+				<attribute name="Extension-Name" value="${extension.name}"/>
+				<attribute name="Extension-Version" value="${extension.version}"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="compile-tests" depends="compile">
+		<javac srcdir="src/test" destdir="${test-target}" debug="on" includeantruntime="false">
+			<classpath refid="compile-test-classpath" />
+			<sourcepath refid="compile-test-sourcepath" />
+		</javac>
+	</target>
+	
+	<target name="test" depends="compile-tests">
+		<junit printsummary="yes" haltonerror="true" fork="yes" forkmode="once">
+			<jvmarg value="-XX:MaxPermSize=512M"/>
+			<classpath refid="compile-test-classpath" />
+			<batchtest todir="${build-results}">
+				<fileset dir="${test-target}" />
+				<formatter type="plain" usefile="false" />
+				<formatter type="xml" usefile="true"/>
+			</batchtest>
+			<sysproperty key="java.library.path" value="lib" />
+		</junit>
+	</target>
+	
+	<target name="deploy" depends="jar">
+		<copy todir="${qisserver-lib}">
+			<fileset dir="${dist}">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+	</target>
+
+</project>
