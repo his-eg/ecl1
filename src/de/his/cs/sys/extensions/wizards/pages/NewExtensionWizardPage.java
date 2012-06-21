@@ -56,7 +56,7 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		}
 	}
 	
-	public Collection<String> getToProjectsToReference() {
+	public Collection<String> getProjectsToReference() {
 		Collection<String> result = new ArrayList<String>();
 		String[] selection = projectList.getSelection();
 		for (String project : selection) {

@@ -3,6 +3,7 @@ package de.his.cs.sys.extensions.wizards.utils;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -27,6 +28,15 @@ import org.eclipse.jdt.core.JavaModelException;
 public class ProjectSupport {
 
 	private static final String[] PATHS = { "src/java", "src/test", "src/generated", "resource" };
+	
+	private final Collection<String> referencedProjects;
+	
+	/**
+	 * @param projects the projects to reference
+	 */
+	public ProjectSupport(Collection<String> projects) {
+		this.referencedProjects = projects;
+	}
 
 	/**
 	 * creates a new project with a skeleton
@@ -35,7 +45,7 @@ public class ProjectSupport {
 	 * @param location location
 	 * @return IProject instance
 	 */
-	public static IProject createProject(String projectName, URI location) {
+	public IProject createProject(String projectName, URI location) {
 		Assert.isNotNull(projectName);
 		Assert.isTrue(projectName.trim().length() > 0);
 
@@ -64,14 +74,16 @@ public class ProjectSupport {
 		javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
 	}
 
-	private static void addProjectDependencies(IProject project) throws JavaModelException {
+	private void addProjectDependencies(IProject project) throws JavaModelException {
 		IJavaProject javaProject = createJavaProject(project);
-		IPath path = new Path("/" + HISConstants.WEBAPPS);
-		IClasspathEntry projectEntry = JavaCore.newProjectEntry(path);
-		IClasspathEntry[] oldClassPath = javaProject.getRawClasspath();
-		ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>(Arrays.asList(oldClassPath));
-		list.add(projectEntry);
-		javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
+		for (String referencedProject : this.referencedProjects) {
+			IPath path = new Path("/" + referencedProject);
+			IClasspathEntry projectEntry = JavaCore.newProjectEntry(path);
+			IClasspathEntry[] oldClassPath = javaProject.getRawClasspath();
+			ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>(Arrays.asList(oldClassPath));
+			list.add(projectEntry);
+			javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
+		}
 	}
 
 	private static void setSourceFolders(IProject project) throws JavaModelException {

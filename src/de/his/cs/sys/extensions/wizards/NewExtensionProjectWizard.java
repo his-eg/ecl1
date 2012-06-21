@@ -23,7 +23,7 @@ import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
  */
 public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 
-	private WizardNewProjectCreationPage firstPage;
+	private NewExtensionWizardPage firstPage;
 
 	/**
 	 * creates a NewModuleProjectWizard
@@ -44,7 +44,7 @@ public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 		if(!firstPage.useDefaults()) {
 			location = firstPage.getLocationURI();
 		}
-		IProject project = ProjectSupport.createProject(projectName, location);
+		IProject project = new ProjectSupport(firstPage.getProjectsToReference()).createProject(projectName, location);
 		try {
 			new ResourceSupport(project).createFiles();
 		} catch (CoreException e) {
