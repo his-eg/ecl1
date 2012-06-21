@@ -39,7 +39,7 @@ public class ResourceSupport {
 		InputStream is = ResourceSupport.class.getResourceAsStream("templates/src/java/extension.beans.spring.xml.template");
 		writeProjectFile(filename, is);
 
-		is = new ByteArrayInputStream(("extension.name=" + project.getName()).getBytes("UTF-8"));
+		is = new ByteArrayInputStream(("extension.name=" + project.getName() + "\nextension.version=0.0.1").getBytes("UTF-8"));
 		writeProjectFile("/extension.ant.properties", is);
 
 		is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build").getBytes("UTF-8"));
