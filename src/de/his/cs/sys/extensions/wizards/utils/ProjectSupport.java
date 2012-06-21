@@ -26,7 +26,6 @@ import org.eclipse.jdt.core.JavaModelException;
  */
 public class ProjectSupport {
 
-	private static final String WEBAPPS = "webapps";
 	private static final String[] PATHS = { "src/java", "src/test", "src/generated", "resource" };
 
 	/**
@@ -67,7 +66,7 @@ public class ProjectSupport {
 
 	private static void addProjectDependencies(IProject project) throws JavaModelException {
 		IJavaProject javaProject = createJavaProject(project);
-		IPath path = new Path("/"+WEBAPPS);
+		IPath path = new Path("/" + HISConstants.WEBAPPS);
 		IClasspathEntry projectEntry = JavaCore.newProjectEntry(path);
 		IClasspathEntry[] oldClassPath = javaProject.getRawClasspath();
 		ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>(Arrays.asList(oldClassPath));

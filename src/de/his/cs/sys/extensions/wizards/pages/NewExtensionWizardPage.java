@@ -9,10 +9,16 @@
  */
 package de.his.cs.sys.extensions.wizards.pages;
 
+import java.util.Collection;
+
+import org.eclipse.core.resources.IProject;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
+
+import de.his.cs.sys.extensions.wizards.utils.WorkspaceSupport;
 
 /**
  * Extended New Project Wizard Page asking for additional information on extensions
@@ -21,6 +27,8 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
  * @version $Revision$ 
  */
 public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
+
+	private Combo projectCombo;
 
 	/**
 	 * @param pageName
@@ -34,10 +42,15 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		super.createControl(parent);
 		Composite control = (Composite) getControl();
 		Composite projectChoice = new Composite(control, NONE);
-		GridLayout gl = new GridLayout(4, false);
+		GridLayout gl = new GridLayout(2, false);
 		projectChoice.setLayout(gl);
 		Label projectChoiceLabel = new Label(projectChoice, NONE);
-		projectChoiceLabel.setText("Project");
+		projectChoiceLabel.setText("Referenced Projects");
+		projectCombo = new Combo(projectChoice, NONE);
+		Collection<String> references = new WorkspaceSupport().getPossibleProjectsToReference();
+		for (String ref : references) {
+			projectCombo.add(ref);
+		}
 	}
 
 }
