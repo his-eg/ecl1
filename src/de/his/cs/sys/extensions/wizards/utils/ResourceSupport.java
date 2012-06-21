@@ -9,10 +9,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+
+import de.his.cs.sys.extensions.wizards.utils.templates.TemplateVariableReplacer;
 
 /**
  * Simple Resource access support
@@ -20,6 +24,9 @@ import org.eclipse.core.runtime.CoreException;
  * @author keunecke, brummermann
  */
 public class ResourceSupport {
+	
+	private final Map<String, String> extensionAntPropertiesReplacements = new HashMap<String, String>();
+	
 	private final IProject project;
 
 	/**
@@ -29,6 +36,8 @@ public class ResourceSupport {
 	 */
 	public ResourceSupport(IProject project) {
 		this.project = project;
+		extensionAntPropertiesReplacements.put("[name]", project.getName());
+		extensionAntPropertiesReplacements.put("[version]", "0.0.1");
 	}
 
 
@@ -39,27 +48,11 @@ public class ResourceSupport {
 	 * @throws UnsupportedEncodingException
 	 */
 	public void createFiles() throws CoreException, UnsupportedEncodingException {
-		String filename = "/src/java/extension.beans.spring.xml";
 		InputStream is = ResourceSupport.class.getResourceAsStream("templates/src/java/extension.beans.spring.xml.template");
-		writeProjectFile(filename, is);
+		writeProjectFile("/src/java/extension.beans.spring.xml", is);
 
-		is = ResourceSupport.class.getResourceAsStream("templates/extension.ant.properties");
-		BufferedReader br = new BufferedReader(new InputStreamReader(is));
-		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-		PrintStream writer = new PrintStream(buffer);
-		try {
-			String line = br.readLine();
-			while(br.readLine() != null)  {
-				String temp = line.replace("[name]", this.project.getName());
-				System.out.println(line + " -> " + temp);
-				writer.println(temp);
-				writer.flush();
-				line = br.readLine();
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		writeProjectFile("/extension.ant.properties", new ByteArrayInputStream(buffer.toByteArray()));
+		String content = new TemplateVariableReplacer("extension.ant.properties", extensionAntPropertiesReplacements).replace();
+		writeProjectFile("/extension.ant.properties", new ByteArrayInputStream(content.getBytes()));
 
 		is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build").getBytes("UTF-8"));
 		writeProjectFile("/.gitignore", is);
