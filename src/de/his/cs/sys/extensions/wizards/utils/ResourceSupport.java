@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
-import de.his.cs.sys.extensions.wizards.utils.templates.TemplateVariableReplacer;
+import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
 
 /**
  * Simple Resource access support
@@ -51,9 +51,12 @@ public class ResourceSupport {
 		InputStream is = ResourceSupport.class.getResourceAsStream("templates/src/java/extension.beans.spring.xml.template");
 		writeProjectFile("/src/java/extension.beans.spring.xml", is);
 
-		String content = new TemplateVariableReplacer("extension.ant.properties", extensionAntPropertiesReplacements).replace();
+		String content = new TemplateManager("extension.ant.properties", extensionAntPropertiesReplacements).getContent();
 		writeProjectFile("/extension.ant.properties", new ByteArrayInputStream(content.getBytes()));
-
+		
+		String buildXml = new TemplateManager("build.xml").getContent();
+		writeProjectFile("/build.xml", new ByteArrayInputStream(buildXml.getBytes()));
+		
 		is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build").getBytes("UTF-8"));
 		writeProjectFile("/.gitignore", is);
 	}

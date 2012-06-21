@@ -25,7 +25,7 @@ import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
-import de.his.cs.sys.extensions.wizards.utils.templates.TemplateVariableReplacer;
+import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
 
 /**
  * creates a new EnrollChecker
@@ -91,7 +91,7 @@ public class NewEnrollCheckerWizard extends Wizard implements INewWizard {
 			Map<String, String> variables = new HashMap<String, String>();
 			variables.put("[name]", name);
 			variables.put("[package]", packageName);
-			String content = new TemplateVariableReplacer("src/java/EnrollChecker.java.template", variables).replace();
+			String content = new TemplateManager("src/java/EnrollChecker.java.template", variables).getContent();
 			return new ByteArrayInputStream(content.getBytes());
 		}
 
