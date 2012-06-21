@@ -12,6 +12,7 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
+import de.his.cs.sys.extensions.wizards.pages.NewExtensionWizardPage;
 import de.his.cs.sys.extensions.wizards.utils.ProjectSupport;
 import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
 
@@ -57,7 +58,7 @@ public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 	@Override
 	public void addPages() {
 		super.addPages();
-		firstPage = new WizardNewProjectCreationPage("New HISinOne Module Project");
+		firstPage = new NewExtensionWizardPage("New HISinOne Module Project");
 		firstPage.setDescription("Unterstützung bei der Erstellung eines neuen HISinOne Extension Projekts");
 		addPage(firstPage);
 	}
