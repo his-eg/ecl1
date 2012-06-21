@@ -1,9 +1,13 @@
 package de.his.cs.sys.extensions.wizards.utils;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 
 import org.eclipse.core.resources.IFile;
@@ -39,8 +43,23 @@ public class ResourceSupport {
 		InputStream is = ResourceSupport.class.getResourceAsStream("templates/src/java/extension.beans.spring.xml.template");
 		writeProjectFile(filename, is);
 
-		is = new ByteArrayInputStream(("extension.name=" + project.getName() + "\nextension.version=0.0.1").getBytes("UTF-8"));
-		writeProjectFile("/extension.ant.properties", is);
+		is = ResourceSupport.class.getResourceAsStream("templates/extension.ant.properties");
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+		PrintStream writer = new PrintStream(buffer);
+		try {
+			String line = br.readLine();
+			while(br.readLine() != null)  {
+				String temp = line.replace("[name]", this.project.getName());
+				System.out.println(line + " -> " + temp);
+				writer.println(temp);
+				writer.flush();
+				line = br.readLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		writeProjectFile("/extension.ant.properties", new ByteArrayInputStream(buffer.toByteArray()));
 
 		is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build").getBytes("UTF-8"));
 		writeProjectFile("/.gitignore", is);
