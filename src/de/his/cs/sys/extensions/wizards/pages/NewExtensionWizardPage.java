@@ -43,12 +43,12 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 	public void createControl(Composite parent) {
 		super.createControl(parent);
 		Composite control = (Composite) getControl();
-		Composite projectChoice = new Composite(control, NONE);
-		GridLayout gl = new GridLayout(2, false);
+		Composite projectChoice = new Composite(control, SWT.BORDER | SWT.TOP);
+		GridLayout gl = new GridLayout(2, true);
 		projectChoice.setLayout(gl);
-		Label projectChoiceLabel = new Label(projectChoice, NONE);
+		Label projectChoiceLabel = new Label(projectChoice, SWT.TOP);
 		projectChoiceLabel.setText("Referenced Projects");
-		projectList = new List(projectChoice, SWT.MULTI);
+		projectList = new List(projectChoice, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
 		java.util.List<String> references = new WorkspaceSupport().getPossibleProjectsToReference();
 		int index = 0;
 		for (String ref : references) {
