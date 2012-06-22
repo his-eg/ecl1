@@ -10,7 +10,7 @@
 package de.his.cs.sys.extensions.wizards.utils;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
@@ -25,8 +25,8 @@ import org.eclipse.core.runtime.Path;
  */
 public class WorkspaceSupport {
 	
-	public Collection<String> getPossibleProjectsToReference() {
-		Collection<String> result = new ArrayList<String>();
+	public List<String> getPossibleProjectsToReference() {
+		List<String> result = new ArrayList<String>();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IWorkspaceRoot root = workspace.getRoot();
 		IProject[] projects = root.getProjects();
