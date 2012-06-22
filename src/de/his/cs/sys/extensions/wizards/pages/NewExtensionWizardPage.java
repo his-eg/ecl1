@@ -44,7 +44,7 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		super.createControl(parent);
 		Composite control = (Composite) getControl();
 		Composite projectChoice = new Composite(control, SWT.BORDER | SWT.TOP);
-		GridLayout gl = new GridLayout(2, true);
+		GridLayout gl = new GridLayout(2, false);
 		projectChoice.setLayout(gl);
 		Label projectChoiceLabel = new Label(projectChoice, SWT.TOP);
 		projectChoiceLabel.setText("Referenced Projects");
