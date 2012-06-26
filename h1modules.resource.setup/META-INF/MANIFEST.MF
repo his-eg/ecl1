@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Extension Project Resource Setup
+Bundle-SymbolicName: h1modules.resource.setup;singleton:=true
+Bundle-Version: 0.0.1.2012-06-26
+Bundle-Activator: h1modules.resource.setup.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ de.his.h1moduleswizard;bundle-version="0.0.8",
+ org.eclipse.jdt.core;bundle-version="3.7.0",
+ org.eclipse.core.resources;bundle-version="3.7.100"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
