@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Utilities for H1 extension tools
+Bundle-SymbolicName: h1modules.utilities
+Bundle-Version: 0.0.1.2012-0626
+Bundle-Activator: h1modules.utilities.utils.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.jdt
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: de.his.cs.sys.extensions.wizards.utils,
+ de.his.cs.sys.extensions.wizards.utils.templates
+Import-Package: org.eclipse.jdt.core
