@@ -7,8 +7,7 @@
 			verify="false"
 			pluginPath="${pluginPath}"
 			configInfo="${configs}"
-			pluginList="acme.plugin.A,acme.plugin.B"
+			pluginList="de.his.h1moduleswizard"
 			featureList="${featureList}"
-			includeLaunchers="false"
-		/>
-	</target>
+			includeLaunchers="false"/>
+</target>
