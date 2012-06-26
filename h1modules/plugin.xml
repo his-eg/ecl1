@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension-point id="cs.sys.extensions.ProjectSetupSteps" name="ProjectSetupSteps" schema="schema/cs.sys.extensions.ProjectSetupSteps.exsd"/>
    <extension
          point="org.eclipse.ui.newWizards">
       <category

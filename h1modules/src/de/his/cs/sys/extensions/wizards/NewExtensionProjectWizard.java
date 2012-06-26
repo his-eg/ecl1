@@ -6,15 +6,20 @@ import java.net.URI;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
+import de.his.cs.sys.extensions.extensionpointhandlers.ForEachProjectSetupStepHandler;
 import de.his.cs.sys.extensions.wizards.pages.NewExtensionWizardPage;
 import de.his.cs.sys.extensions.wizards.utils.ProjectSupport;
 import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
+
+import static de.his.cs.sys.extensions.steps.DeclaredExtensionPointIds.*;
 
 /**
  * Wizard für das Anlegen eines neuen Modulprojekts
@@ -45,13 +50,7 @@ public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 			location = firstPage.getLocationURI();
 		}
 		IProject project = new ProjectSupport(firstPage.getProjectsToReference()).createProject(projectName, location);
-		try {
-			new ResourceSupport(project).createFiles();
-		} catch (CoreException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		new ForEachProjectSetupStepHandler(JavaCore.create(project)).contribute();
 		return true;
 	}
 
