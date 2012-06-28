@@ -93,7 +93,7 @@ To apply the Apache License to your work, attach the following boilerplate notic
       <import plugin="org.eclipse.jdt.ui" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="h1modules.utilities" version="0.0.1" match="greaterOrEqual"/>
       <import plugin="de.his.h1moduleswizard" version="0.0.8" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.jdt"/>
+      <import plugin="org.eclipse.jdt" version="3.7.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
