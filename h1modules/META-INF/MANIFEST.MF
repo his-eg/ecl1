@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: HISinOne Extension Wizard
 Bundle-SymbolicName: de.his.h1moduleswizard;singleton:=true
-Bundle-Version: 0.0.9.2012-06-26
+Bundle-Version: 0.0.10.2012-06-27
 Bundle-Activator: de.his.cs.sys.extensions.Activator
 Bundle-Vendor: HIS GmbH
 Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
