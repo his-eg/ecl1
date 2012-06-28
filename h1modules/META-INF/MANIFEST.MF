@@ -14,8 +14,12 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
  h1modules.utilities;bundle-version="0.0.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Export-Package: de.his.cs.sys.extensions,
- de.his.cs.sys.extensions.extensionpointhandlers,
- de.his.cs.sys.extensions.steps,
- de.his.cs.sys.extensions.wizards,
- de.his.cs.sys.extensions.wizards.pages
+Export-Package: de.his.cs.sys.extensions;uses:="org.eclipse.ui.plugin,org.osgi.framework",
+ de.his.cs.sys.extensions.extensionpointhandlers;uses:="org.eclipse.jdt.core",
+ de.his.cs.sys.extensions.steps;uses:="org.eclipse.jdt.core",
+ de.his.cs.sys.extensions.wizards;
+  uses:="org.eclipse.jface.wizard,
+   org.eclipse.ui,
+   org.eclipse.jface.viewers,
+   org.eclipse.ui.dialogs",
+ de.his.cs.sys.extensions.wizards.pages;uses:="org.eclipse.ui.dialogs,org.eclipse.swt.widgets"
