@@ -8,6 +8,6 @@ Require-Bundle: org.eclipse.core.runtime,
  de.his.h1moduleswizard;bundle-version="0.0.8",
  org.eclipse.jdt.core,
  org.eclipse.core.resources,
- h1modules.utilities;bundle-version="0.0.1"
+ h1modules.utilities
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
