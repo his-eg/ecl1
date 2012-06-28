@@ -14,4 +14,8 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
  h1modules.utilities;bundle-version="0.0.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Export-Package: de.his.cs.sys.extensions.steps
+Export-Package: de.his.cs.sys.extensions,
+ de.his.cs.sys.extensions.extensionpointhandlers,
+ de.his.cs.sys.extensions.steps,
+ de.his.cs.sys.extensions.wizards,
+ de.his.cs.sys.extensions.wizards.pages
