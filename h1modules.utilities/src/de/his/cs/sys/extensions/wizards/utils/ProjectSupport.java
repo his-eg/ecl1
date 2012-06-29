@@ -65,7 +65,7 @@ public class ProjectSupport {
 		return project;
 		}
 
-	private static void setJreEnvironment(IProject project) throws JavaModelException {
+	private void setJreEnvironment(IProject project) throws JavaModelException {
 		IJavaProject javaProject = createJavaProject(project);
 		IClasspathEntry containerEntry = JavaCore.newContainerEntry(new Path("org.eclipse.jdt.launching.JRE_CONTAINER"), false);
 		IClasspathEntry[] oldClassPath = javaProject.getRawClasspath();
@@ -86,7 +86,7 @@ public class ProjectSupport {
 		}
 	}
 
-	private static void setSourceFolders(IProject project) throws JavaModelException {
+	private void setSourceFolders(IProject project) throws JavaModelException {
 		IJavaProject javaProject = createJavaProject(project);
 		IClasspathEntry[] newEntries = new IClasspathEntry[PATHS.length];
 		int count = 0;
@@ -99,12 +99,19 @@ public class ProjectSupport {
 		javaProject.setRawClasspath(newEntries, null);
 	}
 
-	private static IJavaProject createJavaProject(IProject project) {
+	private IJavaProject createJavaProject(IProject project) {
 		IJavaProject javaProject = JavaCore.create(project);
 		return javaProject;
 	}
 
-	private static IProject createBaseProject(String name, URI location) {
+	/**
+	 * Creates an empty project at the given location
+	 * 
+	 * @param name
+	 * @param location
+	 * @return
+	 */
+	public IProject createBaseProject(String name, URI location) {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot()
 				.getProject(name);
 		if (!project.exists()) {
@@ -129,7 +136,7 @@ public class ProjectSupport {
 		return project;
 	}
 
-	private static void createFolder(IFolder folder) throws CoreException {
+	private void createFolder(IFolder folder) throws CoreException {
 		IContainer parent = folder.getParent();
 		if (parent instanceof IFolder) {
 			createFolder((IFolder) parent);
@@ -147,7 +154,7 @@ public class ProjectSupport {
 	 * @param paths
 	 * @throws CoreException
 	 */
-	private static void addToProjectStructure(IProject newProject,
+	private void addToProjectStructure(IProject newProject,
 			String[] paths) throws CoreException {
 		for (String path : paths) {
 			IFolder etcFolders = newProject.getFolder(path);
@@ -156,12 +163,12 @@ public class ProjectSupport {
 		createFolder(newProject.getFolder("/src/java/" + newProject.getName().replace('.', '/')));
 	}
 
-	private static void addNatures(IProject project) throws CoreException {
+	private void addNatures(IProject project) throws CoreException {
 		addNature(project, ProjectNature.JAVA);
 //		addNature(project, ProjectNature.MACKER);
 	}
 
-	private static void addNature(IProject project, ProjectNature nature) throws CoreException {
+	private void addNature(IProject project, ProjectNature nature) throws CoreException {
 		if (!project.hasNature(nature.getNature())) {
 			IProjectDescription description = project.getDescription();
 			String[] prevNatures = description.getNatureIds();
