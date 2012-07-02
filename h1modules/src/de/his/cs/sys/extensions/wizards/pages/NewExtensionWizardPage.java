@@ -17,8 +17,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
+import de.his.cs.sys.extensions.steps.InitialProjectConfigurationChoices;
 import de.his.cs.sys.extensions.wizards.utils.HISConstants;
 import de.his.cs.sys.extensions.wizards.utils.WorkspaceSupport;
 
@@ -31,7 +33,8 @@ import de.his.cs.sys.extensions.wizards.utils.WorkspaceSupport;
 public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 
 	private List projectList;
-
+	private Text versionInputTextField;
+	
 	/**
 	 * @param pageName
 	 */
@@ -43,6 +46,11 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 	public void createControl(Composite parent) {
 		super.createControl(parent);
 		Composite control = (Composite) getControl();
+		Composite versionChoice = new Composite(control, SWT.BORDER|SWT.TOP);
+		Label versionInputLabel = new Label(versionChoice, SWT.LEFT);
+		versionInputLabel.setText("Initial Extension Version");
+		versionInputTextField = new Text(control, SWT.LEFT);
+		versionInputTextField.setText("0.0.1");
 		Composite projectChoice = new Composite(control, SWT.BORDER | SWT.TOP);
 		GridLayout gl = new GridLayout(2, false);
 		projectChoice.setLayout(gl);
@@ -60,13 +68,32 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		projectList.select(index);
 	}
 	
-	public Collection<String> getProjectsToReference() {
+	/**
+	 * Get the initial version of the new extension
+	 * 
+	 * @return initial version string
+	 */
+	private String getInitialVersion(){
+		return versionInputTextField.getText();
+	}
+	
+	/**
+	 * @return collection of project names to reference by the new extension project
+	 */
+	private Collection<String> getProjectsToReference() {
 		Collection<String> result = new ArrayList<String>();
 		String[] selection = projectList.getSelection();
 		for (String project : selection) {
 			result.add(project);
 		}
 		return result;
+	}
+	
+	/**
+	 * @return get the initial choices done by the user
+	 */
+	public InitialProjectConfigurationChoices getInitialConfiguration() {
+		return new InitialProjectConfigurationChoices(getProjectsToReference(), getProjectName(), getInitialVersion());
 	}
 
 }
