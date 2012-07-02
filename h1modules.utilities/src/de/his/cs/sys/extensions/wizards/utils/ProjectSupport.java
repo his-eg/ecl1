@@ -27,15 +27,10 @@ import org.eclipse.jdt.core.JavaModelException;
  */
 public class ProjectSupport {
 
-	private static final String[] PATHS = { "src/java", "src/test", "src/generated", "resource" };
-	
-	private final Collection<String> referencedProjects;
-	
 	/**
 	 * @param projects the projects to reference
 	 */
-	public ProjectSupport(Collection<String> projects) {
-		this.referencedProjects = projects;
+	public ProjectSupport() {
 	}
 
 	/**
@@ -50,22 +45,17 @@ public class ProjectSupport {
 		Assert.isTrue(projectName.trim().length() > 0);
 
 		IProject project = createBaseProject(projectName, location);
-		try {
-			addNatures(project);
-	
-			addToProjectStructure(project, PATHS);
-			setSourceFolders(project);
-			addProjectDependencies(project);
-			setJreEnvironment(project);
-		} catch (CoreException e) {
-			e.printStackTrace();
-			project = null;
-		}
 
 		return project;
 		}
 
-	private void setJreEnvironment(IProject project) throws JavaModelException {
+	/**
+	 * configure the project's jre environment
+	 * 
+	 * @param project
+	 * @throws JavaModelException
+	 */
+	public void setJreEnvironment(IProject project) throws JavaModelException {
 		IJavaProject javaProject = createJavaProject(project);
 		IClasspathEntry containerEntry = JavaCore.newContainerEntry(new Path("org.eclipse.jdt.launching.JRE_CONTAINER"), false);
 		IClasspathEntry[] oldClassPath = javaProject.getRawClasspath();
@@ -74,23 +64,41 @@ public class ProjectSupport {
 		javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
 	}
 
-	private void addProjectDependencies(IProject project) throws JavaModelException {
-		IJavaProject javaProject = createJavaProject(project);
-		for (String referencedProject : this.referencedProjects) {
-			IPath path = new Path("/" + referencedProject);
-			IClasspathEntry projectEntry = JavaCore.newProjectEntry(path);
-			IClasspathEntry[] oldClassPath = javaProject.getRawClasspath();
-			ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>(Arrays.asList(oldClassPath));
-			list.add(projectEntry);
-			javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
-		}
+	/**
+	 * configure the project's referenced projects
+	 * 
+	 * @param project
+	 * @param referencedProjects
+	 * @throws JavaModelException
+	 */
+	public void addProjectDependencies(IProject project, Collection<String> referencedProjects) {
+	    try {
+    		IJavaProject javaProject = createJavaProject(project);
+    		for (String referencedProject : referencedProjects) {
+    			IPath path = new Path("/" + referencedProject);
+    			IClasspathEntry projectEntry = JavaCore.newProjectEntry(path);
+    			IClasspathEntry[] oldClassPath = javaProject.getRawClasspath();
+    			ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>(Arrays.asList(oldClassPath));
+    			list.add(projectEntry);
+                    javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
+    		}
+	    } catch (JavaModelException e) {
+	        e.printStackTrace();
+	    }
 	}
 
-	private void setSourceFolders(IProject project) throws JavaModelException {
+	/**
+	 * set the project's source folders
+	 * 
+	 * @param project
+	 * @param paths
+	 * @throws JavaModelException
+	 */
+	public void setSourceFolders(IProject project, String[] paths) throws JavaModelException {
 		IJavaProject javaProject = createJavaProject(project);
-		IClasspathEntry[] newEntries = new IClasspathEntry[PATHS.length];
+		IClasspathEntry[] newEntries = new IClasspathEntry[paths.length];
 		int count = 0;
-		for (String srcPathName : PATHS) {
+		for (String srcPathName : paths) {
 			IPath srcPath= javaProject.getPath().append(srcPathName);
 			IClasspathEntry srcEntry= JavaCore.newSourceEntry(srcPath, null);
 			newEntries[count] = JavaCore.newSourceEntry(srcEntry.getPath());
@@ -154,7 +162,7 @@ public class ProjectSupport {
 	 * @param paths
 	 * @throws CoreException
 	 */
-	private void addToProjectStructure(IProject newProject,
+	public void addToProjectStructure(IProject newProject,
 			String[] paths) throws CoreException {
 		for (String path : paths) {
 			IFolder etcFolders = newProject.getFolder(path);
@@ -163,7 +171,7 @@ public class ProjectSupport {
 		createFolder(newProject.getFolder("/src/java/" + newProject.getName().replace('.', '/')));
 	}
 
-	private void addNatures(IProject project) throws CoreException {
+	public void addNatures(IProject project) throws CoreException {
 		addNature(project, ProjectNature.JAVA);
 //		addNature(project, ProjectNature.MACKER);
 	}

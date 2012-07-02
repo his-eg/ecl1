@@ -9,14 +9,14 @@
  */
 package de.his.cs.sys.extensions.extensionpointhandlers;
 
+import static de.his.cs.sys.extensions.steps.DeclaredExtensionPointIds.CS_SYS_EXTENSIONS_PROJECT_SETUP_STEPS;
+
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jdt.core.IJavaProject;
 
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
-
-import static de.his.cs.sys.extensions.steps.DeclaredExtensionPointIds.*;
 
 /**
  * @author keunecke
@@ -24,12 +24,12 @@ import static de.his.cs.sys.extensions.steps.DeclaredExtensionPointIds.*;
  */
 public class ForEachProjectSetupStepHandler {
 	
-	private final IJavaProject project;
+	private final IProject project;
 	
 	/**
 	 * @param project
 	 */
-	public ForEachProjectSetupStepHandler(IJavaProject project) {
+	public ForEachProjectSetupStepHandler(IProject project) {
 		this.project = project;
 	}
 

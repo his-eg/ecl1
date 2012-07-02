@@ -10,7 +10,10 @@
 package h1modules.resource.setup.step;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.util.Collection;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 
@@ -23,14 +26,11 @@ import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
  */
 public class ResourceSetupStep implements ProjectSetupStep {
 
-    /* (non-Javadoc)
-     * @see de.his.cs.sys.extensions.steps.ProjectSetupStep#performStep(de.his.cs.sys.extensions.steps.IJavaProject)
-     */
     @Override
-    public void performStep(IJavaProject project) {
+    public void performStep(IProject project) {
         System.out.println("performing resource setup");
         try {
-            new ResourceSupport(project.getProject()).createFiles();
+            new ResourceSupport(project).createFiles();
         } catch (CoreException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {

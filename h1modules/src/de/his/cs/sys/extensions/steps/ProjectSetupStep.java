@@ -9,7 +9,10 @@
  */
 package de.his.cs.sys.extensions.steps;
 
-import org.eclipse.jdt.core.IJavaProject;
+import java.net.URI;
+import java.util.Collection;
+
+import org.eclipse.core.resources.IProject;
 
 /**
  * Step for the setup of an extension project
@@ -23,7 +26,10 @@ public interface ProjectSetupStep {
 	 * perform the actions of this step on the given project
 	 * 
 	 * @param project
+	 * @param references
+	 * @param projectName
+	 * @param location
 	 */
-	public void performStep(IJavaProject project);
+	public void performStep(IProject project);
 
 }

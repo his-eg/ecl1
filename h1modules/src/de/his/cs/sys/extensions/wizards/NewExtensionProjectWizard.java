@@ -49,8 +49,9 @@ public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 		if(!firstPage.useDefaults()) {
 			location = firstPage.getLocationURI();
 		}
-		IProject project = new ProjectSupport(firstPage.getProjectsToReference()).createProject(projectName, location);
-		new ForEachProjectSetupStepHandler(JavaCore.create(project)).contribute();
+		IProject project = new ProjectSupport().createProject(projectName, location);
+		new ProjectSupport().addProjectDependencies(project, firstPage.getProjectsToReference());
+		new ForEachProjectSetupStepHandler(project).contribute();
 		return true;
 	}
 
