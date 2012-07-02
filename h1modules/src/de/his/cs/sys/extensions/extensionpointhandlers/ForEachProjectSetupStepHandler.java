@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 
+import de.his.cs.sys.extensions.steps.InitialProjectConfigurationChoices;
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
 
 /**
@@ -25,12 +26,15 @@ import de.his.cs.sys.extensions.steps.ProjectSetupStep;
 public class ForEachProjectSetupStepHandler {
 	
 	private final IProject project;
+	private final InitialProjectConfigurationChoices initialChoice;
 	
 	/**
 	 * @param project
+	 * @param initialChoice 
 	 */
-	public ForEachProjectSetupStepHandler(IProject project) {
+	public ForEachProjectSetupStepHandler(IProject project, InitialProjectConfigurationChoices initialChoice) {
 		this.project = project;
+		this.initialChoice = initialChoice;
 	}
 
 	public void contribute() {

@@ -27,7 +27,8 @@ public class ResourceSetupStep implements ProjectSetupStep {
     public void performStep(IProject project) {
         System.out.println("performing resource setup");
         try {
-            new ResourceSupport(project).createFiles();
+            String version = "0.0.1";
+            new ResourceSupport(project, version).createFiles();
         } catch (CoreException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {

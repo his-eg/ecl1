@@ -33,11 +33,12 @@ public class ResourceSupport {
 	 * ResourceSupport
 	 *
 	 * @param project eclipse project
+	 * @param version initial extension version
 	 */
-	public ResourceSupport(IProject project) {
+	public ResourceSupport(IProject project, String version) {
 		this.project = project;
 		extensionAntPropertiesReplacements.put("[name]", project.getName());
-		extensionAntPropertiesReplacements.put("[version]", "0.0.1");
+		extensionAntPropertiesReplacements.put("[version]", version);
 	}
 
 
