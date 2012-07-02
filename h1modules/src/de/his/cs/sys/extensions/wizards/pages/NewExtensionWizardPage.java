@@ -20,8 +20,8 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
-import de.his.cs.sys.extensions.steps.InitialProjectConfigurationChoices;
 import de.his.cs.sys.extensions.wizards.utils.HISConstants;
+import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
 import de.his.cs.sys.extensions.wizards.utils.WorkspaceSupport;
 
 /**

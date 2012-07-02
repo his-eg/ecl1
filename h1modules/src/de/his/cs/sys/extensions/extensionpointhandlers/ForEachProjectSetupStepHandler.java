@@ -16,8 +16,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 
-import de.his.cs.sys.extensions.steps.InitialProjectConfigurationChoices;
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
+import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
 
 /**
  * @author keunecke

@@ -10,8 +10,8 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
 import de.his.cs.sys.extensions.extensionpointhandlers.ForEachProjectSetupStepHandler;
-import de.his.cs.sys.extensions.steps.InitialProjectConfigurationChoices;
 import de.his.cs.sys.extensions.wizards.pages.NewExtensionWizardPage;
+import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
 import de.his.cs.sys.extensions.wizards.utils.ProjectSupport;
 
 /**

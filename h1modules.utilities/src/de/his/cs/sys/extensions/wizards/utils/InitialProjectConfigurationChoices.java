@@ -7,7 +7,7 @@
  *
  * Created on 02.07.2012 by keunecke
  */
-package de.his.cs.sys.extensions.steps;
+package de.his.cs.sys.extensions.wizards.utils;
 
 import java.util.Collection;
 
