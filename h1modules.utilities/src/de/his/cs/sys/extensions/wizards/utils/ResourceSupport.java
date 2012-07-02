@@ -51,7 +51,7 @@ public class ResourceSupport {
 		String content = new TemplateManager("extension.ant.properties.template", extensionAntPropertiesReplacements).getContent();
 		writeProjectFile("/extension.ant.properties", new ByteArrayInputStream(content.getBytes()));
 		
-		String buildXml = new TemplateManager("build.xml").getContent();
+		String buildXml = new TemplateManager("build.xml.template").getContent();
 		writeProjectFile("/build.xml", new ByteArrayInputStream(buildXml.getBytes()));
 		
 		is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build").getBytes("UTF-8"));
