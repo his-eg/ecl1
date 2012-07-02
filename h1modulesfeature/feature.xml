@@ -2,7 +2,7 @@
 <feature
       id="h1modulesfeature"
       label="H1modulesfeature"
-      version="0.0.10.2012-06-27"
+      version="0.0.11.2012-07-02"
       provider-name="HIS GmbH">
 
    <description>
@@ -94,6 +94,8 @@ To apply the Apache License to your work, attach the following boilerplate notic
       <import plugin="h1modules.utilities" version="0.0.1" match="greaterOrEqual"/>
       <import plugin="de.his.h1moduleswizard" version="0.0.8" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="de.his.h1moduleswizard" version="0.0.10" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources" version="3.7.100" match="greaterOrEqual"/>
    </requires>
 
    <plugin
@@ -111,6 +113,13 @@ To apply the Apache License to your work, attach the following boilerplate notic
 
    <plugin
          id="h1modules.utilities"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="h1modules.structure.setup"
          download-size="0"
          install-size="0"
          version="0.0.0"
