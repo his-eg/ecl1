@@ -48,11 +48,8 @@ public class ResourceSupport {
 	public void createFiles() throws CoreException, UnsupportedEncodingException {
 		InputStream is = ResourceSupport.class.getResourceAsStream("templates/src/java/extension.beans.spring.xml.template");
 		writeProjectFile("/src/java/extension.beans.spring.xml", is);
-
 		new TemplateManager("extension.ant.properties.template", extensionAntPropertiesReplacements).writeContent(project);
-		
 		new TemplateManager("build.xml.template").writeContent(project);
-		
 		is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build").getBytes("UTF-8"));
 		writeProjectFile("/.gitignore", is);
 	}
