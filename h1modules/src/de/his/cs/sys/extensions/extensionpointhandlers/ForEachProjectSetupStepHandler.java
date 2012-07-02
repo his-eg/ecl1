@@ -51,7 +51,7 @@ public class ForEachProjectSetupStepHandler {
 	
 	private void evaluate(Object object) {
 		ProjectSetupStep step = (ProjectSetupStep) object;
-		step.performStep(project);
+		step.performStep(this.project, this.initialChoice);
 	}
 	
 }

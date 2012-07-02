@@ -15,6 +15,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
+import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
 import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
 
 /**
@@ -24,11 +25,10 @@ import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
 public class ResourceSetupStep implements ProjectSetupStep {
 
     @Override
-    public void performStep(IProject project) {
+    public void performStep(IProject project, InitialProjectConfigurationChoices choices) {
         System.out.println("performing resource setup");
         try {
-            String version = "0.0.1";
-            new ResourceSupport(project, version).createFiles();
+            new ResourceSupport(project, choices).createFiles();
         } catch (CoreException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {

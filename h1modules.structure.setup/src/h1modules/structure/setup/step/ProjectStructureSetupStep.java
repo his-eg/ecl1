@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.JavaModelException;
 
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
+import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
 import de.his.cs.sys.extensions.wizards.utils.ProjectSupport;
 
 /**
@@ -25,7 +26,7 @@ public class ProjectStructureSetupStep implements ProjectSetupStep {
     private static final String[] PATHS = { "src/java", "src/test", "src/generated", "resource" };
 
     @Override
-    public void performStep(IProject project) {
+    public void performStep(IProject project, InitialProjectConfigurationChoices choices) {
         try {
             ProjectSupport support = new ProjectSupport();
             support.addNatures(project);
