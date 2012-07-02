@@ -9,9 +9,6 @@
  */
 package de.his.cs.sys.extensions.steps;
 
-import java.net.URI;
-import java.util.Collection;
-
 import org.eclipse.core.resources.IProject;
 
 /**

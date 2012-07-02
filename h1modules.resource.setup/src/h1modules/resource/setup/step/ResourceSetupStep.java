@@ -10,12 +10,9 @@
 package h1modules.resource.setup.step;
 
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
-import java.util.Collection;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IJavaProject;
 
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
 import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
