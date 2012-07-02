@@ -48,11 +48,9 @@ public class ResourceSupport {
 		InputStream is = ResourceSupport.class.getResourceAsStream("templates/src/java/extension.beans.spring.xml.template");
 		writeProjectFile("/src/java/extension.beans.spring.xml", is);
 
-		String content = new TemplateManager("extension.ant.properties.template", extensionAntPropertiesReplacements).getContent();
-		writeProjectFile("/extension.ant.properties", new ByteArrayInputStream(content.getBytes()));
+		new TemplateManager("extension.ant.properties.template", extensionAntPropertiesReplacements).writeContent(project);
 		
-		String buildXml = new TemplateManager("build.xml.template").getContent();
-		writeProjectFile("/build.xml", new ByteArrayInputStream(buildXml.getBytes()));
+		new TemplateManager("build.xml.template").writeContent(project);
 		
 		is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build").getBytes("UTF-8"));
 		writeProjectFile("/.gitignore", is);
