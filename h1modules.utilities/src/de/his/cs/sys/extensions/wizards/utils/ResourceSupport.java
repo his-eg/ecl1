@@ -48,7 +48,7 @@ public class ResourceSupport {
 		InputStream is = ResourceSupport.class.getResourceAsStream("templates/src/java/extension.beans.spring.xml.template");
 		writeProjectFile("/src/java/extension.beans.spring.xml", is);
 
-		String content = new TemplateManager("extension.ant.properties", extensionAntPropertiesReplacements).getContent();
+		String content = new TemplateManager("extension.ant.properties.template", extensionAntPropertiesReplacements).getContent();
 		writeProjectFile("/extension.ant.properties", new ByteArrayInputStream(content.getBytes()));
 		
 		String buildXml = new TemplateManager("build.xml").getContent();
