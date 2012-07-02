@@ -46,11 +46,13 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 	public void createControl(Composite parent) {
 		super.createControl(parent);
 		Composite control = (Composite) getControl();
-		Composite versionChoice = new Composite(control, SWT.BORDER|SWT.TOP);
+		
+		Composite versionChoice = new Composite(control, SWT.BORDER | SWT.LEFT);
 		Label versionInputLabel = new Label(versionChoice, SWT.LEFT);
 		versionInputLabel.setText("Initial Extension Version");
-		versionInputTextField = new Text(control, SWT.LEFT);
+		versionInputTextField = new Text(versionChoice, SWT.LEFT);
 		versionInputTextField.setText("0.0.1");
+		
 		Composite projectChoice = new Composite(control, SWT.BORDER | SWT.TOP);
 		GridLayout gl = new GridLayout(2, false);
 		projectChoice.setLayout(gl);

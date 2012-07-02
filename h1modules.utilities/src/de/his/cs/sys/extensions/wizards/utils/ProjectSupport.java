@@ -26,6 +26,8 @@ import org.eclipse.jdt.core.JavaModelException;
  * @author keunecke
  */
 public class ProjectSupport {
+    
+    private static final String[] PATHS = { "src/java", "src/test", "src/generated", "resource" };
 
 	/**
 	 * @param projects the projects to reference
@@ -40,11 +42,21 @@ public class ProjectSupport {
 	 * @param location location
 	 * @return IProject instance
 	 */
-	public IProject createProject(String projectName, URI location) {
-		Assert.isNotNull(projectName);
-		Assert.isTrue(projectName.trim().length() > 0);
+	public IProject createProject(InitialProjectConfigurationChoices choices, URI location) {
+		Assert.isNotNull(choices.getName());
+		Assert.isTrue(choices.getName().trim().length() > 0);
 
-		IProject project = createBaseProject(projectName, location);
+		IProject project = createBaseProject(choices.getName(), location);
+		try {
+            addNatures(project);
+            addToProjectStructure(project, PATHS);
+            setSourceFolders(project, PATHS);
+            addProjectDependencies(project, choices.getProjectsToReference());
+            setJreEnvironment(project);
+        } catch (CoreException e) {
+            e.printStackTrace();
+            project = null;
+        }
 
 		return project;
 		}

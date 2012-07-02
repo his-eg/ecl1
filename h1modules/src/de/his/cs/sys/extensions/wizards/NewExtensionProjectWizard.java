@@ -4,6 +4,7 @@ package de.his.cs.sys.extensions.wizards;
 import java.net.URI;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -42,8 +43,8 @@ public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 			location = firstPage.getLocationURI();
 		}
 		InitialProjectConfigurationChoices initialChoice = firstPage.getInitialConfiguration();
-		IProject project = new ProjectSupport().createProject(initialChoice.getName(), location);
-		new ProjectSupport().addProjectDependencies(project, initialChoice.getProjectsToReference());
+		IProject project = new ProjectSupport().createProject(initialChoice, location);
+		System.out.println("Project resource exists after creation: " + project.exists());
 		new ForEachProjectSetupStepHandler(project, initialChoice).contribute();
 		return true;
 	}
