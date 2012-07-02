@@ -7,7 +7,7 @@
  *
  * Created on 21.06.2012 by keunecke
  */
-package de.his.cs.sys.extensions.wizards.utils.templates;
+package utils.templates;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;

@@ -12,7 +12,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
-import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
+import utils.templates.TemplateManager;
+
 
 /**
  * Simple Resource access support
