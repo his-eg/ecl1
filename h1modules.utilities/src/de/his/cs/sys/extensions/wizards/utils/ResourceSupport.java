@@ -12,7 +12,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
-import utils.templates.TemplateManager;
+import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
+
 
 
 /**
@@ -46,10 +47,10 @@ public class ResourceSupport {
 	 * @throws UnsupportedEncodingException
 	 */
 	public void createFiles() throws CoreException, UnsupportedEncodingException {
-		InputStream is = ResourceSupport.class.getResourceAsStream("templates/src/java/extension.beans.spring.xml.template");
+		InputStream is = TemplateManager.class.getResourceAsStream("src/java/extension.beans.spring.xml.template");
 		writeProjectFile("/src/java/extension.beans.spring.xml", is);
-		new TemplateManager("extension.ant.properties.template", extensionAntPropertiesReplacements).writeContent(project);
-		new TemplateManager("build.xml.template").writeContent(project);
+		new TemplateManager("build.xml.template", this.extensionAntPropertiesReplacements).writeContent(this.project);
+		new TemplateManager("extension.ant.properties.template", this.extensionAntPropertiesReplacements).writeContent(this.project);
 		is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build").getBytes("UTF-8"));
 		writeProjectFile("/.gitignore", is);
 	}

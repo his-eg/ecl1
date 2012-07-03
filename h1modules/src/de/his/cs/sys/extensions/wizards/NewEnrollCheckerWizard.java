@@ -24,6 +24,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
+
 import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
 import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
 

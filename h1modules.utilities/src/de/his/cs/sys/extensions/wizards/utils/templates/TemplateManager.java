@@ -7,7 +7,7 @@
  *
  * Created on 21.06.2012 by keunecke
  */
-package utils.templates;
+package de.his.cs.sys.extensions.wizards.utils.templates;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -65,18 +65,23 @@ public class TemplateManager {
 	 */
 	public String getContent() {
 		StringBuilder result = new StringBuilder();
-		BufferedReader br = new BufferedReader(new InputStreamReader(this.template));
-		String line = "";
 		try {
-			while((line = br.readLine() )!= null) {
-				String temp = line;
-				for (Entry<String, String> variableAssignment : this.variables.entrySet()) {
-					temp = temp.replace(variableAssignment.getKey(), variableAssignment.getValue());
-				}
-				result.append(temp + System.getProperty("line.separator"));
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
+		    BufferedReader br = new BufferedReader(new InputStreamReader(this.template));
+		    String line = "";
+		    try {
+		        while((line = br.readLine() )!= null) {
+		            String temp = line;
+		            for (Entry<String, String> variableAssignment : this.variables.entrySet()) {
+		                temp = temp.replace(variableAssignment.getKey(), variableAssignment.getValue());
+		            }
+		            result.append(temp + System.getProperty("line.separator"));
+		        }
+		    } catch (IOException e) {
+		        e.printStackTrace();
+		    }
+		} catch (NullPointerException e) {
+		    System.out.println("TemplatePath: " + this.templatePath);
+		    System.out.println("Variables: " + this.variables);
 		}
 		return result.toString().trim();
 	}
