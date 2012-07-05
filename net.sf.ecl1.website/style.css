@@ -1,3 +1,10 @@
 body {font-family: sans-serif}
-h1 {font-weight: normal}
-h3 {font-weight: normal}
+h1, h2, h3 {font-weight: normal}
+
+body {background-color:#AAA; margin: 0; padding:0}
+#content, #toc {background-color:#FFF}
+
+#content {margin-left: 10em; border-left: 1px solid #AAA; padding-left: 1em; }
+
+#toc {position: fixed; left:0; top:0; padding: 1em; margin-top:5em}
+#toc li, #toc ul {list-style-type: none; padding: 0; margin:0}
