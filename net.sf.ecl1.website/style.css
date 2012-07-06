@@ -7,3 +7,5 @@ body {font-family: sans-serif; background-color:#AAA; margin: 0; padding:0}
 #toc li, #toc ul {list-style-type: none; padding: 0; margin:0}
 
 h1, h2, h3 {font-weight: normal}
+
+#pageicon {float: right; margin:1em}
