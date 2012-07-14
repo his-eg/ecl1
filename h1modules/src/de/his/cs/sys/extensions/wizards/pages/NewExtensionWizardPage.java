@@ -15,9 +15,11 @@ import java.util.Collection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
 import de.his.cs.sys.extensions.wizards.utils.HISConstants;
@@ -34,6 +36,7 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 
 	private List projectList;
 	private Text versionInputTextField;
+	private PackageStructureStrategy strategy = new ProjectStrategy();
 	
 	/**
 	 * @param pageName
@@ -70,6 +73,15 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 			}
 		}
 		projectList.select(index);
+		Composite packageCreationComposite = new Composite(control, SWT.LEFT | SWT.LEFT_TO_RIGHT);
+		Group buttonGroup = new Group(packageCreationComposite, SWT.BORDER);
+		buttonGroup.setText("Choose Package Creation Pattern");
+		Button defaultButton = new Button(buttonGroup, SWT.RADIO);
+		defaultButton.setText("HISinOne Structure");
+		Button projectButton = new Button(buttonGroup, SWT.RADIO);
+		projectButton.setText("Project Name");
+		Button extensionButton = new Button(buttonGroup, SWT.RADIO);
+		extensionButton.setText("Extension Structure");
 	}
 	
 	/**
@@ -91,6 +103,13 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 			result.add(project);
 		}
 		return result;
+	}
+	
+	/**
+	 * @return
+	 */
+	public PackageStructureStrategy getStrategy() {
+		return this.strategy;
 	}
 	
 	/**
