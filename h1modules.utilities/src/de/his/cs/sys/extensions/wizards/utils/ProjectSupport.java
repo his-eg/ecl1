@@ -28,11 +28,14 @@ import org.eclipse.jdt.core.JavaModelException;
 public class ProjectSupport {
     
     private static final String[] PATHS = { "src/java", "src/test", "src/generated", "resource" };
+    
+    private final Collection<String> packagesToCreate;
 
 	/**
 	 * @param projects the projects to reference
 	 */
-	public ProjectSupport() {
+	public ProjectSupport(Collection<String> packages) {
+	    this.packagesToCreate = packages;
 	}
 
 	/**
@@ -180,7 +183,10 @@ public class ProjectSupport {
 			IFolder etcFolders = newProject.getFolder(path);
 			createFolder(etcFolders);
 		}
-		createFolder(newProject.getFolder("/src/java/" + newProject.getName().replace('.', '/')));
+		for (String packageName : this.packagesToCreate) {
+		    createFolder(newProject.getFolder("/src/java/" + packageName.replace('.', '/')));
+		    createFolder(newProject.getFolder("/src/test/" + packageName.replace('.', '/')));
+        }
 	}
 
 	public void addNatures(IProject project) throws CoreException {

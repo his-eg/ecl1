@@ -2,6 +2,7 @@ package de.his.cs.sys.extensions.wizards;
 
 
 import java.net.URI;
+import java.util.Arrays;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -43,7 +44,7 @@ public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 			location = firstPage.getLocationURI();
 		}
 		InitialProjectConfigurationChoices initialChoice = firstPage.getInitialConfiguration();
-		IProject project = new ProjectSupport().createProject(initialChoice, location);
+		IProject project = new ProjectSupport(Arrays.asList(initialChoice.getName())).createProject(initialChoice, location);
 		System.out.println("Project resource exists after creation: " + project.exists());
 		new ForEachProjectSetupStepHandler(project, initialChoice).contribute();
 		return true;
