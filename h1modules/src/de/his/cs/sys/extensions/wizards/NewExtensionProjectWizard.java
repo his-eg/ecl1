@@ -45,7 +45,6 @@ public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 		}
 		InitialProjectConfigurationChoices initialChoice = firstPage.getInitialConfiguration();
 		IProject project = new ProjectSupport(Arrays.asList(initialChoice.getName())).createProject(initialChoice, location);
-		System.out.println("Project resource exists after creation: " + project.exists());
 		new ForEachProjectSetupStepHandler(project, initialChoice).contribute();
 		return true;
 	}
