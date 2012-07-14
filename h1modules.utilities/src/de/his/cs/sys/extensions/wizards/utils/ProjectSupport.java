@@ -72,7 +72,7 @@ public class ProjectSupport {
 	 */
 	public void setJreEnvironment(IProject project) throws JavaModelException {
 		IJavaProject javaProject = createJavaProject(project);
-		IClasspathEntry containerEntry = JavaCore.newContainerEntry(new Path("org.eclipse.jdt.launching.JRE_CONTAINER/JavaSE-1.6"), false);
+		IClasspathEntry containerEntry = JavaCore.newContainerEntry(new Path("org.eclipse.jdt.launching.JRE_CONTAINER"), false);
 		IClasspathEntry[] oldClassPath = javaProject.getRawClasspath();
 		ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>(Arrays.asList(oldClassPath));
 		list.add(containerEntry);
