@@ -22,6 +22,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
+import de.his.cs.sys.extensions.wizards.pages.packages.PackageStructureStrategy;
+import de.his.cs.sys.extensions.wizards.pages.packages.ProjectStrategy;
 import de.his.cs.sys.extensions.wizards.utils.HISConstants;
 import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
 import de.his.cs.sys.extensions.wizards.utils.WorkspaceSupport;

@@ -7,7 +7,7 @@
  *
  * Created on 14.07.2012 by keunecke
  */
-package de.his.cs.sys.extensions.wizards.pages;
+package de.his.cs.sys.extensions.wizards.pages.packages;
 
 import java.util.Arrays;
 import java.util.Collection;
