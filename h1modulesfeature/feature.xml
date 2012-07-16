@@ -2,7 +2,7 @@
 <feature
       id="h1modulesfeature"
       label="H1modulesfeature"
-      version="0.0.12.2012-07-03"
+      version="0.0.13.2012-07-16"
       provider-name="HIS GmbH">
 
    <description>
@@ -88,14 +88,12 @@ To apply the Apache License to your work, attach the following boilerplate notic
       <import plugin="org.eclipse.ui" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.ide" version="3.7.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.jdt.core" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt.ui" version="3.7.0" match="greaterOrEqual"/>
-      <import plugin="h1modules.utilities" version="0.0.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jdt.core" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="de.his.h1moduleswizard" version="0.0.8" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt" version="3.7.0" match="greaterOrEqual"/>
-      <import plugin="de.his.h1moduleswizard" version="0.0.10" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.resources" version="3.7.100" match="greaterOrEqual"/>
+      <import plugin="net.sf.ecl1.utilities" version="0.0.1" match="greaterOrEqual"/>
    </requires>
 
    <plugin
@@ -106,13 +104,14 @@ To apply the Apache License to your work, attach the following boilerplate notic
          unpack="false"/>
 
    <plugin
-         id="h1modules.resource.setup"
+         id="net.sf.ecl1.resource.setup"
          download-size="0"
          install-size="0"
-         version="0.0.0"/>
+         version="0.0.0"
+         unpack="false"/>
 
    <plugin
-         id="h1modules.utilities"
+         id="net.sf.ecl1.utilities"
          download-size="0"
          install-size="0"
          version="0.0.0"

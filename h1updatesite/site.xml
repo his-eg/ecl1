@@ -3,40 +3,7 @@
    <description name="HIS Eclipse Update Site">
       On this page you find all ecl1 plugins that support the development of HISinOne extensions.
    </description>
-   <feature url="features/h1modulesfeature_0.0.1.2012-05-11.jar" id="h1modulesfeature" version="0.0.1.2012-05-11">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.2.2012-05-24.jar" id="h1modulesfeature" version="0.0.2.2012-05-24">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.3.2012-06-16.jar" id="h1modulesfeature" version="0.0.3.2012-06-16">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.4.2012-06-19.jar" id="h1modulesfeature" version="0.0.4.2012-06-19">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.5.2012-06-20.jar" id="h1modulesfeature" version="0.0.5.2012-06-20">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.6.2012-06-21.jar" id="h1modulesfeature" version="0.0.6.2012-06-21">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.7.2012-06-21.jar" id="h1modulesfeature" version="0.0.7.2012-06-21">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.8.2012-06-22.jar" id="h1modulesfeature" version="0.0.8.2012-06-22">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.9.2012-06-26.jar" id="h1modulesfeature" version="0.0.9.2012-06-26">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.10.2012-06-27.jar" id="h1modulesfeature" version="0.0.10.2012-06-27">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.11.2012-07-02.jar" id="h1modulesfeature" version="0.0.11.2012-07-02">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.12.2012-07-03.jar" id="h1modulesfeature" version="0.0.12.2012-07-03">
+   <feature url="features/h1modulesfeature_0.0.13.2012-07-16.jar" id="h1modulesfeature" version="0.0.13.2012-07-16">
       <category name="de.his.cs.sys.extensions"/>
    </feature>
    <category-def name="de.his.cs.sys.extensions" label="Extension Tools"/>
