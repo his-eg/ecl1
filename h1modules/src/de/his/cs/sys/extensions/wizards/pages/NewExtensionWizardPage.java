@@ -13,15 +13,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ExtendedModifyEvent;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
+import de.his.cs.sys.extensions.wizards.pages.packages.ExtensionStrategy;
+import de.his.cs.sys.extensions.wizards.pages.packages.HISinOneStrategy;
 import de.his.cs.sys.extensions.wizards.pages.packages.PackageStructureStrategy;
 import de.his.cs.sys.extensions.wizards.pages.packages.ProjectStrategy;
 import de.his.cs.sys.extensions.wizards.utils.HISConstants;
@@ -35,6 +41,32 @@ import de.his.cs.sys.extensions.wizards.utils.WorkspaceSupport;
  * @version $Revision$ 
  */
 public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
+
+	/**
+	 * @author keunecke
+	 * @version $Revision$ 
+	 */
+	private final class StrategySetter implements SelectionListener {
+		
+		private final PackageStructureStrategy strategyToSet;
+		
+		/**
+		 * @param strategyToSet
+		 */
+		public StrategySetter(PackageStructureStrategy strategyToSet) {
+			this.strategyToSet = strategyToSet;
+		}
+		
+		@Override
+		public void widgetSelected(SelectionEvent e) {
+			strategy = strategyToSet; 
+		}
+
+		@Override
+		public void widgetDefaultSelected(SelectionEvent e) {
+			// 
+		}
+	}
 
 	private List projectList;
 	private Text versionInputTextField;
@@ -75,15 +107,19 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 			}
 		}
 		projectList.select(index);
-		Composite packageCreationComposite = new Composite(control, SWT.LEFT | SWT.LEFT_TO_RIGHT);
-		Group buttonGroup = new Group(packageCreationComposite, SWT.BORDER);
+		Group buttonGroup = new Group(control, SWT.BORDER);
+		buttonGroup.setLayout(new RowLayout());
 		buttonGroup.setText("Choose Package Creation Pattern");
 		Button defaultButton = new Button(buttonGroup, SWT.RADIO);
+		defaultButton.setSelection(true);
+		defaultButton.addSelectionListener(new StrategySetter(new HISinOneStrategy()));
 		defaultButton.setText("HISinOne Structure");
 		Button projectButton = new Button(buttonGroup, SWT.RADIO);
 		projectButton.setText("Project Name");
+		projectButton.addSelectionListener(new StrategySetter(new ProjectStrategy()));
 		Button extensionButton = new Button(buttonGroup, SWT.RADIO);
 		extensionButton.setText("Extension Structure");
+		extensionButton.addSelectionListener(new StrategySetter(new ExtensionStrategy()));
 	}
 	
 	/**
