@@ -114,11 +114,14 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		defaultButton.setSelection(true);
 		defaultButton.addSelectionListener(new StrategySetter(new HISinOneStrategy()));
 		defaultButton.setText("HISinOne Layout");
+		defaultButton.setToolTipText("HISinOne Package Layout with packages for persistence etc.");
 		Button projectButton = new Button(buttonGroup, SWT.RADIO);
 		projectButton.setText("Project Name Layout");
+		projectButton.setToolTipText("Single Package with project name");
 		projectButton.addSelectionListener(new StrategySetter(new ProjectStrategy()));
 		Button extensionButton = new Button(buttonGroup, SWT.RADIO);
 		extensionButton.setText("Extension Layout");
+		extensionButton.setToolTipText("Package Layout for an extension");
 		extensionButton.addSelectionListener(new StrategySetter(new ExtensionStrategy()));
 	}
 	
