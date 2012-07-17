@@ -52,15 +52,6 @@ public class ExtensionPointView extends ViewPart {
 	 * (like Task List, for example).
 	 */
 	 
-	class ViewContentProvider implements IStructuredContentProvider {
-		public void inputChanged(Viewer v, Object oldInput, Object newInput) {
-		}
-		public void dispose() {
-		}
-		public Object[] getElements(Object parent) {
-			return new String[] { "One", "Two", "Three" };
-		}
-	}
 	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 		public String getColumnText(Object obj, int index) {
 			return getText(obj);
@@ -73,6 +64,7 @@ public class ExtensionPointView extends ViewPart {
 					getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
 		}
 	}
+	
 	class NameSorter extends ViewerSorter {
 	}
 
@@ -88,7 +80,7 @@ public class ExtensionPointView extends ViewPart {
 	 */
 	public void createPartControl(Composite parent) {
 		viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		viewer.setContentProvider(new ViewContentProvider());
+		viewer.setContentProvider(new ExtensionPointsViewContentProvider());
 		viewer.setLabelProvider(new ViewLabelProvider());
 		viewer.setSorter(new NameSorter());
 		viewer.setInput(getViewSite());
