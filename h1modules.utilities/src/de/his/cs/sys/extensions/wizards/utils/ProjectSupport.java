@@ -27,7 +27,7 @@ import org.eclipse.jdt.core.JavaModelException;
  */
 public class ProjectSupport {
     
-    private static final String[] PATHS = { "src/java", "src/test", "src/generated", "resource" };
+    private static final String[] PATHS = { "src/java", "src/test", "src/generated", "resource", ".settings" };
     
     private final Collection<String> packagesToCreate;
 
