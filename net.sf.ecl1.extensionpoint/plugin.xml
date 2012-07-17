@@ -34,5 +34,14 @@
             file="contexts.xml">
       </contexts>
    </extension>
+   <extension
+         id="net.sf.ecl1.extensiontpoint.collector"
+         point="org.eclipse.jdt.core.compilationParticipant">
+     <compilationParticipant
+         class="net.sf.ecl1.extensionpoint.collector.ExtensionPointCollector"
+         id="net.sf.ecl1.extensionpoint.collector.ExtensionPointCollector"
+         requiredSourceLevel="1.6">
+	 </compilationParticipant>
+   </extension>
 
 </plugin>
