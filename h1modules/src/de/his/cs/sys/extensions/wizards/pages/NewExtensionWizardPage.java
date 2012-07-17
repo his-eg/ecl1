@@ -109,16 +109,16 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		projectList.select(index);
 		Group buttonGroup = new Group(control, SWT.BORDER);
 		buttonGroup.setLayout(new RowLayout());
-		buttonGroup.setText("Choose Package Creation Pattern");
+		buttonGroup.setText("Choose Package Layout");
 		Button defaultButton = new Button(buttonGroup, SWT.RADIO);
 		defaultButton.setSelection(true);
 		defaultButton.addSelectionListener(new StrategySetter(new HISinOneStrategy()));
-		defaultButton.setText("HISinOne Structure");
+		defaultButton.setText("HISinOne Layout");
 		Button projectButton = new Button(buttonGroup, SWT.RADIO);
-		projectButton.setText("Project Name");
+		projectButton.setText("Project Name Layout");
 		projectButton.addSelectionListener(new StrategySetter(new ProjectStrategy()));
 		Button extensionButton = new Button(buttonGroup, SWT.RADIO);
-		extensionButton.setText("Extension Structure");
+		extensionButton.setText("Extension Layout");
 		extensionButton.addSelectionListener(new StrategySetter(new ExtensionStrategy()));
 	}
 	
