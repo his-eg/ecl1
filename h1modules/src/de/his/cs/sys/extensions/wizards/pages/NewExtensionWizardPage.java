@@ -70,7 +70,7 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 
 	private List projectList;
 	private Text versionInputTextField;
-	private PackageStructureStrategy strategy = new ProjectStrategy();
+	private PackageStructureStrategy strategy = new HISinOneStrategy();
 	
 	/**
 	 * @param pageName
