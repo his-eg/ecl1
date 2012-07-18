@@ -12,6 +12,7 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMemberValuePair;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
@@ -78,6 +79,13 @@ public class ExtensionPointCollector extends CompilationParticipant {
 			String elementName = annotation.getElementName();
 			if(EXTENSION_POINT_ANNOTATION_NAME.equals(elementName)) {
 				handleAnnotation(annotation);
+			}
+		}
+		IMethod[] methods = type.getMethods();
+		for (IMethod method : methods) {
+			IAnnotation[] methodAnnotations = method.getAnnotations();
+			for (IAnnotation methodAnnotation : methodAnnotations) {
+				handleAnnotation(methodAnnotation);
 			}
 		}
 	}
