@@ -85,7 +85,10 @@ public class ExtensionPointCollector extends CompilationParticipant {
 		for (IMethod method : methods) {
 			IAnnotation[] methodAnnotations = method.getAnnotations();
 			for (IAnnotation methodAnnotation : methodAnnotations) {
-				handleAnnotation(methodAnnotation);
+				String elementName = methodAnnotation.getElementName();
+				if(EXTENSION_POINT_ANNOTATION_NAME.equals(elementName)) {
+					handleAnnotation(methodAnnotation);
+				}
 			}
 		}
 	}
