@@ -2,7 +2,6 @@ package net.sf.ecl1.extensionpoint.collector;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 import net.sf.ecl1.extensionpoint.collector.model.ExtensionPointInformation;
