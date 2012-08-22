@@ -1,5 +1,8 @@
 package net.sf.ecl1.extensionpoint.collector;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -21,7 +24,8 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 
 	private static final String EXTENSION_ANT_PROPERTIES = "extension.ant.properties";
 	private static final String EXTENSION_ANNOTATION_NAME = "Extension";
-	private IJavaProject projectUnderScan;
+	
+	private Collection<String> contributingClasses = new LinkedList<String>();
 
 	@Override
 	public int aboutToBuild(IJavaProject project) {
@@ -30,7 +34,6 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 
 	@Override
 	public void buildFinished(IJavaProject project) {
-		this.projectUnderScan = project;
 		try {
 			IPackageFragment[] fragmentRoots = project.getPackageFragments();
 			for (IPackageFragment iPackageFragment : fragmentRoots) {
@@ -59,14 +62,9 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 		for (IAnnotation annotation : annotations) {
 			String elementName = annotation.getElementName();
 			if(EXTENSION_ANNOTATION_NAME.equals(elementName)) {
-				handleAnnotation(annotation);
+				this.contributingClasses.add(type.getFullyQualifiedName());
 			}
 		}
-	}
-
-	private void handleAnnotation(IAnnotation annotation) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
