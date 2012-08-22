@@ -7,6 +7,7 @@ Bundle-Activator: net.sf.ecl1.extensionpoint.Activator
 Bundle-Vendor: HIS GmbH
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.jdt.core
+ org.eclipse.jdt.core,
+ org.eclipse.core.resources
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
