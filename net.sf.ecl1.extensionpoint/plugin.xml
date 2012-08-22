@@ -42,6 +42,11 @@
          id="net.sf.ecl1.extensionpoint.collector.ExtensionPointCollector"
          requiredSourceLevel="1.6">
 	 </compilationParticipant>
+	 <compilationParticipant
+         class="net.sf.ecl1.extensionpoint.collector.ExtensionPointContributionCollector"
+         id="net.sf.ecl1.extensionpoint.collector.ExtensionPointContributionCollector"
+         requiredSourceLevel="1.6">
+	 </compilationParticipant>
    </extension>
 
 </plugin>
