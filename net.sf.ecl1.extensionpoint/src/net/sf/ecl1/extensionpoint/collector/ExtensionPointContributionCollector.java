@@ -1,7 +1,13 @@
 package net.sf.ecl1.extensionpoint.collector;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jdt.core.IAnnotation;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.compiler.CompilationParticipant;
 
 /**
@@ -14,6 +20,8 @@ import org.eclipse.jdt.core.compiler.CompilationParticipant;
 public class ExtensionPointContributionCollector extends CompilationParticipant {
 
 	private static final String EXTENSION_ANT_PROPERTIES = "extension.ant.properties";
+	private static final String EXTENSION_ANNOTATION_NAME = "Extension";
+	private IJavaProject projectUnderScan;
 
 	@Override
 	public int aboutToBuild(IJavaProject project) {
@@ -22,8 +30,43 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 
 	@Override
 	public void buildFinished(IJavaProject project) {
-		// TODO 
+		this.projectUnderScan = project;
+		try {
+			IPackageFragment[] fragmentRoots = project.getPackageFragments();
+			for (IPackageFragment iPackageFragment : fragmentRoots) {
+				if(IPackageFragmentRoot.K_SOURCE == iPackageFragment.getKind()) {
+					scanPackage(iPackageFragment);
+				}
+			}
+		} catch (JavaModelException e) {
+			e.printStackTrace();
+		}
 		super.buildFinished(project);
+	}
+
+	private void scanPackage(IPackageFragment iPackageFragment) throws JavaModelException {
+		ICompilationUnit[] units = iPackageFragment.getCompilationUnits();
+		for (ICompilationUnit unit : units) {
+			IType[] types = unit.getAllTypes();
+			for (IType type : types) {
+				scanType(type);
+			}
+		}
+	}
+
+	private void scanType(IType type) throws JavaModelException {
+		IAnnotation[] annotations = type.getAnnotations();
+		for (IAnnotation annotation : annotations) {
+			String elementName = annotation.getElementName();
+			if(EXTENSION_ANNOTATION_NAME.equals(elementName)) {
+				handleAnnotation(annotation);
+			}
+		}
+	}
+
+	private void handleAnnotation(IAnnotation annotation) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	@Override
