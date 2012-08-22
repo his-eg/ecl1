@@ -51,7 +51,7 @@ public class ExtensionPointView extends ViewPart {
 	 * it and always show the same content 
 	 * (like Task List, for example).
 	 */
-	 
+	 //TODO extract this class and implement multiple columns (maybe use an adapter)
 	class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
 		public String getColumnText(Object obj, int index) {
 			return getText(obj);
