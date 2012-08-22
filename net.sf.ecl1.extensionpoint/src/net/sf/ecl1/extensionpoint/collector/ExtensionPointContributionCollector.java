@@ -44,6 +44,7 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 		} catch (JavaModelException e) {
 			e.printStackTrace();
 		}
+		//TODO implement writing to property file
 		super.buildFinished(project);
 	}
 
