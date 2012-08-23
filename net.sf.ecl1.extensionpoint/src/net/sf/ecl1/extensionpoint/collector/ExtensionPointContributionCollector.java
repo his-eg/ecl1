@@ -1,5 +1,7 @@
 package net.sf.ecl1.extensionpoint.collector;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Collection;
@@ -7,6 +9,7 @@ import java.util.LinkedList;
 import java.util.Properties;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
@@ -15,6 +18,9 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.compiler.CompilationParticipant;
+
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
 
 /**
  * This class collects all contributions to extension points from projects, that have a file
@@ -25,6 +31,7 @@ import org.eclipse.jdt.core.compiler.CompilationParticipant;
  */
 public class ExtensionPointContributionCollector extends CompilationParticipant {
 
+	private static final String EXTENSION_EXTENDED_POINTS = "extension.extended-points";
 	private static final String EXTENSION_ANT_PROPERTIES = "extension.ant.properties";
 	private static final String EXTENSION_ANNOTATION_NAME = "Extension";
 	
@@ -50,11 +57,16 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 		IFile propertyFile = getExtensionPropertyFile(project);
 		Properties extensionProperties = new Properties();
 		try {
-			extensionProperties.load(propertyFile.getRawLocationURI().toURL().openStream());
-			extensionProperties.put("", "");
+			extensionProperties.load(propertyFile.getContents());
+			String contributors = Joiner.on(",").join(contributingClasses);
+			extensionProperties.put(EXTENSION_EXTENDED_POINTS, contributors);
+			FileWriter fw = new FileWriter(new File(propertyFile.getRawLocationURI()));
+			extensionProperties.store(fw, "");
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (CoreException e) {
 			e.printStackTrace();
 		}
 		super.buildFinished(project);
