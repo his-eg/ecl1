@@ -9,5 +9,8 @@
    <feature url="features/h1modulesfeature_0.0.14.2012-07-17.jar" id="h1modulesfeature" version="0.0.14.2012-07-17">
       <category name="de.his.cs.sys.extensions"/>
    </feature>
+   <feature url="features/h1modulesfeature_0.0.15.2012-08-23.jar" id="h1modulesfeature" version="0.0.15.2012-08-23">
+      <category name="de.his.cs.sys.extensions"/>
+   </feature>
    <category-def name="de.his.cs.sys.extensions" label="Extension Tools"/>
 </site>
