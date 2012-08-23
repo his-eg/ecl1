@@ -5,7 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.HashSet;
 import java.util.Properties;
 
 import org.eclipse.core.resources.IFile;
@@ -34,7 +34,7 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 	private static final String EXTENSION_ANT_PROPERTIES = "extension.ant.properties";
 	private static final String EXTENSION_ANNOTATION_NAME = "Extension";
 	
-	private Collection<String> contributingClasses = new LinkedList<String>();
+    private Collection<String> contributingClasses = new HashSet<String>();
 
 	@Override
 	public int aboutToBuild(IJavaProject project) {
@@ -60,10 +60,11 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 			extensionProperties.load(propertyFile.getContents());
             if (!this.contributingClasses.isEmpty()) {
                 String contributors = Joiner.on(",").join(contributingClasses);
-                extensionProperties.remove(EXTENSION_ANT_PROPERTIES);
+                extensionProperties.remove(EXTENSION_EXTENDED_POINTS);
                 extensionProperties.put(EXTENSION_EXTENDED_POINTS, contributors);
                 FileWriter fw = new FileWriter(new File(propertyFile.getRawLocationURI()));
                 extensionProperties.store(fw, "");
+                propertyFile.refreshLocal(0, null);
             }
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
