@@ -71,9 +71,14 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 	@Override
 	public boolean isActive(IJavaProject project) {
 		boolean containsExtensionAntProperties = false;
-		IFile file = project.getProject().getFile(EXTENSION_ANT_PROPERTIES);
+		IFile file = getExtensionPropertyFile(project);
 		containsExtensionAntProperties = file.exists();
 		return containsExtensionAntProperties;
+	}
+
+	private IFile getExtensionPropertyFile(IJavaProject project) {
+		IFile file = project.getProject().getFile(EXTENSION_ANT_PROPERTIES);
+		return file;
 	}
 
 }
