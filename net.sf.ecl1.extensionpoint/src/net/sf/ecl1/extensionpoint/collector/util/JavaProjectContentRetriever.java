@@ -19,8 +19,11 @@ public class JavaProjectContentRetriever {
 
     private final IJavaProject project;
 
+    /**
+     * Create a new JavaProjectContentRetriever
+     * @param project
+     */
     public JavaProjectContentRetriever(IJavaProject project) {
-        super();
         this.project = project;
     }
 
