@@ -8,13 +8,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
 
+import net.sf.ecl1.extensionpoint.collector.util.JavaProjectContentRetriever;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IAnnotation;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.compiler.CompilationParticipant;
@@ -45,12 +44,10 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 	public void buildFinished(IJavaProject project) {
 		System.out.println("Starting to collect extension point contributions from project '" + project.getElementName() + "'");
 		try {
-			IPackageFragment[] fragmentRoots = project.getPackageFragments();
-			for (IPackageFragment iPackageFragment : fragmentRoots) {
-				if(IPackageFragmentRoot.K_SOURCE == iPackageFragment.getKind()) {
-					scanPackage(iPackageFragment);
-				}
-			}
+            Collection<IType> types = new JavaProjectContentRetriever(project).getClasses();
+            for (IType iType : types) {
+                this.scanType(iType);
+            }
 		} catch (JavaModelException e) {
 			e.printStackTrace();
 		}
@@ -75,16 +72,6 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 		}
         System.out.println("Finished collection of extension point contributions from project '" + project.getElementName() + "'");
 		super.buildFinished(project);
-	}
-
-	private void scanPackage(IPackageFragment iPackageFragment) throws JavaModelException {
-		ICompilationUnit[] units = iPackageFragment.getCompilationUnits();
-		for (ICompilationUnit unit : units) {
-			IType[] types = unit.getAllTypes();
-			for (IType type : types) {
-				scanType(type);
-			}
-		}
 	}
 
 	private void scanType(IType type) throws JavaModelException {

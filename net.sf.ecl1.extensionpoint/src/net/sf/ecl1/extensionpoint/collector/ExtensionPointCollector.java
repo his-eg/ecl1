@@ -7,14 +7,11 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import net.sf.ecl1.extensionpoint.collector.model.ExtensionPointInformation;
+import net.sf.ecl1.extensionpoint.collector.util.JavaProjectContentRetriever;
 
 import org.eclipse.jdt.core.IAnnotation;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMemberValuePair;
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.compiler.CompilationParticipant;
@@ -48,12 +45,10 @@ public class ExtensionPointCollector extends CompilationParticipant {
 		this.found = new LinkedList<ExtensionPointInformation>();
 		this.projectUnderScan = project;
 		try {
-			IPackageFragment[] fragmentRoots = project.getPackageFragments();
-			for (IPackageFragment iPackageFragment : fragmentRoots) {
-				if(IPackageFragmentRoot.K_SOURCE == iPackageFragment.getKind()) {
-					scanPackage(iPackageFragment);
-				}
-			}
+            Collection<IType> classes = new JavaProjectContentRetriever(projectUnderScan).getClasses();
+            for (IType iType : classes) {
+                scanType(iType);
+            }
 		} catch (JavaModelException e) {
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
@@ -63,32 +58,12 @@ public class ExtensionPointCollector extends CompilationParticipant {
 		System.out.println("Finished Extension Point Collection");
 	}
 
-	private void scanPackage(IPackageFragment iPackageFragment) throws JavaModelException, ClassNotFoundException {
-		ICompilationUnit[] units = iPackageFragment.getCompilationUnits();
-		for (ICompilationUnit unit : units) {
-			IType[] types = unit.getAllTypes();
-			for (IType type : types) {
-				scanType(type);
-			}
-		}
-	}
-
 	private void scanType(IType type) throws JavaModelException, ClassNotFoundException {
 		IAnnotation[] annotations = type.getAnnotations();
 		for (IAnnotation annotation : annotations) {
 			String elementName = annotation.getElementName();
 			if(EXTENSION_POINT_ANNOTATION_NAME.equals(elementName)) {
 				handleAnnotation(annotation);
-			}
-		}
-		IMethod[] methods = type.getMethods();
-		for (IMethod method : methods) {
-			IAnnotation[] methodAnnotations = method.getAnnotations();
-			for (IAnnotation methodAnnotation : methodAnnotations) {
-				String elementName = methodAnnotation.getElementName();
-				if(EXTENSION_POINT_ANNOTATION_NAME.equals(elementName)) {
-					handleAnnotation(methodAnnotation);
-				}
 			}
 		}
 	}
