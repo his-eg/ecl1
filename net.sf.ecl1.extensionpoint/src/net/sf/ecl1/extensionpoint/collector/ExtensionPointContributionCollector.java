@@ -1,7 +1,10 @@
 package net.sf.ecl1.extensionpoint.collector;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.Properties;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.IAnnotation;
@@ -44,7 +47,16 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 		} catch (JavaModelException e) {
 			e.printStackTrace();
 		}
-		//TODO implement writing to property file
+		IFile propertyFile = getExtensionPropertyFile(project);
+		Properties extensionProperties = new Properties();
+		try {
+			extensionProperties.load(propertyFile.getRawLocationURI().toURL().openStream());
+			extensionProperties.put("", "");
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		super.buildFinished(project);
 	}
 
