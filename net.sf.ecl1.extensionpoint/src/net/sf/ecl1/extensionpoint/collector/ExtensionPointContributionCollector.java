@@ -60,6 +60,7 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 			extensionProperties.load(propertyFile.getContents());
             if (!this.contributingClasses.isEmpty()) {
                 String contributors = Joiner.on(",").join(contributingClasses);
+                extensionProperties.remove(EXTENSION_ANT_PROPERTIES);
                 extensionProperties.put(EXTENSION_EXTENDED_POINTS, contributors);
                 FileWriter fw = new FileWriter(new File(propertyFile.getRawLocationURI()));
                 extensionProperties.store(fw, "");
