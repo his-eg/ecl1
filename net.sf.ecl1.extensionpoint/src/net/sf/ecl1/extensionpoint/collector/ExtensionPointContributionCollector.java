@@ -20,7 +20,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.compiler.CompilationParticipant;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
 
 /**
  * This class collects all contributions to extension points from projects, that have a file
@@ -44,6 +43,7 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 
 	@Override
 	public void buildFinished(IJavaProject project) {
+		System.out.println("Starting to collect extension point contributions from project '" + project.getElementName() + "'");
 		try {
 			IPackageFragment[] fragmentRoots = project.getPackageFragments();
 			for (IPackageFragment iPackageFragment : fragmentRoots) {
@@ -58,10 +58,12 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 		Properties extensionProperties = new Properties();
 		try {
 			extensionProperties.load(propertyFile.getContents());
-			String contributors = Joiner.on(",").join(contributingClasses);
-			extensionProperties.put(EXTENSION_EXTENDED_POINTS, contributors);
-			FileWriter fw = new FileWriter(new File(propertyFile.getRawLocationURI()));
-			extensionProperties.store(fw, "");
+            if (!this.contributingClasses.isEmpty()) {
+                String contributors = Joiner.on(",").join(contributingClasses);
+                extensionProperties.put(EXTENSION_EXTENDED_POINTS, contributors);
+                FileWriter fw = new FileWriter(new File(propertyFile.getRawLocationURI()));
+                extensionProperties.store(fw, "");
+            }
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -69,6 +71,7 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 		} catch (CoreException e) {
 			e.printStackTrace();
 		}
+        System.out.println("Finished collection of extension point contributions from project '" + project.getElementName() + "'");
 		super.buildFinished(project);
 	}
 
@@ -97,6 +100,9 @@ public class ExtensionPointContributionCollector extends CompilationParticipant 
 		boolean containsExtensionAntProperties = false;
 		IFile file = getExtensionPropertyFile(project);
 		containsExtensionAntProperties = file.exists();
+        if (!containsExtensionAntProperties) {
+            System.out.println("Extension Point Contribution Collection not active for '" + project.getElementName() + "'");
+        }
 		return containsExtensionAntProperties;
 	}
 
