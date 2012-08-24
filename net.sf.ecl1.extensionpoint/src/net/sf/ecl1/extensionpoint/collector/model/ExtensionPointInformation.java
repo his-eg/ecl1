@@ -1,4 +1,8 @@
 package net.sf.ecl1.extensionpoint.collector.model;
+
+import com.google.common.base.Objects;
+
+
 /**
  * Container for extension point information
  * 
@@ -23,5 +27,19 @@ public class ExtensionPointInformation {
 		return "ExtensionPointInformation [id=" + id + ", name=" + name
 				+ ", iface=" + iface + "]";
 	}
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id, name, iface);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof ExtensionPointInformation) {
+            ExtensionPointInformation that = (ExtensionPointInformation) object;
+            return Objects.equal(this.id, that.id) && Objects.equal(this.name, that.name) && Objects.equal(this.iface, that.iface);
+        }
+        return false;
+    }
 
 }
