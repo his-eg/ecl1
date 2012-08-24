@@ -2,7 +2,7 @@
 <feature
       id="h1modulesfeature"
       label="H1modulesfeature"
-      version="0.0.15.2012-08-23"
+      version="0.0.15.2012-08-24"
       provider-name="HIS GmbH">
 
    <description>
@@ -120,6 +120,13 @@ To apply the Apache License to your work, attach the following boilerplate notic
 
    <plugin
          id="net.sf.ecl1.extensionpoint"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.guava"
          download-size="0"
          install-size="0"
          version="0.0.0"
