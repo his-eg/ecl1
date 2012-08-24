@@ -86,7 +86,11 @@ public class ExtensionPointCollector extends CompilationParticipant {
 				if(pair.getValueKind() == IMemberValuePair.K_CLASS) {
 					String ifaceName = (String) pair.getValue();
 					IType findType = projectUnderScan.findType(ifaceName);
-					iface = findType.getFullyQualifiedName();
+                    if (findType != null) {
+                        iface = findType.getFullyQualifiedName();
+                    } else {
+                        System.out.println("Referenced Interface Type not found in project '" + this.projectUnderScan.getElementName() + "': '" + ifaceName + "'");
+                    }
 				}
 			}
 		}
