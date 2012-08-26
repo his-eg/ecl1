@@ -3,49 +3,42 @@
  */
 package net.sf.ecl1.extensionpoint.collector;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
+import java.util.HashSet;
 
 import net.sf.ecl1.extensionpoint.collector.model.ExtensionPointInformation;
-import net.sf.ecl1.extensionpoint.collector.util.JavaProjectContentRetriever;
+import net.sf.ecl1.extensionpoint.collector.util.ConsoleLoggingHelper;
 
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.compiler.CompilationParticipant;
 
 /**
  * @author keunecke
  *
  */
-public class ExtensionPointCollector extends CompilationParticipant {
+public class ExtensionPointCollector {
 
 	private static final String EXTENSION_POINT_ANNOTATION_NAME = "ExtensionPoint";
 	
-	private Collection<ExtensionPointInformation> found;
+    private Collection<ExtensionPointInformation> found = new ArrayList<ExtensionPointInformation>();
 	
-	private IJavaProject projectUnderScan;
+    private ConsoleLoggingHelper logger;
 
-	@Override
-	public int aboutToBuild(IJavaProject project) {
-		return super.aboutToBuild(project);
-	}
+    private IJavaProject project;
 
-	@Override
-	public boolean isActive(IJavaProject project) {
-		return true;
-	}
+    public ExtensionPointCollector(IJavaProject project) {
+        this.project = project;
+        logger = new ConsoleLoggingHelper(project, this.getClass().getSimpleName());
+    }
 
-	@Override
-	public void buildFinished(IJavaProject project) {
-		System.out.println("Starting Extension Point Collection");
-		System.out.println("Project: " + project.getElementName());
-		this.found = new LinkedList<ExtensionPointInformation>();
-		this.projectUnderScan = project;
+    public Collection<ExtensionPointInformation> extractExtensionInformation(Collection<IType> classes) {
+        logger.logToConsole("Starting Extension Point Collection");
+        this.found = new HashSet<ExtensionPointInformation>();
 		try {
-            Collection<IType> classes = new JavaProjectContentRetriever(projectUnderScan).getClasses();
             for (IType iType : classes) {
                 scanType(iType);
             }
@@ -54,8 +47,8 @@ public class ExtensionPointCollector extends CompilationParticipant {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		ExtensionPointManager.addExtensions(project.getElementName(), this.found);
-		System.out.println("Finished Extension Point Collection");
+        logger.logToConsole("Finished Extension Point Collection");
+        return this.found;
 	}
 
 	private void scanType(IType type) throws JavaModelException, ClassNotFoundException {
@@ -70,7 +63,7 @@ public class ExtensionPointCollector extends CompilationParticipant {
 
 	private void handleAnnotation(IAnnotation annotation)
 			throws JavaModelException, ClassNotFoundException {
-		System.out.println("Found " + annotation.getElementName());
+        logger.logToConsole("Found " + annotation.getElementName());
 		IMemberValuePair[] pairs = annotation.getMemberValuePairs();
 		String id = null;
 		String name = null;
@@ -85,21 +78,21 @@ public class ExtensionPointCollector extends CompilationParticipant {
 			if(pair.getMemberName().equals("extensionInterface")) {
 				if(pair.getValueKind() == IMemberValuePair.K_CLASS) {
 					String ifaceName = (String) pair.getValue();
-					IType findType = projectUnderScan.findType(ifaceName);
+                    IType findType = project.findType(ifaceName);
                     if (findType != null) {
                         iface = findType.getFullyQualifiedName();
                     } else {
-                        System.out.println("Referenced Interface Type not found in project '" + this.projectUnderScan.getElementName() + "': '" + ifaceName + "'");
+                        logger.logToConsole("Referenced Interface Type not found in project '" + this.project.getElementName() + "': '" + ifaceName + "'");
                     }
 				}
 			}
 		}
 		if(id != null && name != null && iface != null) {
 			ExtensionPointInformation e = new ExtensionPointInformation(id, name, iface);
-			System.out.println(e);
+            logger.logToConsole(e.toString());
 			found.add(e);
 		} else {
-			System.err.println("Extension Information incomplete: " + annotation.getSource());
+            logger.logToConsole("Extension Information incomplete: " + annotation.getSource());
 		}
 	}
 

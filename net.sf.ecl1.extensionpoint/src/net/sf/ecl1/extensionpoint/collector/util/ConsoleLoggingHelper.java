@@ -21,14 +21,20 @@ public class ConsoleLoggingHelper {
         this.name = name;
     }
 
-    public void logToConsole(String message) throws IOException {
+    public void logToConsole(String message) {
         MessageConsole console = findConsole(this.name);
         MessageConsoleStream newMessageStream = console.newMessageStream();
         try {
-            newMessageStream.write("[" + this.javaProject.getElementName() + "] " + message);
+            newMessageStream.write("[" + this.javaProject.getElementName() + "] " + message + "\n");
             newMessageStream.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
         } finally {
-            newMessageStream.close();
+            try {
+                newMessageStream.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
     }

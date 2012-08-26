@@ -35,18 +35,39 @@
       </contexts>
    </extension>
    <extension
-         id="net.sf.ecl1.extensiontpoint.collector"
-         point="org.eclipse.jdt.core.compilationParticipant">
-     <compilationParticipant
-         class="net.sf.ecl1.extensionpoint.collector.ExtensionPointCollector"
-         id="net.sf.ecl1.extensionpoint.collector.ExtensionPointCollector"
-         requiredSourceLevel="1.6">
-	 </compilationParticipant>
-	 <compilationParticipant
-         class="net.sf.ecl1.extensionpoint.collector.ExtensionPointContributionCollector"
-         id="net.sf.ecl1.extensionpoint.collector.ExtensionPointContributionCollector"
-         requiredSourceLevel="1.6">
-	 </compilationParticipant>
+         id="extensionPointBuilder"
+         name="Extension Point Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="net.sf.ecl1.extensionpoint.collector.ExtensionPointBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="hisinoneExtensionsNature"
+         name="HISinOne Extensions"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="net.sf.ecl1.extensionpoint.collector.HisinoneExtensionsNature">
+         </run>
+      </runtime>
+      <builder
+            id="net.sf.ecl1.extensionpoint.extensionPointBuilder">
+      </builder>
+   </extension>
+   <extension
+         id="xmlProblem"
+         name="XML Problem"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <persistent
+            value="true">
+      </persistent>
    </extension>
 
 </plugin>
