@@ -7,6 +7,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.JavaCore;
 
 public class ExtensionPointBuilder extends IncrementalProjectBuilder {
 
@@ -17,7 +18,7 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
     protected IProject[] build(int kind, @SuppressWarnings("rawtypes")
     Map args, IProgressMonitor monitor)
 			throws CoreException {
-        visitor = new ExtensionPointVisitor();
+        visitor = new ExtensionPointVisitor(JavaCore.create(getProject()));
 		if (kind == FULL_BUILD) {
 			fullBuild(monitor);
 		} else {
