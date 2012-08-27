@@ -1,7 +1,9 @@
 package net.sf.ecl1.extensionpoint.collector;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Properties;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -9,16 +11,42 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
+import com.google.common.base.Splitter;
+
 class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
+
+    private static final String JAVA_FILE_EXTENSION = "java";
+
+    private static final String EXTENSION_ANNOTATION_NAME = "Extension";
+
+    private static final String EXTENSION_POINT_ANNOTATION_NAME = "ExtensionPoint";
 
     private Collection<String> contributors = new HashSet<String>();
 
     public ExtensionPointVisitor(IJavaProject project) {
+        IFile props = project.getProject().getFile("extension.ant.properties");
+        if (props != null && props.exists()) {
+            try {
+                Properties p = new Properties();
+                p.load(props.getContents());
+                String propString = p.getProperty("extension.extended-points");
+                Iterable<String> contribs = Splitter.on(",").split(propString);
+                for (String contrib : contribs) {
+                    this.contributors.add(contrib);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (CoreException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public boolean visit(IResource resource) {
@@ -53,7 +81,7 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
         return true;
     }
 
-    private void handelDeletedResource(IResource resource) {
+    private void handelDeletedResource(IResource resource) throws JavaModelException {
         switch (resource.getType()) {
         case IResource.FILE:
             handleDeletedFile((IFile) resource);
@@ -64,9 +92,21 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
         }
     }
 
-    private void handleDeletedFile(IFile resource) {
-        // TODO Auto-generated method stub
-
+    private void handleDeletedFile(IFile resource) throws JavaModelException {
+        // handle only java files
+        if (JAVA_FILE_EXTENSION.equals(resource.getFileExtension())) {
+            ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(resource);
+            for (IType type : compilationUnit.getTypes()) {
+                IAnnotation extensionAnnotation = type.getAnnotation(EXTENSION_ANNOTATION_NAME);
+                if (extensionAnnotation != null) {
+                    //TODO
+                }
+                IAnnotation extensionPointAnnotation = type.getAnnotation(EXTENSION_POINT_ANNOTATION_NAME);
+                if (extensionPointAnnotation != null) {
+                    //TODO
+                }
+            }
+        }
     }
 
     private void handleResource(IResource resource) throws JavaModelException {
@@ -82,7 +122,7 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
 
     private void handleFile(IFile resource) throws JavaModelException {
         // handle only java files
-        if ("java".equals(resource.getFileExtension())) {
+        if (JAVA_FILE_EXTENSION.equals(resource.getFileExtension())) {
             ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(resource);
         }
     }
