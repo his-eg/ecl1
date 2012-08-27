@@ -1,10 +1,5 @@
 package net.sf.ecl1.extensionpoint.collector;
 
-import java.util.Arrays;
-import java.util.Collection;
-
-import net.sf.ecl1.extensionpoint.collector.model.ExtensionPointInformation;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -17,10 +12,13 @@ import org.eclipse.jdt.core.JavaModelException;
 
 class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
 
-	private ExtensionPointCollector extensionPointCollector;
-
     public boolean visit(IResource resource) {
 		//return true to continue visiting children.
+        try {
+            handleResource(resource);
+        } catch (JavaModelException e) {
+            e.printStackTrace();
+        }
 		return true;
 	}
 
@@ -29,7 +27,7 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
         switch (delta.getKind()) {
         case IResourceDelta.ADDED:
             // handle added resource
-            handleAddedResource(resource);
+            handleResource(resource);
             break;
         case IResourceDelta.REMOVED:
             // handle removed resource
@@ -38,13 +36,14 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
             break;
         case IResourceDelta.CHANGED:
             // handle changed resource
+            handleResource(resource);
             break;
         }
         //return true to continue visiting children.
         return true;
     }
 
-    private void handleAddedResource(IResource resource) throws JavaModelException {
+    private void handleResource(IResource resource) throws JavaModelException {
         switch (resource.getType()) {
         case IResource.FILE:
             handleAddedFile((IFile) resource);
@@ -59,9 +58,6 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
         // handle only java files
         if ("java".equals(resource.getFileExtension())) {
             ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(resource);
-            extensionPointCollector = new ExtensionPointCollector(JavaCore.create(resource.getProject()));
-            Collection<ExtensionPointInformation> collection = extensionPointCollector.extractExtensionInformation(Arrays.asList(compilationUnit.getAllTypes()));
-            ExtensionPointManager.addExtensions(resource.getProject().getName(), collection);
         }
     }
 }

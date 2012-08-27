@@ -41,7 +41,6 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
 
 	protected void incrementalBuild(IResourceDelta delta,
 			IProgressMonitor monitor) throws CoreException {
-		// the visitor does the work.
         delta.accept(visitor);
 	}
 }
