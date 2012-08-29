@@ -33,10 +33,11 @@ public final class ExtensionPointManager {
             pointsInProject = new HashMap<String, Collection<ExtensionPointInformation>>();
             extensions.put(extension, pointsInProject);
         }
-        Collection<ExtensionPointInformation> collection = pointsInProject.get(type.getFullyQualifiedName());
+        String fullyQualifiedName = type.getFullyQualifiedName();
+        Collection<ExtensionPointInformation> collection = pointsInProject.get(fullyQualifiedName);
         if (collection == null) {
             collection = new HashSet<ExtensionPointInformation>();
-            pointsInProject.put(extension, collection);
+            pointsInProject.put(fullyQualifiedName, collection);
         }
         collection.addAll(epis);
         updateListeners();
@@ -48,11 +49,11 @@ public final class ExtensionPointManager {
      * @param extension
      * @param epis
      */
-    public static final void removeExtensions(String extension, IType type, Collection<ExtensionPointInformation> epis) {
+    public static final void removeExtensions(String extension, IType type) {
         Map<String, Collection<ExtensionPointInformation>> pointsInProject = extensions.get(extension);
-        Collection<ExtensionPointInformation> collection = pointsInProject.get(type.getFullyQualifiedName());
+        Collection<ExtensionPointInformation> collection = pointsInProject.remove(type.getFullyQualifiedName());
         if (collection != null) {
-            collection.removeAll(epis);
+            collection.clear();
         }
         updateListeners();
     }
