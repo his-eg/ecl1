@@ -34,11 +34,13 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
 
     private Collection<String> contributors = new HashSet<String>();
 
-    private IJavaProject project;
-
+    /**
+     * Create a new ExtensionPointVisitor
+     * 
+     * @param project
+     */
     public ExtensionPointVisitor(IJavaProject project) {
         IFile props = project.getProject().getFile("extension.ant.properties");
-        this.project = project;
         if (props != null && props.exists()) {
             try {
                 Properties p = new Properties();

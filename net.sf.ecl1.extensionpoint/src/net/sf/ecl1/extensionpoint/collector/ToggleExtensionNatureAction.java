@@ -12,6 +12,11 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
+/**
+ * Action to add/remove the extension nature from a project
+ *  
+ * @author keunecke
+ */
 public class ToggleExtensionNatureAction implements IObjectActionDelegate {
 
 	private ISelection selection;
@@ -21,7 +26,8 @@ public class ToggleExtensionNatureAction implements IObjectActionDelegate {
 	 * 
 	 * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
 	 */
-	public void run(IAction action) {
+    @SuppressWarnings("rawtypes")
+    public void run(IAction action) {
 		if (selection instanceof IStructuredSelection) {
 			for (Iterator it = ((IStructuredSelection) selection).iterator(); it
 					.hasNext();) {
