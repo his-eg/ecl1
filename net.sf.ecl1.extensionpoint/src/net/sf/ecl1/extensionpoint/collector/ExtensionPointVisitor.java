@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
 
+import net.sf.ecl1.extensionpoint.collector.manager.ExtensionPointManager;
 import net.sf.ecl1.extensionpoint.collector.model.ExtensionPointInformation;
 
 import org.eclipse.core.resources.IFile;

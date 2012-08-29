@@ -1,15 +1,34 @@
 package net.sf.ecl1.extensionpoint.views;
 
 
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.part.*;
-import org.eclipse.jface.viewers.*;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.jface.action.*;
+import net.sf.ecl1.extensionpoint.collector.manager.ExtensionPointManager;
+import net.sf.ecl1.extensionpoint.collector.manager.ExtensionPointManagerChangeListener;
+
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.ui.*;
-import org.eclipse.swt.widgets.Menu;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.ViewPart;
 
 
 /**
@@ -30,7 +49,7 @@ import org.eclipse.swt.SWT;
  * <p>
  */
 
-public class ExtensionPointView extends ViewPart {
+public class ExtensionPointView extends ViewPart implements ExtensionPointManagerChangeListener {
 
 	/**
 	 * The ID of the view as specified by the extension.
@@ -84,6 +103,7 @@ public class ExtensionPointView extends ViewPart {
 		viewer.setLabelProvider(new ViewLabelProvider());
 		viewer.setSorter(new NameSorter());
 		viewer.setInput(getViewSite());
+        ExtensionPointManager.register(this);
 
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), "net.sf.ecl1.extensionpoint.viewer");
@@ -179,4 +199,18 @@ public class ExtensionPointView extends ViewPart {
 	public void setFocus() {
 		viewer.getControl().setFocus();
 	}
+
+    @Override
+    public void update() {
+        if (this.viewer != null) {
+            Display current = Display.getDefault();
+            current.asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    ExtensionPointView.this.viewer.refresh();
+                }
+            });
+        }
+    }
+
 }

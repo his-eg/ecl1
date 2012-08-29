@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-import net.sf.ecl1.extensionpoint.collector.ExtensionPointManager;
+import net.sf.ecl1.extensionpoint.collector.manager.ExtensionPointManager;
 import net.sf.ecl1.extensionpoint.collector.model.ExtensionPointInformation;
 
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -17,6 +17,7 @@ import org.eclipse.jface.viewers.Viewer;
 public class ExtensionPointsViewContentProvider implements IStructuredContentProvider {
 	
 	public void inputChanged(Viewer v, Object oldInput, Object newInput) {
+        v.refresh();
 	}
 	
 	public void dispose() {
@@ -30,4 +31,5 @@ public class ExtensionPointsViewContentProvider implements IStructuredContentPro
 		}
 		return extensionPoints.toArray();
 	}
+
 }
