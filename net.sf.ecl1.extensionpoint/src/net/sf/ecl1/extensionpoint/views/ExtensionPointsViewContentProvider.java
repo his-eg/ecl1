@@ -24,12 +24,15 @@ public class ExtensionPointsViewContentProvider implements IStructuredContentPro
 	}
 	
 	public Object[] getElements(Object parent) {
-		Map<String, Collection<ExtensionPointInformation>> extensions = ExtensionPointManager.getExtensions();
-		ArrayList<ExtensionPointInformation> extensionPoints = new ArrayList<ExtensionPointInformation>();
-		for (Collection<ExtensionPointInformation> extensionPointInformation : extensions.values()) {
-			extensionPoints.addAll(extensionPointInformation);
-		}
-		return extensionPoints.toArray();
+        Map<String, Map<String, Collection<ExtensionPointInformation>>> allExtensions = ExtensionPointManager.getExtensions();
+        ArrayList<ExtensionPointInformation> extensionPoints = new ArrayList<ExtensionPointInformation>();
+        for (Map<String, Collection<ExtensionPointInformation>> allExtension : allExtensions.values()) {
+            Map<String, Collection<ExtensionPointInformation>> extensions = allExtension;
+            for (Collection<ExtensionPointInformation> extensionPointInformation : extensions.values()) {
+                extensionPoints.addAll(extensionPointInformation);
+            }
+        }
+        return extensionPoints.toArray();
 	}
 
 }

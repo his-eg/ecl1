@@ -7,6 +7,8 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import net.sf.ecl1.extensionpoint.collector.model.ExtensionPointInformation;
+
+import org.eclipse.jdt.core.IType;
 /**
  * Manager for collected extension points
  * 
@@ -15,7 +17,7 @@ import net.sf.ecl1.extensionpoint.collector.model.ExtensionPointInformation;
 public final class ExtensionPointManager {
 	
 	/** Map containing source extension name as key and the defined extension point */
-	private static final Map<String, Collection<ExtensionPointInformation>> extensions = new HashMap<String, Collection<ExtensionPointInformation>>();
+    private static final Map<String, Map<String, Collection<ExtensionPointInformation>>> extensions = new HashMap<String, Map<String, Collection<ExtensionPointInformation>>>();
 	
     private static final Collection<ExtensionPointManagerChangeListener> listeners = new LinkedList<ExtensionPointManagerChangeListener>();
 
@@ -25,11 +27,16 @@ public final class ExtensionPointManager {
 	 * @param extension
 	 * @param epi
 	 */
-	public static final void addExtensions(String extension, Collection<ExtensionPointInformation> epis) {
-        Collection<ExtensionPointInformation> collection = extensions.get(extension);
+    public static final void addExtensions(String extension, IType type, Collection<ExtensionPointInformation> epis) {
+        Map<String, Collection<ExtensionPointInformation>> pointsInProject = extensions.get(extension);
+        if (pointsInProject == null) {
+            pointsInProject = new HashMap<String, Collection<ExtensionPointInformation>>();
+            extensions.put(extension, pointsInProject);
+        }
+        Collection<ExtensionPointInformation> collection = pointsInProject.get(type.getFullyQualifiedName());
         if (collection == null) {
             collection = new HashSet<ExtensionPointInformation>();
-            extensions.put(extension, collection);
+            pointsInProject.put(extension, collection);
         }
         collection.addAll(epis);
         updateListeners();
@@ -41,8 +48,9 @@ public final class ExtensionPointManager {
      * @param extension
      * @param epis
      */
-    public static final void removeExtensions(String extension, Collection<ExtensionPointInformation> epis) {
-        Collection<ExtensionPointInformation> collection = extensions.get(extension);
+    public static final void removeExtensions(String extension, IType type, Collection<ExtensionPointInformation> epis) {
+        Map<String, Collection<ExtensionPointInformation>> pointsInProject = extensions.get(extension);
+        Collection<ExtensionPointInformation> collection = pointsInProject.get(type.getFullyQualifiedName());
         if (collection != null) {
             collection.removeAll(epis);
         }
@@ -54,8 +62,8 @@ public final class ExtensionPointManager {
      * 
      * @return map with key extension and value collection of contained extension points
      */
-	public static final Map<String, Collection<ExtensionPointInformation>> getExtensions() {
-		return new HashMap<String, Collection<ExtensionPointInformation>>(extensions);
+    public static final Map<String, Map<String, Collection<ExtensionPointInformation>>> getExtensions() {
+        return new HashMap<String, Map<String, Collection<ExtensionPointInformation>>>(extensions);
 	}
 
     public static final void register(ExtensionPointManagerChangeListener l) {
