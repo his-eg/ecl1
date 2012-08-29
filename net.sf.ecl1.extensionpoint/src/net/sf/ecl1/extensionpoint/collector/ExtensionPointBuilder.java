@@ -9,8 +9,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.JavaCore;
 
+/**
+ * Project Builder to collect and process extension point and contribution information
+ *  
+ * @author keunecke
+ */
 public class ExtensionPointBuilder extends IncrementalProjectBuilder {
 
+    /** Builder ID constant */
     public static final String BUILDER_ID = "net.sf.ecl1.extensionpoint.extensionPointBuilder";
 
     private ExtensionPointVisitor visitor;
@@ -32,6 +38,12 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
 		return null;
 	}
 
+    /**
+     * Perform a full build
+     * 
+     * @param monitor
+     * @throws CoreException
+     */
 	protected void fullBuild(final IProgressMonitor monitor)
 			throws CoreException {
 		try {
@@ -42,6 +54,13 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
 		}
 	}
 
+    /**
+     * Perform an incremental build
+     * 
+     * @param delta
+     * @param monitor
+     * @throws CoreException
+     */
 	protected void incrementalBuild(IResourceDelta delta,
 			IProgressMonitor monitor) throws CoreException {
         delta.accept(visitor);
