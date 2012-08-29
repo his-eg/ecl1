@@ -19,7 +19,7 @@ public final class ExtensionPointManager {
     private static ExtensionPointManager instance;
 	
 	/** Map containing source extension name as key and the defined extension point */
-    private final Multimap<IType, ExtensionPointInformation> extensions = HashMultimap.create();
+    private Multimap<IType, ExtensionPointInformation> extensions = HashMultimap.create();
 	
     private final Collection<ExtensionPointManagerChangeListener> listeners = new LinkedList<ExtensionPointManagerChangeListener>();
 
@@ -46,20 +46,11 @@ public final class ExtensionPointManager {
 	}
 
     /**
-     * Remove extension points from an extension
-     * 
-     * @param type 
-     */
-    public final void removeExtensions(IType type) {
-        extensions.removeAll(type);
-        updateListeners();
-    }
-
-    /**
      * Clear all known extension points
      */
     public final void clear() {
         this.extensions.clear();
+        this.extensions = HashMultimap.create();
     }
 
     /**
