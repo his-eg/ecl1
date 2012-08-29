@@ -40,7 +40,7 @@ public class ExtensionPointInformation {
                 if (resolveType != null && resolveType.length > 0) {
                     ifaceValue = resolveType[0][0] + "." + resolveType[0][1];
                 } else {
-                    logger.logToConsole("Missing information for extension point: " + a.getSource());
+                    logger.logToConsole("Missing information for extension point: \n" + a.getSource());
                     logger.logToConsole("Could not find referenced type from iface attribute: " + ifaceValue);
                 }
             }
