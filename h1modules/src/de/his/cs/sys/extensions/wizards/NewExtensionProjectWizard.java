@@ -2,7 +2,6 @@ package de.his.cs.sys.extensions.wizards;
 
 
 import java.net.URI;
-import java.util.Arrays;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.viewers.IStructuredSelection;

@@ -24,8 +24,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-
-import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
 import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
 
 /**
@@ -62,7 +60,6 @@ public class NewEnrollCheckerWizard extends Wizard implements INewWizard {
 		}
 	}
 
-	@SuppressWarnings("hiding")
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		this.selection = selection;

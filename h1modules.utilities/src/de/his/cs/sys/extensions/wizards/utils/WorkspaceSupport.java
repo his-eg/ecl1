@@ -24,7 +24,12 @@ import org.eclipse.core.runtime.Path;
  * @version $Revision$ 
  */
 public class WorkspaceSupport {
-	
+
+    /**
+     * Determine all projects that could be referenced by a new project
+     * 
+     * @return a list of suitable projects
+     */
 	public List<String> getPossibleProjectsToReference() {
 		List<String> result = new ArrayList<String>();
 		IWorkspace workspace = ResourcesPlugin.getWorkspace();

@@ -37,6 +37,9 @@ public class ForEachProjectSetupStepHandler {
 		this.initialChoice = initialChoice;
 	}
 
+	/**
+	 * Execute each project setup step
+	 */
 	public void contribute() {
 		IConfigurationElement[] elements = Platform.getExtensionRegistry().getConfigurationElementsFor(CS_SYS_EXTENSIONS_PROJECT_SETUP_STEPS);
 		for (IConfigurationElement element : elements) {
