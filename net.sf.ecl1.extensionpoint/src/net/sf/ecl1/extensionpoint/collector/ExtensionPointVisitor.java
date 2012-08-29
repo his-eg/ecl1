@@ -110,7 +110,7 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
                 }
                 IAnnotation extensionPointAnnotation = type.getAnnotation(EXTENSION_POINT_ANNOTATION_NAME);
                 if (extensionPointAnnotation != null) {
-                    ExtensionPointManager.get().removeExtensions(this.project.getElementName(), type);
+                    ExtensionPointManager.get().removeExtensions(type);
                 }
             }
         }
@@ -138,7 +138,7 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
                 }
                 IAnnotation extensionPointAnnotation = type.getAnnotation(EXTENSION_POINT_ANNOTATION_NAME);
                 if (extensionPointAnnotation != null && extensionPointAnnotation.exists()) {
-                    ExtensionPointManager.get().addExtensions(this.project.getElementName(), type, Arrays.asList(ExtensionPointInformation.create(extensionPointAnnotation, type)));
+                    ExtensionPointManager.get().addExtensions(type, Arrays.asList(ExtensionPointInformation.create(extensionPointAnnotation, type)));
                 } else {
                     // TODO remove all points for this type from manager
                 }
