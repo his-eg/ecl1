@@ -27,12 +27,12 @@ public class ResourceSupport {
 	
 	private final IProject project;
 
-	/**
-	 * ResourceSupport
-	 *
-	 * @param project eclipse project
-	 * @param version initial extension version
-	 */
+	    /**
+     * ResourceSupport
+     *
+     * @param project eclipse project
+     * @param choices configuration choices from setup 
+     */
 	public ResourceSupport(IProject project, InitialProjectConfigurationChoices choices) {
 		this.project = project;
 		extensionAntPropertiesReplacements.put("[name]", choices.getName());

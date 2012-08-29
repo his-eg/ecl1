@@ -3,6 +3,11 @@ package h1modules.utilities.utils;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+/**
+ * Activator
+ * 
+ * @author keunecke
+ */
 public class Activator implements BundleActivator {
 
 	private static BundleContext context;

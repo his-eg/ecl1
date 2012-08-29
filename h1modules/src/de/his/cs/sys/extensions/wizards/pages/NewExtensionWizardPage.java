@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ExtendedModifyEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
@@ -147,7 +146,7 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 	}
 	
 	/**
-	 * @return
+	 * @return the package structure strategy
 	 */
 	public PackageStructureStrategy getStrategy() {
 		return this.strategy;

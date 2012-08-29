@@ -24,6 +24,14 @@ public class ExtensionPointInformation {
 	
 	private final String iface;
 
+    /**
+     * Factory method for a new ExtensionPointInformation object
+     * 
+     * @param a the Annotation declaring the point
+     * @param type the type containing the point
+     * @return a new ExtensionPointInformation object
+     * @throws JavaModelException
+     */
     public static ExtensionPointInformation create(IAnnotation a, IType type) throws JavaModelException {
         ConsoleLoggingHelper logger = new ConsoleLoggingHelper(a.getJavaProject(), Constants.CONSOLE_NAME);
         String idValue = null;
@@ -54,7 +62,14 @@ public class ExtensionPointInformation {
         return new ExtensionPointInformation(idValue, nameValue, ifaceValue);
     }
 
-	public ExtensionPointInformation(String id, String name, String iface) {
+    /**
+     * Create a new ExtensionPointInformation object
+     * 
+     * @param id
+     * @param name
+     * @param iface
+     */
+    private ExtensionPointInformation(String id, String name, String iface) {
 		this.id = id;
 		this.name = name;
 		this.iface = iface;

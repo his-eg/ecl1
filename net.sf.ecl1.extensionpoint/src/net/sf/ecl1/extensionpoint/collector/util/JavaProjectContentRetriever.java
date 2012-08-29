@@ -29,7 +29,7 @@ public class JavaProjectContentRetriever {
 
     /**
      * Get all classes out of a java project
-     * @return
+     * @return collection of IType
      * @throws JavaModelException
      */
     public Collection<IType> getClasses() throws JavaModelException {

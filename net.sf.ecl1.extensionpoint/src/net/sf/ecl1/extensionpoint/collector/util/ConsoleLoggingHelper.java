@@ -9,6 +9,12 @@ import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
+/**
+ * Helper class for logging messages to a console
+ * 
+ * @author keunecke
+ *
+ */
 public class ConsoleLoggingHelper {
 
     /** project in which context we are logging */
@@ -16,11 +22,22 @@ public class ConsoleLoggingHelper {
 
     private String name;
 
+    /**
+     * Create a new ConsoleLoggingHelper
+     * 
+     * @param javaProject
+     * @param name
+     */
     public ConsoleLoggingHelper(IJavaProject javaProject, String name) {
         this.javaProject = javaProject;
         this.name = name;
     }
 
+    /**
+     * Log a message to the console
+     * 
+     * @param message
+     */
     public void logToConsole(String message) {
         MessageConsole console = findConsole(this.name);
         MessageConsoleStream newMessageStream = console.newMessageStream();
