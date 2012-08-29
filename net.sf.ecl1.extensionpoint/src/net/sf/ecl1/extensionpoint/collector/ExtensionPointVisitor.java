@@ -1,9 +1,12 @@
 package net.sf.ecl1.extensionpoint.collector;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
+
+import net.sf.ecl1.extensionpoint.collector.model.ExtensionPointInformation;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -30,8 +33,11 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
 
     private Collection<String> contributors = new HashSet<String>();
 
+    private IJavaProject project;
+
     public ExtensionPointVisitor(IJavaProject project) {
         IFile props = project.getProject().getFile("extension.ant.properties");
+        this.project = project;
         if (props != null && props.exists()) {
             try {
                 Properties p = new Properties();
@@ -103,7 +109,7 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
                 }
                 IAnnotation extensionPointAnnotation = type.getAnnotation(EXTENSION_POINT_ANNOTATION_NAME);
                 if (extensionPointAnnotation != null) {
-                    //TODO
+                    ExtensionPointManager.removeExtensions(this.project.getElementName(), Arrays.asList(ExtensionPointInformation.create(extensionPointAnnotation, type)));
                 }
             }
         }
@@ -124,6 +130,16 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
         // handle only java files
         if (JAVA_FILE_EXTENSION.equals(resource.getFileExtension())) {
             ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(resource);
+            for (IType type : compilationUnit.getTypes()) {
+                IAnnotation extensionAnnotation = type.getAnnotation(EXTENSION_ANNOTATION_NAME);
+                if (extensionAnnotation != null) {
+                    //TODO
+                }
+                IAnnotation extensionPointAnnotation = type.getAnnotation(EXTENSION_POINT_ANNOTATION_NAME);
+                if (extensionPointAnnotation != null && extensionPointAnnotation.exists()) {
+                    ExtensionPointManager.addExtensions(this.project.getElementName(), Arrays.asList(ExtensionPointInformation.create(extensionPointAnnotation, type)));
+                }
+            }
         }
     }
 }

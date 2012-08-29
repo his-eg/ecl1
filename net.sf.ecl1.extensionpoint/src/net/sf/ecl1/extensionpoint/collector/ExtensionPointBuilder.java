@@ -37,6 +37,8 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
 		try {
             getProject().accept(visitor);
 		} catch (CoreException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
 		}
 	}
 

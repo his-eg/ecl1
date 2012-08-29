@@ -29,14 +29,8 @@
       </perspectiveExtension>
    </extension>
    <extension
-         point="org.eclipse.help.contexts">
-      <contexts
-            file="contexts.xml">
-      </contexts>
-   </extension>
-   <extension
-         id="extensionPointBuilder"
-         name="Extension Point Builder"
+         id="net.sf.ecl1.extensionpoint.extensionPointBuilder"
+         name="Extension Project Builder"
          point="org.eclipse.core.resources.builders">
       <builder
             hasNature="true">
@@ -46,8 +40,8 @@
       </builder>
    </extension>
    <extension
-         id="hisinoneExtensionsNature"
-         name="HISinOne Extensions"
+         id="net.sf.ecl1.extensionpoint.hisinoneExtensionsNature"
+         name="Extension Project Nature"
          point="org.eclipse.core.resources.natures">
       <runtime>
          <run
@@ -59,15 +53,20 @@
       </builder>
    </extension>
    <extension
-         id="xmlProblem"
-         name="XML Problem"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="org.eclipse.core.resources.problemmarker">
-      </super>
-      <persistent
-            value="true">
-      </persistent>
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="net.sf.ecl1.extensionpoint.toggler"
+            nameFilter="*"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="net.sf.ecl1.extensionpoint.collector.ToggleExtensionNatureAction"
+               enablesFor="+"
+               id="net.sf.ecl1.extensionpoint.addRemoveNatureAction"
+               label="Add/Remove Extension Nature"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
    </extension>
 
 </plugin>
