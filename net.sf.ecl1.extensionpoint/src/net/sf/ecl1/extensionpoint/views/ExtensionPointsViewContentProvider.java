@@ -24,7 +24,7 @@ public class ExtensionPointsViewContentProvider implements IStructuredContentPro
 	}
 	
 	public Object[] getElements(Object parent) {
-        Map<String, Map<String, Collection<ExtensionPointInformation>>> allExtensions = ExtensionPointManager.getExtensions();
+        Map<String, Map<String, Collection<ExtensionPointInformation>>> allExtensions = ExtensionPointManager.get().getExtensions();
         ArrayList<ExtensionPointInformation> extensionPoints = new ArrayList<ExtensionPointInformation>();
         for (Map<String, Collection<ExtensionPointInformation>> allExtension : allExtensions.values()) {
             Map<String, Collection<ExtensionPointInformation>> extensions = allExtension;

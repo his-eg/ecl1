@@ -103,7 +103,7 @@ public class ExtensionPointView extends ViewPart implements ExtensionPointManage
 		viewer.setLabelProvider(new ViewLabelProvider());
 		viewer.setSorter(new NameSorter());
 		viewer.setInput(getViewSite());
-        ExtensionPointManager.register(this);
+        ExtensionPointManager.get().register(this);
 
 		// Create the help context id for the viewer's control
 		PlatformUI.getWorkbench().getHelpSystem().setHelp(viewer.getControl(), "net.sf.ecl1.extensionpoint.viewer");

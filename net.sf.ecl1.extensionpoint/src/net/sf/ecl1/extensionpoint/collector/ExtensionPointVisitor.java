@@ -106,11 +106,11 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
             for (IType type : compilationUnit.getTypes()) {
                 IAnnotation extensionAnnotation = type.getAnnotation(EXTENSION_ANNOTATION_NAME);
                 if (extensionAnnotation != null) {
-                    //TODO
+                    //TODO delete contributions
                 }
                 IAnnotation extensionPointAnnotation = type.getAnnotation(EXTENSION_POINT_ANNOTATION_NAME);
                 if (extensionPointAnnotation != null) {
-                    ExtensionPointManager.removeExtensions(this.project.getElementName(), type, Arrays.asList(ExtensionPointInformation.create(extensionPointAnnotation, type)));
+                    ExtensionPointManager.get().removeExtensions(this.project.getElementName(), type);
                 }
             }
         }
@@ -134,13 +134,13 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
             for (IType type : compilationUnit.getTypes()) {
                 IAnnotation extensionAnnotation = type.getAnnotation(EXTENSION_ANNOTATION_NAME);
                 if (extensionAnnotation != null) {
-                    //TODO
+                    //TODO manage contributions
                 }
                 IAnnotation extensionPointAnnotation = type.getAnnotation(EXTENSION_POINT_ANNOTATION_NAME);
                 if (extensionPointAnnotation != null && extensionPointAnnotation.exists()) {
-                    ExtensionPointManager.addExtensions(this.project.getElementName(), type, Arrays.asList(ExtensionPointInformation.create(extensionPointAnnotation, type)));
+                    ExtensionPointManager.get().addExtensions(this.project.getElementName(), type, Arrays.asList(ExtensionPointInformation.create(extensionPointAnnotation, type)));
                 } else {
-                    // TODO remove all points from manager
+                    // TODO remove all points for this type from manager
                 }
             }
         }

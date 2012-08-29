@@ -15,11 +15,20 @@ import org.eclipse.jdt.core.IType;
  * @author keunecke
  */
 public final class ExtensionPointManager {
+
+    private static ExtensionPointManager instance;
 	
 	/** Map containing source extension name as key and the defined extension point */
-    private static final Map<String, Map<String, Collection<ExtensionPointInformation>>> extensions = new HashMap<String, Map<String, Collection<ExtensionPointInformation>>>();
+    private final Map<String, Map<String, Collection<ExtensionPointInformation>>> extensions = new HashMap<String, Map<String, Collection<ExtensionPointInformation>>>();
 	
-    private static final Collection<ExtensionPointManagerChangeListener> listeners = new LinkedList<ExtensionPointManagerChangeListener>();
+    private final Collection<ExtensionPointManagerChangeListener> listeners = new LinkedList<ExtensionPointManagerChangeListener>();
+
+    public static ExtensionPointManager get() {
+        if(instance == null) {
+            instance = new ExtensionPointManager();
+        }
+        return instance;
+    }
 
 	/**
 	 * Add a discovered extension
@@ -27,7 +36,7 @@ public final class ExtensionPointManager {
 	 * @param extension
 	 * @param epi
 	 */
-    public static final void addExtensions(String extension, IType type, Collection<ExtensionPointInformation> epis) {
+    public final void addExtensions(String extension, IType type, Collection<ExtensionPointInformation> epis) {
         Map<String, Collection<ExtensionPointInformation>> pointsInProject = extensions.get(extension);
         if (pointsInProject == null) {
             pointsInProject = new HashMap<String, Collection<ExtensionPointInformation>>();
@@ -49,7 +58,7 @@ public final class ExtensionPointManager {
      * @param extension
      * @param epis
      */
-    public static final void removeExtensions(String extension, IType type) {
+    public final void removeExtensions(String extension, IType type) {
         Map<String, Collection<ExtensionPointInformation>> pointsInProject = extensions.get(extension);
         Collection<ExtensionPointInformation> collection = pointsInProject.remove(type.getFullyQualifiedName());
         if (collection != null) {
@@ -63,15 +72,15 @@ public final class ExtensionPointManager {
      * 
      * @return map with key extension and value collection of contained extension points
      */
-    public static final Map<String, Map<String, Collection<ExtensionPointInformation>>> getExtensions() {
+    public final Map<String, Map<String, Collection<ExtensionPointInformation>>> getExtensions() {
         return new HashMap<String, Map<String, Collection<ExtensionPointInformation>>>(extensions);
 	}
 
-    public static final void register(ExtensionPointManagerChangeListener l) {
+    public final void register(ExtensionPointManagerChangeListener l) {
         listeners.add(l);
     }
 
-    private static final void updateListeners() {
+    private final void updateListeners() {
         for (ExtensionPointManagerChangeListener listener : listeners) {
             listener.update();
         }
