@@ -61,7 +61,7 @@ public final class ExtensionPointManager {
      * @return map with key extension and value collection of contained extension points
      */
     public final Multimap<IType, ExtensionPointInformation> getExtensions() {
-        return extensions;
+        return HashMultimap.create(extensions);
 	}
 
     /**
