@@ -3,7 +3,6 @@ package net.sf.ecl1.extensionpoint.collector;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -25,16 +24,7 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
     Map args, IProgressMonitor monitor)
 			throws CoreException {
         visitor = new ExtensionPointVisitor(JavaCore.create(getProject()));
-		if (kind == FULL_BUILD) {
-			fullBuild(monitor);
-		} else {
-			IResourceDelta delta = getDelta(getProject());
-			if (delta == null) {
-				fullBuild(monitor);
-			} else {
-				incrementalBuild(delta, monitor);
-			}
-		}
+        fullBuild(monitor);
 		return null;
 	}
 
@@ -54,15 +44,4 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
 		}
 	}
 
-    /**
-     * Perform an incremental build
-     * 
-     * @param delta
-     * @param monitor
-     * @throws CoreException
-     */
-	protected void incrementalBuild(IResourceDelta delta,
-			IProgressMonitor monitor) throws CoreException {
-        delta.accept(visitor);
-	}
 }

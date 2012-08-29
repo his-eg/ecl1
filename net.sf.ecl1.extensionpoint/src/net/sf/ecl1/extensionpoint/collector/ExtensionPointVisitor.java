@@ -6,13 +6,13 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Properties;
 
+import net.sf.ecl1.extensionpoint.Constants;
 import net.sf.ecl1.extensionpoint.collector.manager.ExtensionPointManager;
 import net.sf.ecl1.extensionpoint.collector.model.ExtensionPointInformation;
+import net.sf.ecl1.extensionpoint.collector.util.ConsoleLoggingHelper;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IAnnotation;
@@ -24,7 +24,9 @@ import org.eclipse.jdt.core.JavaModelException;
 
 import com.google.common.base.Splitter;
 
-class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
+class ExtensionPointVisitor implements IResourceVisitor {
+
+    private final ConsoleLoggingHelper logger;
 
     private static final String JAVA_FILE_EXTENSION = "java";
 
@@ -40,6 +42,7 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
      * @param project
      */
     public ExtensionPointVisitor(IJavaProject project) {
+        this.logger = new ConsoleLoggingHelper(project, Constants.CONSOLE_NAME);
         IFile props = project.getProject().getFile("extension.ant.properties");
         if (props != null && props.exists()) {
             try {
@@ -68,56 +71,6 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
 		return true;
 	}
 
-    public boolean visit(IResourceDelta delta) throws CoreException {
-        IResource resource = delta.getResource();
-        switch (delta.getKind()) {
-        case IResourceDelta.ADDED:
-            // handle added resource
-            handleResource(resource);
-            break;
-        case IResourceDelta.REMOVED:
-            // handle removed resource
-            // remove contributions
-            // remove points
-            handelDeletedResource(resource);
-            break;
-        case IResourceDelta.CHANGED:
-            // handle changed resource
-            handleResource(resource);
-            break;
-        }
-        //return true to continue visiting children.
-        return true;
-    }
-
-    private void handelDeletedResource(IResource resource) throws JavaModelException {
-        switch (resource.getType()) {
-        case IResource.FILE:
-            handleDeletedFile((IFile) resource);
-            break;
-        default:
-            //do nothing
-            break;
-        }
-    }
-
-    private void handleDeletedFile(IFile resource) throws JavaModelException {
-        // handle only java files
-        if (JAVA_FILE_EXTENSION.equals(resource.getFileExtension())) {
-            ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(resource);
-            for (IType type : compilationUnit.getTypes()) {
-                IAnnotation extensionAnnotation = type.getAnnotation(EXTENSION_ANNOTATION_NAME);
-                if (extensionAnnotation != null) {
-                    //TODO delete contributions
-                }
-                IAnnotation extensionPointAnnotation = type.getAnnotation(EXTENSION_POINT_ANNOTATION_NAME);
-                if (extensionPointAnnotation != null) {
-                    ExtensionPointManager.get().removeExtensions(type);
-                }
-            }
-        }
-    }
-
     private void handleResource(IResource resource) throws JavaModelException {
         switch (resource.getType()) {
         case IResource.FILE:
@@ -132,17 +85,20 @@ class ExtensionPointVisitor implements IResourceVisitor, IResourceDeltaVisitor {
     private void handleFile(IFile resource) throws JavaModelException {
         // handle only java files
         if (JAVA_FILE_EXTENSION.equals(resource.getFileExtension())) {
+            logger.logToConsole("Java Resource: " + resource.getName());
             ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(resource);
             for (IType type : compilationUnit.getTypes()) {
+                logger.logToConsole("Type: " + type.getElementName());
+                ExtensionPointManager.get().removeExtensions(type);
                 IAnnotation extensionAnnotation = type.getAnnotation(EXTENSION_ANNOTATION_NAME);
                 if (extensionAnnotation != null) {
                     //TODO manage contributions
                 }
                 IAnnotation extensionPointAnnotation = type.getAnnotation(EXTENSION_POINT_ANNOTATION_NAME);
                 if (extensionPointAnnotation != null && extensionPointAnnotation.exists()) {
-                    ExtensionPointManager.get().addExtensions(type, Arrays.asList(ExtensionPointInformation.create(extensionPointAnnotation, type)));
-                } else {
-                    // TODO remove all points for this type from manager
+                    ExtensionPointInformation epi = ExtensionPointInformation.create(extensionPointAnnotation, type);
+                    logger.logToConsole("Found Extension Point: " + epi);
+                    ExtensionPointManager.get().addExtensions(type, Arrays.asList(epi));
                 }
             }
         }
