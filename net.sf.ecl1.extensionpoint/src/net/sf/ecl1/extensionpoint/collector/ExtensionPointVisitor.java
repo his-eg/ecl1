@@ -93,7 +93,6 @@ class ExtensionPointVisitor implements IResourceVisitor {
                 ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(resource);
                 for (IType type : compilationUnit.getTypes()) {
                     //                    logger.logToConsole("Type: " + type.getElementName());
-                    ExtensionPointManager.get().removeExtensions(type);
                     IAnnotation extensionAnnotation = type.getAnnotation(EXTENSION_ANNOTATION_NAME);
                     if (extensionAnnotation != null) {
                         //TODO manage contributions

@@ -56,6 +56,13 @@ public final class ExtensionPointManager {
     }
 
     /**
+     * Clear all known extension points
+     */
+    public final void clear() {
+        this.extensions.clear();
+    }
+
+    /**
      * Get all extension points
      * 
      * @return map with key extension and value collection of contained extension points

@@ -2,6 +2,8 @@ package net.sf.ecl1.extensionpoint.collector;
 
 import java.util.Map;
 
+import net.sf.ecl1.extensionpoint.collector.manager.ExtensionPointManager;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
@@ -24,6 +26,7 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
     Map args, IProgressMonitor monitor)
 			throws CoreException {
         visitor = new ExtensionPointVisitor(JavaCore.create(getProject()));
+        ExtensionPointManager.get().clear();
         fullBuild(monitor);
 		return null;
 	}
