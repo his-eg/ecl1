@@ -34,6 +34,8 @@ class ExtensionPointVisitor implements IResourceVisitor {
 
     private static final String EXTENSION_POINT_ANNOTATION_NAME = "ExtensionPoint";
 
+    private IJavaProject project;
+
     private Collection<String> contributors = new HashSet<String>();
 
     /**
@@ -43,7 +45,8 @@ class ExtensionPointVisitor implements IResourceVisitor {
      */
     public ExtensionPointVisitor(IJavaProject project) {
         this.logger = new ConsoleLoggingHelper(project, Constants.CONSOLE_NAME);
-        IFile props = project.getProject().getFile("extension.ant.properties");
+        this.project = project;
+        IFile props = this.project.getProject().getFile("extension.ant.properties");
         if (props != null && props.exists()) {
             try {
                 Properties p = new Properties();
@@ -86,19 +89,21 @@ class ExtensionPointVisitor implements IResourceVisitor {
         // handle only java files
         if (JAVA_FILE_EXTENSION.equals(resource.getFileExtension())) {
             logger.logToConsole("Java Resource: " + resource.getName());
-            ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(resource);
-            for (IType type : compilationUnit.getTypes()) {
-                logger.logToConsole("Type: " + type.getElementName());
-                ExtensionPointManager.get().removeExtensions(type);
-                IAnnotation extensionAnnotation = type.getAnnotation(EXTENSION_ANNOTATION_NAME);
-                if (extensionAnnotation != null) {
-                    //TODO manage contributions
-                }
-                IAnnotation extensionPointAnnotation = type.getAnnotation(EXTENSION_POINT_ANNOTATION_NAME);
-                if (extensionPointAnnotation != null && extensionPointAnnotation.exists()) {
-                    ExtensionPointInformation epi = ExtensionPointInformation.create(extensionPointAnnotation, type);
-                    logger.logToConsole("Found Extension Point: " + epi);
-                    ExtensionPointManager.get().addExtensions(type, Arrays.asList(epi));
+            if (project.isOnClasspath(resource)) {
+                ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(resource);
+                for (IType type : compilationUnit.getTypes()) {
+                    logger.logToConsole("Type: " + type.getElementName());
+                    ExtensionPointManager.get().removeExtensions(type);
+                    IAnnotation extensionAnnotation = type.getAnnotation(EXTENSION_ANNOTATION_NAME);
+                    if (extensionAnnotation != null) {
+                        //TODO manage contributions
+                    }
+                    IAnnotation extensionPointAnnotation = type.getAnnotation(EXTENSION_POINT_ANNOTATION_NAME);
+                    if (extensionPointAnnotation != null && extensionPointAnnotation.exists()) {
+                        ExtensionPointInformation epi = ExtensionPointInformation.create(extensionPointAnnotation, type);
+                        logger.logToConsole("Found Extension Point: " + epi);
+                        ExtensionPointManager.get().addExtensions(type, Arrays.asList(epi));
+                    }
                 }
             }
         }
