@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Extension Project Resource Setup
 Bundle-SymbolicName: net.sf.ecl1.resource.setup;singleton:=true
-Bundle-Version: 0.0.5.2012-08-23
+Bundle-Version: 0.0.6.2012-08-30
 Bundle-Activator: h1modules.resource.setup.Activator
 Require-Bundle: org.eclipse.core.runtime,
  de.his.h1moduleswizard;bundle-version="0.0.8",
