@@ -67,11 +67,9 @@ class ExtensionPointVisitor implements IResourceVisitor {
     private void handleFile(IFile resource) throws JavaModelException {
         // handle only java files
         if (JAVA_FILE_EXTENSION.equals(resource.getFileExtension())) {
-            //            logger.logToConsole("Java Resource: " + resource.getName());
             if (project.isOnClasspath(resource)) {
                 ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(resource);
                 for (IType type : compilationUnit.getTypes()) {
-                    //                    logger.logToConsole("Type: " + type.getElementName());
                     IAnnotation extensionAnnotation = type.getAnnotation(EXTENSION_ANNOTATION_NAME);
                     if (extensionAnnotation != null && extensionAnnotation.exists()) {
                         this.contributors.add(type.getFullyQualifiedName());
