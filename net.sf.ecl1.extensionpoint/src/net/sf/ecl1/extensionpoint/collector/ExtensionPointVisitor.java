@@ -75,6 +75,7 @@ class ExtensionPointVisitor implements IResourceVisitor {
                     IAnnotation extensionAnnotation = type.getAnnotation(EXTENSION_ANNOTATION_NAME);
                     if (extensionAnnotation != null) {
                         this.contributors.add(type.getFullyQualifiedName());
+                        logger.logToConsole("Found contributor: " + type.getFullyQualifiedName());
                     }
                     IAnnotation extensionPointAnnotation = type.getAnnotation(EXTENSION_POINT_ANNOTATION_NAME);
                     if (extensionPointAnnotation != null && extensionPointAnnotation.exists()) {
