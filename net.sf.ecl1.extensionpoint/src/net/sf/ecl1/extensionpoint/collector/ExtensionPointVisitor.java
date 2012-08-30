@@ -1,10 +1,8 @@
 package net.sf.ecl1.extensionpoint.collector;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Properties;
 
 import net.sf.ecl1.extensionpoint.Constants;
 import net.sf.ecl1.extensionpoint.collector.manager.ExtensionPointManager;
@@ -14,15 +12,12 @@ import net.sf.ecl1.extensionpoint.collector.util.ConsoleLoggingHelper;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-
-import com.google.common.base.Splitter;
 
 class ExtensionPointVisitor implements IResourceVisitor {
 
@@ -46,22 +41,6 @@ class ExtensionPointVisitor implements IResourceVisitor {
     public ExtensionPointVisitor(IJavaProject project) {
         this.logger = new ConsoleLoggingHelper(project, Constants.CONSOLE_NAME);
         this.project = project;
-        IFile props = this.project.getProject().getFile("extension.ant.properties");
-        if (props != null && props.exists()) {
-            try {
-                Properties p = new Properties();
-                p.load(props.getContents());
-                String propString = p.getProperty("extension.extended-points");
-                Iterable<String> contribs = Splitter.on(",").split(propString);
-                for (String contrib : contribs) {
-                    this.contributors.add(contrib);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (CoreException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public boolean visit(IResource resource) {
@@ -95,7 +74,7 @@ class ExtensionPointVisitor implements IResourceVisitor {
                     //                    logger.logToConsole("Type: " + type.getElementName());
                     IAnnotation extensionAnnotation = type.getAnnotation(EXTENSION_ANNOTATION_NAME);
                     if (extensionAnnotation != null) {
-                        //TODO manage contributions
+                        this.contributors.add(type.getFullyQualifiedName());
                     }
                     IAnnotation extensionPointAnnotation = type.getAnnotation(EXTENSION_POINT_ANNOTATION_NAME);
                     if (extensionPointAnnotation != null && extensionPointAnnotation.exists()) {
@@ -106,5 +85,12 @@ class ExtensionPointVisitor implements IResourceVisitor {
                 }
             }
         }
+    }
+
+    /**
+     * @return the contributors
+     */
+    public Collection<String> getContributors() {
+        return contributors;
     }
 }
