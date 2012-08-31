@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="h1modulesfeature"
-      label="H1modulesfeature"
-      version="0.0.16.2012-08-30"
+      label="HISinOne Extension Tools"
+      version="0.0.17.2012-08-31"
       provider-name="HIS GmbH">
 
    <description>
-      Features for the work with modularized HISinOne
+      Tools for the work with modularized HISinOne
    </description>
 
    <license url="https://www.apache.org/licenses/LICENSE-2.0.html">
