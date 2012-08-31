@@ -12,4 +12,9 @@ public interface Constants {
      */
     public static final String CONSOLE_NAME = "Extensions";
 
+    /**
+     * The name of the preference value determining if detailed logging should occur
+     */
+    public static final String LOGGING_PREFERENCE = "extensionsLogging";
+
 }
