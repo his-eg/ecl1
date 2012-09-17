@@ -25,7 +25,6 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
-import de.his.cs.sys.extensions.wizards.pages.packages.ExtensionStrategy;
 import de.his.cs.sys.extensions.wizards.pages.packages.HISinOneStrategy;
 import de.his.cs.sys.extensions.wizards.pages.packages.PackageStructureStrategy;
 import de.his.cs.sys.extensions.wizards.pages.packages.ProjectStrategy;
@@ -119,9 +118,6 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		projectButton.setToolTipText("Single Package with project name");
 		projectButton.addSelectionListener(new StrategySetter(new ProjectStrategy()));
 		Button extensionButton = new Button(buttonGroup, SWT.RADIO);
-		extensionButton.setText("Extension Layout");
-		extensionButton.setToolTipText("Package Layout for an extension");
-		extensionButton.addSelectionListener(new StrategySetter(new ExtensionStrategy()));
 	}
 	
 	/**
