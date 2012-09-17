@@ -40,7 +40,11 @@ public class ExtensionPointInformation {
         IMemberValuePair[] pairs = a.getMemberValuePairs();
         for (IMemberValuePair pair : pairs) {
             if ("id".equals(pair.getMemberName())) {
-                idValue = (String) pair.getValue();
+                if (pair.getValueKind() == IMemberValuePair.K_QUALIFIED_NAME) {
+                    idValue = (String) pair.getValue();
+                } else {
+                    idValue = (String) pair.getValue();
+                }
             }
             if ("extensionInterface".equals(pair.getMemberName())) {
                 String ifaceSimpleName = (String) pair.getValue();
