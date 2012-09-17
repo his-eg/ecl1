@@ -49,17 +49,19 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
         try {
             Collection<String> contributors = visitor.getContributors();
             IFile file = getProject().getFile(EXTENSION_ANT_PROPERTIES_FILE);
-            String joined = Joiner.on(",").join(contributors);
-            Properties props = new Properties();
-            props.load(file.getContents());
-            props.remove(EXTENSION_EXTENDED_POINTS_PROPERTY);
-            props.setProperty(EXTENSION_EXTENDED_POINTS_PROPERTY, joined);
-            StringWriter stringWriter = new StringWriter();
-            props.store(stringWriter, null);
-            stringWriter.flush();
-            stringWriter.close();
-            InputStream source = new ByteArrayInputStream(stringWriter.toString().getBytes());
-            file.setContents(source, IFile.FORCE, null);
+            if (file.exists()) {
+                String joined = Joiner.on(",").join(contributors);
+                Properties props = new Properties();
+                props.load(file.getContents());
+                props.remove(EXTENSION_EXTENDED_POINTS_PROPERTY);
+                props.setProperty(EXTENSION_EXTENDED_POINTS_PROPERTY, joined);
+                StringWriter stringWriter = new StringWriter();
+                props.store(stringWriter, null);
+                stringWriter.flush();
+                stringWriter.close();
+                InputStream source = new ByteArrayInputStream(stringWriter.toString().getBytes());
+                file.setContents(source, IFile.FORCE, null);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (CoreException e) {
