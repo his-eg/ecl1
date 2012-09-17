@@ -131,6 +131,7 @@
 			<manifest>
 				<attribute name="Extension-Name" value="${extension.name}"/>
 				<attribute name="Extension-Version" value="${extension.version}"/>
+				<attribute name="Extension-ExtendedPoints" value="${extension.extended-points}"/>
 			</manifest>
 		</jar>
 	</target>
