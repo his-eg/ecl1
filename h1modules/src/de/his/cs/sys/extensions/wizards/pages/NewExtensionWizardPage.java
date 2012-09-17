@@ -68,7 +68,7 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 
 	private List projectList;
 	private Text versionInputTextField;
-	private PackageStructureStrategy strategy = new HISinOneStrategy();
+	private PackageStructureStrategy strategy = new ProjectStrategy();
 	
 	/**
 	 * @param pageName
@@ -109,7 +109,6 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		buttonGroup.setLayout(new RowLayout());
 		buttonGroup.setText("Choose Package Layout");
 		Button defaultButton = new Button(buttonGroup, SWT.RADIO);
-		defaultButton.setSelection(true);
 		defaultButton.addSelectionListener(new StrategySetter(new HISinOneStrategy()));
 		defaultButton.setText("HISinOne Layout");
 		defaultButton.setToolTipText("HISinOne Package Layout with packages for persistence etc.");
@@ -117,7 +116,7 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		projectButton.setText("Project Name Layout");
 		projectButton.setToolTipText("Single Package with project name");
 		projectButton.addSelectionListener(new StrategySetter(new ProjectStrategy()));
-		Button extensionButton = new Button(buttonGroup, SWT.RADIO);
+		projectButton.setSelection(true);
 	}
 	
 	/**
