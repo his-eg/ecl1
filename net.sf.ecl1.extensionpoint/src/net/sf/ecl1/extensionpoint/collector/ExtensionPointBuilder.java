@@ -3,11 +3,12 @@ package net.sf.ecl1.extensionpoint.collector;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import net.sf.ecl1.extensionpoint.collector.manager.ExtensionPointManager;
 
@@ -62,11 +63,7 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
                 if (contributionsChanged) {
                     props.remove(EXTENSION_EXTENDED_POINTS_PROPERTY);
                     props.setProperty(EXTENSION_EXTENDED_POINTS_PROPERTY, joined);
-                    StringWriter stringWriter = new StringWriter();
-                    props.store(stringWriter, null);
-                    stringWriter.flush();
-                    stringWriter.close();
-                    InputStream source = new ByteArrayInputStream(stringWriter.toString().getBytes());
+                    InputStream source = createNewContentForProperties(props);
                     file.setContents(source, IFile.FORCE, null);
                 }
             }
@@ -75,6 +72,24 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
         } catch (CoreException e) {
             e.printStackTrace();
         }
+    }
+
+    private InputStream createNewContentForProperties(Properties props) {
+        SortedMap<Object, Object> tree = convertToSortedMap(props);
+        StringBuilder propStringBuilder = new StringBuilder();
+        for (Object prop : tree.keySet()) {
+            // build properties string
+        }
+        InputStream source = new ByteArrayInputStream(propStringBuilder.toString().getBytes());
+        return source;
+    }
+
+    private SortedMap<Object, Object> convertToSortedMap(Properties props) {
+        SortedMap<Object, Object> tree = new TreeMap<Object, Object>();
+        for (Object prop : props.keySet()) {
+            tree.put(prop, props.get(prop));
+        }
+        return tree;
     }
 
     private boolean haveContributionsChanged(Iterable<String> newContributors, Iterable<String> oldContributors) {
