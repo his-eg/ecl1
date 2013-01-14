@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -18,6 +19,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.JavaCore;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 
 /**
  * Project Builder to collect and process extension point and contribution information
@@ -53,20 +56,31 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
                 String joined = Joiner.on(",").join(contributors);
                 Properties props = new Properties();
                 props.load(file.getContents());
-                props.remove(EXTENSION_EXTENDED_POINTS_PROPERTY);
-                props.setProperty(EXTENSION_EXTENDED_POINTS_PROPERTY, joined);
-                StringWriter stringWriter = new StringWriter();
-                props.store(stringWriter, null);
-                stringWriter.flush();
-                stringWriter.close();
-                InputStream source = new ByteArrayInputStream(stringWriter.toString().getBytes());
-                file.setContents(source, IFile.FORCE, null);
+                String oldContribs = props.getProperty(EXTENSION_EXTENDED_POINTS_PROPERTY);
+                Iterable<String> split = Splitter.on(",").split(oldContribs);
+                boolean contributionsChanged = this.haveContributionsChanged(contributors, split);
+                if (contributionsChanged) {
+                    props.remove(EXTENSION_EXTENDED_POINTS_PROPERTY);
+                    props.setProperty(EXTENSION_EXTENDED_POINTS_PROPERTY, joined);
+                    StringWriter stringWriter = new StringWriter();
+                    props.store(stringWriter, null);
+                    stringWriter.flush();
+                    stringWriter.close();
+                    InputStream source = new ByteArrayInputStream(stringWriter.toString().getBytes());
+                    file.setContents(source, IFile.FORCE, null);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         } catch (CoreException e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean haveContributionsChanged(Iterable<String> newContributors, Iterable<String> oldContributors) {
+        List<String> newList = Lists.newArrayList(newContributors);
+        List<String> oldList = Lists.newArrayList(oldContributors);
+        return !oldList.equals(newList);
     }
 
     /**
