@@ -79,6 +79,7 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
         StringBuilder propStringBuilder = new StringBuilder();
         for (Object prop : tree.keySet()) {
             // build properties string
+            propStringBuilder.append(prop.toString().replace(":", "\\:").replace("=", "\\=") + "=" + tree.get(prop).toString().replace(":", "\\:").replace("=", "\\=") + "\n");
         }
         InputStream source = new ByteArrayInputStream(propStringBuilder.toString().getBytes());
         return source;
