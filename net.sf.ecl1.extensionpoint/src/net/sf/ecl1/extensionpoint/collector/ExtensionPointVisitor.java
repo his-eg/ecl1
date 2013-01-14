@@ -12,6 +12,7 @@ import net.sf.ecl1.extensionpoint.collector.util.ConsoleLoggingHelper;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
@@ -68,20 +69,30 @@ class ExtensionPointVisitor implements IResourceVisitor {
         // handle only java files
         if (JAVA_FILE_EXTENSION.equals(resource.getFileExtension())) {
             if (project.isOnClasspath(resource)) {
+                try {
+                    resource.refreshLocal(0, null);
+                } catch (CoreException e) {
+                    e.printStackTrace();
+                }
                 ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(resource);
                 for (IType type : compilationUnit.getTypes()) {
-                    IAnnotation extensionAnnotation = type.getAnnotation(EXTENSION_ANNOTATION_NAME);
-                    if (extensionAnnotation != null) {
-                        if (extensionAnnotation.exists()) {
-                            this.contributors.add(type.getFullyQualifiedName());
-                            logger.logToConsole("Found contribution: " + type.getFullyQualifiedName());
+                    IAnnotation[] annotations = type.getAnnotations();
+                    for (IAnnotation extensionAnnotation : annotations) {
+                        if (extensionAnnotation != null) {
+                            if (EXTENSION_ANNOTATION_NAME.equals(extensionAnnotation.getElementName())) {
+                                if (extensionAnnotation.exists()) {
+                                    this.contributors.add(type.getFullyQualifiedName());
+                                    logger.logToConsole("Found contribution: " + type.getFullyQualifiedName());
+                                }
+                            }
+                            if (EXTENSION_POINT_ANNOTATION_NAME.equals(extensionAnnotation.getElementName())) {
+                                if (extensionAnnotation != null && extensionAnnotation.exists()) {
+                                    ExtensionPointInformation epi = ExtensionPointInformation.create(extensionAnnotation, type);
+                                    logger.logToConsole("Found Extension Point: " + epi);
+                                    ExtensionPointManager.get().addExtensions(type, Arrays.asList(epi));
+                                }
+                            }
                         }
-                    }
-                    IAnnotation extensionPointAnnotation = type.getAnnotation(EXTENSION_POINT_ANNOTATION_NAME);
-                    if (extensionPointAnnotation != null && extensionPointAnnotation.exists()) {
-                        ExtensionPointInformation epi = ExtensionPointInformation.create(extensionPointAnnotation, type);
-                        logger.logToConsole("Found Extension Point: " + epi);
-                        ExtensionPointManager.get().addExtensions(type, Arrays.asList(epi));
                     }
                 }
             }
