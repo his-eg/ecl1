@@ -71,9 +71,11 @@ class ExtensionPointVisitor implements IResourceVisitor {
                 ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(resource);
                 for (IType type : compilationUnit.getTypes()) {
                     IAnnotation extensionAnnotation = type.getAnnotation(EXTENSION_ANNOTATION_NAME);
-                    if (extensionAnnotation != null && extensionAnnotation.exists()) {
-                        this.contributors.add(type.getFullyQualifiedName());
-                        logger.logToConsole("Found contribution: " + type.getFullyQualifiedName());
+                    if (extensionAnnotation != null) {
+                        if (extensionAnnotation.exists()) {
+                            this.contributors.add(type.getFullyQualifiedName());
+                            logger.logToConsole("Found contribution: " + type.getFullyQualifiedName());
+                        }
                     }
                     IAnnotation extensionPointAnnotation = type.getAnnotation(EXTENSION_POINT_ANNOTATION_NAME);
                     if (extensionPointAnnotation != null && extensionPointAnnotation.exists()) {
