@@ -1,0 +1,26 @@
+/*
+ * Copyright (c) 2013 HIS GmbH All Rights Reserved.
+ *
+ * $Id$
+ *
+ * $Log$
+ *
+ * Created on 25.01.2013 by keunecke
+ */
+
+import org.junit.Test;
+
+/**
+ * @version $Revision$
+ */
+public class DummyTest {
+
+    /**
+     * 
+     */
+    @Test
+    public void test() {
+        //do nothing just succeed
+    }
+
+}
