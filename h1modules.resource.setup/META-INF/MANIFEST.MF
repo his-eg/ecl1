@@ -8,7 +8,9 @@ Require-Bundle: org.eclipse.core.runtime,
  de.his.h1moduleswizard;bundle-version="0.0.8",
  org.eclipse.jdt.core,
  org.eclipse.core.resources,
- net.sf.ecl1.utilities
+ net.sf.ecl1.utilities,
+ org.eclipse.egit,
+ org.eclipse.jgit
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: HIS GmbH
