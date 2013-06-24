@@ -51,6 +51,7 @@ public class ResourceSupport {
 		writeProjectFile("/src/java/extension.beans.spring.xml", is);
 		new TemplateManager("build.xml.template", this.extensionAntPropertiesReplacements).writeContent(this.project);
 		new TemplateManager("extension.ant.properties.template", this.extensionAntPropertiesReplacements).writeContent(this.project);
+        new TemplateManager(".settings/sonar-project.properties.template", this.extensionAntPropertiesReplacements).writeContent(this.project);
 		new TemplateManager(".settings/org.eclipse.core.resources.prefs").writeContent(this.project);
 		new TemplateManager(".settings/org.eclipse.jdt.core.prefs").writeContent(this.project);
 		new TemplateManager(".settings/org.eclipse.jdt.ui.prefs").writeContent(this.project);

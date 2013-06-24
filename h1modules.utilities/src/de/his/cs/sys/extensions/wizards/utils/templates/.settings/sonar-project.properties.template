@@ -1,0 +1,23 @@
+# required metadata
+sonar.projectKey=[name]
+sonar.projectName=[name]
+sonar.projectVersion=[version]
+ 
+# path to source directories (required)
+sonar.sources=src/java,src/generated,resource
+ 
+# path to test source directories (optional)
+sonar.tests=src/test
+ 
+# path to project binaries (optional), for example directory of Java bytecode
+sonar.binaries=build/classes
+ 
+# optional comma-separated list of paths to libraries. Only path to JAR file and path to directory of classes are supported.
+sonar.libraries=../../cs.sys.base.library/workspace/lib/*.jar,../../webapps/workspace/qisserver/WEB-INF/lib/*.jar
+ 
+# The value of the property must be the key of the language.
+sonar.language=java
+sonar.dynamicAnalysis=reuseReports
+sonar.java.coveragePlugin=cobertura
+sonar.surefire.reportsPath=build/results
+sonar.cobertura.reportPath=build/coveragereport/coverage.xml
