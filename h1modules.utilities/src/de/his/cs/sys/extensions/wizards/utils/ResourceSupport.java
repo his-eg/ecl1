@@ -49,8 +49,8 @@ public class ResourceSupport {
 	public void createFiles() throws CoreException, UnsupportedEncodingException {
 		InputStream is = TemplateManager.class.getResourceAsStream("src/java/extension.beans.spring.xml.template");
 		writeProjectFile("/src/java/extension.beans.spring.xml", is);
-        InputStream isdummy = TemplateManager.class.getResourceAsStream("src/test/DummTest.java.template");
-        writeProjectFile("src/test/DummTest.java", isdummy);
+        InputStream isdummy = TemplateManager.class.getResourceAsStream("src/test/DummyTest.java.template");
+        writeProjectFile("src/test/DummyTest.java", isdummy);
 		new TemplateManager("build.xml.template", this.extensionAntPropertiesReplacements).writeContent(this.project);
 		new TemplateManager("extension.ant.properties.template", this.extensionAntPropertiesReplacements).writeContent(this.project);
         new TemplateManager(".settings/sonar-project.properties.template", this.extensionAntPropertiesReplacements).writeContent(this.project);
