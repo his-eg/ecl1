@@ -5,7 +5,6 @@
  *
  * $Log$
  *
- * Created on 25.01.2013 by keunecke
  */
 
 import org.junit.Test;
