@@ -4,7 +4,7 @@
             Build Script for HISinOne Extension
     </description>
 
-	<!-- Lokal können per Propertiesdatei Werte überschrieben werden -->
+	<!-- Lokal koennen per Propertiesdatei Werte Ueberschrieben werden -->
 	<property file="${user.name}.ant.properties" />
 	
 	<!-- 
@@ -26,22 +26,18 @@
 	</condition>
 
 	<property name="qisserver" value="${webapps}/qisserver" />
-
 	<property name="qisserver-webinf" value="${qisserver}/WEB-INF" />
-
 	<property name="qisserver-lib" value="${qisserver-webinf}/lib" />
-
 	<property name="qisserver-lib-compile" value="${qisserver-webinf}/lib-compile" />
-
 	<property name="qisserver-classes" value="${qisserver-webinf}/classes" />
-	
 	<property name="classes-target" value="${build}/classes" />
-	
 	<property name="test-target" value="${build}/test" />
-	
 	<property name="resources-target" value="${classes-target}/META-INF/resources" />
-	
 	<property name="build-results" value="${build}/results"/>
+	<property name="cobertura-dir" value="${qisserver-lib-compile}" />
+	<property name="src-java" value="src/java"/>
+	<property name="src-test" value="src/test"/>
+	<property name="test-resource" location="resource"/>
 	
 	<path id="compile-classpath">
 		<pathelement location="${qisserver-classes}"/>
@@ -79,18 +75,35 @@
 		</fileset>
 	</path>
 	
+	<property name="build_cobertura" value="${build}/cobertura_build"/>
+		
+	<property name="build_cobertura_report" value="${build}/coveragereport"/>
+	
+	<path id="cobertura-classpath">
+		<fileset dir="${qisserver-lib}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${qisserver-webinf}/internal/ant/lib">
+			<include name="*.jar" />
+		</fileset>		
+	</path>
+	
+	<path id="cobertura-test-classpath">
+		<pathelement location="${build_cobertura}" />
+		<pathelement location="${test-target}" />
+		<pathelement location = "${test-resource}"/>
+		<path refid="compile-test-classpath" />
+		<path refid="cobertura-classpath" />
+	</path>
+	
+	<taskdef classpathref="cobertura-classpath" resource="tasks.properties" />
+	
 	<path id="compile-test-sourcepath">
 		<dirset dir="src">
 			<include name="test" />
 		</dirset>
 	</path>
 	
-	<target name="debug">
-		<echo>Debuginformationen</echo>
-		<echo>Liste aller Properties:</echo>
-		<echoproperties />
-	</target>
-
 	<target name="clean">
 		<delete failonerror="false">
 			<fileset dir="${build-results}" />
@@ -99,10 +112,12 @@
 			<fileset dir="${resources-target}" />
 			<fileset dir="${build}" />
 			<fileset dir="${dist}" />
+			<fileset dir="${build_cobertura}" />
+			<fileset dir="${build_cobertura_report}" />
 		</delete>
 	</target>
 
-	<target name="init" depends="clean">
+	<target name="init">
 		<mkdir dir="${build}" />
 		<mkdir dir="${build-results}" />
 		<mkdir dir="${test-target}" />
@@ -112,9 +127,10 @@
 	</target>
 
 	<target name="compile" depends="init">
-		<javac srcdir="src/java" destdir="${classes-target}" debug="on" includeantruntime="false">
+		<javac destdir="${classes-target}" debug="on" includeantruntime="false" source="1.6" target="1.6" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
+			<compilerarg line="-encoding utf-8"/>
 			<classpath refid="compile-classpath" />
-			<sourcepath refid="compile-sourcepath" />
+			<src refid="compile-sourcepath" />
 		</javac>
 		<copy todir="${classes-target}" verbose="true">
 			<fileset dir="src/java">
@@ -125,48 +141,100 @@
 			<fileset dir="resource" />
 		</copy>
 	</target>
-
-	<target name="jar" depends="compile" description="Extension JAR für die Distribution erzeugen">
+	
+	<target name="git-data">
+		<available file=".git" type="dir" property="git.present"/>
+		<exec executable="git" outputproperty="git.revision" failifexecutionfails="false" errorproperty="">
+	        <arg value="describe"/>
+	        <arg value="--tags"/>
+	        <arg value="--always"/>
+	        <arg value="HEAD"/>
+	    </exec>
+	    <condition property="repository.version" value="${git.revision}" else="unknown">
+	        <and>
+	            <isset property="git.revision"/>
+	            <length string="${git.revision}" trim="yes" length="0" when="greater"/>
+	        </and>
+	    </condition>
+	</target>
+	
+	<target name="jar-with-contribution" depends="git-data,compile" description="Extension JAR fÃ¼r die Distribution erzeugen" if="has-contribs">
 		<jar destfile="${target-file}" basedir="${classes-target}" index="true" >
 			<manifest>
 				<attribute name="Extension-Name" value="${extension.name}"/>
 				<attribute name="Extension-Version" value="${extension.version}"/>
 				<attribute name="Extension-ExtendedPoints" value="${extension.extended-points}"/>
+				<attribute name="Extension-Revision" value="${repository.version}"/>
 			</manifest>
 		</jar>
 	</target>
 	
+	<target name="jar-without-contribution" depends="git-data,compile" description="Extension JAR fÃ¼r die Distribution erzeugen" unless="has-contribs">
+		<jar destfile="${target-file}" basedir="${classes-target}" index="true" >
+			<manifest>
+				<attribute name="Extension-Name" value="${extension.name}"/>
+				<attribute name="Extension-Version" value="${extension.version}"/>
+				<attribute name="Extension-Revision" value="${repository.version}"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="jar-has-contribs">
+		<condition property="has-contribs">
+			<isset property="extension.extended-points"/>
+		</condition>
+	</target>
+	
+	<target name="jar" description="Extension JAR für die Distribution erzeugen" depends="jar-has-contribs,jar-with-contribution,jar-without-contribution" >
+	</target>
+	
 	<target name="compile-tests" depends="compile">
-		<javac srcdir="src/test" destdir="${test-target}" debug="on" includeantruntime="false">
+		<javac srcdir="src/test" destdir="${test-target}" debug="on" includeantruntime="false" source="1.6" target="1.6" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
+			<compilerarg line="-encoding utf-8"/>
 			<classpath refid="compile-test-classpath" />
 			<sourcepath refid="compile-test-sourcepath" />
 		</javac>
-		<copy todir="${test-target}" verbose="true">
-			<fileset dir="src/test">
-				<filename name="**/*.java" negate="true" />
-			</fileset>
-		</copy>
 	</target>
 	
-	<target name="test" depends="compile-tests">
-		<junit printsummary="yes" haltonerror="true" fork="yes" forkmode="once">
+	<target name="cobertura-instrument" depends="compile-tests">
+		<delete file="cobertura.ser" quiet="true" />
+		<cobertura-instrument todir="${build_cobertura}" datafile="cobertura.ser">
+			<ignore regex="org.apache.log4j.*" />
+			<fileset dir="${classes-target}">
+				<include name="**/*.class" />
+			</fileset>
+			<fileset dir="${test-target}">
+				<include name="**/*.class" />
+			</fileset>
+		</cobertura-instrument>
+	</target>
+	
+	<target name="cobertura-test" depends="cobertura-instrument">
+		<junit printsummary="yes" haltonerror="false" fork="true" forkmode="once">
+			<sysproperty key="net.sourceforge.cobertura.datafile"
+						file="cobertura.ser" />
 			<jvmarg value="-XX:MaxPermSize=512M"/>
-			<classpath refid="compile-test-classpath" />
+			<classpath refid="cobertura-test-classpath" />
 			<batchtest todir="${build-results}">
-				<fileset dir="${test-target}" />
+				<fileset dir="${src-test}" >
+					<include name="**/*Test.java"/>
+					<include name="**/Test*.java"/>
+				</fileset>
 				<formatter type="plain" usefile="false" />
 				<formatter type="xml" usefile="true"/>
 			</batchtest>
-			<sysproperty key="java.library.path" value="lib" />
 		</junit>
 	</target>
 	
-	<target name="deploy" depends="jar">
-		<copy todir="${qisserver-lib}">
-			<fileset dir="${dist}">
-				<include name="*.jar" />
-			</fileset>
-		</copy>
+	<target name="cobertura-report" depends="cobertura-test">
+		<cobertura-report format="html" destdir="${build_cobertura_report}" datafile="cobertura.ser">
+			<fileset dir="${src-java}" />
+			<fileset dir="${src-test}" />
+		</cobertura-report>
+		<cobertura-report format="xml" destdir="${build_cobertura_report}" datafile="cobertura.ser">
+			<fileset dir="${src-java}" />
+			<fileset dir="${src-test}" />
+		</cobertura-report>
 	</target>
-
+	
 </project>
