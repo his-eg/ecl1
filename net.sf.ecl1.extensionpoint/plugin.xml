@@ -69,19 +69,5 @@
       </objectContribution>
    </extension>
    
-   <extension
-         point="org.eclipse.ui.preferencePages">
-      <page
-            class="net.sf.ecl1.extensionpoint.preferences.HISinOneExtensionPreferences"
-            id="net.sf.ecl1.extensionpoint.preferences.HISinOneExtensionPreferences"
-            name="HISinOne Extensions">
-      </page>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="net.sf.ecl1.extensionpoint.preferences.PreferenceInitializer">
-      </initializer>
-   </extension>
 
 </plugin>
