@@ -55,7 +55,7 @@ public class ResourceSupport {
 		new TemplateManager(".settings/org.eclipse.core.resources.prefs").writeContent(this.project);
 		new TemplateManager(".settings/org.eclipse.jdt.core.prefs").writeContent(this.project);
 		new TemplateManager(".settings/org.eclipse.jdt.ui.prefs").writeContent(this.project);
-		is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build").getBytes("UTF-8"));
+        is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build" + System.getProperty("line.separator") + "/dist").getBytes("UTF-8"));
 		writeProjectFile("/.gitignore", is);
 	}
 
