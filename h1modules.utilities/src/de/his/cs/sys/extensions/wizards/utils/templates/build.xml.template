@@ -141,6 +141,11 @@
 			<classpath refid="compile-test-classpath" />
 			<sourcepath refid="compile-test-sourcepath" />
 		</javac>
+		<copy todir="${test-target}" verbose="true">
+			<fileset dir="src/test">
+				<filename name="**/*.java" negate="true" />
+			</fileset>
+		</copy>
 	</target>
 	
 	<target name="test" depends="compile-tests">
