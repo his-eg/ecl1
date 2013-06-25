@@ -5,7 +5,7 @@
       version="0.0.20.2013-06-25"
       provider-name="HIS GmbH">
 
-   <description>
+   <description url="http://ecl1.sf.net">
       Tools for the work with modularized HISinOne
    </description>
 
