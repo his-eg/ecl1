@@ -193,7 +193,7 @@
 			<compilerarg line="-encoding utf-8"/>
 			<classpath refid="compile-test-classpath" />
 			<sourcepath refid="compile-test-sourcepath" />
-		</javac>+		
+		</javac>
 		<copy todir="${test-target}" verbose="true">
 			<fileset dir="src/test">
 				<filename name="**/*.java" negate="true" />
