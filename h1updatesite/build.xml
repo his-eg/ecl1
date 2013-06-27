@@ -3,6 +3,26 @@
 	
 	<property file="build.ant-private.properties"/>
 	
+	<path id="plugins">
+		<fileset dir="plugins">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	
+	<path id="features">
+		<fileset dir="features">
+			<include name="*.jar"/>
+		</fileset>
+	</path>
+	
 	<target name="sign">
+		<signjar alias="${keystore.alias}" keystore="${keystore}" 
+			storepass="${keystore.password}" >
+			<path>
+				<path refid="plugins"/>
+				<path refid="features"/>
+			</path>
+		</signjar>
 	</target>
+	
 </project>
