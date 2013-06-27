@@ -57,7 +57,7 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
                 String joined = Joiner.on(",").join(contributors);
                 Properties props = new Properties();
                 props.load(file.getContents());
-                String oldContribs = props.getProperty(EXTENSION_EXTENDED_POINTS_PROPERTY);
+                String oldContribs = props.getProperty(EXTENSION_EXTENDED_POINTS_PROPERTY, "");
                 Iterable<String> split = Splitter.on(",").split(oldContribs);
                 boolean contributionsChanged = this.haveContributionsChanged(contributors, split);
                 if (contributionsChanged) {
