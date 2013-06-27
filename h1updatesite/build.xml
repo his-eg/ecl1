@@ -1,0 +1,8 @@
+<?xml version='1.0'?>
+<project name="ecl1" default="sign" basedir=".">
+	
+	<property file="build.ant-private.properties"/>
+	
+	<target name="sign">
+	</target>
+</project>
