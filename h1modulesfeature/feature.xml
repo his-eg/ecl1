@@ -2,7 +2,7 @@
 <feature
       id="h1modulesfeature"
       label="ecl1 - HISinOne Extension Tools"
-      version="0.0.20.2013-06-25"
+      version="0.0.21.2013-06-26"
       provider-name="HIS GmbH">
 
    <description url="http://ecl1.sf.net">
