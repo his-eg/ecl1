@@ -17,7 +17,7 @@
 	
 	<target name="sign">
 		<signjar alias="${keystore.alias}" keystore="${keystore}" 
-			storepass="${keystore.password}" >
+			storepass="${keystore.password}" lazy="true">
 			<path>
 				<path refid="plugins"/>
 				<path refid="features"/>
@@ -25,4 +25,9 @@
 		</signjar>
 	</target>
 	
+	<target name="upload" depends="sign">
+		<exec executable="rsync" dir=".">
+			<arg line="-a --delete -e ssh features plugins web artifacts.jar content.jar index.html site.xml ${sourceforge.user}@frs.sourceforge.net:/home/frs/project/ecl1/updatesite/" />
+		</exec>
+	</target>
 </project>
