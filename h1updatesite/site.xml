@@ -3,33 +3,6 @@
    <description name="HIS Eclipse Update Site">
       On this page you find all ecl1 plugins that support the development of HISinOne extensions.
    </description>
-   <feature url="features/h1modulesfeature_0.0.13.2012-07-16.jar" id="h1modulesfeature" version="0.0.13.2012-07-16">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.14.2012-07-17.jar" id="h1modulesfeature" version="0.0.14.2012-07-17">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.15.2012-08-23.jar" id="h1modulesfeature" version="0.0.15.2012-08-23">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.15.2012-08-24.jar" id="h1modulesfeature" version="0.0.15.2012-08-24">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.16.2012-08-30.jar" id="h1modulesfeature" version="0.0.16.2012-08-30">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.17.2012-08-31.jar" id="h1modulesfeature" version="0.0.17.2012-08-31">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.18.2013-01-08.jar" id="h1modulesfeature" version="0.0.18.2013-01-08">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.19.2013-01-14.jar" id="h1modulesfeature" version="0.0.19.2013-01-14">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
-   <feature url="features/h1modulesfeature_0.0.20.2013-06-25.jar" id="h1modulesfeature" version="0.0.20.2013-06-25">
-      <category name="de.his.cs.sys.extensions"/>
-   </feature>
    <feature url="features/h1modulesfeature_0.0.21.2013-06-27.jar" id="h1modulesfeature" version="0.0.21.2013-06-27">
       <category name="de.his.cs.sys.extensions"/>
    </feature>
