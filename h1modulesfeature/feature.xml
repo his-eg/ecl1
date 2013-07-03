@@ -2,11 +2,11 @@
 <feature
       id="h1modulesfeature"
       label="ecl1 - HISinOne Extension Tools"
-      version="0.0.21.2013-06-27"
+      version="0.0.22.2013-07-03"
       provider-name="HIS GmbH">
 
    <description url="http://ecl1.sf.net">
-      Tools for the work with modularized HISinOne
+      Tools for the work with modularized HISinOne. Adds wizards to create a new extension and checkers for the enrollment process.
    </description>
 
    <license url="https://www.apache.org/licenses/LICENSE-2.0.html">
@@ -82,6 +82,7 @@ To apply the Apache License to your work, attach the following boilerplate notic
       <update label="ecl1 Sourceforge Updatesite" url="http://ecl1.sourceforge.net/update/"/>
       <discovery label="HIS GmbH Website" url="http://www.his.de"/>
       <discovery label="Project Website" url="http://ecl1.sourceforge.net"/>
+      <discovery label="HISinOne Website" url="http://hisinone.de"/>
    </url>
 
    <requires>
