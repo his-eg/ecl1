@@ -127,7 +127,7 @@
 	</target>
 
 	<target name="compile" depends="init">
-		<javac destdir="${classes-target}" debug="on" includeantruntime="false" source="1.6" target="1.6" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
+		<javac destdir="${classes-target}" debug="on" includeantruntime="false" source="1.7" target="1.7" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
 			<compilerarg line="-encoding utf-8"/>
 			<classpath refid="compile-classpath" />
 			<src refid="compile-sourcepath" />
@@ -189,7 +189,7 @@
 	</target>
 	
 	<target name="compile-tests" depends="compile">
-		<javac srcdir="src/test" destdir="${test-target}" debug="on" includeantruntime="false" source="1.6" target="1.6" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
+		<javac srcdir="src/test" destdir="${test-target}" debug="on" includeantruntime="false" source="1.7" target="1.7" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
 			<compilerarg line="-encoding utf-8"/>
 			<classpath refid="compile-test-classpath" />
 			<sourcepath refid="compile-test-sourcepath" />
