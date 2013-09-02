@@ -16,7 +16,7 @@ public enum ProjectNature {
     MACKER("de.his.core.tools.cs.sys.quality.eclipsemacker.mackerNature"),
 
     /** an extension project */
-    ECL1("net.sf.ecl1.extensionpoint.extensionPointBuilder");
+    ECL1("net.sf.ecl1.extensionpoint.hisinoneExtensionsNature");
 
 	private final String nature;
 
