@@ -199,6 +199,7 @@ public class ProjectSupport {
      */
 	public void addNatures(IProject project) throws CoreException {
 		addNature(project, ProjectNature.JAVA);
+        addNature(project, ProjectNature.ECL1);
 	}
 
 	private void addNature(IProject project, ProjectNature nature) throws CoreException {
