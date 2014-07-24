@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="net.sf.ecl1.classpathContainerInitializer"
+         name="ecl1 Classpath Container Initializer"
+         point="org.eclipse.jdt.core.classpathContainerInitializer">
+         <classpathContainerInitializer                                          
+      			id="net.sf.ecl1.ECL1_CONTAINER"                                                        
+      			class="net.sf.ecl1.classpath.ExtensionClasspathContainerInitializer"/>
+   </extension>
+   <extension
+         point="org.eclipse.jdt.ui.classpathContainerPage">
+		   <classpathContainerPage
+				id="net.sf.ecl1.ECL1_CONTAINER"
+				name="ecl1 Classpath Container Page"
+				class="net.sf.ecl1.classpath.ExtensionClasspathContainerPage"/>
+   </extension>
+
+</plugin>
