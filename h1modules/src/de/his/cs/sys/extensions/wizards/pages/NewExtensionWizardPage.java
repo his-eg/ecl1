@@ -27,7 +27,6 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
 import de.his.cs.sys.extensions.wizards.pages.packages.HISinOneStrategy;
 import de.his.cs.sys.extensions.wizards.pages.packages.PackageStructureStrategy;
-import de.his.cs.sys.extensions.wizards.pages.packages.ProjectStrategy;
 import de.his.cs.sys.extensions.wizards.utils.HISConstants;
 import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
 import de.his.cs.sys.extensions.wizards.utils.WorkspaceSupport;
@@ -68,7 +67,7 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 
 	private List projectList;
 	private Text versionInputTextField;
-	private PackageStructureStrategy strategy = new ProjectStrategy();
+	private PackageStructureStrategy strategy = new HISinOneStrategy();
 	
 	/**
 	 * @param pageName
@@ -112,11 +111,7 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		defaultButton.addSelectionListener(new StrategySetter(new HISinOneStrategy()));
 		defaultButton.setText("HISinOne Layout");
 		defaultButton.setToolTipText("HISinOne Package Layout with packages for persistence etc.");
-		Button projectButton = new Button(buttonGroup, SWT.RADIO);
-		projectButton.setText("Project Name Layout");
-		projectButton.setToolTipText("Single Package with project name");
-		projectButton.addSelectionListener(new StrategySetter(new ProjectStrategy()));
-		projectButton.setSelection(true);
+		defaultButton.setSelection(true);
 	}
 	
 	/**

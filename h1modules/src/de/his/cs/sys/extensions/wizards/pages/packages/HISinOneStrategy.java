@@ -23,7 +23,7 @@ public class HISinOneStrategy implements PackageStructureStrategy {
 												"de.his.appserver.service.impl.",
 												"de.his.appserver.persistence.iface.",
 												"de.his.appserver.persistence.impl.hibernate.",
-												"de.his.appclient.jsf"};
+												"de.his.appclient.jsf."};
 
 	@Override
 	public Collection<String> packagesToCreate(String project) {
