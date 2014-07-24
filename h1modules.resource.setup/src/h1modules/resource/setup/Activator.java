@@ -3,6 +3,10 @@ package h1modules.resource.setup;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
+/**
+ * Activator for this plugin 
+ * @author keunecke
+ */
 public class Activator implements BundleActivator {
 
 	private static BundleContext context;

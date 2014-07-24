@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.ExtendedModifyEvent;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
@@ -26,7 +25,6 @@ import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
-import de.his.cs.sys.extensions.wizards.pages.packages.ExtensionStrategy;
 import de.his.cs.sys.extensions.wizards.pages.packages.HISinOneStrategy;
 import de.his.cs.sys.extensions.wizards.pages.packages.PackageStructureStrategy;
 import de.his.cs.sys.extensions.wizards.pages.packages.ProjectStrategy;
@@ -109,17 +107,16 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		projectList.select(index);
 		Group buttonGroup = new Group(control, SWT.BORDER);
 		buttonGroup.setLayout(new RowLayout());
-		buttonGroup.setText("Choose Package Creation Pattern");
+		buttonGroup.setText("Choose Package Layout");
 		Button defaultButton = new Button(buttonGroup, SWT.RADIO);
-		defaultButton.setSelection(true);
 		defaultButton.addSelectionListener(new StrategySetter(new HISinOneStrategy()));
-		defaultButton.setText("HISinOne Structure");
+		defaultButton.setText("HISinOne Layout");
+		defaultButton.setToolTipText("HISinOne Package Layout with packages for persistence etc.");
 		Button projectButton = new Button(buttonGroup, SWT.RADIO);
-		projectButton.setText("Project Name");
+		projectButton.setText("Project Name Layout");
+		projectButton.setToolTipText("Single Package with project name");
 		projectButton.addSelectionListener(new StrategySetter(new ProjectStrategy()));
-		Button extensionButton = new Button(buttonGroup, SWT.RADIO);
-		extensionButton.setText("Extension Structure");
-		extensionButton.addSelectionListener(new StrategySetter(new ExtensionStrategy()));
+		projectButton.setSelection(true);
 	}
 	
 	/**
@@ -144,7 +141,7 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 	}
 	
 	/**
-	 * @return
+	 * @return the package structure strategy
 	 */
 	public PackageStructureStrategy getStrategy() {
 		return this.strategy;

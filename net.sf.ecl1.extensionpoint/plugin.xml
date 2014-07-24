@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.views">
+      <category
+            name="Extensions"
+            id="net.sf.ecl1.extensionpoint">
+      </category>
+      <view
+            name="Extension Points"
+            icon="icons/sample.gif"
+            category="net.sf.ecl1.extensionpoint"
+            class="net.sf.ecl1.extensionpoint.views.ExtensionPointView"
+            id="net.sf.ecl1.extensionpoint.views.ExtensionPointView">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.eclipse.jdt.ui.JavaPerspective">
+         <view
+               ratio="0.5"
+               relative="org.eclipse.ui.views.TaskList"
+               relationship="right"
+               id="net.sf.ecl1.extensionpoint.views.ExtensionPointView">
+         </view>
+      </perspectiveExtension>
+   </extension>
+   <extension
+         id="net.sf.ecl1.extensionpoint.extensionPointBuilder"
+         name="Extension Project Builder"
+         point="org.eclipse.core.resources.builders">
+      <builder
+            hasNature="true">
+         <run
+               class="net.sf.ecl1.extensionpoint.collector.ExtensionPointBuilder">
+         </run>
+      </builder>
+   </extension>
+   <extension
+         id="net.sf.ecl1.extensionpoint.hisinoneExtensionsNature"
+         name="Extension Project Nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="net.sf.ecl1.extensionpoint.collector.HisinoneExtensionsNature">
+         </run>
+      </runtime>
+      <builder
+            id="net.sf.ecl1.extensionpoint.extensionPointBuilder">
+      </builder>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="net.sf.ecl1.extensionpoint.toggler"
+            nameFilter="*"
+            objectClass="org.eclipse.core.resources.IProject">
+         <action
+               class="net.sf.ecl1.extensionpoint.collector.ToggleExtensionNatureAction"
+               enablesFor="+"
+               id="net.sf.ecl1.extensionpoint.addRemoveNatureAction"
+               label="Add/Remove Extension Nature"
+               menubarPath="additions">
+         </action>
+      </objectContribution>
+   </extension>
+   
+
+</plugin>

@@ -27,24 +27,27 @@ import org.eclipse.jdt.core.JavaModelException;
  */
 public class ProjectSupport {
     
-    private static final String[] PATHS = { "src/java", "src/test", "src/generated", "resource" };
+    private static final String[] PATHS = { "src/java", "src/test", "src/generated", "resource", ".settings" };
     
     private final Collection<String> packagesToCreate;
 
-	/**
-	 * @param projects the projects to reference
-	 */
+	        /**
+    * Create a new ProjectSupport
+    * 
+    * @param packages packages that should be created 
+    */
 	public ProjectSupport(Collection<String> packages) {
 	    this.packagesToCreate = packages;
 	}
 
-	/**
-	 * creates a new project with a skeleton
-	 *
-	 * @param projectName name of project
-	 * @param location location
-	 * @return IProject instance
-	 */
+	    /**
+     * creates a new project with a skeleton
+     *
+     * @param choices choices container from the setup pages 
+     * @param projectName name of project
+     * @param location location
+     * @return IProject instance
+     */
 	public IProject createProject(InitialProjectConfigurationChoices choices, URI location) {
 		Assert.isNotNull(choices.getName());
 		Assert.isTrue(choices.getName().trim().length() > 0);
@@ -127,13 +130,13 @@ public class ProjectSupport {
 		return javaProject;
 	}
 
-	/**
-	 * Creates an empty project at the given location
-	 * 
-	 * @param name
-	 * @param location
-	 * @return
-	 */
+	    /**
+     * Creates an empty project at the given location
+     * 
+     * @param name
+     * @param location
+     * @return the new project
+     */
 	public IProject createBaseProject(String name, URI location) {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot()
 				.getProject(name);
@@ -189,9 +192,14 @@ public class ProjectSupport {
         }
 	}
 
+    /**
+     * Add natures to the project
+     * @param project
+     * @throws CoreException
+     */
 	public void addNatures(IProject project) throws CoreException {
 		addNature(project, ProjectNature.JAVA);
-//		addNature(project, ProjectNature.MACKER);
+        addNature(project, ProjectNature.ECL1);
 	}
 
 	private void addNature(IProject project, ProjectNature nature) throws CoreException {

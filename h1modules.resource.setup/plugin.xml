@@ -7,6 +7,10 @@
             class="h1modules.resource.setup.step.ResourceSetupStep"
             name="Resource Setup">
       </Step>
+      <Step
+            class="h1modules.resource.setup.step.GitInitSetupStep"
+            name="Resource Setup">
+      </Step>
    </extension>
 
 </plugin>

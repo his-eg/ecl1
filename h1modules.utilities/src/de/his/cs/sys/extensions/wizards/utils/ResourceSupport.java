@@ -27,12 +27,12 @@ public class ResourceSupport {
 	
 	private final IProject project;
 
-	/**
-	 * ResourceSupport
-	 *
-	 * @param project eclipse project
-	 * @param version initial extension version
-	 */
+	    /**
+     * ResourceSupport
+     *
+     * @param project eclipse project
+     * @param choices configuration choices from setup 
+     */
 	public ResourceSupport(IProject project, InitialProjectConfigurationChoices choices) {
 		this.project = project;
 		extensionAntPropertiesReplacements.put("[name]", choices.getName());
@@ -49,9 +49,16 @@ public class ResourceSupport {
 	public void createFiles() throws CoreException, UnsupportedEncodingException {
 		InputStream is = TemplateManager.class.getResourceAsStream("src/java/extension.beans.spring.xml.template");
 		writeProjectFile("/src/java/extension.beans.spring.xml", is);
+        InputStream isdummy = TemplateManager.class.getResourceAsStream("src/test/DummyTest.java.template");
+        writeProjectFile("src/test/DummyTest.java", isdummy);
 		new TemplateManager("build.xml.template", this.extensionAntPropertiesReplacements).writeContent(this.project);
 		new TemplateManager("extension.ant.properties.template", this.extensionAntPropertiesReplacements).writeContent(this.project);
-		is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build").getBytes("UTF-8"));
+        new TemplateManager(".settings/sonar-project.properties.template", this.extensionAntPropertiesReplacements).writeContent(this.project);
+        new TemplateManager("jenkins.ant.properties").writeContent(this.project);
+		new TemplateManager(".settings/org.eclipse.core.resources.prefs").writeContent(this.project);
+		new TemplateManager(".settings/org.eclipse.jdt.core.prefs").writeContent(this.project);
+		new TemplateManager(".settings/org.eclipse.jdt.ui.prefs").writeContent(this.project);
+        is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build" + System.getProperty("line.separator") + "/dist").getBytes("UTF-8"));
 		writeProjectFile("/.gitignore", is);
 	}
 

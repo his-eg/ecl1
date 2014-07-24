@@ -11,8 +11,6 @@ package de.his.cs.sys.extensions.wizards.pages.packages;
 
 import java.util.Collection;
 
-import org.eclipse.core.resources.IProject;
-
 /**
  * @author keunecke
  * @version $Revision$ 

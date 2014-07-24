@@ -15,6 +15,9 @@ package de.his.cs.sys.extensions.wizards.utils;
  */
 public interface HISConstants {
 	
+    /**
+     * HIS-Default name of the 'core' project
+     */
 	public static final String WEBAPPS = "webapps";
 
 }

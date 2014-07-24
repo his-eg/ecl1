@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Extension Bundle Resolver
+Bundle-SymbolicName: net.sf.ecl1.bundleresolver;singleton:=true
+Bundle-Version: 0.0.1.2013-02-12
+Bundle-Vendor: HIS GmbH
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.eclipse.core.resources;bundle-version="3.7.100",
+ org.eclipse.core.runtime;bundle-version="3.7.0",
+ org.eclipse.jdt.core;bundle-version="3.7.0",
+ org.eclipse.jdt.ui;bundle-version="3.7.0",
+ org.eclipse.jface;bundle-version="3.7.0"

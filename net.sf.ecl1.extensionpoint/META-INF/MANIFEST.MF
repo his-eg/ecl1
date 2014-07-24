@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Extension Point Collector
+Bundle-SymbolicName: net.sf.ecl1.extensionpoint; singleton:=true
+Bundle-Version: 0.0.7.2013-09-02
+Bundle-Activator: net.sf.ecl1.extensionpoint.Activator
+Bundle-Vendor: HIS GmbH
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.jdt.core,
+ org.eclipse.core.resources,
+ org.eclipse.ui.console;bundle-version="3.5.100",
+ com.google.guava;bundle-version="11.0.1"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

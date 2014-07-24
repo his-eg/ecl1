@@ -37,14 +37,27 @@ public class InitialProjectConfigurationChoices {
 		this.version = version;
 	}
 
+    /**
+     * Get the projects that will be referenced by a new project
+     * @return a collection of project names
+     */
 	public Collection<String> getProjectsToReference() {
 		return projectsToReference;
 	}
 
+    /**
+     * The name of the new project
+     * @return the name
+     */
 	public String getName() {
 		return name;
 	}
 
+    /**
+     * The initial version for the extension
+     * 
+     * @return the version
+     */
 	public String getVersion() {
 		return version;
 	}

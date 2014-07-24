@@ -1,0 +1,29 @@
+/*
+ * Copyright (c) 2013 HIS GmbH All Rights Reserved.
+ *
+ * $Id$
+ *
+ * $Log$
+ *
+ */
+
+import static org.junit.Assert.fail;
+
+import org.junit.Test;
+
+
+/**
+ * @version $Revision$
+ */
+public class DummyTest {
+
+    /**
+     * 
+     */
+    @Test
+    public void test() {
+        //do nothing just succeed
+        fail("DummyTest does always fail! Implement some JUnit tests to gain coverage and a stable Jenkins build.");
+    }
+
+}

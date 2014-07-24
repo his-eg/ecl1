@@ -24,8 +24,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-
-import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
 import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
 
 /**
@@ -62,7 +60,6 @@ public class NewEnrollCheckerWizard extends Wizard implements INewWizard {
 		}
 	}
 
-	@SuppressWarnings("hiding")
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
 		this.selection = selection;
@@ -100,7 +97,7 @@ public class NewEnrollCheckerWizard extends Wizard implements INewWizard {
 			String firstLowercaseName = firstCharLowerCase(name);
 			String sep = System.getProperty("line.separator");
 			String newEntry =
-					"		<bean id=\"" + firstLowercaseName + "\"" + sep +
+					"		<bean id=\"" + this.project.getName() + "." + firstLowercaseName + "\"" + sep +
 					"		  class=\"" + packageName + "." + name + "\"" + sep +
 					"		  scope=\"prototype\">" + sep +
 					"		  <property name=\"planelementDao\" ref=\"planelementDao\"/>" + sep +
