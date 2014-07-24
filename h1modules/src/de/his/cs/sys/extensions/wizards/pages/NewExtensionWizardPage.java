@@ -106,7 +106,7 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		projectList.select(index);
 		Group buttonGroup = new Group(control, SWT.BORDER);
 		buttonGroup.setLayout(new RowLayout());
-		buttonGroup.setText("Choose Package Layout");
+		buttonGroup.setText("Package Layout");
 		Button defaultButton = new Button(buttonGroup, SWT.RADIO);
 		defaultButton.addSelectionListener(new StrategySetter(new HISinOneStrategy()));
 		defaultButton.setText("HISinOne Layout");
