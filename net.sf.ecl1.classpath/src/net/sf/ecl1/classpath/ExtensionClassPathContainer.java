@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -34,12 +36,16 @@ class ExtensionClassPathContainer implements
 	public static final String EXTENSIONS_FOLDER = "qisserver/WEB-INF/extensions/";
 	
 	private final IJavaProject javaProject;
+	
+	private final Collection<String> extensionsForClasspath = new HashSet<>();
 
 	/**
 	 * @param javaProject
+	 * @param containerPath 
 	 */
-	public ExtensionClassPathContainer(IJavaProject javaProject) {
+	public ExtensionClassPathContainer(IJavaProject javaProject, IPath containerPath) {
 		this.javaProject = javaProject;
+		//TODO parse containerPath to fill extensions
 	}
 
 	@Override
@@ -62,25 +68,35 @@ class ExtensionClassPathContainer implements
 		Map<String, String> extensions = new HashMap<String, String>();
 		
 		scanForExtensionJars(javaProject, extensions);
-		scanForExtensionProjects(javaProject, extensions);
+		scanForExtensionProjects(extensions);
 		
 		ArrayList<IClasspathEntry> result = new ArrayList<>();
-		//uniquely register extensions either as jar or as project
 		
+		//uniquely register extensions either as jar or as project
 		for (Map.Entry<String, String> extension : extensions.entrySet()) {
-			if(extension.getValue().endsWith(".jar")) {
-				IPath path = javaProject.getPath().append(EXTENSIONS_FOLDER).append(extension.getValue());
-				//create a lib entry
-				System.out.println("Creating new container entry for: " + path.toString());
-				IClasspathEntry libraryEntry = JavaCore.newLibraryEntry(path, null, null, true);
-				result.add(libraryEntry);
-			} else {
-				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(extension.getValue());
-				System.out.println("Creating new container entry for project: " + project.getName());
-				JavaCore.newProjectEntry(project.getLocation(), true);
+			
+			String extensionName = extension.getKey();
+			String extensionPath = extension.getValue();
+			
+			if(isExtensionToBeAddedToClasspath(extensionName)) {
+				if(extensionPath.endsWith(".jar")) {
+					IPath path = javaProject.getPath().append(EXTENSIONS_FOLDER).append(extensionPath);
+					//create a lib entry
+					System.out.println("Creating new container entry for: " + path.toString());
+					IClasspathEntry libraryEntry = JavaCore.newLibraryEntry(path, null, null, true);
+					result.add(libraryEntry);
+				} else {
+					IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(extensionPath);
+					System.out.println("Creating new container entry for project: " + project.getName());
+					JavaCore.newProjectEntry(project.getLocation(), true);
+				}
 			}
 		}
 		return result.toArray(new IClasspathEntry[1]);
+	}
+
+	private boolean isExtensionToBeAddedToClasspath(String extensionName) {
+		return !extensionsForClasspath.isEmpty() && extensionsForClasspath.contains(extensionName);
 	}
 	
 	/**
@@ -88,8 +104,7 @@ class ExtensionClassPathContainer implements
 	 * @param javaProject
 	 * @param extensions
 	 */
-	private void scanForExtensionProjects(IJavaProject javaProject,
-			Map<String, String> extensions) {
+	private void scanForExtensionProjects(Map<String, String> extensions) {
 		//scan workspace for extension projects
 		IWorkspaceRoot ws = ResourcesPlugin.getWorkspace().getRoot();
 		List<IProject> projects = Arrays.asList(ws.getProjects(0));
