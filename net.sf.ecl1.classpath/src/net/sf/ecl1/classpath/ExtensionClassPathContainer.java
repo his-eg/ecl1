@@ -72,12 +72,12 @@ class ExtensionClassPathContainer implements
 				IPath path = javaProject.getPath().append(EXTENSIONS_FOLDER).append(extension.getValue());
 				//create a lib entry
 				System.out.println("Creating new container entry for: " + path.toString());
-				IClasspathEntry libraryEntry = JavaCore.newLibraryEntry(path, null, null);
+				IClasspathEntry libraryEntry = JavaCore.newLibraryEntry(path, null, null, true);
 				result.add(libraryEntry);
 			} else {
 				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(extension.getValue());
 				System.out.println("Creating new container entry for project: " + project.getName());
-				JavaCore.newProjectEntry(project.getLocation());
+				JavaCore.newProjectEntry(project.getLocation(), true);
 			}
 		}
 		return result.toArray(new IClasspathEntry[1]);
