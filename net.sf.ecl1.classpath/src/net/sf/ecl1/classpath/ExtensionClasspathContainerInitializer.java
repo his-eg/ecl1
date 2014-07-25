@@ -20,7 +20,7 @@ public class ExtensionClasspathContainerInitializer extends
 	
 	@Override
 	public void initialize(IPath containerPath, IJavaProject javaProject) throws CoreException {
-		ExtensionClassPathContainer container = new ExtensionClassPathContainer(javaProject);
+		ExtensionClassPathContainer container = new ExtensionClassPathContainer(javaProject, containerPath);
 		JavaCore.setClasspathContainer(containerPath, new IJavaProject[]{javaProject}, 
 													  new IClasspathContainer[]{container}, null);
 	}
