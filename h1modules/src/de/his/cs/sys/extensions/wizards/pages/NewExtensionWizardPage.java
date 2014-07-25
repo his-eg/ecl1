@@ -13,11 +13,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
@@ -39,34 +36,10 @@ import de.his.cs.sys.extensions.wizards.utils.WorkspaceSupport;
  */
 public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 
-	/**
-	 * @author keunecke
-	 * @version $Revision$ 
-	 */
-	private final class StrategySetter implements SelectionListener {
-		
-		private final PackageStructureStrategy strategyToSet;
-		
-		/**
-		 * @param strategyToSet
-		 */
-		public StrategySetter(PackageStructureStrategy strategyToSet) {
-			this.strategyToSet = strategyToSet;
-		}
-		
-		@Override
-		public void widgetSelected(SelectionEvent e) {
-			strategy = strategyToSet; 
-		}
-
-		@Override
-		public void widgetDefaultSelected(SelectionEvent e) {
-			// 
-		}
-	}
-
 	private List projectList;
+	
 	private Text versionInputTextField;
+	
 	private PackageStructureStrategy strategy = new HISinOneStrategy();
 	
 	/**
@@ -107,11 +80,6 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		Group buttonGroup = new Group(control, SWT.BORDER);
 		buttonGroup.setLayout(new RowLayout());
 		buttonGroup.setText("Package Layout");
-		Button defaultButton = new Button(buttonGroup, SWT.RADIO);
-		defaultButton.addSelectionListener(new StrategySetter(new HISinOneStrategy()));
-		defaultButton.setText("HISinOne Layout");
-		defaultButton.setToolTipText("HISinOne Package Layout with packages for persistence etc.");
-		defaultButton.setSelection(true);
 	}
 	
 	/**
