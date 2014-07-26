@@ -39,7 +39,7 @@ class ExtensionClassPathContainer implements
 	
 	private final IJavaProject javaProject;
 	
-	private final Collection<String> extensionsToExport = new HashSet<>();
+	private final Collection<String> extensionsForClassPath = new HashSet<>();
 
 	/**
 	 * @param javaProject
@@ -59,7 +59,7 @@ class ExtensionClassPathContainer implements
 			String commaSeparatedExtensionsToIgnore = containerPath.segment(1);
 			if(commaSeparatedExtensionsToIgnore != null) {
 				List<String> extensionsToIgnore = Splitter.on(",").splitToList(commaSeparatedExtensionsToIgnore);
-				this.extensionsToExport.addAll(extensionsToIgnore);
+				this.extensionsForClassPath.addAll(extensionsToIgnore);
 			}
 		}
 	}
@@ -94,27 +94,30 @@ class ExtensionClassPathContainer implements
 			String extensionName = extension.getKey();
 			String extensionPath = extension.getValue();
 		
-			boolean extensionNeedsToBeExported = extensionNeedsToBeExported(extensionName);
-			if(extensionPath.endsWith(".jar")) {
-				IPath path = javaProject.getPath().append(EXTENSIONS_FOLDER).append(extensionPath);
-				//create a lib entry
-				System.out.println("Creating new container entry for: " + path.toString() 
-						+ " exported: " + extensionNeedsToBeExported);
-				IClasspathEntry libraryEntry = JavaCore.newLibraryEntry(path, path, path, extensionNeedsToBeExported);
-				result.add(libraryEntry);
-			} else {
-				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(extensionPath);
-				System.out.println("Creating new container entry for project: " + project.getName() 
-						+ " exported: " + extensionNeedsToBeExported);
-				JavaCore.newProjectEntry(project.getLocation(), extensionNeedsToBeExported);
+			boolean extensionNeedsToBeExported = extensionNeedsToBeAddedToClasspath(extensionName);
+			if(extensionNeedsToBeExported) {
+				if(extensionPath.endsWith(".jar")) {
+					IPath path = javaProject.getPath().append(EXTENSIONS_FOLDER).append(extensionPath);
+					//create a lib entry
+					System.out.println("Creating new container entry for: " + path.toString() 
+							+ " exported: " + extensionNeedsToBeExported);
+					IClasspathEntry libraryEntry = JavaCore.newLibraryEntry(path, path, path, true);
+					result.add(libraryEntry);
+				} else {
+					IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(extensionPath);
+					System.out.println("Creating new container entry for project: " + project.getName() 
+							+ " exported: " + extensionNeedsToBeExported);
+					JavaCore.newProjectEntry(project.getLocation(), true);
+				}
 			}
 		}
 		return result.toArray(new IClasspathEntry[1]);
 	}
 
-	private boolean extensionNeedsToBeExported(String extensionName) {
-		boolean configuredExtensionsEmpty = extensionsToExport.isEmpty();
-		return configuredExtensionsEmpty || extensionsToExport.contains(extensionName);
+	private boolean extensionNeedsToBeAddedToClasspath(String extensionName) {
+		boolean configuredExtensionsEmpty = extensionsForClassPath.isEmpty();
+		boolean extensionIsListed = extensionsForClassPath.contains(extensionName);
+		return configuredExtensionsEmpty || extensionIsListed;
 	}
 	
 	/**
