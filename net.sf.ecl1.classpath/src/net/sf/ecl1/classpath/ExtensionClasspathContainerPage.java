@@ -13,6 +13,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -41,11 +42,12 @@ implements IClasspathContainerPage {
 	@Override
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NULL);
-        composite.setLayout(new GridLayout());
-        composite.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL
-                | GridData.HORIZONTAL_ALIGN_FILL));
+        composite.setLayout(new GridLayout(4, false));
         composite.setFont(parent.getFont());
-        extensionsTextList = new Text(composite, SWT.NONE);
+        Label label = new Label(composite, SWT.LEFT);
+        label.setText("Available Extensions");
+        extensionsTextList = new Text(composite, SWT.FILL );
+        extensionsTextList.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 3, 1));
         updateExtensionsTextfieldFromPath();
         setControl(composite);
 	}
