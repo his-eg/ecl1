@@ -15,6 +15,6 @@ public interface Constants {
     /**
      * The name of the preference value determining if detailed logging should occur
      */
-    public static final String LOGGING_PREFERENCE = "extensionsLogging";
+    public static final String LOGGING_PREFERENCE = "net.sf.ecl1.extensionpoint.extensionsLogging";
 
 }

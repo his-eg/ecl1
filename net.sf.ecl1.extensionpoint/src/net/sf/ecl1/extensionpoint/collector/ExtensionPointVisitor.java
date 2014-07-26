@@ -40,7 +40,7 @@ class ExtensionPointVisitor implements IResourceVisitor {
      * @param project
      */
     public ExtensionPointVisitor(IJavaProject project) {
-        this.logger = new ConsoleLoggingHelper(project, Constants.CONSOLE_NAME);
+        this.logger = new ConsoleLoggingHelper(project, Constants.CONSOLE_NAME, Constants.LOGGING_PREFERENCE);
         this.project = project;
     }
 

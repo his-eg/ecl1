@@ -33,7 +33,9 @@ public class ExtensionPointInformation {
      * @throws JavaModelException
      */
     public static ExtensionPointInformation create(IAnnotation a, IType type) throws JavaModelException {
-        ConsoleLoggingHelper logger = new ConsoleLoggingHelper(a.getJavaProject(), Constants.CONSOLE_NAME);
+        ConsoleLoggingHelper logger = new ConsoleLoggingHelper(a.getJavaProject(), 
+        														Constants.CONSOLE_NAME, 
+        														Constants.LOGGING_PREFERENCE);
         String idValue = null;
         String nameValue = null;
         String ifaceValue = null;
