@@ -42,12 +42,12 @@ implements IClasspathContainerPage {
 	@Override
 	public void createControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NULL);
-        composite.setLayout(new GridLayout(4, false));
+        composite.setLayout(new GridLayout(5, false));
         composite.setFont(parent.getFont());
         Label label = new Label(composite, SWT.LEFT);
         label.setText("Available Extensions");
         extensionsTextList = new Text(composite, SWT.FILL );
-        extensionsTextList.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 3, 1));
+        extensionsTextList.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 4, 1));
         updateExtensionsTextfieldFromPath();
         setControl(composite);
 	}
