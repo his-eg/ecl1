@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Extension Project Resource Setup
 Bundle-SymbolicName: net.sf.ecl1.resource.setup;singleton:=true
-Bundle-Version: 0.0.22.2013-09-02
+Bundle-Version: 0.0.24.2014-07-28
 Bundle-Activator: h1modules.resource.setup.Activator
 Require-Bundle: org.eclipse.core.runtime,
  de.his.h1moduleswizard;bundle-version="0.0.8",
@@ -13,4 +13,4 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jgit
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-Vendor: HIS GmbH
+Bundle-Vendor: HIS eG

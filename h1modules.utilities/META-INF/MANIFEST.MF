@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Utilities for H1 extension tools
 Bundle-SymbolicName: net.sf.ecl1.utilities;singleton:=true
-Bundle-Version: 0.0.13.2013-09-02
+Bundle-Version: 0.0.24.2014-07-28
 Bundle-Activator: h1modules.utilities.utils.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
@@ -12,4 +12,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: de.his.cs.sys.extensions.wizards.utils;uses:="org.eclipse.core.resources",
  de.his.cs.sys.extensions.wizards.utils.templates
 Import-Package: org.eclipse.jdt.core
-Bundle-Vendor: HIS GmbH
+Bundle-Vendor: HIS eG
