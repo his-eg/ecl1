@@ -28,7 +28,7 @@ public class ExtensionPointBuilderPreferencePage
 	public ExtensionPointBuilderPreferencePage() {
 		super(GRID);
 		setPreferenceStore(ExtensionPointBuilderPlugin.getDefault().getPreferenceStore());
-		setDescription("A demonstration of a preference page implementation");
+		setDescription("Configuration for the Extension Point Builder");
 	}
 	
 	/**
