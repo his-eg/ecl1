@@ -1,0 +1,5 @@
+<condition property="[dependency]" value="../[dependency]" else="../../[dependency]">
+	<resourceexists>
+	    <file file="../[dependency]" />
+	</resourceexists>
+</condition>

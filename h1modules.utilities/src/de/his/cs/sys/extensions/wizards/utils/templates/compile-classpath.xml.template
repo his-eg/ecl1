@@ -1,0 +1,9 @@
+<project name="compile-classpath" basedir=".">
+	
+	[conditionelements]
+  
+	<path id="additional-classpath">
+		[pathelements]
+	</path>
+	
+</project>

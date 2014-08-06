@@ -5,12 +5,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
 import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
 
@@ -23,11 +25,44 @@ import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
  */
 public class ResourceSupport {
 	
+
+	private static final String TEMPLATE = ".template";
+
+	private static final String COMPILE_CLASSPATH_XML = "compile-classpath.xml";
+	
+	private static final String COMPILE_CLASSPATH_XML_TEMPLATE = COMPILE_CLASSPATH_XML + TEMPLATE;
+	
+	private static final String SRC_JAVA_EXTENSION_BEANS_SPRING_XML = "src/java/extension.beans.spring.xml";
+
+	private static final String SRC_JAVA_EXTENSION_BEANS_SPRING_XML_TEMPLATE = SRC_JAVA_EXTENSION_BEANS_SPRING_XML + TEMPLATE;
+
+	private static final String SRC_TEST_DUMMY_TEST_JAVA = "src/test/DummyTest.java";
+	
+	private static final String SRC_TEST_DUMMY_TEST_JAVA_TEMPLATE = SRC_TEST_DUMMY_TEST_JAVA + TEMPLATE;
+
+	private static final String BUILD_XML_TEMPLATE = "build.xml" + TEMPLATE;
+
+	private static final String EXTENSION_ANT_PROPERTIES_TEMPLATE = "extension.ant.properties" + TEMPLATE;
+
+	private static final String SETTINGS_SONAR_PROJECT_PROPERTIES_TEMPLATE = ".settings/sonar-project.properties"+ TEMPLATE;
+
+	private static final String SETTINGS_ORG_ECLIPSE_CORE_RESOURCES_PREFS = ".settings/org.eclipse.core.resources.prefs";
+
+	private static final String SETTINGS_ORG_ECLIPSE_JDT_CORE_PREFS = ".settings/org.eclipse.jdt.core.prefs";
+
+	private static final String SETTINGS_ORG_ECLIPSE_JDT_UI_PREFS = ".settings/org.eclipse.jdt.ui.prefs";
+
+	private static final String JENKINS_ANT_PROPERTIES = "jenkins.ant.properties";
+
 	private final Map<String, String> extensionAntPropertiesReplacements = new HashMap<String, String>();
 	
 	private final IProject project;
+	
+	private final Collection<String> requiredProjects;
+	
+	private final String PROPERTY_DEPENDENCY_TEMPLATE = "[dependency]=${WORKSPACE}/../../../[dependency]/workspace";
 
-	    /**
+	/**
      * ResourceSupport
      *
      * @param project eclipse project
@@ -35,6 +70,7 @@ public class ResourceSupport {
      */
 	public ResourceSupport(IProject project, InitialProjectConfigurationChoices choices) {
 		this.project = project;
+		this.requiredProjects = choices.getProjectsToReference();
 		extensionAntPropertiesReplacements.put("[name]", choices.getName());
 		extensionAntPropertiesReplacements.put("[version]", choices.getVersion());
 	}
@@ -47,20 +83,99 @@ public class ResourceSupport {
 	 * @throws UnsupportedEncodingException
 	 */
 	public void createFiles() throws CoreException, UnsupportedEncodingException {
-		InputStream is = TemplateManager.class.getResourceAsStream("src/java/extension.beans.spring.xml.template");
-		writeProjectFile("/src/java/extension.beans.spring.xml", is);
-        InputStream isdummy = TemplateManager.class.getResourceAsStream("src/test/DummyTest.java.template");
-        writeProjectFile("src/test/DummyTest.java", isdummy);
-		new TemplateManager("build.xml.template", this.extensionAntPropertiesReplacements).writeContent(this.project);
-		new TemplateManager("extension.ant.properties.template", this.extensionAntPropertiesReplacements).writeContent(this.project);
-        new TemplateManager(".settings/sonar-project.properties.template", this.extensionAntPropertiesReplacements).writeContent(this.project);
-        new TemplateManager("jenkins.ant.properties").writeContent(this.project);
-		new TemplateManager(".settings/org.eclipse.core.resources.prefs").writeContent(this.project);
-		new TemplateManager(".settings/org.eclipse.jdt.core.prefs").writeContent(this.project);
-		new TemplateManager(".settings/org.eclipse.jdt.ui.prefs").writeContent(this.project);
+		InputStream is = TemplateManager.class.getResourceAsStream(SRC_JAVA_EXTENSION_BEANS_SPRING_XML_TEMPLATE);
+		writeProjectFile(SRC_JAVA_EXTENSION_BEANS_SPRING_XML, is);
+        InputStream isdummy = TemplateManager.class.getResourceAsStream(SRC_TEST_DUMMY_TEST_JAVA_TEMPLATE);
+        writeProjectFile(SRC_TEST_DUMMY_TEST_JAVA, isdummy);
+		new TemplateManager(BUILD_XML_TEMPLATE, this.extensionAntPropertiesReplacements).writeContent(this.project);
+		new TemplateManager(EXTENSION_ANT_PROPERTIES_TEMPLATE, this.extensionAntPropertiesReplacements).writeContent(this.project);
+        new TemplateManager(SETTINGS_SONAR_PROJECT_PROPERTIES_TEMPLATE, this.extensionAntPropertiesReplacements).writeContent(this.project);
+		new TemplateManager(SETTINGS_ORG_ECLIPSE_CORE_RESOURCES_PREFS).writeContent(this.project);
+		new TemplateManager(SETTINGS_ORG_ECLIPSE_JDT_CORE_PREFS).writeContent(this.project);
+		new TemplateManager(SETTINGS_ORG_ECLIPSE_JDT_UI_PREFS).writeContent(this.project);
         is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build" + System.getProperty("line.separator") + "/dist").getBytes("UTF-8"));
 		writeProjectFile("/.gitignore", is);
+		prepareAdditionalBuildConfiguration();
 	}
+
+
+	/**
+	 * Creates the jenkins.ant.properties file with all needed properties
+	 */
+	private void prepareAdditionalBuildConfiguration() {
+		try {
+			new TemplateManager(JENKINS_ANT_PROPERTIES).writeContent(this.project);
+			IFile file = this.project.getFile(JENKINS_ANT_PROPERTIES);
+			String additionalDependencies = createAdditionalDependencyProperties();
+			if(!additionalDependencies.isEmpty()) {
+				InputStream additionalDependenciesStream = new ByteArrayInputStream(additionalDependencies.getBytes());
+				file.appendContents(additionalDependenciesStream, IFile.KEEP_HISTORY, new NullProgressMonitor());
+				createAdditionalClasspathStructure();
+			}
+		} catch (CoreException e) {
+			e.printStackTrace();
+		}
+	}
+
+
+	private void createAdditionalClasspathStructure() throws CoreException {
+		Map<String, String> variables = new HashMap<String, String>();
+		variables.put("[conditionelements]", createConditionElements());
+		variables.put("[pathelements]", createPathElements());
+		new TemplateManager(COMPILE_CLASSPATH_XML_TEMPLATE, variables).writeContent(project);
+	}
+
+	private String createPathElements() {
+		StringBuilder pathElementsStringBuilder = new StringBuilder();
+		for (String project : requiredProjects) {
+			boolean projectIsWebapps = HISConstants.WEBAPPS.equals(project);
+			if(!projectIsWebapps) {
+				Map<String, String> variables = new HashMap<String, String>();
+				variables.put("[dependency]", project);
+				String pathElement = new TemplateManager("pathelement.template", variables).getContent();
+				System.out.println("New pathelement: " + pathElement);
+				pathElementsStringBuilder.append(pathElement);
+				pathElementsStringBuilder.append("\n");
+			}
+		}
+		return pathElementsStringBuilder.toString().trim();
+	}
+
+	private String createConditionElements() {
+		StringBuilder conditionElementsStringBuilder = new StringBuilder();
+		for (String project : requiredProjects) {
+			boolean projectIsWebapps = HISConstants.WEBAPPS.equals(project);
+			if(!projectIsWebapps) {
+				Map<String, String> variables = new HashMap<String, String>();
+				variables.put("[dependency]", project);
+				String conditionElement = new TemplateManager("conditionelement.template", variables).getContent();
+				System.out.println("New condition: " + conditionElement);
+				conditionElementsStringBuilder.append(conditionElement);
+				conditionElementsStringBuilder.append("\n");
+			}
+		}
+		return conditionElementsStringBuilder.toString();
+	}
+
+
+	private String createAdditionalDependencyProperties() {
+		if(this.requiredProjects.isEmpty()) {
+			return "";
+		}
+		StringBuilder sb = new StringBuilder();
+		sb.append("\n");
+		for (String project : requiredProjects) {
+			boolean projectIsWebapps = HISConstants.WEBAPPS.equals(project);
+			if(!projectIsWebapps) {
+				String additionalDependencyProperty = PROPERTY_DEPENDENCY_TEMPLATE.replace("[dependency]", project);
+				sb.append(additionalDependencyProperty);
+				sb.append("\n");
+				System.out.println("Adding additional dependency for jenkins: " + additionalDependencyProperty);
+			}
+		}
+		return sb.toString();
+	}
+
 
 	/**
 	 * writes a file
