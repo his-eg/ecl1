@@ -89,13 +89,38 @@ public class ResourceSupport {
         writeProjectFile(SRC_TEST_DUMMY_TEST_JAVA, isdummy);
 		new TemplateManager(BUILD_XML_TEMPLATE, this.extensionAntPropertiesReplacements).writeContent(this.project);
 		new TemplateManager(EXTENSION_ANT_PROPERTIES_TEMPLATE, this.extensionAntPropertiesReplacements).writeContent(this.project);
-        new TemplateManager(SETTINGS_SONAR_PROJECT_PROPERTIES_TEMPLATE, this.extensionAntPropertiesReplacements).writeContent(this.project);
+        createSonarInfrastructureFiles();
 		new TemplateManager(SETTINGS_ORG_ECLIPSE_CORE_RESOURCES_PREFS).writeContent(this.project);
 		new TemplateManager(SETTINGS_ORG_ECLIPSE_JDT_CORE_PREFS).writeContent(this.project);
 		new TemplateManager(SETTINGS_ORG_ECLIPSE_JDT_UI_PREFS).writeContent(this.project);
         is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build" + System.getProperty("line.separator") + "/dist").getBytes("UTF-8"));
 		writeProjectFile("/.gitignore", is);
 		prepareAdditionalBuildConfiguration();
+	}
+
+
+	private void createSonarInfrastructureFiles() {
+		Map<String, String> variables = new HashMap<String, String>();
+		variables.putAll(this.extensionAntPropertiesReplacements);
+		String additionalClassesFolders = createAdditionalClassesFolderReferencesForSonar();
+		variables.put("[dependencies]", additionalClassesFolders );
+		new TemplateManager(SETTINGS_SONAR_PROJECT_PROPERTIES_TEMPLATE, variables).writeContent(this.project);
+	}
+
+
+	private String createAdditionalClassesFolderReferencesForSonar() {
+		StringBuilder classesReferences = new StringBuilder();
+		HashMap<String, String> variables = new HashMap<String, String>();
+		for (String project : requiredProjects) {
+			boolean projectIsWebapps = HISConstants.WEBAPPS.equals(project);
+			if(!projectIsWebapps) {
+				variables.put("[dependency]", project);
+				String pathElement = new TemplateManager("sonarbinarieselement.template", variables).getContent();
+				classesReferences.append("," + pathElement);
+				variables.clear();
+			}
+		}
+		return classesReferences.toString().trim();
 	}
 
 
@@ -127,15 +152,16 @@ public class ResourceSupport {
 
 	private String createPathElements() {
 		StringBuilder pathElementsStringBuilder = new StringBuilder();
+		Map<String, String> variables = new HashMap<String, String>();
 		for (String project : requiredProjects) {
 			boolean projectIsWebapps = HISConstants.WEBAPPS.equals(project);
 			if(!projectIsWebapps) {
-				Map<String, String> variables = new HashMap<String, String>();
 				variables.put("[dependency]", project);
 				String pathElement = new TemplateManager("pathelement.template", variables).getContent();
 				System.out.println("New pathelement: " + pathElement);
 				pathElementsStringBuilder.append(pathElement);
 				pathElementsStringBuilder.append("\n");
+				variables.clear();
 			}
 		}
 		return pathElementsStringBuilder.toString().trim();
