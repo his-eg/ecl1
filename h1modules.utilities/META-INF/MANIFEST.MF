@@ -6,7 +6,8 @@ Bundle-Version: 0.0.24.2014-07-28
 Bundle-Activator: h1modules.utilities.utils.Activator
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.resources,
- org.eclipse.jdt
+ org.eclipse.jdt,
+ com.google.guava;bundle-version="15.0.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: de.his.cs.sys.extensions.wizards.utils;uses:="org.eclipse.core.resources",
