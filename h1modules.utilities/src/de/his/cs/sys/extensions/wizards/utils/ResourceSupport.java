@@ -26,6 +26,12 @@ import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
 public class ResourceSupport {
 	
 
+	private static final String DEPENDENCIES_VARIABLE_NAME = "[dependencies]";
+
+	private static final String DEPENDENCY_VARIABLE_NAME = "[dependency]";
+
+	private static final String SONARBINARIESELEMENT_TEMPLATE = "sonarbinarieselement.template";
+
 	private static final String TEMPLATE = ".template";
 
 	private static final String COMPILE_CLASSPATH_XML = "compile-classpath.xml";
@@ -103,7 +109,7 @@ public class ResourceSupport {
 		Map<String, String> variables = new HashMap<String, String>();
 		variables.putAll(this.extensionAntPropertiesReplacements);
 		String additionalClassesFolders = createAdditionalClassesFolderReferencesForSonar();
-		variables.put("[dependencies]", additionalClassesFolders );
+		variables.put(DEPENDENCIES_VARIABLE_NAME, additionalClassesFolders );
 		new TemplateManager(SETTINGS_SONAR_PROJECT_PROPERTIES_TEMPLATE, variables).writeContent(this.project);
 	}
 
@@ -114,8 +120,8 @@ public class ResourceSupport {
 		for (String project : requiredProjects) {
 			boolean projectIsWebapps = HISConstants.WEBAPPS.equals(project);
 			if(!projectIsWebapps) {
-				variables.put("[dependency]", project);
-				String pathElement = new TemplateManager("sonarbinarieselement.template", variables).getContent();
+				variables.put(DEPENDENCY_VARIABLE_NAME, project);
+				String pathElement = new TemplateManager(SONARBINARIESELEMENT_TEMPLATE, variables).getContent();
 				classesReferences.append("," + pathElement);
 				variables.clear();
 			}
@@ -156,9 +162,8 @@ public class ResourceSupport {
 		for (String project : requiredProjects) {
 			boolean projectIsWebapps = HISConstants.WEBAPPS.equals(project);
 			if(!projectIsWebapps) {
-				variables.put("[dependency]", project);
+				variables.put(DEPENDENCY_VARIABLE_NAME, project);
 				String pathElement = new TemplateManager("pathelement.template", variables).getContent();
-				System.out.println("New pathelement: " + pathElement);
 				pathElementsStringBuilder.append(pathElement);
 				pathElementsStringBuilder.append("\n");
 				variables.clear();
@@ -173,9 +178,8 @@ public class ResourceSupport {
 			boolean projectIsWebapps = HISConstants.WEBAPPS.equals(project);
 			if(!projectIsWebapps) {
 				Map<String, String> variables = new HashMap<String, String>();
-				variables.put("[dependency]", project);
+				variables.put(DEPENDENCY_VARIABLE_NAME, project);
 				String conditionElement = new TemplateManager("conditionelement.template", variables).getContent();
-				System.out.println("New condition: " + conditionElement);
 				conditionElementsStringBuilder.append(conditionElement);
 				conditionElementsStringBuilder.append("\n");
 			}
@@ -193,10 +197,9 @@ public class ResourceSupport {
 		for (String project : requiredProjects) {
 			boolean projectIsWebapps = HISConstants.WEBAPPS.equals(project);
 			if(!projectIsWebapps) {
-				String additionalDependencyProperty = PROPERTY_DEPENDENCY_TEMPLATE.replace("[dependency]", project);
+				String additionalDependencyProperty = PROPERTY_DEPENDENCY_TEMPLATE.replace(DEPENDENCY_VARIABLE_NAME, project);
 				sb.append(additionalDependencyProperty);
 				sb.append("\n");
-				System.out.println("Adding additional dependency for jenkins: " + additionalDependencyProperty);
 			}
 		}
 		return sb.toString();
