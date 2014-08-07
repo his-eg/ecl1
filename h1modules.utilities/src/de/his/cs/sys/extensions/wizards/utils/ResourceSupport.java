@@ -91,17 +91,25 @@ public class ResourceSupport {
 	public void createFiles() throws CoreException, UnsupportedEncodingException {
 		InputStream is = TemplateManager.class.getResourceAsStream(SRC_JAVA_EXTENSION_BEANS_SPRING_XML_TEMPLATE);
 		writeProjectFile(SRC_JAVA_EXTENSION_BEANS_SPRING_XML, is);
+		
         InputStream isdummy = TemplateManager.class.getResourceAsStream(SRC_TEST_DUMMY_TEST_JAVA_TEMPLATE);
         writeProjectFile(SRC_TEST_DUMMY_TEST_JAVA, isdummy);
-		new TemplateManager(BUILD_XML_TEMPLATE, this.extensionAntPropertiesReplacements).writeContent(this.project);
+        
 		new TemplateManager(EXTENSION_ANT_PROPERTIES_TEMPLATE, this.extensionAntPropertiesReplacements).writeContent(this.project);
-        createSonarInfrastructureFiles();
+		
+        is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build" + System.getProperty("line.separator") + "/dist").getBytes("UTF-8"));
+		writeProjectFile("/.gitignore", is);
+		
+		createEclipseProjectSpecificConfigFiles();
+		createSonarInfrastructureFiles();
+		prepareBuildConfiguration();
+	}
+
+
+	private void createEclipseProjectSpecificConfigFiles() {
 		new TemplateManager(SETTINGS_ORG_ECLIPSE_CORE_RESOURCES_PREFS).writeContent(this.project);
 		new TemplateManager(SETTINGS_ORG_ECLIPSE_JDT_CORE_PREFS).writeContent(this.project);
 		new TemplateManager(SETTINGS_ORG_ECLIPSE_JDT_UI_PREFS).writeContent(this.project);
-        is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build" + System.getProperty("line.separator") + "/dist").getBytes("UTF-8"));
-		writeProjectFile("/.gitignore", is);
-		prepareAdditionalBuildConfiguration();
 	}
 
 
@@ -133,8 +141,9 @@ public class ResourceSupport {
 	/**
 	 * Creates the jenkins.ant.properties file with all needed properties
 	 */
-	private void prepareAdditionalBuildConfiguration() {
+	private void prepareBuildConfiguration() {
 		try {
+			new TemplateManager(BUILD_XML_TEMPLATE, this.extensionAntPropertiesReplacements).writeContent(this.project);
 			new TemplateManager(JENKINS_ANT_PROPERTIES).writeContent(this.project);
 			IFile file = this.project.getFile(JENKINS_ANT_PROPERTIES);
 			String additionalDependencies = createAdditionalDependencyProperties();
