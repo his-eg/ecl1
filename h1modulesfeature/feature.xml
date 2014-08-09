@@ -80,7 +80,7 @@ To apply the Apache License to your work, attach the following boilerplate notic
 
    <url>
       <update label="ecl1 Sourceforge Updatesite" url="http://ecl1.sourceforge.net/update/"/>
-      <discovery label="HIS GmbH Website" url="http://www.his.de"/>
+      <discovery label="HIS eG Website" url="http://www.his.de"/>
       <discovery label="Project Website" url="http://ecl1.sourceforge.net"/>
       <discovery label="HISinOne Website" url="http://hisinone.de"/>
    </url>

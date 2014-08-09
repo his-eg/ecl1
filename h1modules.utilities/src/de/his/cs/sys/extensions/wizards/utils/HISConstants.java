@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 HIS GmbH All Rights Reserved.
+ * Copyright (c) 2012 HIS eG All Rights Reserved.
  *
  * $Id$
  *
@@ -10,6 +10,8 @@
 package de.his.cs.sys.extensions.wizards.utils;
 
 /**
+ * Constant values referring to HIS infrastructure
+ * 
  * @author keunecke
  * @version $Revision$ 
  */

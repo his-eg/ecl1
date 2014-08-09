@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 HIS GmbH All Rights Reserved.
+ * Copyright (c) 2012 HIS eG All Rights Reserved.
  *
  * $Id$
  *
