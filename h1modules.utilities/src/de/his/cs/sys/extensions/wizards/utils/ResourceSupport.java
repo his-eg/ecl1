@@ -24,15 +24,17 @@ import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
  * @author keunecke, brummermann
  */
 public class ResourceSupport {
-	
+
 
 	private static final String DEPENDENCIES_VARIABLE_NAME = "[dependencies]";
 
 	private static final String DEPENDENCY_VARIABLE_NAME = "[dependency]";
 
-	private static final String SONARBINARIESELEMENT_TEMPLATE = "sonarbinarieselement.template";
-
 	private static final String TEMPLATE = ".template";
+	
+	private static final String SONARBINARIESELEMENT_TEMPLATE = "sonarbinarieselement" + TEMPLATE;
+	
+	private static final String GITIGNORE = ".gitignore" + TEMPLATE;
 
 	private static final String COMPILE_CLASSPATH_XML = "compile-classpath.xml";
 	
@@ -89,16 +91,11 @@ public class ResourceSupport {
 	 * @throws UnsupportedEncodingException
 	 */
 	public void createFiles() throws CoreException, UnsupportedEncodingException {
-		InputStream is = TemplateManager.class.getResourceAsStream(SRC_JAVA_EXTENSION_BEANS_SPRING_XML_TEMPLATE);
-		writeProjectFile(SRC_JAVA_EXTENSION_BEANS_SPRING_XML, is);
 		
-        InputStream isdummy = TemplateManager.class.getResourceAsStream(SRC_TEST_DUMMY_TEST_JAVA_TEMPLATE);
-        writeProjectFile(SRC_TEST_DUMMY_TEST_JAVA, isdummy);
-        
-		new TemplateManager(EXTENSION_ANT_PROPERTIES_TEMPLATE, this.extensionAntPropertiesReplacements).writeContent(this.project);
-		
-        is = new ByteArrayInputStream(("/bin" + System.getProperty("line.separator") + "/build" + System.getProperty("line.separator") + "/dist").getBytes("UTF-8"));
-		writeProjectFile("/.gitignore", is);
+		new TemplateManager(SRC_JAVA_EXTENSION_BEANS_SPRING_XML_TEMPLATE, extensionAntPropertiesReplacements).writeContent(project);
+        new TemplateManager(SRC_TEST_DUMMY_TEST_JAVA_TEMPLATE, extensionAntPropertiesReplacements).writeContent(project);
+		new TemplateManager(EXTENSION_ANT_PROPERTIES_TEMPLATE, extensionAntPropertiesReplacements).writeContent(this.project);
+		new TemplateManager(GITIGNORE, extensionAntPropertiesReplacements).writeContent(project);
 		
 		createEclipseProjectSpecificConfigFiles();
 		createSonarInfrastructureFiles();
