@@ -14,6 +14,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,7 +26,9 @@ import org.eclipse.core.runtime.CoreException;
 import com.google.common.collect.Maps;
 
 /**
- * Replaces variables in templates given by name
+ * Replaces variables in templates given by name.
+ * 
+ * Templates will be retrieved from http://ecl1.sourceforge.net/templates
  * 
  * @author keunecke
  * @version $Revision$ 
@@ -38,7 +41,7 @@ public class TemplateManager {
 		nameReplacements.put(".template", "");
 	}
 	
-	private final InputStream template;
+	private static final String TEMPLATES_ROOT_URL = "http://ecl1.sourceforge.net/templates";
 	
 	private final Map<String, String> variables;
 
@@ -51,7 +54,6 @@ public class TemplateManager {
 	 * @param variables
 	 */
 	public TemplateManager(String templatePath, Map<String, String> variables) {
-		this.template = TemplateManager.class.getResourceAsStream(templatePath);
 		this.templatePath = templatePath;
 		this.variables = variables;
 	}
@@ -72,23 +74,32 @@ public class TemplateManager {
 	 */
 	public String getContent() {
 		StringBuilder result = new StringBuilder();
+		URL templateUrl;
+		InputStream templateStream = null;
 		try {
-		    BufferedReader br = new BufferedReader(new InputStreamReader(this.template));
+			templateUrl = new URL(TEMPLATES_ROOT_URL+"/templatePath");
+		    templateStream = templateUrl.openStream();
+			BufferedReader br = new BufferedReader(new InputStreamReader(templateStream));
 		    String line = "";
-		    try {
-		        while((line = br.readLine() )!= null) {
-		            String temp = line;
-		            for (Entry<String, String> variableAssignment : this.variables.entrySet()) {
-		                temp = temp.replace(variableAssignment.getKey(), variableAssignment.getValue());
-		            }
-		            result.append(temp + System.getProperty("line.separator"));
-		        }
-		    } catch (IOException e) {
-		        e.printStackTrace();
-		    }
-		} catch (NullPointerException e) {
-		    System.out.println("TemplatePath: " + this.templatePath);
+	        while((line = br.readLine() )!= null) {
+	            String temp = line;
+	            for (Entry<String, String> variableAssignment : this.variables.entrySet()) {
+	                temp = temp.replace(variableAssignment.getKey(), variableAssignment.getValue());
+	            }
+	            result.append(temp + System.getProperty("line.separator"));
+	        }
+		} catch (IOException e) {
+	        e.printStackTrace();
+	        System.out.println("TemplatePath: " + this.templatePath);
 		    System.out.println("Variables: " + this.variables);
+	    } finally {
+			if(templateStream != null) {
+				try {
+					templateStream.close();
+				} catch (IOException e) {
+					//
+				}
+			}
 		}
 		return result.toString().trim();
 	}
@@ -100,7 +111,6 @@ public class TemplateManager {
 	 * @param project
 	 */
 	public void writeContent(IProject project) {
-		//TODO implement folder and file renaming
 	    IFile file = project.getFile(doFolderAndFileRenaming(this.templatePath));
 	    InputStream is = new ByteArrayInputStream(getContent().getBytes());
 	    try {
