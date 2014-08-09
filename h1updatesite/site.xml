@@ -18,5 +18,8 @@
    <feature url="features/h1modulesfeature_0.0.25.2014-08-08.jar" id="h1modulesfeature" version="0.0.25.2014-08-08">
       <category name="de.his.cs.sys.extensions"/>
    </feature>
+   <feature url="features/h1modulesfeature_0.1.0.2014-08-11.jar" id="h1modulesfeature" version="0.1.0.2014-08-11">
+      <category name="de.his.cs.sys.extensions"/>
+   </feature>
    <category-def name="de.his.cs.sys.extensions" label="Extension Tools"/>
 </site>

@@ -17,13 +17,13 @@
 	</path>
 	
 	<target name="sign">
-		<signjar alias="${keystore.alias}" keystore="${keystore}" 
+		<!--<signjar alias="${keystore.alias}" keystore="${keystore}" 
 			storepass="${keystore.password}" lazy="true">
 			<path>
 				<path refid="plugins"/>
 				<path refid="features"/>
 			</path>
-		</signjar>
+		</signjar>-->
 	</target>
 	
 	<target name="zip">
@@ -45,7 +45,7 @@
 	
 	<!-- Attention: To use this target you need a copy of http://www.jcraft.com/jsch/ in your ant lib search path -->
 	<target name="upload" depends="sign, zip">
-		<scp todir="${sourceforge.user}:${sourceforge.password}@frs.sourceforge.net:/home/frs/project/ecl1/test" 
+		<scp todir="${sourceforge.user}:${sourceforge.password}@frs.sourceforge.net:/home/frs/project/ecl1/" 
 			 file="${zip-file-name}">
 		</scp>
 		<exec executable="rsync" dir=".">
