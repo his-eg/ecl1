@@ -36,7 +36,7 @@ public class ResourceSupport {
 	
 	private static final String SONARBINARIESELEMENT_TEMPLATE = "sonarbinarieselement" + TEMPLATE;
 	
-	private static final String GITIGNORE = ".gitignore" + TEMPLATE;
+	private static final String GITIGNORE = "gitignore" + TEMPLATE;
 
 	private static final String COMPILE_CLASSPATH_XML = "compile-classpath.xml";
 	
