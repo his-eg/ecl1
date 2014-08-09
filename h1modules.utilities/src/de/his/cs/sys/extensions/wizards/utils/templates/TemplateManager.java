@@ -22,6 +22,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
+import com.google.common.collect.Maps;
+
 /**
  * Replaces variables in templates given by name
  * 
@@ -29,6 +31,12 @@ import org.eclipse.core.runtime.CoreException;
  * @version $Revision$ 
  */
 public class TemplateManager {
+	
+	private static final Map<String, String> nameReplacements = Maps.newHashMap();
+	static {
+		nameReplacements.put("settings", ".settings");
+		nameReplacements.put(".template", "");
+	}
 	
 	private final InputStream template;
 	
@@ -92,7 +100,8 @@ public class TemplateManager {
 	 * @param project
 	 */
 	public void writeContent(IProject project) {
-	    IFile file = project.getFile("/" + this.templatePath.replace(".template", ""));
+		//TODO implement folder and file renaming
+	    IFile file = project.getFile(doFolderAndFileRenaming(this.templatePath));
 	    InputStream is = new ByteArrayInputStream(getContent().getBytes());
 	    try {
             file.create(is, true, null);
@@ -102,6 +111,15 @@ public class TemplateManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+	}
+
+	private String doFolderAndFileRenaming(String path) {
+		String replacedFileName = path;
+		for (Map.Entry<String, String> replacement : nameReplacements.entrySet()) {
+			replacedFileName = replacedFileName.replace(replacement.getKey(), replacement.getValue());
+			System.out.println("After replacement (" + replacement.getKey() + ", " + replacement.getValue() + "): " + replacedFileName);
+		}
+		return replacedFileName;
 	}
 
 }
