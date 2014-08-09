@@ -39,6 +39,7 @@ public class TemplateManager {
 	static {
 		nameReplacements.put("settings", ".settings");
 		nameReplacements.put(".template", "");
+		nameReplacements.put("gitignore", ".gitignore");
 	}
 	
 	private static final String TEMPLATES_ROOT_URL = "http://ecl1.sourceforge.net/templates";
@@ -77,7 +78,9 @@ public class TemplateManager {
 		URL templateUrl;
 		InputStream templateStream = null;
 		try {
-			templateUrl = new URL(TEMPLATES_ROOT_URL+"/templatePath");
+			String fullTemplateUrlString = TEMPLATES_ROOT_URL + "/" + templatePath;
+			System.out.println("Loading template from: " + fullTemplateUrlString);
+			templateUrl = new URL(fullTemplateUrlString);
 		    templateStream = templateUrl.openStream();
 			BufferedReader br = new BufferedReader(new InputStreamReader(templateStream));
 		    String line = "";
@@ -115,11 +118,15 @@ public class TemplateManager {
 	    InputStream is = new ByteArrayInputStream(getContent().getBytes());
 	    try {
             file.create(is, true, null);
-            is.close();
         } catch (CoreException e) {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            
+        } finally {
+        	try {
+				is.close();
+			} catch (IOException e1) {
+				//
+			}
         }
 	}
 
@@ -127,7 +134,6 @@ public class TemplateManager {
 		String replacedFileName = path;
 		for (Map.Entry<String, String> replacement : nameReplacements.entrySet()) {
 			replacedFileName = replacedFileName.replace(replacement.getKey(), replacement.getValue());
-			System.out.println("After replacement (" + replacement.getKey() + ", " + replacement.getValue() + "): " + replacedFileName);
 		}
 		return replacedFileName;
 	}
