@@ -102,14 +102,18 @@ public class ResourceSupport {
 		prepareBuildConfiguration();
 	}
 
-
+	/**
+	 * Setup of project specific configuration for compiler settings etc.
+	 */
 	private void createEclipseProjectSpecificConfigFiles() {
 		new TemplateManager(SETTINGS_ORG_ECLIPSE_CORE_RESOURCES_PREFS).writeContent(this.project);
 		new TemplateManager(SETTINGS_ORG_ECLIPSE_JDT_CORE_PREFS).writeContent(this.project);
 		new TemplateManager(SETTINGS_ORG_ECLIPSE_JDT_UI_PREFS).writeContent(this.project);
 	}
 
-
+	/**
+	 * Setup sonar configuration file
+	 */
 	private void createSonarInfrastructureFiles() {
 		Map<String, String> variables = new HashMap<String, String>();
 		variables.putAll(this.extensionAntPropertiesReplacements);
@@ -118,7 +122,11 @@ public class ResourceSupport {
 		new TemplateManager(SETTINGS_SONAR_PROJECT_PROPERTIES_TEMPLATE, variables).writeContent(this.project);
 	}
 
-
+	/**
+	 * Creates the references to classes folders that are needed for sonar checks
+	 * 
+	 * @return String with references to classes folders of required extensions' build results
+	 */
 	private String createAdditionalClassesFolderReferencesForSonar() {
 		StringBuilder classesReferences = new StringBuilder();
 		HashMap<String, String> variables = new HashMap<String, String>();
@@ -155,13 +163,21 @@ public class ResourceSupport {
 	}
 
 
-	private void createAdditionalClasspathStructure() throws CoreException {
+	/**
+	 * Creates the additional classpath structure in compile-classpath.xml needed for the new extension 
+	 */
+	private void createAdditionalClasspathStructure() {
 		Map<String, String> variables = new HashMap<String, String>();
 		variables.put("[conditionelements]", createConditionElements());
 		variables.put("[pathelements]", createPathElements());
 		new TemplateManager(COMPILE_CLASSPATH_XML_TEMPLATE, variables).writeContent(project);
 	}
 
+	/**
+	 * Creates the path elements for the imṕorted compile-classpath.xml
+	 *  
+	 * @return the XML String containing path refs for all required extensions
+	 */
 	private String createPathElements() {
 		StringBuilder pathElementsStringBuilder = new StringBuilder();
 		Map<String, String> variables = new HashMap<String, String>();
@@ -178,6 +194,11 @@ public class ResourceSupport {
 		return pathElementsStringBuilder.toString().trim();
 	}
 
+	/**
+	 * Creates all conditional property elements for the compile-classpath.xml
+	 * 
+	 * @return the XML String containing path refs for all required extensions
+	 */
 	private String createConditionElements() {
 		StringBuilder conditionElementsStringBuilder = new StringBuilder();
 		for (String project : requiredProjects) {
@@ -193,7 +214,11 @@ public class ResourceSupport {
 		return conditionElementsStringBuilder.toString();
 	}
 
-
+	/**
+	 * Creates the properties for required extensions
+	 * 
+	 * @return properties as String to write into a property file
+	 */
 	private String createAdditionalDependencyProperties() {
 		if(this.requiredProjects.isEmpty()) {
 			return "";
@@ -209,26 +234,6 @@ public class ResourceSupport {
 			}
 		}
 		return sb.toString();
-	}
-
-
-	/**
-	 * writes a file
-	 *
-	 * @param filename filename relative to project root
-	 * @param is input stream with data to write
-	 * @throws CoreException in case of an exception
-	 */
-	private void writeProjectFile(String filename, InputStream is) throws CoreException {
-		IFile file = project.getFile(filename);
-		try {
-			file.create(is, true, null);
-			is.close();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 }
