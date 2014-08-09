@@ -26,6 +26,8 @@ import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
 public class ResourceSupport {
 
 
+	private static final String SETTINGS = "settings";
+
 	private static final String DEPENDENCIES_VARIABLE_NAME = "[dependencies]";
 
 	private static final String DEPENDENCY_VARIABLE_NAME = "[dependency]";
@@ -52,13 +54,13 @@ public class ResourceSupport {
 
 	private static final String EXTENSION_ANT_PROPERTIES_TEMPLATE = "extension.ant.properties" + TEMPLATE;
 
-	private static final String SETTINGS_SONAR_PROJECT_PROPERTIES_TEMPLATE = ".settings/sonar-project.properties"+ TEMPLATE;
+	private static final String SETTINGS_SONAR_PROJECT_PROPERTIES_TEMPLATE = SETTINGS + "/sonar-project.properties"+ TEMPLATE;
 
-	private static final String SETTINGS_ORG_ECLIPSE_CORE_RESOURCES_PREFS = ".settings/org.eclipse.core.resources.prefs";
+	private static final String SETTINGS_ORG_ECLIPSE_CORE_RESOURCES_PREFS = SETTINGS + "/org.eclipse.core.resources.prefs";
 
-	private static final String SETTINGS_ORG_ECLIPSE_JDT_CORE_PREFS = ".settings/org.eclipse.jdt.core.prefs";
+	private static final String SETTINGS_ORG_ECLIPSE_JDT_CORE_PREFS = SETTINGS + "/org.eclipse.jdt.core.prefs";
 
-	private static final String SETTINGS_ORG_ECLIPSE_JDT_UI_PREFS = ".settings/org.eclipse.jdt.ui.prefs";
+	private static final String SETTINGS_ORG_ECLIPSE_JDT_UI_PREFS = SETTINGS + "/org.eclipse.jdt.ui.prefs";
 
 	private static final String JENKINS_ANT_PROPERTIES = "jenkins.ant.properties";
 
