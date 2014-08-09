@@ -2,7 +2,7 @@
 <feature
       id="h1modulesfeature"
       label="ecl1 - HISinOne Extension Tools"
-      version="0.0.25.2014-08-08"
+      version="0.1.0.2014-08-11"
       provider-name="HIS eG">
 
    <description url="http://ecl1.sf.net">
@@ -128,6 +128,13 @@ To apply the Apache License to your work, attach the following boilerplate notic
 
    <plugin
          id="com.google.guava"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.sf.ecl1.classpath"
          download-size="0"
          install-size="0"
          version="0.0.0"
