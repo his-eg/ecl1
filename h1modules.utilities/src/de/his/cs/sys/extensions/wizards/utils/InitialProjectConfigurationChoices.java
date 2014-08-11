@@ -28,9 +28,9 @@ public class InitialProjectConfigurationChoices {
     /**
      * Standard constructor
      *
-     * @param projectsToReference
-     * @param name
-     * @param version
+     * @param projectsToReference, must not be null
+     * @param name, must not be null
+     * @param version, must not be null
      */
     public InitialProjectConfigurationChoices(Collection<String> projectsToReference, String name,
                                               String version) {
