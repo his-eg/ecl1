@@ -3,6 +3,9 @@
 	
 	<property file="build.ant-private.properties"/>
 	
+	<property name="templates" value="../h1modules.utilities/src/de/his/cs/sys/extensions/wizards/utils/templates"/>
+
+	
 	<path id="plugins">
 		<fileset dir="plugins">
 			<include name="*.jar"/>
@@ -45,11 +48,23 @@
 	
 	<!-- Attention: To use this target you need a copy of http://www.jcraft.com/jsch/ in your ant lib search path -->
 	<target name="upload" depends="sign, zip">
-		<scp todir="${sourceforge.user}:${sourceforge.password}@frs.sourceforge.net:/home/frs/project/ecl1/" 
-			 file="${zip-file-name}">
+		<scp todir="${sourceforge.user}@frs.sourceforge.net:/home/frs/project/ecl1/" 
+			 file="${zip-file-name}" keyfile="${publickeyfile}">
 		</scp>
 		<exec executable="rsync" dir=".">
-			<arg line="-a delete -e ssh features plugins web artifacts.jar content.jar index.html site.xml ${sourceforge.user}@frs.sourceforge.net:/home/frs/project/ecl1/updatesite/" />
+			<arg line="-a --delete -e ssh features plugins web artifacts.jar content.jar index.html site.xml ${sourceforge.user}@frs.sourceforge.net:/home/frs/project/ecl1/updatesite/" />
 		</exec>
 	</target>
+	
+	<target name="update-templates">
+		<scp todir="${sourceforge.user}@frs.sourceforge.net:/home/frs/project/ecl1/templates" 
+			 keyfile="${publickeyfile}" >
+			<fileset dir="${templates}">
+				<include name="**/*.template"/>
+				<include name="**/*.properties"/>
+				<include name="**/*.prefs"/>
+			</fileset>
+		</scp>
+	</target>
+	
 </project>
