@@ -234,7 +234,6 @@ public class ResourceSupport {
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("\n");
         for (String project : requiredProjects) {
             boolean projectIsWebapps = HISConstants.WEBAPPS.equals(project);
             if(!projectIsWebapps) {
