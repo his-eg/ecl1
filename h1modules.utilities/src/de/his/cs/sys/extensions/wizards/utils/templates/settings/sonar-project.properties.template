@@ -4,7 +4,7 @@ sonar.projectName=[name]
 sonar.projectVersion=[version]
  
 # path to source directories (required)
-sonar.sources=src/java,src/generated,resource
+sonar.sources=src/java
  
 # path to test source directories (optional)
 sonar.tests=src/test
