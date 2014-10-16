@@ -14,9 +14,7 @@ import java.util.Collection;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
@@ -77,9 +75,6 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 			}
 		}
 		projectList.select(index);
-		Group buttonGroup = new Group(control, SWT.BORDER);
-		buttonGroup.setLayout(new RowLayout());
-		buttonGroup.setText("Package Layout");
 	}
 	
 	/**
