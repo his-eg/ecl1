@@ -16,6 +16,8 @@
 	<property name="build" value="build" />
 
 	<property name="dist" value="dist" />
+	
+	<property name="lib" value="lib"/>
 
 	<property name="target-file" value="${dist}/${extension.name}.jar" />
 
@@ -131,6 +133,7 @@
 		<mkdir dir="${classes-target}" />
 		<mkdir dir="${resources-target}" />
 		<mkdir dir="${dist}" />
+		<mkdir dir="${lib}" />
 	</target>
 
 	<target name="compile" depends="init">
