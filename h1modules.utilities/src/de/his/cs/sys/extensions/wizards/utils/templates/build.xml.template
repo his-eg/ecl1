@@ -17,8 +17,6 @@
 
 	<property name="dist" value="dist" />
 	
-	<property name="lib" value="lib"/>
-
 	<property name="target-file" value="${dist}/${extension.name}.jar" />
 
 	<condition property="webapps" value="../webapps" else="../../webapps">
@@ -133,12 +131,12 @@
 		<mkdir dir="${classes-target}" />
 		<mkdir dir="${resources-target}" />
 		<mkdir dir="${dist}" />
-		<mkdir dir="${lib}" />
 	</target>
 
 	<target name="compile" depends="init">
 		<javac destdir="${classes-target}" debug="on" includeantruntime="false" source="1.7" target="1.7" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
-			<compilerarg line="-encoding UTF-8"/>
+			<compilerarg line="-encoding UTF-8" />
+			<compilerarg line="-enableJavadoc" />
 			<classpath refid="compile-classpath" />
 			<src refid="compile-sourcepath" />
 		</javac>
@@ -201,6 +199,7 @@
 	<target name="compile-tests" depends="compile">
 		<javac srcdir="src/test" destdir="${test-target}" debug="on" includeantruntime="false" source="1.7" target="1.7" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
 			<compilerarg line="-encoding utf-8"/>
+			<compilerarg line="-enableJavadoc" />
 			<classpath refid="compile-test-classpath" />
 			<sourcepath refid="compile-test-sourcepath" />
 		</javac>
