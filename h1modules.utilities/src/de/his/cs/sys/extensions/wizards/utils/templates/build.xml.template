@@ -216,9 +216,6 @@
 			<fileset dir="${classes-target}">
 				<include name="**/*.class" />
 			</fileset>
-			<fileset dir="${test-target}">
-				<include name="**/*.class" />
-			</fileset>
 		</cobertura-instrument>
 	</target>
 	
@@ -242,11 +239,9 @@
 	<target name="cobertura-report" depends="cobertura-test">
 		<cobertura-report format="html" destdir="${build_cobertura_report}" datafile="cobertura.ser">
 			<fileset dir="${src-java}" />
-			<fileset dir="${src-test}" />
 		</cobertura-report>
 		<cobertura-report format="xml" destdir="${build_cobertura_report}" datafile="cobertura.ser">
 			<fileset dir="${src-java}" />
-			<fileset dir="${src-test}" />
 		</cobertura-report>
 	</target>
 	
