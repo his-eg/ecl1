@@ -68,8 +68,8 @@
 	
 	<path id="compile-test-classpath">
 		<pathelement location="${qisserver-classes}"/>
-		<dirset dir="${classes-target}" />
-		<dirset dir="${test-target}" />
+		<pathelement location="${classes-target}" />
+		<pathelement location="${test-target}" />
 		<fileset dir="${qisserver-lib}">
 			<include name="*.jar" />
 			<exclude name="ant-1.8.1.jar"/>
@@ -243,6 +243,10 @@
 		<cobertura-report format="xml" destdir="${build_cobertura_report}" datafile="cobertura.ser">
 			<fileset dir="${src-java}" />
 		</cobertura-report>
+	</target>
+	
+	<target name="update-webapps">
+		<get dest="${qisserver-extensions}/${extension.name}.jar" src="${latest-build-result}"/>
 	</target>
 	
 </project>
