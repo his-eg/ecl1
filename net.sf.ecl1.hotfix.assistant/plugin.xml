@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+  point="org.eclipse.team.ui.synchronizeParticipants">
+	  	<participant
+	    	persistent="false"
+	      	icon="icons/icon.png"
+	        class="net.sf.ecl1.hotfix.assistant.CreateHotfixParticipant"
+	        name="Create Hotifx Snippet"
+	        id="net.sf.ecl1.hotfix.assistant.CreateHotfixParticipant-Id"/>
+   	</extension>
+	<extension
+  		point="org.eclipse.team.ui.synchronizeWizards">
+		<wizard
+			class="net.sf.ecl1.hotfix.assistant.CreateHotfixSynchronizeWizard"
+    		icon="icons/icon.png"
+		    description="Create Hotfix Snippets for release.xml from changes"
+		    name="Create Hotfix Snuppe"
+		    id="CreateHotfix.wizard1"/>
+	</extension>
+</plugin>
