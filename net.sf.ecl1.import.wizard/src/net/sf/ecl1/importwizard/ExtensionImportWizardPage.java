@@ -30,10 +30,10 @@ import de.his.cs.sys.extensions.wizards.utils.WorkspaceSupport;
 public class ExtensionImportWizardPage extends WizardPage {
 
     // All extensions existing on repo server
-    private final Set<String> remoteExtensions = new TreeSet<>();
+    private final Set<String> remoteExtensions = new TreeSet<String>();
 
     // All extensions existing in workspace
-    private final Set<String> extensionsInWorkspace = new TreeSet<>();
+    private final Set<String> extensionsInWorkspace = new TreeSet<String>();
 
     private List projectList;
 

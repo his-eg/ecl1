@@ -12,7 +12,7 @@ Require-Bundle: org.eclipse.ui;bundle-version="3.7.0",
  org.eclipse.jdt.ui;bundle-version="3.7.0",
  net.sf.ecl1.utilities;bundle-version="0.0.1",
  org.eclipse.jdt.core;bundle-version="3.7.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Export-Package: de.his.cs.sys.extensions;uses:="org.eclipse.ui.plugin,org.osgi.framework",
  de.his.cs.sys.extensions.extensionpointhandlers;uses:="org.eclipse.jdt.core",
