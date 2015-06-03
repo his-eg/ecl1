@@ -6,6 +6,7 @@ import java.util.Collection;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -58,6 +59,7 @@ public class ProjectFromGitImporter {
      * @throws CoreException
      */
     public void importProject(String extensionToImport) throws CoreException {
+        disableAutoBuild();
         String fullRepositoryPath = baseRepositoryPath + extensionToImport;
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IPath workspacePath = workspace.getRoot().getLocation();
@@ -89,7 +91,23 @@ public class ProjectFromGitImporter {
             if (extensionFolder.exists()) {
                 extensionFolder.delete();
             }
+            enableAutoBuild();
         }
+    }
+
+    private void enableAutoBuild() throws CoreException {
+        setWorkspaceAutoBuild(true);
+    }
+
+    private void disableAutoBuild() throws CoreException {
+        setWorkspaceAutoBuild(false);
+    }
+
+    private void setWorkspaceAutoBuild(boolean flag) throws CoreException {
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        final IWorkspaceDescription description = workspace.getDescription();
+        description.setAutoBuilding(flag);
+        workspace.setDescription(description);
     }
 
 }
