@@ -10,4 +10,5 @@ Require-Bundle: org.eclipse.ui,
  net.sf.ecl1.utilities,
  org.eclipse.jgit
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
-Import-Package: org.eclipse.core.runtime
+Import-Package: de.his.core.tools.cs.sys.quality.eclipsemacker.gui,
+ org.eclipse.core.runtime

@@ -5,7 +5,7 @@ import h1modules.utilities.utils.Activator;
 import java.util.Collection;
 import java.util.TreeSet;
 
-import net.sf.ecl1.utilities.preferences.PreferenceConstants;
+import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -52,8 +52,8 @@ public class RemoteProjectSearchSupport {
 
     public Collection<String> getProjects() {
         IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-        String buildServer = store.getString(PreferenceConstants.BUILD_SERVER_PREFERENCE);
-        String buildServerView = store.getString(PreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE);
+        String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE);
+        String buildServerView = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE);
         String lookUpTarget = buildServer + HIS_DEFAULT_JENKINS_VIEW_INFIX + buildServerView + JENKINS_API_ADDITION;
         TreeSet<String> result = new TreeSet<String>();
         BuildJobView view = JsonUtil.fromJson(BuildJobView.class, RestUtil.getJsonStream(lookUpTarget));

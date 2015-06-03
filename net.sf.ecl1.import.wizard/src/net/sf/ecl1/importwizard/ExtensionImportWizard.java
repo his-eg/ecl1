@@ -10,7 +10,11 @@
  *******************************************************************************/
 package net.sf.ecl1.importwizard;
 
+import h1modules.utilities.utils.Activator;
+
 import java.util.Collection;
+
+import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -40,7 +44,8 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
         boolean openProjectsAfterImport = mainPage.openProjectsAfterImport();
 
         try {
-            new ProjectFromGitImporter("ssh://git@git.his.de", openProjectsAfterImport).importProjects(extensionsToImport);
+            String reposerver = Activator.getDefault().getPreferenceStore().getString(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE);
+            new ProjectFromGitImporter(reposerver, openProjectsAfterImport).importProjects(extensionsToImport);
         } catch (CoreException e) {
             e.printStackTrace();
         }

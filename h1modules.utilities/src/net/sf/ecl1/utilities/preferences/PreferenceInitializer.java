@@ -18,9 +18,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     @Override
     public void initializeDefaultPreferences() {
         IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-        store.setDefault(PreferenceConstants.GIT_SERVER_PREFERENCE, "ssh://git@git.his.de/");
-        store.setDefault(PreferenceConstants.BUILD_SERVER_PREFERENCE, "http://build.his.de/build/");
-        store.setDefault(PreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, "HEAD");
+        store.setDefault(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE, "ssh://git@git.his.de/");
+        store.setDefault(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE, "http://build.his.de/build/");
+        store.setDefault(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, "HEAD");
     }
 
 }

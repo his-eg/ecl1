@@ -29,9 +29,9 @@ implements IWorkbenchPreferencePage {
      */
     @Override
     public void createFieldEditors() {
-        addField(new StringFieldEditor(PreferenceConstants.GIT_SERVER_PREFERENCE, "GIT Server:", getFieldEditorParent()));
-        addField(new StringFieldEditor(PreferenceConstants.BUILD_SERVER_PREFERENCE, "Build Server:", getFieldEditorParent()));
-        addField(new StringFieldEditor(PreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, "Search view on Build Server (Branches):", getFieldEditorParent()));
+        addField(new StringFieldEditor(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE, "GIT Server:", getFieldEditorParent()));
+        addField(new StringFieldEditor(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE, "Build Server:", getFieldEditorParent()));
+        addField(new StringFieldEditor(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, "Search view on Build Server (Branches):", getFieldEditorParent()));
     }
 
     /* (non-Javadoc)

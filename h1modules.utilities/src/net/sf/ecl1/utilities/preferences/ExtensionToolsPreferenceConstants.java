@@ -3,7 +3,7 @@ package net.sf.ecl1.utilities.preferences;
 /**
  * Constant definitions for HISinOne-Extension tools plug-in preferences
  */
-public class PreferenceConstants {
+public class ExtensionToolsPreferenceConstants {
 
     /**
      * Preference for URI to git server

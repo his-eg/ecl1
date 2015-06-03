@@ -15,7 +15,9 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: de.his.cs.sys.extensions.wizards.utils;uses:="org.eclipse.core.resources",
- de.his.cs.sys.extensions.wizards.utils.templates
+ de.his.cs.sys.extensions.wizards.utils.templates,
+ h1modules.utilities.utils,
+ net.sf.ecl1.utilities.preferences
 Import-Package: org.eclipse.jdt.core
 Bundle-Vendor: HIS eG
 Bundle-ClassPath: lib/javax.ws.rs-api-2.0-m09.jar,
