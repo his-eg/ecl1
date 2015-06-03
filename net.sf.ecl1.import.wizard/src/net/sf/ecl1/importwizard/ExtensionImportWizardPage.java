@@ -57,9 +57,14 @@ public class ExtensionImportWizardPage extends WizardPage {
         Label question = new Label(openAfterImportComposite, SWT.TOP);
         question.setText("Open extensions after import?");
         openAfterImport = new Button(openAfterImportComposite, SWT.CHECK);
+        openAfterImport.setSelection(true);
 
         Composite projectChoice = new Composite(parent, SWT.BORDER | SWT.TOP);
         projectChoice.setLayout(gl);
+
+        Label infoText = new Label(projectChoice, SWT.TOP | SWT.LEFT | SWT.BORDER);
+        infoText.setText("You can use Ctrl + A to select all extensions.");
+
         Label projectChoiceLabel = new Label(projectChoice, SWT.TOP);
         projectChoiceLabel.setText("Importable Projects");
         projectList = new List(projectChoice, SWT.MULTI | SWT.V_SCROLL);
