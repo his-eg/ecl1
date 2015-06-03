@@ -21,59 +21,60 @@ import org.eclipse.core.runtime.Path;
 
 /**
  * @author keunecke
- * @version $Revision$ 
+ * @version $Revision$
  */
 public class WorkspaceSupport {
 
     /**
      * Determine all projects that could be referenced by a new project
-     * 
+     *
      * @return a list of suitable projects
      */
-	public List<String> getPossibleProjectsToReference() {
-		List<String> result = new ArrayList<String>();
-		IWorkspace workspace = ResourcesPlugin.getWorkspace();
-		IWorkspaceRoot root = workspace.getRoot();
-		IProject[] projects = root.getProjects();
-		for (IProject iProject : projects) {
-			String name = iProject.getName();
-			if(isEligibleForReferencing(iProject)) {
-				result.add(name);
-			}
-		}
-		return result;
-	}
-	
-	/**
-	 * Checks if a project is eligible as referenced project:
-	 * - webapps-project is eligible
-	 * - any extension project is eligible
-	 * 
-	 * @param iProject
-	 * @return true if project may be referenced by a new project
-	 */
-	private boolean isEligibleForReferencing(IProject iProject) {
-		if(HISConstants.WEBAPPS.equals(iProject.getName())) {
-			return true;
-		}
-		if(isExtensionProject(iProject)) {
-			return true;
-		}
-		return false;
-	}
+    public List<String> getPossibleProjectsToReference() {
+        List<String> result = new ArrayList<String>();
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        IWorkspaceRoot root = workspace.getRoot();
+        IProject[] projects = root.getProjects();
+        for (IProject iProject : projects) {
+            String name = iProject.getName();
+            if(isEligibleForReferencing(iProject)) {
+                result.add(name);
+            }
+        }
+        return result;
+    }
 
-	/**
-	 * Checks if a project is an extension project
-	 * 
-	 * @param iProject
-	 * @return true if iProject is an extension project
-	 */
-	private boolean isExtensionProject(IProject iProject) {
-		IPath path = new Path("src/java/extension.beans.spring.xml");
-		if(iProject.exists(path)) {
-			return true;
-		}
-		return false;
-	}
+    /**
+     * Checks if a project is eligible as referenced project:
+     * - webapps-project is eligible
+     * - any extension project is eligible
+     *
+     * @param iProject
+     * @return true if project may be referenced by a new project
+     */
+    private boolean isEligibleForReferencing(IProject iProject) {
+        if(HISConstants.WEBAPPS.equals(iProject.getName())) {
+            return true;
+        }
+        if(isExtensionProject(iProject)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Checks if a project is an extension project
+     *
+     * @param iProject
+     * @return true if iProject is an extension project
+     */
+    private boolean isExtensionProject(IProject iProject) {
+        IPath beanConfPath = new Path("src/java/extension.beans.spring.xml");
+        IPath propertiesPath = new Path("extension.ant.properties");
+        if (iProject.exists(beanConfPath) || iProject.exists(propertiesPath)) {
+            return true;
+        }
+        return false;
+    }
 
 }
