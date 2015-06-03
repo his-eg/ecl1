@@ -10,10 +10,16 @@
  *******************************************************************************/
 package net.sf.ecl1.importwizard;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
@@ -24,7 +30,6 @@ import org.eclipse.swt.widgets.List;
 
 import de.his.cs.sys.extensions.wizards.utils.HISConstants;
 import de.his.cs.sys.extensions.wizards.utils.RemoteProjectSearchSupport;
-import de.his.cs.sys.extensions.wizards.utils.WorkspaceSupport;
 
 
 public class ExtensionImportWizardPage extends WizardPage {
@@ -82,7 +87,15 @@ public class ExtensionImportWizardPage extends WizardPage {
     }
 
     private void initExtensionsInWorkspace() {
-        extensionsInWorkspace.addAll(new WorkspaceSupport().getPossibleProjectsToReference());
+        Collection<String> result = new ArrayList<String>();
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        IWorkspaceRoot root = workspace.getRoot();
+        IProject[] projects = root.getProjects();
+        for (IProject iProject : projects) {
+            String name = iProject.getName();
+            result.add(name);
+        }
+        extensionsInWorkspace.addAll(result);
     }
 
     public Set<String> getSelectedExtensions() {
