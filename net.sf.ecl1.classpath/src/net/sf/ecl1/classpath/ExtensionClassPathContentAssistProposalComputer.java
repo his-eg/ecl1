@@ -8,10 +8,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -81,8 +85,20 @@ public class ExtensionClassPathContentAssistProposalComputer implements IJavaCom
     }
 
     private void scanProjectEntry(IClasspathEntry cpe) {
-        // TODO Auto-generated method stub
-
+        IPath outputLocation = cpe.getOutputLocation();
+        System.out.println(outputLocation);
+        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(cpe.getPath().lastSegment());
+        IJavaProject javaProject = JavaCore.create(project);
+        try {
+            IJavaElement[] children = javaProject.getChildren();
+            for (IJavaElement child : children) {
+                if (child.getElementType() == IJavaElement.CLASS_FILE) {
+                    //
+                }
+            }
+        } catch (JavaModelException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

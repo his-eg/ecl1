@@ -4,13 +4,21 @@ Bundle-Name: Utilities for H1 extension tools
 Bundle-SymbolicName: net.sf.ecl1.utilities;singleton:=true
 Bundle-Version: 0.1.1.2014-08-13
 Bundle-Activator: h1modules.utilities.utils.Activator
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.core.resources,
- org.eclipse.jdt,
- com.google.guava;bundle-version="15.0.0"
+Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
+ org.eclipse.core.resources;visibility:=reexport,
+ org.eclipse.jdt;visibility:=reexport,
+ com.google.guava;bundle-version="15.0.0",
+ com.google.gson;bundle-version="2.2.4",
+ org.apache.httpcomponents.httpclient;bundle-version="4.2.6",
+ org.apache.httpcomponents.httpcore;bundle-version="4.2.5",
+ org.eclipse.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: de.his.cs.sys.extensions.wizards.utils;uses:="org.eclipse.core.resources",
  de.his.cs.sys.extensions.wizards.utils.templates
 Import-Package: org.eclipse.jdt.core
 Bundle-Vendor: HIS eG
+Bundle-ClassPath: lib/javax.ws.rs-api-2.0-m09.jar,
+ lib/jersey-client-2.0-m05-1.jar,
+ lib/jersey-common-2.0-m05-1.jar,
+ .

@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Extension Import Wizard
+Bundle-SymbolicName: net.sf.ecl1.import.wizard;singleton:=true
+Bundle-Version: 0.0.1
+Bundle-Vendor: HIS eG
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.ui.ide,
+ org.eclipse.core.resources,
+ net.sf.ecl1.utilities,
+ org.eclipse.jgit
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Import-Package: org.eclipse.core.runtime
