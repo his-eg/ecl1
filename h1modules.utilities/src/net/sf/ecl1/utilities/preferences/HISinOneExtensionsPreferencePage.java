@@ -28,7 +28,7 @@ implements IWorkbenchPreferencePage {
     public HISinOneExtensionsPreferencePage() {
         super(GRID);
         setPreferenceStore(Activator.getDefault().getPreferenceStore());
-        setDescription("A demonstration of a preference page implementation");
+        setDescription("Preferences for HISinOne-Extension-Tools");
     }
 
     /**
@@ -41,7 +41,7 @@ implements IWorkbenchPreferencePage {
     public void createFieldEditors() {
         addField(new StringFieldEditor(PreferenceConstants.GIT_SERVER_PREFERENCE, "GIT Server:", getFieldEditorParent()));
         addField(new StringFieldEditor(PreferenceConstants.BUILD_SERVER_PREFERENCE, "Build Server:", getFieldEditorParent()));
-        addField(new StringFieldEditor(PreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, "Search view on Build Server:", getFieldEditorParent()));
+        addField(new StringFieldEditor(PreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, "Search view on Build Server (Branches):", getFieldEditorParent()));
     }
 
     /* (non-Javadoc)
