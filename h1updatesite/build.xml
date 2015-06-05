@@ -56,11 +56,11 @@
 		</exec>
 	</target>
 	
-	<target name="update-website">
-		<exec executable="rsync" dir=".">
-			<arg line="-a --delete -e ssh * ${sourceforge.user},ecl1@web.sourceforge.net:htdocs/" />
+	<!--target name="update-website">
+		<exec executable="rsync" dir="../net.sf.ecl1.website">
+			<arg line="-a delete -e ssh *.html *.png *.css ${sourceforge.user},ecl1@web.sourceforge.net:htdocs/" />
 		</exec>
-	</target>
+	</target-->
 	
 	<target name="update-templates">
 		<scp todir="${sourceforge.user}@frs.sourceforge.net:/home/frs/project/ecl1/templates" 
