@@ -142,10 +142,12 @@ public class ExtensionImportWizardPage extends WizardPage {
 
     public Set<String> getSelectedExtensions() {
         Set<String> result = new TreeSet<String>();
-        TableItem[] selection = projectTable.getSelection();
-        for (TableItem selected : selection) {
-            String text = selected.getText(1);
-            result.add(text);
+        TableItem[] items = projectTable.getItems();
+        for (TableItem item : items) {
+            if (item.getChecked()) {
+                String text = item.getText(1);
+                result.add(text);
+            }
         }
         return result;
     }
