@@ -11,7 +11,6 @@
 package net.sf.ecl1.importwizard;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
@@ -22,11 +21,16 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 
 import de.his.cs.sys.extensions.wizards.utils.HISConstants;
 import de.his.cs.sys.extensions.wizards.utils.RemoteProjectSearchSupport;
@@ -40,7 +44,7 @@ public class ExtensionImportWizardPage extends WizardPage {
     // All extensions existing in workspace
     private final Set<String> extensionsInWorkspace = new TreeSet<String>();
 
-    private List projectList;
+    private Table projectTable;
 
     private Button openAfterImport;
 
@@ -54,6 +58,7 @@ public class ExtensionImportWizardPage extends WizardPage {
         initExtensionsInWorkspace();
         GridLayout gl = new GridLayout(1, false);
         GridLayout gl2 = new GridLayout(2, false);
+        GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
 
         parent.setLayout(gl);
 
@@ -66,17 +71,54 @@ public class ExtensionImportWizardPage extends WizardPage {
 
         Composite projectChoice = new Composite(parent, SWT.BORDER | SWT.TOP);
         projectChoice.setLayout(gl);
-
-        Label infoText = new Label(projectChoice, SWT.TOP | SWT.LEFT | SWT.BORDER);
-        infoText.setText("You can use Ctrl + A to select all extensions.");
+        projectChoice.setLayoutData(layoutData);
 
         Label projectChoiceLabel = new Label(projectChoice, SWT.TOP);
         projectChoiceLabel.setText("Importable Projects");
-        projectList = new List(projectChoice, SWT.MULTI | SWT.V_SCROLL);
+
+        final Button selectAllButton = new Button(projectChoice, SWT.CHECK);
+        selectAllButton.setText("Select all");
+        selectAllButton.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                handleSelect(selectAllButton.getSelection());
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                handleSelect(selectAllButton.getSelection());
+            }
+
+            private void handleSelect(boolean selection) {
+                for (TableItem item : projectTable.getItems()) {
+                    item.setChecked(selection);
+                }
+            }
+        });
+
+        projectTable = new Table(projectChoice, SWT.MULTI | SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
+        projectTable.setLinesVisible(true);
+        projectTable.setHeaderVisible(true);
+        projectTable.setLayoutData(layoutData);
+        projectTable.setSize(200, 400);
+
+        String[] headers = { "Import?", "Name" };
+        for (String header : headers) {
+            TableColumn c = new TableColumn(projectTable, SWT.NONE);
+            c.setText(header);
+        }
+
         for (String remoteExtensionName : remoteExtensions) {
             if (!extensionsInWorkspace.contains(remoteExtensionName) && !remoteExtensionName.contains(HISConstants.WEBAPPS)) {
-                projectList.add(remoteExtensionName);
+                //                projectList.add(remoteExtensionName);
+                TableItem tableItem = new TableItem(projectTable, SWT.NONE);
+                tableItem.setChecked(false);
+                tableItem.setText(1, remoteExtensionName);
             }
+        }
+
+        for (int i = 0; i < headers.length; i++) {
+            projectTable.getColumn(i).pack();
         }
 
         setControl(parent);
@@ -99,7 +141,11 @@ public class ExtensionImportWizardPage extends WizardPage {
     }
 
     public Set<String> getSelectedExtensions() {
-        return new TreeSet<String>(Arrays.asList(projectList.getSelection()));
+        Set<String> result = new TreeSet<String>();
+        for (TableItem selected : projectTable.getSelection()) {
+            result.add(selected.getText(1));
+        }
+        return result;
     }
 
     public boolean openProjectsAfterImport() {
