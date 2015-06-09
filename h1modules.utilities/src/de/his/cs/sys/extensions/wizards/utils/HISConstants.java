@@ -11,15 +11,20 @@ package de.his.cs.sys.extensions.wizards.utils;
 
 /**
  * Constant values referring to HIS infrastructure
- * 
+ *
  * @author keunecke
- * @version $Revision$ 
+ * @version $Revision$
  */
 public interface HISConstants {
-	
+
     /**
      * HIS-Default name of the 'core' project
      */
-	public static final String WEBAPPS = "webapps";
+    public static final String WEBAPPS = "webapps";
+
+    /**
+     * Root URL for project template files
+     */
+    public static final String TEMPLATES_ROOT_URL = "http://ecl1.sourceforge.net/templates";
 
 }

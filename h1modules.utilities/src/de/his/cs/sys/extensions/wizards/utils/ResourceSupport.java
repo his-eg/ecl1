@@ -1,20 +1,17 @@
 package de.his.cs.sys.extensions.wizards.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import static de.his.cs.sys.extensions.wizards.utils.HISConstants.TEMPLATES_ROOT_URL;
+
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 
+import de.his.cs.sys.extensions.wizards.utils.templates.TemplateFetcher;
 import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
-
-
 
 /**
  * Simple Resource access support
@@ -22,9 +19,6 @@ import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
  * @author keunecke, brummermann
  */
 public class ResourceSupport {
-
-
-    private static final String SETTINGS = "settings";
 
     private static final String DEPENDENCIES_VARIABLE_NAME = "[dependencies]";
 
@@ -34,43 +28,9 @@ public class ResourceSupport {
 
     private static final String SONARBINARIESELEMENT_TEMPLATE = "sonarbinarieselement" + TEMPLATE;
 
-    private static final String GITIGNORE = "gitignore" + TEMPLATE;
-
     private static final String COMPILE_CLASSPATH_XML = "compile-classpath.xml";
 
     private static final String COMPILE_CLASSPATH_XML_TEMPLATE = COMPILE_CLASSPATH_XML + TEMPLATE;
-
-    private static final String SRC_JAVA_EXTENSION_BEANS_SPRING_XML = "src/java/extension.beans.spring.xml";
-
-    private static final String SRC_JAVA_EXTENSION_BEANS_SPRING_XML_TEMPLATE = SRC_JAVA_EXTENSION_BEANS_SPRING_XML + TEMPLATE;
-
-    private static final String SRC_TEST_DUMMY_TEST_JAVA = "src/test/DummyTest.java";
-
-    private static final String SRC_TEST_DUMMY_TEST_JAVA_TEMPLATE = SRC_TEST_DUMMY_TEST_JAVA + TEMPLATE;
-
-    private static final String SRC_GENERATED_DUMMY_TXT = "src/generated/dummy.txt";
-
-    private static final String RESOURCE_DUMMY_TXT = "resource/dummy.txt";
-
-    private static final String SRC_GENERATED_DUMMY_TXT_TEMPLATE = SRC_GENERATED_DUMMY_TXT + TEMPLATE;
-
-    private static final String RESOURCE_DUMMY_TXT_TEMPLATE = RESOURCE_DUMMY_TXT + TEMPLATE;
-
-    private static final String BUILD_XML_TEMPLATE = "build.xml" + TEMPLATE;
-
-    private static final String ADDITONAL_TARGETS_XML_TEMPLATE = "additional-targets.xml" + TEMPLATE;
-
-    private static final String EXTENSION_ANT_PROPERTIES_TEMPLATE = "extension.ant.properties" + TEMPLATE;
-
-    private static final String SETTINGS_SONAR_PROJECT_PROPERTIES_TEMPLATE = SETTINGS + "/sonar-project.properties"+ TEMPLATE;
-
-    private static final String SETTINGS_ORG_ECLIPSE_CORE_RESOURCES_PREFS = SETTINGS + "/org.eclipse.core.resources.prefs";
-
-    private static final String SETTINGS_ORG_ECLIPSE_JDT_CORE_PREFS = SETTINGS + "/org.eclipse.jdt.core.prefs";
-
-    private static final String SETTINGS_ORG_ECLIPSE_JDT_UI_PREFS = SETTINGS + "/org.eclipse.jdt.ui.prefs";
-
-    private static final String JENKINS_ANT_PROPERTIES = "jenkins.ant.properties";
 
     private final Map<String, String> extensionAntPropertiesReplacements = new HashMap<String, String>();
 
@@ -102,36 +62,20 @@ public class ResourceSupport {
      */
     public void createFiles() throws CoreException, UnsupportedEncodingException {
 
-        new TemplateManager(SRC_JAVA_EXTENSION_BEANS_SPRING_XML_TEMPLATE, extensionAntPropertiesReplacements).writeContent(project);
-        new TemplateManager(SRC_TEST_DUMMY_TEST_JAVA_TEMPLATE, extensionAntPropertiesReplacements).writeContent(project);
-        new TemplateManager(SRC_GENERATED_DUMMY_TXT_TEMPLATE, extensionAntPropertiesReplacements).writeContent(project);
-        new TemplateManager(RESOURCE_DUMMY_TXT_TEMPLATE, extensionAntPropertiesReplacements).writeContent(project);
-        new TemplateManager(EXTENSION_ANT_PROPERTIES_TEMPLATE, extensionAntPropertiesReplacements).writeContent(project);
-        new TemplateManager(GITIGNORE, extensionAntPropertiesReplacements).writeContent(project);
+        //prepare variables
+        this.extensionAntPropertiesReplacements.put(DEPENDENCIES_VARIABLE_NAME, createAdditionalClassesFolderReferencesForSonar());
+        this.extensionAntPropertiesReplacements.put("[additionaldependencies]", createAdditionalDependencyProperties());
+        this.extensionAntPropertiesReplacements.put("[conditionelements]", createConditionElements());
+        this.extensionAntPropertiesReplacements.put("[pathelements]", createPathElements());
 
-        createEclipseProjectSpecificConfigFiles();
-        createSonarInfrastructureFiles();
-        prepareBuildConfiguration();
-    }
+        Iterable<String> templates = new TemplateFetcher(TEMPLATES_ROOT_URL + "/templatelist.txt").getTemplates();
+        for (String template : templates) {
+            new TemplateManager(template, extensionAntPropertiesReplacements).writeContent(project);
+        }
 
-    /**
-     * Setup of project specific configuration for compiler settings etc.
-     */
-    private void createEclipseProjectSpecificConfigFiles() {
-        new TemplateManager(SETTINGS_ORG_ECLIPSE_CORE_RESOURCES_PREFS).writeContent(this.project);
-        new TemplateManager(SETTINGS_ORG_ECLIPSE_JDT_CORE_PREFS).writeContent(this.project);
-        new TemplateManager(SETTINGS_ORG_ECLIPSE_JDT_UI_PREFS).writeContent(this.project);
-    }
-
-    /**
-     * Setup sonar configuration file
-     */
-    private void createSonarInfrastructureFiles() {
-        Map<String, String> variables = new HashMap<String, String>();
-        variables.putAll(this.extensionAntPropertiesReplacements);
-        String additionalClassesFolders = createAdditionalClassesFolderReferencesForSonar();
-        variables.put(DEPENDENCIES_VARIABLE_NAME, additionalClassesFolders );
-        new TemplateManager(SETTINGS_SONAR_PROJECT_PROPERTIES_TEMPLATE, variables).writeContent(this.project);
+        if (!this.extensionAntPropertiesReplacements.get("[additionaldependencies]").isEmpty()) {
+            new TemplateManager(COMPILE_CLASSPATH_XML_TEMPLATE, this.extensionAntPropertiesReplacements).writeContent(project);
+        }
     }
 
     /**
@@ -154,37 +98,6 @@ public class ResourceSupport {
         return classesReferences.toString().trim();
     }
 
-
-    /**
-     * Creates the jenkins.ant.properties file with all needed properties
-     */
-    private void prepareBuildConfiguration() {
-        try {
-            new TemplateManager(BUILD_XML_TEMPLATE, this.extensionAntPropertiesReplacements).writeContent(this.project);
-            new TemplateManager(ADDITONAL_TARGETS_XML_TEMPLATE).writeContent(this.project);
-            new TemplateManager(JENKINS_ANT_PROPERTIES).writeContent(this.project);
-            IFile file = this.project.getFile(JENKINS_ANT_PROPERTIES);
-            String additionalDependencies = createAdditionalDependencyProperties();
-            if(!additionalDependencies.isEmpty()) {
-                InputStream additionalDependenciesStream = new ByteArrayInputStream(additionalDependencies.getBytes());
-                file.appendContents(additionalDependenciesStream, IFile.KEEP_HISTORY, new NullProgressMonitor());
-                createAdditionalClasspathStructure();
-            }
-        } catch (CoreException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    /**
-     * Creates the additional classpath structure in compile-classpath.xml needed for the new extension
-     */
-    private void createAdditionalClasspathStructure() {
-        Map<String, String> variables = new HashMap<String, String>();
-        variables.put("[conditionelements]", createConditionElements());
-        variables.put("[pathelements]", createPathElements());
-        new TemplateManager(COMPILE_CLASSPATH_XML_TEMPLATE, variables).writeContent(project);
-    }
 
     /**
      * Creates the path elements for the imṕorted compile-classpath.xml
@@ -233,9 +146,6 @@ public class ResourceSupport {
      * @return properties as String to write into a property file
      */
     private String createAdditionalDependencyProperties() {
-        if(this.requiredProjects.isEmpty()) {
-            return "";
-        }
         StringBuilder sb = new StringBuilder();
         for (String project : requiredProjects) {
             boolean projectIsWebapps = HISConstants.WEBAPPS.equals(project);

@@ -69,6 +69,7 @@
 				<include name="**/*.template"/>
 				<include name="**/*.properties"/>
 				<include name="**/*.prefs"/>
+				<include name="**/*.txt"/>
 			</fileset>
 		</scp>
 	</target>

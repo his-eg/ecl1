@@ -1,0 +1,13 @@
+build.xml.template
+additional-targets.xml.template
+jenkins.ant.properties.template
+extension.ant.properties.template
+gitignore.template
+src/java/extension.beans.spring.xml.template
+src/test/DummyTest.java.template
+src/generated/dummy.txt.template
+resource/dummy.txt.template
+settings/org.eclipse.core.resources.prefs
+settings/org.eclipse.jdt.core.prefs
+settings/org.eclipse.jdt.ui.prefs
+settings/sonar-project.properties.template

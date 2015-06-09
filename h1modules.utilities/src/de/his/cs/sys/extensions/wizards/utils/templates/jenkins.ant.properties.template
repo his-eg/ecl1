@@ -1,0 +1,2 @@
+webapps=${WORKSPACE}/../../../webapps_${REQUIRED-VERSION}/workspace
+[additionaldependencies]
