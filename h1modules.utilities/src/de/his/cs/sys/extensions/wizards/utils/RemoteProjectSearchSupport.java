@@ -2,6 +2,7 @@ package de.his.cs.sys.extensions.wizards.utils;
 
 import h1modules.utilities.utils.Activator;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.TreeSet;
 
@@ -43,7 +44,7 @@ public class RemoteProjectSearchSupport {
         }
     }
 
-    private static final String HIS_DEFAULT_JENKINS_VIEW_INFIX = "view/";
+    private static final String JENKINS_VIEW_INFIX = "view/";
 
     /**
      * Jenkins default addition for REST api calls
@@ -51,14 +52,22 @@ public class RemoteProjectSearchSupport {
     private static final String JENKINS_API_ADDITION = "/api/json";
 
     public Collection<String> getProjects() {
-        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+        IPreferenceStore store = getPreferenceStore();
         String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE);
         String buildServerView = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE);
-        String lookUpTarget = buildServer + HIS_DEFAULT_JENKINS_VIEW_INFIX + buildServerView + JENKINS_API_ADDITION;
+        String lookUpTarget = buildServer + JENKINS_VIEW_INFIX + buildServerView + JENKINS_API_ADDITION;
         TreeSet<String> result = new TreeSet<String>();
-        BuildJobView view = JsonUtil.fromJson(BuildJobView.class, RestUtil.getJsonStream(lookUpTarget));
-        result.addAll(view.getBuildJobNames());
+        InputStream jsonStream = RestUtil.getJsonStream(lookUpTarget);
+        if (jsonStream != null) {
+            BuildJobView view = JsonUtil.fromJson(BuildJobView.class, jsonStream);
+            result.addAll(view.getBuildJobNames());
+        }
         return result;
+    }
+
+    private IPreferenceStore getPreferenceStore() {
+        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+        return store;
     }
 
 }
