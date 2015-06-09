@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="macker">
+
+    <property name="macker.results" value="${build}/macker"/>
+    <property name="macker.report.xml" value="${macker.results}/report.xml" />
+    <property name="macker.report.html" value="${macker.results}/report.html" />
+    <property name="macker.verbose" value="false" />
+    <property name="rules-path" location="${webapps}/.settings/macker/"></property>
+
+    <path id="macker.classpath">
+        <fileset dir="${qisserver-webinf}/internal/macker" includes="**/*.jar" />
+        <path refid="compile-classpath" />
+    </path>
+
+    <taskdef name="macker" classname="net.innig.macker.ant.MackerAntTask" classpathref="macker.classpath" />
+    <taskdef name="macker-report" classname="net.innig.macker.ant.MackerReportAntTask" classpathref="macker.classpath" />
+    
+	<target name="macker-clean">
+		<delete failonerror="false">
+			<fileset dir="${macker.results}" />
+		</delete>
+	</target>
+	
+    <target name="macker-init">
+        <mkdir dir="${macker.results}" />
+    </target>
+    
+    <target name="macker-report" depends="macker-init">
+        <macker printthreshold="info" angerthreshold="warning" failonerror="false" fork="false" xmlReportFile="${macker.report.xml}" angerProperty="macker.angry" maxMessages="3">
+            <rules dir="${rules-path}" includes="*.xml" />
+            <classes dir="${classes-target}">
+                <include name="de/his/**/*.class" />
+                <exclude name="**/package-info.class" />
+            </classes>
+            <var name="basepkg" value="de.his" />
+            <classpath refid="macker.classpath" />
+        </macker>
+        <macker-report xmlReportfile="${macker.report.xml}" outputFile="${macker.report.html}" />
+    </target>
+    
+</project>

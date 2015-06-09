@@ -58,6 +58,8 @@ public class ResourceSupport {
 
     private static final String BUILD_XML_TEMPLATE = "build.xml" + TEMPLATE;
 
+    private static final String ADDITONAL_TARGETS_XML_TEMPLATE = "additional-targets.xml" + TEMPLATE;
+
     private static final String EXTENSION_ANT_PROPERTIES_TEMPLATE = "extension.ant.properties" + TEMPLATE;
 
     private static final String SETTINGS_SONAR_PROJECT_PROPERTIES_TEMPLATE = SETTINGS + "/sonar-project.properties"+ TEMPLATE;
@@ -159,6 +161,7 @@ public class ResourceSupport {
     private void prepareBuildConfiguration() {
         try {
             new TemplateManager(BUILD_XML_TEMPLATE, this.extensionAntPropertiesReplacements).writeContent(this.project);
+            new TemplateManager(ADDITONAL_TARGETS_XML_TEMPLATE).writeContent(this.project);
             new TemplateManager(JENKINS_ANT_PROPERTIES).writeContent(this.project);
             IFile file = this.project.getFile(JENKINS_ANT_PROPERTIES);
             String additionalDependencies = createAdditionalDependencyProperties();

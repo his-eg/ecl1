@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="extension" default="jar">
 	<description>
-            Build Script for an HISinOne Extension
+            Build Script for HISinOne Extension
     </description>
 
 	<!-- Lokal koennen per Propertiesdatei Werte Ueberschrieben werden -->
@@ -16,7 +16,7 @@
 	<property name="build" value="build" />
 
 	<property name="dist" value="dist" />
-	
+
 	<property name="target-file" value="${dist}/${extension.name}.jar" />
 
 	<condition property="webapps" value="../webapps" else="../../webapps">
@@ -25,11 +25,11 @@
 		</resourceexists>
 	</condition>
 
-	
 	<property name="qisserver" value="${webapps}/qisserver" />
 	<property name="qisserver-webinf" value="${qisserver}/WEB-INF" />
 	<property name="qisserver-lib" value="${qisserver-webinf}/lib" />
 	<property name="qisserver-lib-compile" value="${qisserver-webinf}/lib-compile" />
+	<property name="qisserver-extensions" value="${qisserver-webinf}/extensions" />
 	<property name="qisserver-classes" value="${qisserver-webinf}/classes" />
 	<property name="classes-target" value="${build}/classes" />
 	<property name="test-target" value="${build}/test" />
@@ -39,6 +39,11 @@
 	<property name="src-java" value="src/java"/>
 	<property name="src-test" value="src/test"/>
 	<property name="test-resource" location="resource"/>
+	<property name="pitreport" location="pitReports"/>
+	<property name="pithistory" location="${build}/history"/>
+	
+	<property name="build-server" value="http://build.his.de/build/" />
+	<property name="latest-build-result" value="${build-server}job/${extension.name}/lastSuccessfulBuild/artifact/dist/${extension.name}.jar" />
 	
 	<path id="additional-classpath">
 	</path>
@@ -59,11 +64,17 @@
 		<path refid="additional-classpath" />
 	</path>
 	
+	<path id="additional-sourcepath">
+	</path>
+	
+	<import file="compile-sourcepath.xml" optional="true" />
+	
 	<path id="compile-sourcepath">
 		<dirset dir="src">
 			<include name="java" />
 			<include name="generated" />
 		</dirset>
+		<path refid="additional-sourcepath"/>
 	</path>
 	
 	<path id="compile-test-classpath">
@@ -80,15 +91,18 @@
 		<fileset dir="lib" erroronmissingdir="false">
 			<include name="*.jar" />
 		</fileset>
+		<path refid="additional-classpath" />
 	</path>
 	
 	<property name="build_cobertura" value="${build}/cobertura_build"/>
-
+		
 	<property name="build_cobertura_report" value="${build}/coveragereport"/>
 	
 	<path id="cobertura-classpath">
 		<fileset dir="${qisserver-lib}">
 			<include name="*.jar" />
+			<exclude name="ant-1.8.1.jar"/>
+			<exclude name="asm-3.2.jar"/>
 		</fileset>
 		<fileset dir="${qisserver-webinf}/internal/ant/lib">
 			<include name="*.jar" />
@@ -111,16 +125,25 @@
 		</dirset>
 	</path>
 	
+	<!-- Benötigte Pitest und JUnit jars-->
+	<path id="pitest.path">
+		<pathelement location="${qisserver-webinf}/internal/ant/lib/pitest-1.1.4.jar" />
+		<pathelement location="${qisserver-webinf}/internal/ant/lib/pitest-ant-1.1.4.jar" />
+		<pathelement location="${qisserver-lib}/junit-4.11.jar" />
+	</path>
+		
+	<taskdef name="pitest" classname="org.pitest.ant.PitestTask" classpathref="pitest.path" />
+	
 	<target name="clean">
-		<delete failonerror="false">
+		<delete>
 			<fileset dir="${build-results}" />
 			<fileset dir="${test-target}" />
 			<fileset dir="${classes-target}" />
 			<fileset dir="${resources-target}" />
-			<fileset dir="${build}" />
-			<fileset dir="${dist}" />
 			<fileset dir="${build_cobertura}" />
 			<fileset dir="${build_cobertura_report}" />
+			<fileset dir="${build}" />
+			<fileset dir="${dist}" />
 		</delete>
 	</target>
 
@@ -134,8 +157,8 @@
 	</target>
 
 	<target name="compile" depends="init">
-		<javac destdir="${classes-target}" debug="on" includeantruntime="false" source="1.7" target="1.7" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
-			<compilerarg line="-encoding UTF-8" />
+		<javac destdir="${classes-target}" debug="on" debuglevel="source,lines,vars" includeantruntime="false" source="1.7" target="1.7" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
+			<compilerarg line="-encoding utf-8"/>
 			<compilerarg line="-enableJavadoc" />
 			<classpath refid="compile-classpath" />
 			<src refid="compile-sourcepath" />
@@ -211,11 +234,22 @@
 	</target>
 	
 	<target name="cobertura-instrument" depends="compile-tests">
+		<delete file="cobertura.ser" quiet="true" />
+
 		<cobertura-instrument todir="${build_cobertura}" datafile="cobertura.ser">
 			<ignore regex="org.apache.log4j.*" />
 			<fileset dir="${classes-target}">
 				<include name="**/*.class" />
 			</fileset>
+			<auxClasspath>
+				<pathelement path="${qisserver-classes} "/>
+				<fileset dir="${qisserver-lib}">
+					<include name="**/*.jar"/>
+				</fileset>
+				<fileset dir="${qisserver-lib-compile}">
+					<include name="**/*.jar"/>
+				</fileset>
+			</auxClasspath>
 		</cobertura-instrument>
 	</target>
 	
@@ -245,8 +279,31 @@
 		</cobertura-report>
 	</target>
 	
+	<!-- Pitest ausführen -->
+	<target name="mutationtest" depends="cobertura-report" >
+		<path id="mutation.path">
+			<path refid="pitest.path"/>
+			<path refid="compile-test-classpath"/>
+		</path>	
+		<!-- Hier anpassen -->
+		<pitest pitClasspath="pitest.path"  
+			classPath="mutation.path" 
+			targetTests="de.his.appclient.jsf.cs.sys.test.*,de.his.appserver.model.cs.sys.test.*,de.his.appserver.persistence.dao.impl.hibernate.cs.sys.quality.management.*"
+			targetClasses="de.his.appclient.jsf.cs.sys.quality.management.*, de.his.appserver.model.*, de.his.appserver.persistence.dao.*" 
+			reportDir="${pitreport}" 
+			sourceDir="${src-java},${src-test}" 
+			jvmArgs="-Xmx1075m,-XX:MaxPermSize=512M,-Dfile.encoding=utf-8"
+			timeoutfactor="2000"
+			threads="4"
+			outputformats="HTML,XML"
+			historyinputlocation="${pithistory}"
+			historyoutputlocation="${pithistory}"/>
+	</target>
+	
 	<target name="update-webapps">
 		<get dest="${qisserver-extensions}/${extension.name}.jar" src="${latest-build-result}"/>
 	</target>
+
+	<import file="additional-targets.xml" optional="false" />
 	
 </project>
