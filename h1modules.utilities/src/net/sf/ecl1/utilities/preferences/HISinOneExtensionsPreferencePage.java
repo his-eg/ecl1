@@ -62,10 +62,16 @@ implements IWorkbenchPreferencePage {
     private void validateUrls() {
         String buildServerValue = buildServer.getStringValue();
         Collection<String> errors = Lists.newArrayList();
+        if (buildServerValue.endsWith("/")) {
+            buildServer.setStringValue(buildServerValue + "/");
+        }
         if(!NetUtil.canOpenSocket(buildServerValue)) {
             errors.add("Cannot reach Build Server '" + buildServerValue + "'");
         }
         String gitServerValue = gitServer.getStringValue();
+        if (!gitServerValue.endsWith("/")) {
+            gitServer.setStringValue(gitServerValue + "/");
+        }
         if (!NetUtil.canOpenSocket(gitServerValue)) {
             errors.add("Cannot reach Git Server '" + gitServerValue + "'");
         }
