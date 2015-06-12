@@ -135,16 +135,12 @@
 	<taskdef name="pitest" classname="org.pitest.ant.PitestTask" classpathref="pitest.path" />
 	
 	<target name="clean">
-		<delete>
-			<fileset dir="${build-results}" />
-			<fileset dir="${test-target}" />
-			<fileset dir="${classes-target}" />
-			<fileset dir="${resources-target}" />
-			<fileset dir="${build_cobertura}" />
-			<fileset dir="${build_cobertura_report}" />
-			<fileset dir="${build}" />
-			<fileset dir="${dist}" />
-		</delete>
+		<target name="clean">
+			<delete failonerror="false">
+				<fileset dir="${build}" />
+				<fileset dir="${dist}" />
+			</delete>
+		</target>
 	</target>
 
 	<target name="init">
