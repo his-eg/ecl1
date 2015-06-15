@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Utilities for H1 extension tools
 Bundle-SymbolicName: net.sf.ecl1.utilities;singleton:=true
-Bundle-Version: 0.2.2.2015-06-10
+Bundle-Version: 0.2.3.2015-06-15
 Bundle-Activator: h1modules.utilities.utils.Activator
 Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  org.eclipse.core.resources;visibility:=reexport,
@@ -18,7 +18,8 @@ Export-Package: de.his.cs.sys.extensions.wizards.utils;uses:="org.eclipse.core.r
  de.his.cs.sys.extensions.wizards.utils.templates,
  h1modules.utilities.utils,
  net.sf.ecl1.utilities.preferences
-Import-Package: org.eclipse.jdt.core
+Import-Package: org.eclipse.jdt.core,
+ org.eclipse.team.ui
 Bundle-Vendor: HIS eG
 Bundle-ClassPath: lib/javax.ws.rs-api-2.0-m09.jar,
  lib/jersey-client-2.0-m05-1.jar,
