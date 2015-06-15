@@ -1,7 +1,11 @@
 package net.sf.ecl1.importwizard;
 
+import h1modules.utilities.utils.Activator;
+
 import java.io.File;
 import java.util.Collection;
+
+import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -10,6 +14,7 @@ import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -65,11 +70,16 @@ public class ProjectFromGitImporter {
         IPath workspacePath = workspace.getRoot().getLocation();
         IPath extensionPath = workspacePath.append(extensionToImport);
         File extensionFolder = extensionPath.toFile();
+        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+        String branch = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE);
 
         try {
 
             try {
                 CloneCommand clone = Git.cloneRepository();
+                if (branch != null && !"HEAD".equals(branch)) {
+                    clone.setBranch(branch);
+                }
                 clone.setDirectory(extensionFolder).setURI(fullRepositoryPath).setCloneAllBranches(true);
                 clone.call();
             } catch (GitAPIException e) {
