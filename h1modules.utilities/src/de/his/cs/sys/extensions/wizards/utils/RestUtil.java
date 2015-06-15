@@ -21,7 +21,7 @@ import org.apache.http.util.EntityUtils;
  */
 public class RestUtil {
 
-    public static InputStream getJsonStream(String defaultTarget) {
+    public static InputStream getJsonStream(final String defaultTarget) {
         try {
             HttpGet get = new HttpGet(defaultTarget);
             ResponseHandler<InputStream> responseHandler = new ResponseHandler<InputStream>() {
@@ -32,7 +32,7 @@ public class RestUtil {
                         HttpEntity entity = response.getEntity();
                         return entity != null ? new ByteArrayInputStream(EntityUtils.toString(entity).getBytes()) : null;
                     }
-                    throw new ClientProtocolException("Unexpected response status '" + status + "' expected status <= 200 and < 300");
+                    throw new ClientProtocolException("Unexpected response status '" + status + "' expected status <= 200 and < 300 for URL " + defaultTarget);
                 }
             };
             HttpClient c = new DefaultHttpClient();
