@@ -10,15 +10,20 @@
  *******************************************************************************/
 package net.sf.ecl1.importwizard;
 
+import h1modules.utilities.utils.Activator;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionEvent;
@@ -62,6 +67,8 @@ public class ExtensionImportWizardPage extends WizardPage {
 
         parent.setLayout(gl);
 
+        Label branchInfo = new Label(parent, SWT.BORDER | SWT.LEFT);
+        branchInfo.setText("Branch: " + getBranch());
         Composite openAfterImportComposite = new Composite(parent, SWT.BORDER | SWT.TOP);
         openAfterImportComposite.setLayout(gl2);
         Label question = new Label(openAfterImportComposite, SWT.TOP);
@@ -100,7 +107,7 @@ public class ExtensionImportWizardPage extends WizardPage {
         projectTable.setLinesVisible(true);
         projectTable.setHeaderVisible(true);
         projectTable.setLayoutData(layoutData);
-        projectTable.setSize(200, 400);
+        projectTable.setSize(200, 600);
 
         String[] headers = { "Import?", "Name" };
         for (String header : headers) {
@@ -125,7 +132,13 @@ public class ExtensionImportWizardPage extends WizardPage {
     }
 
     private void initRemoteExtensions() {
-        remoteExtensions.addAll(new RemoteProjectSearchSupport().getProjects());
+        Collection<String> remoteProjectsIncludingBranch = new RemoteProjectSearchSupport().getProjects();
+        String branch = getBranch();
+        for (String remoteProjectIncludingBranch : remoteProjectsIncludingBranch) {
+            String remoteProject = remoteProjectIncludingBranch.replace("_" + branch, "");
+            System.out.println("Replacing original '" + remoteProjectIncludingBranch + "' with '" + remoteProject + "'");
+            remoteExtensions.add(remoteProject);
+        }
     }
 
     private void initExtensionsInWorkspace() {
@@ -140,7 +153,13 @@ public class ExtensionImportWizardPage extends WizardPage {
         extensionsInWorkspace.addAll(result);
     }
 
+    private String getBranch() {
+        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+        return store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE);
+    }
+
     public Set<String> getSelectedExtensions() {
+
         Set<String> result = new TreeSet<String>();
         TableItem[] items = projectTable.getItems();
         for (TableItem item : items) {
