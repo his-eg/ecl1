@@ -62,7 +62,7 @@ implements IWorkbenchPreferencePage {
     private void validateUrls() {
         String buildServerValue = buildServer.getStringValue();
         Collection<String> errors = Lists.newArrayList();
-        if (buildServerValue.endsWith("/")) {
+        if (!buildServerValue.endsWith("/")) {
             buildServer.setStringValue(buildServerValue + "/");
         }
         if(!NetUtil.canOpenSocket(buildServerValue)) {
