@@ -16,12 +16,4 @@
 				name="ecl1 Classpath Container Page"
 				class="net.sf.ecl1.classpath.ExtensionClasspathContainerPage"/>
    </extension>
-   <extension
- 		id="net.sf.ecl1.javaCompletionProposalComputer"
- 		name="ecl1 Code Completion Proposal Computer"
- 		point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
- 		<javaCompletionProposalComputer
-				class="net.sf.ecl1.classpath.ExtensionClassPathContentAssistProposalComputer">
- 		</javaCompletionProposalComputer>
-</extension>
 </plugin>
