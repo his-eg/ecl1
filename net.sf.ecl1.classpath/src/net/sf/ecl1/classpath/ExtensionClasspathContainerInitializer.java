@@ -20,11 +20,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ClasspathContainerInitializer;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -48,12 +44,45 @@ ClasspathContainerInitializer {
 
     @Override
     public void initialize(IPath containerPath, IJavaProject javaProject) throws CoreException {
-        if(containerPath != null) {
-            System.out.println("Supplied path: " + containerPath.toOSString());
+        try {
+            if (containerPath != null) {
+                System.out.println("Supplied path: " + containerPath.toOSString());
+            }
+            initializeExtensionsToAddToClasspath(containerPath);
+            IClasspathEntry[] entries = createEntries(javaProject);
+            ExtensionClassPathContainer container = new ExtensionClassPathContainer(containerPath, entries);
+            JavaCore.setClasspathContainer(containerPath, new IJavaProject[] { javaProject }, new IClasspathContainer[] { container }, new NullProgressMonitor());
+        } catch (CoreException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+            throw e;
         }
-        initializeExtensionsToAddToClasspath(containerPath);
-        ExtensionClassPathContainer container = new ExtensionClassPathContainer(containerPath, createEntries(javaProject));
-        JavaCore.setClasspathContainer(containerPath, new IJavaProject[] { javaProject }, new IClasspathContainer[] { container }, new NullProgressMonitor());
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jdt.core.ClasspathContainerInitializer#canUpdateClasspathContainer(org.eclipse.core.runtime.IPath, org.eclipse.jdt.core.IJavaProject)
+     */
+    @Override
+    public boolean canUpdateClasspathContainer(IPath containerPath, IJavaProject project) {
+        return true;
+    }
+
+    /* (non-Javadoc)
+     * @see org.eclipse.jdt.core.ClasspathContainerInitializer#requestClasspathContainerUpdate(org.eclipse.core.runtime.IPath, org.eclipse.jdt.core.IJavaProject, org.eclipse.jdt.core.IClasspathContainer)
+     */
+    @Override
+    public void requestClasspathContainerUpdate(final IPath containerPath, final IJavaProject project, IClasspathContainer containerSuggestion) {
+        try {
+            initializeExtensionsToAddToClasspath(containerPath);
+            IClasspathEntry[] entries = createEntries(project);
+            ExtensionClassPathContainer extensionClassPathContainer = new ExtensionClassPathContainer(containerPath, entries);
+            IClasspathContainer[] iClasspathContainers = new IClasspathContainer[] { extensionClassPathContainer };
+            IJavaProject[] iJavaProjects = new IJavaProject[] { project };
+            JavaCore.setClasspathContainer(containerPath, iJavaProjects, iClasspathContainers, new NullProgressMonitor());
+        } catch (JavaModelException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -62,6 +91,7 @@ ClasspathContainerInitializer {
      * @param containerPath
      */
     private void initializeExtensionsToAddToClasspath(IPath containerPath) {
+        this.extensionsForClassPath.clear();
         if (containerPath != null && containerPath.segmentCount() == 2) {
             String commaSeparatedExtensionsToIgnore = containerPath.segment(1);
             if (commaSeparatedExtensionsToIgnore != null) {
@@ -87,10 +117,11 @@ ClasspathContainerInitializer {
 
             boolean extensionNeedsToBeExported = extensionNeedsToBeAddedToClasspath(extensionName);
             if (extensionNeedsToBeExported) {
+                IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+                IPath workspace = root.getRawLocation();
                 if (extensionPath.endsWith(".jar")) {
                     IPath path = javaProject.getPath().append(EXTENSIONS_FOLDER).append(extensionPath);
                     //create a lib entry
-                    IPath workspace = ResourcesPlugin.getWorkspace().getRoot().getRawLocation();
                     IPath sourceAttachmentPath = workspace.append(path);
                     IPath sourceAttachmentRootPath = null;
                     IClasspathEntry libraryEntry = JavaCore.newLibraryEntry(path, sourceAttachmentPath, sourceAttachmentRootPath, true);
@@ -98,9 +129,15 @@ ClasspathContainerInitializer {
                     System.out.println("Creating new container library entry for: " + path.toString() + "\n * exported: " + extensionNeedsToBeExported
                                        + "\n * sourceAttachmentPath: " + sourceAttachmentPath + "\n * sourceAttachmentRootPath: " + sourceAttachmentRootPath);
                 } else {
-                    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(extensionPath);
-                    System.out.println("Creating new container entry for project: " + project.getName() + " exported: " + extensionNeedsToBeExported);
-                    result.add(JavaCore.newProjectEntry(project.getLocation(), true));
+                    IProject project = root.getProject(extensionPath);
+                    if (project.exists()) {
+                        System.out.println("Creating new container entry for project: " + project.getName() + " exported: " + extensionNeedsToBeExported);
+                        IPath location = project.getLocation();
+                        IClasspathEntry newProjectEntry = JavaCore.newProjectEntry(location.makeRelativeTo(workspace).makeAbsolute(), true);
+                        result.add(newProjectEntry);
+                    } else {
+                        System.out.println("Extension does not exist as project: " + extensionPath);
+                    }
                 }
             }
         }
@@ -163,40 +200,6 @@ ClasspathContainerInitializer {
                 extensions.put(extensionJar.getName().replace(".jar", ""), extensionJar.getName());
             }
         }
-    }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.jdt.core.ClasspathContainerInitializer#canUpdateClasspathContainer(org.eclipse.core.runtime.IPath, org.eclipse.jdt.core.IJavaProject)
-     */
-    @Override
-    public boolean canUpdateClasspathContainer(IPath containerPath,
-                                               IJavaProject project) {
-        return true;
-    }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.jdt.core.ClasspathContainerInitializer#requestClasspathContainerUpdate(org.eclipse.core.runtime.IPath, org.eclipse.jdt.core.IJavaProject, org.eclipse.jdt.core.IClasspathContainer)
-     */
-    @Override
-    public void requestClasspathContainerUpdate(final IPath containerPath, final IJavaProject project, IClasspathContainer containerSuggestion) {
-        new Job("ecl1-classpath-container-update") {
-            @Override
-            protected IStatus run(IProgressMonitor monitor) {
-                try {
-                    IClasspathEntry[] entries = createEntries(project);
-                    ExtensionClassPathContainer extensionClassPathContainer = new ExtensionClassPathContainer(containerPath, entries);
-                    IClasspathContainer[] iClasspathContainers = new IClasspathContainer[] { extensionClassPathContainer };
-                    IJavaProject[] iJavaProjects = new IJavaProject[] { project };
-                    JavaCore.setClasspathContainer(containerPath, iJavaProjects, iClasspathContainers, new NullProgressMonitor());
-                } catch (JavaModelException e) {
-                    System.out.println(e.getMessage());
-                    return Status.CANCEL_STATUS;
-                }
-                return Status.OK_STATUS;
-            }
-
-        }.schedule();
-        ;
     }
 
 }
