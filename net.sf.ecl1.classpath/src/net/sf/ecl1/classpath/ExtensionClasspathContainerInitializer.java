@@ -48,10 +48,7 @@ ClasspathContainerInitializer {
             if (containerPath != null) {
                 System.out.println("Supplied path: " + containerPath.toOSString());
             }
-            initializeExtensionsToAddToClasspath(containerPath);
-            IClasspathEntry[] entries = createEntries(javaProject);
-            ExtensionClassPathContainer container = new ExtensionClassPathContainer(containerPath, entries);
-            JavaCore.setClasspathContainer(containerPath, new IJavaProject[] { javaProject }, new IClasspathContainer[] { container }, new NullProgressMonitor());
+            updateClasspathContainer(containerPath, javaProject);
         } catch (CoreException e) {
             e.printStackTrace();
             System.out.println(e.getMessage());
@@ -73,15 +70,28 @@ ClasspathContainerInitializer {
     @Override
     public void requestClasspathContainerUpdate(final IPath containerPath, final IJavaProject project, IClasspathContainer containerSuggestion) {
         try {
-            initializeExtensionsToAddToClasspath(containerPath);
-            IClasspathEntry[] entries = createEntries(project);
+            updateClasspathContainer(containerPath, project);
+        } catch (JavaModelException e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * @param containerPath
+     * @param project
+     * @throws JavaModelException
+     */
+    private void updateClasspathContainer(final IPath containerPath, final IJavaProject project) throws JavaModelException {
+        initializeExtensionsToAddToClasspath(containerPath);
+        IClasspathEntry[] entries = createEntries(project);
+        if (entries != null && !Arrays.asList(entries).isEmpty()) {
             ExtensionClassPathContainer extensionClassPathContainer = new ExtensionClassPathContainer(containerPath, entries);
             IClasspathContainer[] iClasspathContainers = new IClasspathContainer[] { extensionClassPathContainer };
             IJavaProject[] iJavaProjects = new IJavaProject[] { project };
             JavaCore.setClasspathContainer(containerPath, iJavaProjects, iClasspathContainers, new NullProgressMonitor());
-        } catch (JavaModelException e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
+        } else {
+            System.out.println("No entries for classpath.");
         }
     }
 
@@ -96,9 +106,17 @@ ClasspathContainerInitializer {
             String commaSeparatedExtensionsToIgnore = containerPath.segment(1);
             if (commaSeparatedExtensionsToIgnore != null) {
                 List<String> extensionsToIgnore = Splitter.on(",").splitToList(commaSeparatedExtensionsToIgnore);
-                this.extensionsForClassPath.addAll(extensionsToIgnore);
+                for (String extension : extensionsToIgnore) {
+                    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(extension);
+                    if (project.exists()) {
+                        extensionsForClassPath.add(extension);
+                    } else {
+                        System.out.println("Skipping non-existing extension '" + extension + "'");
+                    }
+                }
             }
         }
+        System.out.println("Extensions for export: " + extensionsForClassPath);
     }
 
     private IClasspathEntry[] createEntries(IJavaProject javaProject) {
