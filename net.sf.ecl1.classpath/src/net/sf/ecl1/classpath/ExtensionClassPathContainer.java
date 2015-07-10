@@ -11,8 +11,6 @@ import org.eclipse.jdt.core.IClasspathEntry;
 class ExtensionClassPathContainer implements
 IClasspathContainer {
 
-    public static final String NET_SF_ECL1_ECL1_CONTAINER_ID = "net.sf.ecl1.ECL1_CONTAINER";
-
     private final IClasspathEntry[] entries;
 
     private final IPath path;

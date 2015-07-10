@@ -3,6 +3,10 @@
  */
 package net.sf.ecl1.classpath;
 
+import static net.sf.ecl1.classpath.ClasspathContainerConstants.NET_SF_ECL1_ECL1_CONTAINER_ID;
+
+import java.util.Collection;
+
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -15,6 +19,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
 
 /**
  * @author keunecke
@@ -36,7 +43,7 @@ implements IClasspathContainerPage {
         super(ECL1_CLASSPATH_CONTAINER, ECL1_CLASSPATH_CONTAINER , null);
         setDescription(ECL1_CLASSPATH_CONTAINER);
         setPageComplete(true);
-        this.selection = new Path(ExtensionClassPathContainer.NET_SF_ECL1_ECL1_CONTAINER_ID);
+        this.selection = new Path(ClasspathContainerConstants.NET_SF_ECL1_ECL1_CONTAINER_ID);
     }
 
     @Override
@@ -58,12 +65,31 @@ implements IClasspathContainerPage {
             setErrorMessage("Extensions to be exported needs to be configured.");
             return false;
         }
+        Collection<String> nonExistingExtensionsConfigured = checkForNonExistingExtensions();
+        if (!nonExistingExtensionsConfigured.isEmpty()) {
+            setErrorMessage("The Extensions " + nonExistingExtensionsConfigured + " do not exist in workspace.");
+            return true;
+        }
         return true;
+    }
+
+    private Collection<String> checkForNonExistingExtensions() {
+        Collection<String> result = Lists.newArrayList();
+        Iterable<String> configuredExtensions = Splitter.on(",").split(extensionsTextList.getText());
+        for (String extension : configuredExtensions) {
+            boolean existsAsJar = new ExtensionUtil().doesExtensionJarExist(extension);
+            boolean existsAsProject = new ExtensionUtil().doesExtensionProjectExist(extension);
+            if (!existsAsJar && !existsAsProject) {
+                result.add(extension);
+                System.out.println("'" + extension + "' does neither exist as project nor as extension jar.");
+            }
+        }
+        return result;
     }
 
     @Override
     public IClasspathEntry getSelection() {
-        IPath path = new Path(ExtensionClassPathContainer.NET_SF_ECL1_ECL1_CONTAINER_ID);
+        IPath path = new Path(NET_SF_ECL1_ECL1_CONTAINER_ID);
         String extensionsCommaSeparated = extensionsTextList.getText();
         if(extensionsCommaSeparated != null && !extensionsCommaSeparated.isEmpty()) {
             path = path.append(extensionsCommaSeparated);

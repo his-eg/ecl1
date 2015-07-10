@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -28,7 +27,10 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
+import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
 
 /**
  * Classpath Initializer for HISinOne-Extension projects
@@ -39,8 +41,6 @@ public class ExtensionClasspathContainerInitializer extends
 ClasspathContainerInitializer {
 
     private final Collection<String> extensionsForClassPath = new HashSet<>();
-
-    public static final String EXTENSIONS_FOLDER = "qisserver/WEB-INF/extensions/";
 
     @Override
     public void initialize(IPath containerPath, IJavaProject javaProject) throws CoreException {
@@ -84,14 +84,15 @@ ClasspathContainerInitializer {
      */
     private void updateClasspathContainer(final IPath containerPath, final IJavaProject project) throws JavaModelException {
         initializeExtensionsToAddToClasspath(containerPath);
-        IClasspathEntry[] entries = createEntries(project);
-        if (entries != null && !Arrays.asList(entries).isEmpty()) {
-            ExtensionClassPathContainer extensionClassPathContainer = new ExtensionClassPathContainer(containerPath, entries);
+        Collection<IClasspathEntry> entryList = Collections2.filter(Arrays.asList(createEntries(project)), Predicates.notNull());
+        if (!entryList.isEmpty()) {
+            IClasspathEntry[] array = Lists.newArrayList(entryList).toArray(new IClasspathEntry[entryList.size()]);
+            ExtensionClassPathContainer extensionClassPathContainer = new ExtensionClassPathContainer(containerPath, array);
             IClasspathContainer[] iClasspathContainers = new IClasspathContainer[] { extensionClassPathContainer };
             IJavaProject[] iJavaProjects = new IJavaProject[] { project };
             JavaCore.setClasspathContainer(containerPath, iJavaProjects, iClasspathContainers, new NullProgressMonitor());
         } else {
-            System.out.println("No entries for classpath.");
+            System.out.println("No entries for classpath container '" + containerPath + "' in  '" + project.getElementName() + "'.");
         }
     }
 
@@ -107,11 +108,10 @@ ClasspathContainerInitializer {
             if (commaSeparatedExtensionsToIgnore != null) {
                 List<String> extensionsToIgnore = Splitter.on(",").splitToList(commaSeparatedExtensionsToIgnore);
                 for (String extension : extensionsToIgnore) {
-                    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(extension);
-                    if (project.exists()) {
+                    boolean projectExists = new ExtensionUtil().doesExtensionProjectExist(extension);
+                    boolean jarExists = new ExtensionUtil().doesExtensionJarExist(extension);
+                    if (projectExists || jarExists) {
                         extensionsForClassPath.add(extension);
-                    } else {
-                        System.out.println("Skipping non-existing extension '" + extension + "'");
                     }
                 }
             }
@@ -138,7 +138,7 @@ ClasspathContainerInitializer {
                 IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
                 IPath workspace = root.getRawLocation();
                 if (extensionPath.endsWith(".jar")) {
-                    IPath path = javaProject.getPath().append(EXTENSIONS_FOLDER).append(extensionPath);
+                    IPath path = javaProject.getPath().append(ClasspathContainerConstants.EXTENSIONS_FOLDER).append(extensionPath);
                     //create a lib entry
                     IPath sourceAttachmentPath = workspace.append(path);
                     IPath sourceAttachmentRootPath = null;
@@ -159,7 +159,7 @@ ClasspathContainerInitializer {
                 }
             }
         }
-        return result.toArray(new IClasspathEntry[1]);
+        return result.toArray(new IClasspathEntry[result.size()]);
     }
 
     /**
@@ -184,21 +184,10 @@ ClasspathContainerInitializer {
         IWorkspaceRoot ws = ResourcesPlugin.getWorkspace().getRoot();
         List<IProject> projects = Arrays.asList(ws.getProjects(0));
         for (IProject project : projects) {
-            if (isExtensionProject(project)) {
+            if (new ExtensionUtil().isExtensionProject(project)) {
                 extensions.put(project.getName(), project.getName());
             }
         }
-    }
-
-    /**
-     * Check if a project is an extension project
-     *
-     * @param project
-     * @return
-     */
-    private boolean isExtensionProject(IProject project) {
-        IFile file = project.getFile("extension.ant.properties");
-        return file.exists();
     }
 
     /**
@@ -209,7 +198,7 @@ ClasspathContainerInitializer {
      */
     private void scanForExtensionJars(IJavaProject javaProject, Map<String, String> extensions) {
         //scan workspace for extension jars
-        IFolder extensionsFolder = javaProject.getProject().getFolder(EXTENSIONS_FOLDER);
+        IFolder extensionsFolder = javaProject.getProject().getFolder(ClasspathContainerConstants.EXTENSIONS_FOLDER);
         if (extensionsFolder.exists()) {
             //if there is an extensions folder, scan it
             IPath rawLocation = extensionsFolder.getRawLocation();
