@@ -144,10 +144,15 @@ ClasspathContainerInitializer {
         return result.toArray(new IClasspathEntry[1]);
     }
 
+    /**
+     * Determine if extension should be added to classpath
+     *
+     * @param extensionName
+     * @return true iff extensionName is contained in container path
+     */
     private boolean extensionNeedsToBeAddedToClasspath(String extensionName) {
-        boolean configuredExtensionsEmpty = extensionsForClassPath.isEmpty();
         boolean extensionIsListed = extensionsForClassPath.contains(extensionName);
-        return configuredExtensionsEmpty || extensionIsListed;
+        return extensionIsListed;
     }
 
     /**
