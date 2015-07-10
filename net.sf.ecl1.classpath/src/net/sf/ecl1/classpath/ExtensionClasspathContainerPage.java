@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package net.sf.ecl1.classpath;
 
@@ -20,16 +20,16 @@ import org.eclipse.swt.widgets.Text;
  * @author keunecke
  *
  */
-public class ExtensionClasspathContainerPage extends WizardPage 
+public class ExtensionClasspathContainerPage extends WizardPage
 implements IClasspathContainerPage {
-	
-	private IPath selection;
-	
-	private static final String ECL1_CLASSPATH_CONTAINER = "ecl1 Classpath Container";
 
-	private Text extensionsTextList;
+    private IPath selection;
 
-	/**
+    private static final String ECL1_CLASSPATH_CONTAINER = "ecl1 Classpath Container";
+
+    private Text extensionsTextList;
+
+    /**
      * Default Constructor - sets title, page name, description
      */
     public ExtensionClasspathContainerPage() {
@@ -39,9 +39,9 @@ implements IClasspathContainerPage {
         this.selection = new Path(ExtensionClassPathContainer.NET_SF_ECL1_ECL1_CONTAINER_ID);
     }
 
-	@Override
-	public void createControl(Composite parent) {
-		Composite composite = new Composite(parent, SWT.NULL);
+    @Override
+    public void createControl(Composite parent) {
+        Composite composite = new Composite(parent, SWT.NULL);
         composite.setLayout(new GridLayout(5, false));
         composite.setFont(parent.getFont());
         Label label = new Label(composite, SWT.LEFT);
@@ -50,36 +50,40 @@ implements IClasspathContainerPage {
         extensionsTextList.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 4, 1));
         updateExtensionsTextfieldFromPath();
         setControl(composite);
-	}
+    }
 
-	@Override
-	public boolean finish() {
-		return true;
-	}
+    @Override
+    public boolean finish() {
+        if (extensionsTextList.getText().isEmpty()) {
+            setErrorMessage("Extensions to be exported needs to be configured.");
+            return false;
+        }
+        return true;
+    }
 
-	@Override
-	public IClasspathEntry getSelection() {
-		IPath path = new Path(ExtensionClassPathContainer.NET_SF_ECL1_ECL1_CONTAINER_ID);
-		String extensionsCommaSeparated = extensionsTextList.getText();
-		if(extensionsCommaSeparated != null && !extensionsCommaSeparated.isEmpty()) {
-			path = path.append(extensionsCommaSeparated);
-		}
-		return JavaCore.newContainerEntry(path, true);
-	}
+    @Override
+    public IClasspathEntry getSelection() {
+        IPath path = new Path(ExtensionClassPathContainer.NET_SF_ECL1_ECL1_CONTAINER_ID);
+        String extensionsCommaSeparated = extensionsTextList.getText();
+        if(extensionsCommaSeparated != null && !extensionsCommaSeparated.isEmpty()) {
+            path = path.append(extensionsCommaSeparated);
+        }
+        return JavaCore.newContainerEntry(path, true);
+    }
 
-	@Override
-	public void setSelection(IClasspathEntry arg0) {
-		if(arg0 != null) {
-			this.selection = arg0.getPath();
-			updateExtensionsTextfieldFromPath();
-		}
-	}
+    @Override
+    public void setSelection(IClasspathEntry arg0) {
+        if(arg0 != null) {
+            this.selection = arg0.getPath();
+            updateExtensionsTextfieldFromPath();
+        }
+    }
 
-	private void updateExtensionsTextfieldFromPath() {
-		String[] segments = this.selection.segments();
-		if(extensionsTextList != null && segments != null && segments.length > 1) {
-			extensionsTextList.setText(segments[1]);
-		}
-	}
+    private void updateExtensionsTextfieldFromPath() {
+        String[] segments = this.selection.segments();
+        if(extensionsTextList != null && segments != null && segments.length > 1) {
+            extensionsTextList.setText(segments[1]);
+        }
+    }
 
 }
