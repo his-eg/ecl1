@@ -16,7 +16,7 @@
 			class="net.sf.ecl1.hotfix.assistant.CreateHotfixSynchronizeWizard"
     		icon="icons/icon.png"
 		    description="Create Hotfix Snippets for release.xml from changes"
-		    name="Create Hotfix Snuppe"
+		    name="Create Hotfix Snippet"
 		    id="CreateHotfix.wizard1"/>
 	</extension>
 </plugin>
