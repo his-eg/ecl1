@@ -6,6 +6,7 @@ package net.sf.ecl1.classpath;
 import static net.sf.ecl1.classpath.ClasspathContainerConstants.NET_SF_ECL1_ECL1_CONTAINER_ID;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -18,10 +19,14 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 
 /**
  * @author keunecke
@@ -34,7 +39,7 @@ implements IClasspathContainerPage {
 
     private static final String ECL1_CLASSPATH_CONTAINER = "ecl1 Classpath Container";
 
-    private Text extensionsTextList;
+    private Table extensionsTable;
 
     /**
      * Default Constructor - sets title, page name, description
@@ -49,52 +54,69 @@ implements IClasspathContainerPage {
     @Override
     public void createControl(Composite parent) {
         Composite composite = new Composite(parent, SWT.NULL);
+        GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
+
         composite.setLayout(new GridLayout(5, false));
         composite.setFont(parent.getFont());
         Label label = new Label(composite, SWT.LEFT);
         label.setText("Available Extensions");
-        extensionsTextList = new Text(composite, SWT.FILL );
-        extensionsTextList.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 4, 1));
+
+        extensionsTable = new Table(composite, SWT.MULTI | SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
+        extensionsTable.setLinesVisible(true);
+        extensionsTable.setHeaderVisible(true);
+        extensionsTable.setLayoutData(layoutData);
+        extensionsTable.setSize(200, 600);
+
+        String[] headers = { "Export?", "Name" };
+        for (String header : headers) {
+            TableColumn c = new TableColumn(extensionsTable, SWT.NONE);
+            c.setText(header);
+        }
+
+        Collection<String> extensions = findExtensionJarsEligibleForClassPathAddition();
+        for (String extensionName : extensions) {
+            TableItem tableItem = new TableItem(extensionsTable, SWT.NONE);
+            tableItem.setText(1, extensionName);
+        }
+
+        for (int i = 0; i < headers.length; i++) {
+            extensionsTable.getColumn(i).pack();
+        }
+
         updateExtensionsTextfieldFromPath();
         setControl(composite);
     }
 
-    @Override
-    public boolean finish() {
-        if (extensionsTextList.getText().isEmpty()) {
-            setErrorMessage("Extensions to be exported needs to be configured.");
-            return false;
-        }
-        Collection<String> nonExistingExtensionsConfigured = checkForNonExistingExtensions();
-        if (!nonExistingExtensionsConfigured.isEmpty()) {
-            setErrorMessage("The Extensions " + nonExistingExtensionsConfigured + " do not exist in workspace.");
-            return true;
-        }
-        return true;
+    private Collection<String> findExtensionJarsEligibleForClassPathAddition() {
+        Collection<String> result = Lists.newArrayList();
+        result = new ExtensionUtil().findExtensionJars();
+        return result;
     }
 
-    private Collection<String> checkForNonExistingExtensions() {
-        Collection<String> result = Lists.newArrayList();
-        Iterable<String> configuredExtensions = Splitter.on(",").split(extensionsTextList.getText());
-        for (String extension : configuredExtensions) {
-            boolean existsAsJar = new ExtensionUtil().doesExtensionJarExist(extension);
-            boolean existsAsProject = new ExtensionUtil().doesExtensionProjectExist(extension);
-            if (!existsAsJar && !existsAsProject) {
-                result.add(extension);
-                System.out.println("'" + extension + "' does neither exist as project nor as extension jar.");
-            }
-        }
-        return result;
+    @Override
+    public boolean finish() {
+        return true;
     }
 
     @Override
     public IClasspathEntry getSelection() {
         IPath path = new Path(NET_SF_ECL1_ECL1_CONTAINER_ID);
-        String extensionsCommaSeparated = extensionsTextList.getText();
-        if(extensionsCommaSeparated != null && !extensionsCommaSeparated.isEmpty()) {
-            path = path.append(extensionsCommaSeparated);
+        Collection<String> extensionsSelected = getSelectedExtensions();
+        if (!extensionsSelected.isEmpty()) {
+            path = path.append(Joiner.on(",").join(extensionsSelected));
         }
         return JavaCore.newContainerEntry(path, true);
+    }
+
+    private Collection<String> getSelectedExtensions() {
+        Collection<String> result = Sets.newHashSet();
+        TableItem[] items = extensionsTable.getItems();
+        for (TableItem item : items) {
+            if (item.getChecked()) {
+                result.add(item.getText(1));
+            }
+        }
+        return result;
     }
 
     @Override
@@ -107,8 +129,14 @@ implements IClasspathContainerPage {
 
     private void updateExtensionsTextfieldFromPath() {
         String[] segments = this.selection.segments();
-        if(extensionsTextList != null && segments != null && segments.length > 1) {
-            extensionsTextList.setText(segments[1]);
+        if(extensionsTable != null && segments != null && segments.length > 1) {
+            List<String> split = Splitter.on(",").splitToList(segments[1]);
+            TableItem[] items = extensionsTable.getItems();
+            for (TableItem item : items) {
+                if (split.contains(item.getText(1))) {
+                    item.setChecked(true);
+                }
+            }
         }
     }
 
