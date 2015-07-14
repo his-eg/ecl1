@@ -28,7 +28,7 @@ public class ResourceSupport {
 
     private static final String SONARBINARIESELEMENT_TEMPLATE = "sonarbinarieselement" + TEMPLATE;
 
-    private static final String COMPILE_CLASSPATH_XML = "compile-classpath.xml";
+    private static final String COMPILE_CLASSPATH_XML = "buildscript/compile-classpath.xml";
 
     private static final String COMPILE_CLASSPATH_XML_TEMPLATE = COMPILE_CLASSPATH_XML + TEMPLATE;
 

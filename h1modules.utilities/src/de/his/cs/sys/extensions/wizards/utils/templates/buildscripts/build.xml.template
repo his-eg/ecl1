@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="extension.base" default="jar">
+	<description>
+            Build Script for HISinOne Extension
+    </description>
+	
+	<property environment="env" /> 
+
+	<!-- Lokal koennen per Propertiesdatei Werte Ueberschrieben werden -->
+	<property file="${user.name}.ant.properties" />
+	
+	<!-- 
+	Parameter, die modulspezifisch sind, werden in der modul.ant.properties gepflegt:
+	- Modulname: extension.name
+	-->
+	<property file="extension.ant.properties" />
+
+	<property name="build" value="build" />
+
+	<property name="dist" value="dist" />
+
+	<property name="target-file" value="${dist}/${extension.name}.jar" />
+
+	<condition property="webapps" value="../webapps" else="../../webapps">
+		<resourceexists>
+		  <file file="../webapps" />
+		</resourceexists>
+	</condition>
+
+	<property name="qisserver" value="${webapps}/qisserver" />
+	<property name="qisserver-webinf" value="${qisserver}/WEB-INF" />
+	<property name="qisserver-lib" value="${qisserver-webinf}/lib" />
+	<property name="qisserver-lib-compile" value="${qisserver-webinf}/lib-compile" />
+	<property name="qisserver-extensions" value="${qisserver-webinf}/extensions" />
+	<property name="qisserver-classes" value="${qisserver-webinf}/classes" />
+	<property name="classes-target" value="${build}/classes" />
+	<property name="test-target" value="${build}/test" />
+	<property name="resources-target" value="${classes-target}/META-INF/resources" />
+	<property name="build-results" value="${build}/results"/>
+	<property name="cobertura-dir" value="${qisserver-lib-compile}" />
+	<property name="src-java" value="src/java"/>
+	<property name="src-test" value="src/test"/>
+	<property name="test-resource" location="resource"/>
+	<property name="pitreport" location="pitReports"/>
+	<property name="pithistory" location="${build}/history"/>
+
+	<property name="build-server" value="http://build.his.de/build/" />
+	
+	<path id="additional-classpath">
+	</path>
+	
+	<import file="compile-classpath.xml" optional="true" />
+	
+	<path id="compile-classpath">
+		<pathelement location="${qisserver-classes}"/>
+		<fileset dir="${qisserver-lib}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${qisserver-lib-compile}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="lib" erroronmissingdir="false">
+			<include name="*.jar" />
+		</fileset>
+		<path refid="additional-classpath" />
+	</path>
+	
+	<path id="additional-sourcepath">
+	</path>
+	
+	<import file="compile-sourcepath.xml" optional="true" />
+	
+	<path id="compile-sourcepath">
+		<dirset dir="src">
+			<include name="java" />
+			<include name="generated" />
+		</dirset>
+		<path refid="additional-sourcepath"/>
+	</path>
+	
+	<path id="compile-test-classpath">
+		<pathelement location="${qisserver-classes}"/>
+		<pathelement location="${classes-target}" />
+		<pathelement location="${test-target}" />
+		<fileset dir="${qisserver-lib}">
+			<include name="*.jar" />
+			<exclude name="ant-1.8.1.jar"/>
+		</fileset>
+		<fileset dir="${qisserver-lib-compile}">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="lib" erroronmissingdir="false">
+			<include name="*.jar" />
+		</fileset>
+		<path refid="additional-classpath" />
+	</path>
+	
+	<property name="build_cobertura" value="${build}/cobertura_build"/>
+		
+	<property name="build_cobertura_report" value="${build}/coveragereport"/>
+	
+	<path id="cobertura-classpath">
+		<fileset dir="${qisserver-lib}">
+			<include name="*.jar" />
+			<exclude name="ant-1.8.1.jar"/>
+			<exclude name="asm-3.2.jar"/>
+		</fileset>
+		<fileset dir="${qisserver-webinf}/internal/ant/lib">
+			<include name="*.jar" />
+		</fileset>		
+	</path>
+	
+	<path id="cobertura-test-classpath">
+		<pathelement location="${build_cobertura}" />
+		<pathelement location="${test-target}" />
+		<pathelement location = "${test-resource}"/>
+		<path refid="compile-test-classpath" />
+		<path refid="cobertura-classpath" />
+	</path>
+	
+	<taskdef classpathref="cobertura-classpath" resource="tasks.properties" />
+	
+	<path id="compile-test-sourcepath">
+		<dirset dir="src">
+			<include name="test" />
+		</dirset>
+	</path>
+	
+	<target name="clean">
+		<delete includeemptydirs="true" failonerror="false" >
+			<fileset dir="${build}" />
+			<fileset dir="${dist}" />
+		</delete>
+	</target>
+
+	<target name="init">
+		<mkdir dir="${build}" />
+		<mkdir dir="${build-results}" />
+		<mkdir dir="${test-target}" />
+		<mkdir dir="${classes-target}" />
+		<mkdir dir="${resources-target}" />
+		<mkdir dir="${dist}" />
+	</target>
+
+	<target name="compile" depends="init">
+		<javac destdir="${classes-target}" debug="on" debuglevel="source,lines,vars" includeantruntime="false" source="1.7" target="1.7" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
+			<compilerarg line="-encoding utf-8"/>
+			<compilerarg line="-enableJavadoc" />
+			<classpath refid="compile-classpath" />
+			<src refid="compile-sourcepath" />
+		</javac>
+		<copy todir="${classes-target}" verbose="true">
+			<fileset dir="src/java">
+				<filename name="**/*.java" negate="true" />
+			</fileset>
+		</copy>
+		<copy todir="${resources-target}">
+			<fileset dir="resource" />
+		</copy>
+	</target>
+	
+	<target name="git-data">
+	    <condition property="repository.version" value="${env.BUILD_TAG}-${env.GIT_COMMIT}" else="unknown">
+            <isset property="env.BUILD_TAG"/>
+	    </condition>
+	</target>
+	
+	<target name="jar-with-contribution" depends="git-data,compile" description="Extension JAR für die Distribution erzeugen" if="has-contribs">
+		<jar destfile="${target-file}" basedir="${classes-target}" index="true" >
+			<manifest>
+				<attribute name="Extension-Name" value="${extension.name}"/>
+				<attribute name="Extension-Version" value="${extension.version}"/>
+				<attribute name="Extension-ExtendedPoints" value="${extension.extended-points}"/>
+				<attribute name="Extension-Revision" value="${repository.version}"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="jar-without-contribution" depends="git-data,compile" description="Extension JAR für die Distribution erzeugen" unless="has-contribs">
+		<jar destfile="${target-file}" basedir="${classes-target}" index="true" >
+			<manifest>
+				<attribute name="Extension-Name" value="${extension.name}"/>
+				<attribute name="Extension-Version" value="${extension.version}"/>
+				<attribute name="Extension-Revision" value="${repository.version}"/>
+			</manifest>
+		</jar>
+	</target>
+	
+	<target name="jar-has-contribs">
+		<condition property="has-contribs">
+			<isset property="extension.extended-points"/>
+		</condition>
+	</target>
+	
+	<target name="jar" description="Extension JAR für die Distribution erzeugen" depends="jar-has-contribs,jar-with-contribution,jar-without-contribution" >
+	</target>
+	
+	<target name="compile-tests" depends="compile">
+		<javac srcdir="src/test" destdir="${test-target}" debug="on" includeantruntime="false" source="1.7" target="1.7" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
+			<compilerarg line="-encoding utf-8"/>
+			<compilerarg line="-enableJavadoc" />
+			<classpath refid="compile-test-classpath" />
+			<sourcepath refid="compile-test-sourcepath" />
+		</javac>
+		<copy todir="${test-target}" verbose="true">
+			<fileset dir="src/test">
+				<filename name="**/*.java" negate="true" />
+			</fileset>
+		</copy>
+	</target>
+	
+	<target name="cobertura-instrument" depends="compile-tests">
+		<delete file="cobertura.ser" quiet="true" />
+
+		<cobertura-instrument todir="${build_cobertura}" datafile="cobertura.ser">
+			<ignore regex="org.apache.log4j.*" />
+			<fileset dir="${classes-target}">
+				<include name="**/*.class" />
+			</fileset>
+			<auxClasspath>
+				<pathelement path="${qisserver-classes} "/>
+				<fileset dir="${qisserver-lib}">
+					<include name="**/*.jar"/>
+				</fileset>
+				<fileset dir="${qisserver-lib-compile}">
+					<include name="**/*.jar"/>
+				</fileset>
+			</auxClasspath>
+		</cobertura-instrument>
+	</target>
+	
+	<target name="cobertura-test" depends="cobertura-instrument">
+		<junit printsummary="yes" haltonerror="false" fork="true" forkmode="once">
+			<sysproperty key="net.sourceforge.cobertura.datafile"
+						file="cobertura.ser" />
+			<jvmarg value="-XX:MaxPermSize=512M"/>
+			<classpath refid="cobertura-test-classpath" />
+			<batchtest todir="${build-results}">
+				<fileset dir="${src-test}" >
+					<include name="**/*Test.java"/>
+					<include name="**/Test*.java"/>
+				</fileset>
+				<formatter type="plain" usefile="false" />
+				<formatter type="xml" usefile="true"/>
+			</batchtest>
+		</junit>
+	</target>
+	
+	<target name="cobertura-report" depends="cobertura-test">
+		<cobertura-report format="html" destdir="${build_cobertura_report}" datafile="cobertura.ser">
+			<fileset dir="${src-java}" />
+		</cobertura-report>
+		<cobertura-report format="xml" destdir="${build_cobertura_report}" datafile="cobertura.ser">
+			<fileset dir="${src-java}" />
+		</cobertura-report>
+	</target>
+	
+	<!-- Pitest ausführen -->
+	<target name="mutationtest" depends="cobertura-report" >
+		<!-- Benötigte Pitest und JUnit jars -->
+		<path id="pitest.path">
+			<pathelement location="${qisserver-webinf}/internal/ant/lib/pitest-1.1.4.jar" />
+			<pathelement location="${qisserver-webinf}/internal/ant/lib/pitest-ant-1.1.4.jar" />
+			<pathelement location="${qisserver-lib}/junit-*.jar" />
+		</path>
+			
+		<taskdef name="pitest" classname="org.pitest.ant.PitestTask" classpathref="pitest.path" />
+
+		<path id="mutation.path">
+			<path refid="pitest.path"/>
+			<path refid="compile-test-classpath"/>
+		</path>	
+		<!-- hier anpassen -->
+		<pitest pitClasspath="pitest.path"  
+			classPath="mutation.path" 
+			targetTests="de.his.appclient.jsf.cs.sys.test.*,de.his.appserver.model.cs.sys.test.*,de.his.appserver.persistence.dao.impl.hibernate.cs.sys.quality.management.*"
+			targetClasses="de.his.appclient.jsf.cs.sys.quality.management.*, de.his.appserver.model.*, de.his.appserver.persistence.dao.*" 
+			reportDir="${pitreport}" 
+			sourceDir="${src-java},${src-test}" 
+			jvmArgs="-Xmx1075m,-XX:MaxPermSize=512M,-Dfile.encoding=utf-8"
+			timeoutfactor="2000"
+			threads="4"
+			outputformats="HTML,XML"
+			historyinputlocation="${pithistory}"
+			historyoutputlocation="${pithistory}"/>
+	</target>
+	
+	<target name="update-webapps">
+		<loadfile property="cvs.tag" srcFile="${webapps}/CVS/Tag" failonerror="false">
+	        <filterchain>
+	            <striplinebreaks/>
+	            <tokenfilter>
+	                <replaceregex pattern="^T" replace="" />
+	                <replaceregex pattern="^D.*" replace="HEAD" />
+	            </tokenfilter>
+	        </filterchain>
+	    </loadfile>
+	 
+		<condition property="cvs.tag" value="${cvs.tag}" else="HEAD">
+			<resourceexists>
+				  <file file="${webapps}/CVS/Tag" />
+			</resourceexists>
+		</condition>
+		
+		<property name="latest-build-result" value="${build-server}job/${extension.name}_${cvs.tag}/lastSuccessfulBuild/artifact/dist/${extension.name}.jar" />
+		
+		<get dest="${qisserver-extensions}/${extension.name}.jar" src="${latest-build-result}"/>
+	</target>
+
+	<import file="additional-targets.xml" optional="false" />
+	
+</project>
