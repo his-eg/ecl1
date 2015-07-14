@@ -13,7 +13,7 @@
          point="org.eclipse.jdt.ui.classpathContainerPage">
 		   <classpathContainerPage
 				id="net.sf.ecl1.ECL1_CONTAINER"
-				name="ecl1 Classpath Container Page"
+				name="ecl1 Classpath Container"
 				class="net.sf.ecl1.classpath.ExtensionClasspathContainerPage"/>
    </extension>
 </plugin>
