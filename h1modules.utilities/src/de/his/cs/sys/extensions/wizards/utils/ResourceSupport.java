@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
 import de.his.cs.sys.extensions.wizards.utils.templates.TemplateFetcher;
 import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
@@ -29,8 +30,6 @@ public class ResourceSupport {
     private static final String SONARBINARIESELEMENT_TEMPLATE = "sonarbinarieselement" + TEMPLATE;
 
     private static final String COMPILE_CLASSPATH_XML = "buildscript/compile-classpath.xml";
-
-    private static final String COMPILE_CLASSPATH_XML_TEMPLATE = COMPILE_CLASSPATH_XML + TEMPLATE;
 
     private final Map<String, String> extensionAntPropertiesReplacements = new HashMap<String, String>();
 
@@ -73,8 +72,9 @@ public class ResourceSupport {
             new TemplateManager(template, extensionAntPropertiesReplacements).writeContent(project);
         }
 
-        if (!this.extensionAntPropertiesReplacements.get("[additionaldependencies]").isEmpty()) {
-            new TemplateManager(COMPILE_CLASSPATH_XML_TEMPLATE, this.extensionAntPropertiesReplacements).writeContent(project);
+        // if no additional dependencies delete additional classpath definition file
+        if (this.extensionAntPropertiesReplacements.get("[additionaldependencies]").isEmpty()) {
+            this.project.getFile(COMPILE_CLASSPATH_XML).delete(true, new NullProgressMonitor());
         }
     }
 
