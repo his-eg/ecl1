@@ -12,15 +12,22 @@ package net.sf.ecl1.importwizard;
 
 import h1modules.utilities.utils.Activator;
 
+import java.io.File;
 import java.util.Collection;
 
 import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
+
+import com.google.common.collect.Lists;
 
 /**
  * Wizard for import of extension projects listed on a jenkins
@@ -28,6 +35,8 @@ import org.eclipse.ui.IWorkbench;
  * @author keunecke
  */
 public class ExtensionImportWizard extends Wizard implements IImportWizard {
+
+    private static final String ERROR_MESSAGE_EXISTING_FOLDER = "Workspace contains folders named like extensions you want to import. Delete them first.";
 
     ExtensionImportWizardPage mainPage;
 
@@ -42,6 +51,25 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     public boolean performFinish() {
         Collection<String> extensionsToImport = mainPage.getSelectedExtensions();
         boolean openProjectsAfterImport = mainPage.openProjectsAfterImport();
+        Collection<String> existingFolders = checkForExistingFolders(extensionsToImport);
+
+        if (!existingFolders.isEmpty()) {
+            if (mainPage.deleteFolders()) {
+                for (String extension : existingFolders) {
+                    IWorkspace workspace = ResourcesPlugin.getWorkspace();
+                    IWorkspaceRoot root = workspace.getRoot();
+                    File workspaceFile = root.getFullPath().toFile();
+                    File extensionFolder = new File(workspaceFile, extension);
+                    boolean deleted = extensionFolder.delete();
+                    if (!deleted) {
+                        mainPage.setErrorMessage(ERROR_MESSAGE_EXISTING_FOLDER);
+                    }
+                }
+            } else {
+                mainPage.setErrorMessage(ERROR_MESSAGE_EXISTING_FOLDER);
+                return false;
+            }
+        }
 
         try {
             String reposerver = Activator.getDefault().getPreferenceStore().getString(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE);
@@ -50,6 +78,28 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
             e.printStackTrace();
         }
         return true;
+    }
+
+    /**
+     * Check if a folder with an extension name already exists in workspace
+     *
+     * @param extensionsToImport
+     * @return
+     */
+    private Collection<String> checkForExistingFolders(Collection<String> extensionsToImport) {
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        IWorkspaceRoot root = workspace.getRoot();
+        IPath fullPath = root.getLocation();
+        File workspaceFile = fullPath.toFile();
+        Collection<String> result = Lists.newArrayList();
+
+        for (String extension : extensionsToImport) {
+            File extensionFolder = new File(workspaceFile, extension);
+            if (extensionFolder.exists()) {
+                result.add(extension);
+            }
+        }
+        return result;
     }
 
     /* (non-Javadoc)

@@ -53,6 +53,8 @@ public class ExtensionImportWizardPage extends WizardPage {
 
     private Button openAfterImport;
 
+    private Button deleteExistingFolders;
+
     protected ExtensionImportWizardPage(String pageName) {
         super(pageName);
     }
@@ -103,6 +105,10 @@ public class ExtensionImportWizardPage extends WizardPage {
             }
         });
 
+        deleteExistingFolders = new Button(projectChoice, SWT.CHECK);
+        deleteExistingFolders.setText("Delete folders?");
+        deleteExistingFolders.setToolTipText("Should wizard delete existing folders named like extensions for import?");
+
         projectTable = new Table(projectChoice, SWT.MULTI | SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
         projectTable.setLinesVisible(true);
         projectTable.setHeaderVisible(true);
@@ -117,7 +123,6 @@ public class ExtensionImportWizardPage extends WizardPage {
 
         for (String remoteExtensionName : remoteExtensions) {
             if (!extensionsInWorkspace.contains(remoteExtensionName) && !remoteExtensionName.contains(HISConstants.WEBAPPS)) {
-                //                projectList.add(remoteExtensionName);
                 TableItem tableItem = new TableItem(projectTable, SWT.NONE);
                 tableItem.setChecked(false);
                 tableItem.setText(1, remoteExtensionName);
@@ -158,8 +163,12 @@ public class ExtensionImportWizardPage extends WizardPage {
         return store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE);
     }
 
+    /**
+     * Get all user selected extensions for import
+     *
+     * @return set of extension names
+     */
     public Set<String> getSelectedExtensions() {
-
         Set<String> result = new TreeSet<String>();
         TableItem[] items = projectTable.getItems();
         for (TableItem item : items) {
@@ -171,8 +180,22 @@ public class ExtensionImportWizardPage extends WizardPage {
         return result;
     }
 
+    /**
+     * User selection if extensions should be opend after import
+     *
+     * @return true iff user wants extensions to be opened after import
+     */
     public boolean openProjectsAfterImport() {
         return openAfterImport.getSelection();
+    }
+
+    /**
+     * User selection if folders with names like extensions for import should be deleted directly
+     *
+     * @return true iff user wants to have folders deleted
+     */
+    public boolean deleteFolders() {
+        return deleteExistingFolders.getSelection();
     }
 
 }
