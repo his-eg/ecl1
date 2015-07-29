@@ -13,10 +13,12 @@ package net.sf.ecl1.importwizard;
 import h1modules.utilities.utils.Activator;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 
 import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -27,6 +29,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 /**
@@ -36,7 +39,7 @@ import com.google.common.collect.Lists;
  */
 public class ExtensionImportWizard extends Wizard implements IImportWizard {
 
-    private static final String ERROR_MESSAGE_EXISTING_FOLDER = "Workspace contains folders named like extensions you want to import. Delete them first.";
+    private static final String ERROR_MESSAGE_EXISTING_FOLDER = "Workspace contains folders named like extensions you want to import. Delete them first: %s";
 
     ExtensionImportWizardPage mainPage;
 
@@ -52,21 +55,25 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
         Collection<String> extensionsToImport = mainPage.getSelectedExtensions();
         boolean openProjectsAfterImport = mainPage.openProjectsAfterImport();
         Collection<String> existingFolders = checkForExistingFolders(extensionsToImport);
+        String extensionsString = Joiner.on(",").join(existingFolders);
 
         if (!existingFolders.isEmpty()) {
             if (mainPage.deleteFolders()) {
                 for (String extension : existingFolders) {
                     IWorkspace workspace = ResourcesPlugin.getWorkspace();
                     IWorkspaceRoot root = workspace.getRoot();
-                    File workspaceFile = root.getFullPath().toFile();
+                    File workspaceFile = root.getLocation().toFile();
                     File extensionFolder = new File(workspaceFile, extension);
-                    boolean deleted = extensionFolder.delete();
-                    if (!deleted) {
-                        mainPage.setErrorMessage(ERROR_MESSAGE_EXISTING_FOLDER);
+                    try {
+                        FileUtils.deleteDirectory(extensionFolder);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        mainPage.setErrorMessage(String.format(ERROR_MESSAGE_EXISTING_FOLDER, extensionsString));
+                        return false;
                     }
                 }
             } else {
-                mainPage.setErrorMessage(ERROR_MESSAGE_EXISTING_FOLDER);
+                mainPage.setErrorMessage(String.format(ERROR_MESSAGE_EXISTING_FOLDER, extensionsString));
                 return false;
             }
         }

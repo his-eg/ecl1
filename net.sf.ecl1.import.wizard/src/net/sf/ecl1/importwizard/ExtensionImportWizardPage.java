@@ -73,10 +73,14 @@ public class ExtensionImportWizardPage extends WizardPage {
         branchInfo.setText("Branch: " + getBranch());
         Composite openAfterImportComposite = new Composite(parent, SWT.BORDER | SWT.TOP);
         openAfterImportComposite.setLayout(gl2);
-        Label question = new Label(openAfterImportComposite, SWT.TOP);
-        question.setText("Open extensions after import?");
         openAfterImport = new Button(openAfterImportComposite, SWT.CHECK);
+        openAfterImport.setText("Open extensions after import?");
+        openAfterImport.setToolTipText("Should wizard open extension projects after import?");
         openAfterImport.setSelection(true);
+
+        deleteExistingFolders = new Button(openAfterImportComposite, SWT.CHECK);
+        deleteExistingFolders.setText("Delete folders?");
+        deleteExistingFolders.setToolTipText("Should wizard delete existing folders named like extensions for import?");
 
         Composite projectChoice = new Composite(parent, SWT.BORDER | SWT.TOP);
         projectChoice.setLayout(gl);
@@ -104,10 +108,6 @@ public class ExtensionImportWizardPage extends WizardPage {
                 }
             }
         });
-
-        deleteExistingFolders = new Button(projectChoice, SWT.CHECK);
-        deleteExistingFolders.setText("Delete folders?");
-        deleteExistingFolders.setToolTipText("Should wizard delete existing folders named like extensions for import?");
 
         projectTable = new Table(projectChoice, SWT.MULTI | SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
         projectTable.setLinesVisible(true);
