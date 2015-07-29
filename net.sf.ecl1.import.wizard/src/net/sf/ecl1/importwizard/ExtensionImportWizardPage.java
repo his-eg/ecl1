@@ -55,8 +55,8 @@ public class ExtensionImportWizardPage extends WizardPage {
 
     private Button deleteExistingFolders;
 
-    protected ExtensionImportWizardPage(String pageName) {
-        super(pageName);
+    protected ExtensionImportWizardPage() {
+        super("Extension Import");
     }
 
     @Override
@@ -136,6 +136,9 @@ public class ExtensionImportWizardPage extends WizardPage {
         setControl(parent);
     }
 
+    /**
+     * Read remote extensions from configured build server.
+     */
     private void initRemoteExtensions() {
         Collection<String> remoteProjectsIncludingBranch = new RemoteProjectSearchSupport().getProjects();
         String branch = getBranch();
@@ -146,6 +149,9 @@ public class ExtensionImportWizardPage extends WizardPage {
         }
     }
 
+    /**
+     * Read extensions already present in workspace.
+     */
     private void initExtensionsInWorkspace() {
         Collection<String> result = new ArrayList<String>();
         IWorkspace workspace = ResourcesPlugin.getWorkspace();

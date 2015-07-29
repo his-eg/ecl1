@@ -116,7 +116,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     public void init(IWorkbench workbench, IStructuredSelection selection) {
         setWindowTitle("Extension Import Wizard"); //NON-NLS-1
         setNeedsProgressMonitor(true);
-        mainPage = new ExtensionImportWizardPage("Extension Import"); //NON-NLS-1
+        mainPage = new ExtensionImportWizardPage(); //NON-NLS-1
     }
 
     /* (non-Javadoc)
