@@ -40,7 +40,12 @@ import org.eclipse.swt.widgets.TableItem;
 import de.his.cs.sys.extensions.wizards.utils.HISConstants;
 import de.his.cs.sys.extensions.wizards.utils.RemoteProjectSearchSupport;
 
-
+/**
+ * Extension import configuration wizard page
+ *
+ * @author keunecke
+ *
+ */
 public class ExtensionImportWizardPage extends WizardPage {
 
     // All extensions existing on repo server
@@ -55,6 +60,9 @@ public class ExtensionImportWizardPage extends WizardPage {
 
     private Button deleteExistingFolders;
 
+    /**
+     * Create a new ExtensionImportWizardPage
+     */
     protected ExtensionImportWizardPage() {
         super("Extension Import");
     }
