@@ -2,7 +2,7 @@ package net.sf.ecl1.extensionpoint.collector;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.TreeSet;
 
 import net.sf.ecl1.extensionpoint.Constants;
 import net.sf.ecl1.extensionpoint.collector.manager.ExtensionPointManager;
@@ -32,11 +32,11 @@ class ExtensionPointVisitor implements IResourceVisitor {
 
     private IJavaProject project;
 
-    private Collection<String> contributors = new HashSet<String>();
+    private Collection<String> contributors = new TreeSet<String>();
 
     /**
      * Create a new ExtensionPointVisitor
-     * 
+     *
      * @param project
      */
     public ExtensionPointVisitor(IJavaProject project) {
@@ -44,15 +44,16 @@ class ExtensionPointVisitor implements IResourceVisitor {
         this.project = project;
     }
 
+    @Override
     public boolean visit(IResource resource) {
-		//return true to continue visiting children.
+        //return true to continue visiting children.
         try {
             handleResource(resource);
         } catch (JavaModelException e) {
             e.printStackTrace();
         }
-		return true;
-	}
+        return true;
+    }
 
     private void handleResource(IResource resource) throws JavaModelException {
         switch (resource.getType()) {
