@@ -10,6 +10,11 @@ import java.util.HashSet;
 
 import com.google.common.collect.Sets;
 
+/**
+ * A utility to fetch templates from given URLs
+ *
+ * @author keunecke
+ */
 public class TemplateFetcher {
 
     private final String templateListSourceUrl;
@@ -37,10 +42,10 @@ public class TemplateFetcher {
                 while ((line = br.readLine()) != null) {
                     result.add(line);
                     System.out.println("TemplateFetcher found template '" + line + "' for download.");
-
                 }
             } catch (IOException e) {
                 System.out.println("Could not download template list from " + templateListSourceUrl);
+                System.err.println("Could not download template list from " + templateListSourceUrl);
                 e.printStackTrace();
             }
         } catch (MalformedURLException e) {
