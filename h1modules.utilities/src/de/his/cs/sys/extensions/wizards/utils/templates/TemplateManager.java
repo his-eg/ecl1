@@ -93,14 +93,24 @@ public class TemplateManager {
             }
         } catch (IOException e) {
             e.printStackTrace();
+            System.out.println("Erro fetching Template: " + e.getMessage());
             System.out.println("TemplatePath: " + this.templatePath);
             System.out.println("Variables: " + this.variables);
+            System.err.println("Erro fetching Template: " + e.getMessage());
+            System.err.println("TemplatePath: " + this.templatePath);
+            System.err.println("Variables: " + this.variables);
         } finally {
             if(templateStream != null) {
                 try {
                     templateStream.close();
                 } catch (IOException e) {
-                    //
+                    e.printStackTrace();
+                    System.out.println("Erro fetching Template: " + e.getMessage());
+                    System.out.println("TemplatePath: " + this.templatePath);
+                    System.out.println("Variables: " + this.variables);
+                    System.err.println("Erro fetching Template: " + e.getMessage());
+                    System.err.println("TemplatePath: " + this.templatePath);
+                    System.err.println("Variables: " + this.variables);
                 }
             }
         }
@@ -119,13 +129,16 @@ public class TemplateManager {
         try {
             file.create(is, true, null);
         } catch (CoreException e) {
+            System.out.println("Error creating file from template '" + this.templatePath + "': " + e.getMessage());
+            System.err.println("Error creating file from template '" + this.templatePath + "': " + e.getMessage());
             e.printStackTrace();
-
         } finally {
             try {
                 is.close();
             } catch (IOException e1) {
-                //
+                System.out.println("Error creating file from template '" + this.templatePath + "': " + e1.getMessage());
+                System.err.println("Error creating file from template '" + this.templatePath + "': " + e1.getMessage());
+                e1.printStackTrace();
             }
         }
     }
