@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
+import net.sf.ecl1.changeset.exporter.util.ReleaseXmlUtil;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
@@ -60,7 +62,7 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         pageComposite.setLayout(oneColumnGrid);
 
         hotfixTitle = new StringFieldEditor("title", "Title", pageComposite);
-        String version = ChangeSetExportWizardPlugin.getVersionShortString();
+        String version = ReleaseXmlUtil.getVersionShortString();
         hotfixTitle.setStringValue("Hotfix " + version + ".");
         hotfixDescribtion = new StringFieldEditor("description", "Description", pageComposite);
         hiszillaTickets = new StringFieldEditor("hiszilla", "Hiszilla", pageComposite);
@@ -120,7 +122,7 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         Label releaseXmlListLabel = new Label(pageComposite, SWT.LEFT);
         releaseXmlListLabel.setText("Release XMLs");
         releaseFilesList = new List(pageComposite, SWT.BORDER | SWT.V_SCROLL);
-        Collection<IFile> releaseXmlFiles = ChangeSetExportWizardPlugin.getReleaseXmlFiles();
+        Collection<IFile> releaseXmlFiles = ReleaseXmlUtil.getReleaseXmlFiles();
         for (IFile releaseXml : releaseXmlFiles) {
             releaseFilesList.add(releaseXml.getName());
         }
@@ -190,7 +192,7 @@ public class ChangeSetExporterWizardPage extends WizardPage {
 
     public IFile getSelectedReleaseFile() {
         String file = releaseFilesList.getItem(releaseFilesList.getSelectionIndex());
-        return ChangeSetExportWizardPlugin.getReleaseXmlFile(file);
+        return ReleaseXmlUtil.getReleaseXmlFile(file);
     }
 
 }
