@@ -2,6 +2,7 @@ package net.sf.ecl1.changeset.exporter;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.team.internal.ccvs.ui.CVSUIPlugin;
 import org.eclipse.team.internal.core.subscribers.ActiveChangeSetManager;
@@ -61,8 +62,8 @@ public class ChangeSetExportWizardPlugin extends AbstractUIPlugin {
     public Collection<ChangeSet> getChangeSets() {
         Collection<ChangeSet> changeSets = Sets.newHashSet();
         ActiveChangeSetManager manager = CVSUIPlugin.getPlugin().getChangeSetManager();
-        changeSets.add(manager.getDefaultSet());
-        changeSets.addAll(Arrays.asList(manager.getSets()));
+        List<ChangeSet> changeSetsFromManager = Arrays.asList(manager.getSets());
+        changeSets.addAll(changeSetsFromManager);
         return changeSets;
     }
 
