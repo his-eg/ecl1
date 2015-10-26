@@ -25,6 +25,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.team.internal.core.subscribers.ChangeSet;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class ChangeSetExporterWizardPage extends WizardPage {
@@ -56,6 +57,7 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         pageComposite.setLayout(oneColumnGrid);
 
         hotfixTitle = new StringFieldEditor("title", "Title", pageComposite);
+        hotfixTitle.setStringValue("Hotfix ");
         hotfixDescribtion = new StringFieldEditor("description", "Description", pageComposite);
         hiszillaTickets = new StringFieldEditor("hiszilla", "Hiszilla", pageComposite);
 
@@ -125,10 +127,18 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         cb.setContents(new Object[] { hotfixSnippet }, new Transfer[] { textTransfer });
         this.hotfixSnippetTextEditor.setStringValue(hotfixSnippet);
         setMessage("Hotfix XML snippet copied to clipboard!");
+        clearErrorAsync(3000);
+    }
+
+    /**
+     * @param display
+     */
+    private void clearErrorAsync(final int duration) {
+        final Display display = getControl().getDisplay();
         display.asyncExec(new Runnable() {
             @Override
             public void run() {
-                display.timerExec(3000, new Runnable() {
+                display.timerExec(duration, new Runnable() {
                     @Override
                     public void run() {
                         setMessage("");
@@ -144,6 +154,7 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         String hiszilla = hiszillaTickets.getStringValue();
         HotfixInformation hf = new HotfixInformation(title, description, hiszilla);
         ChangeSet selectedChangeSet = itemToChangeMap.get(selectedChangeTableItem.getText(1));
+        List<String> ignored = Lists.newLinkedList();
         if (selectedChangeSet != null) {
             List<IResource> resources = Arrays.asList(selectedChangeSet.getResources());
             for (IResource changedResource : resources) {
@@ -155,9 +166,12 @@ public class ChangeSetExporterWizardPage extends WizardPage {
                 if (qisserver.isPrefixOf(changedResourceProjectRelativePath)) {
                     hf.addFile(name);
                 } else {
-                    System.out.println("Ignored '" + name + "' for hotfix snippet.");
+                    ignored.add(name);
                 }
             }
+        }
+        if(!ignored.isEmpty()) {
+            setErrorMessage("Skipped files outside qisserver in selected change set!");
         }
         return hf;
     }
