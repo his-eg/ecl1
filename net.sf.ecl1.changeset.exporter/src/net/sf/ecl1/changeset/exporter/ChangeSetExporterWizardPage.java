@@ -2,9 +2,9 @@ package net.sf.ecl1.changeset.exporter;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -20,6 +20,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -46,6 +47,8 @@ public class ChangeSetExporterWizardPage extends WizardPage {
 
     private StringFieldEditor hotfixSnippetTextEditor;
 
+    private List releaseFilesList;
+
     public ChangeSetExporterWizardPage() {
         super("Change Set Exporter Wizard");
     }
@@ -57,7 +60,8 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         pageComposite.setLayout(oneColumnGrid);
 
         hotfixTitle = new StringFieldEditor("title", "Title", pageComposite);
-        hotfixTitle.setStringValue("Hotfix ");
+        String version = ChangeSetExportWizardPlugin.getVersionShortString();
+        hotfixTitle.setStringValue("Hotfix " + version + ".");
         hotfixDescribtion = new StringFieldEditor("description", "Description", pageComposite);
         hiszillaTickets = new StringFieldEditor("hiszilla", "Hiszilla", pageComposite);
 
@@ -113,6 +117,14 @@ public class ChangeSetExporterWizardPage extends WizardPage {
             changeSetTable.getColumn(i).pack();
         }
 
+        Label releaseXmlListLabel = new Label(pageComposite, SWT.LEFT);
+        releaseXmlListLabel.setText("Release XMLs");
+        releaseFilesList = new List(pageComposite, SWT.BORDER | SWT.V_SCROLL);
+        Collection<IFile> releaseXmlFiles = ChangeSetExportWizardPlugin.getReleaseXmlFiles();
+        for (IFile releaseXml : releaseXmlFiles) {
+            releaseFilesList.add(releaseXml.getName());
+        }
+
         this.hotfixSnippetTextEditor = new StringFieldEditor("snippet", "Hotfix Snippet", pageComposite);
 
         setControl(pageComposite);
@@ -154,9 +166,9 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         String hiszilla = hiszillaTickets.getStringValue();
         HotfixInformation hf = new HotfixInformation(title, description, hiszilla);
         ChangeSet selectedChangeSet = itemToChangeMap.get(selectedChangeTableItem.getText(1));
-        List<String> ignored = Lists.newLinkedList();
+        java.util.List<String> ignored = Lists.newLinkedList();
         if (selectedChangeSet != null) {
-            List<IResource> resources = Arrays.asList(selectedChangeSet.getResources());
+            java.util.List<IResource> resources = Arrays.asList(selectedChangeSet.getResources());
             for (IResource changedResource : resources) {
                 IPath qisserver = new Path("qisserver/");
                 IPath changedResourceProjectRelativePath = changedResource.getProjectRelativePath();
@@ -174,6 +186,11 @@ public class ChangeSetExporterWizardPage extends WizardPage {
             setErrorMessage("Skipped files outside qisserver in selected change set!");
         }
         return hf;
+    }
+
+    public IFile getSelectedReleaseFile() {
+        String file = releaseFilesList.getItem(releaseFilesList.getSelectionIndex());
+        return ChangeSetExportWizardPlugin.getReleaseXmlFile(file);
     }
 
 }
