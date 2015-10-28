@@ -119,13 +119,14 @@ public class ChangeSetExporterWizardPage extends WizardPage {
             changeSetTable.getColumn(i).pack();
         }
 
-        Label releaseXmlListLabel = new Label(pageComposite, SWT.LEFT);
-        releaseXmlListLabel.setText("Release XMLs");
-        releaseFilesList = new List(pageComposite, SWT.BORDER | SWT.V_SCROLL);
-        Collection<IFile> releaseXmlFiles = ReleaseXmlUtil.getReleaseXmlFiles();
-        for (IFile releaseXml : releaseXmlFiles) {
-            releaseFilesList.add(releaseXml.getName());
-        }
+        //Re-enable if adding snippet to release.xml is needed
+        //Label releaseXmlListLabel = new Label(pageComposite, SWT.LEFT);
+        //releaseXmlListLabel.setText("Release XMLs");
+        //releaseFilesList = new List(pageComposite, SWT.BORDER | SWT.V_SCROLL);
+        //Collection<IFile> releaseXmlFiles = ReleaseXmlUtil.getReleaseXmlFiles();
+        //for (IFile releaseXml : releaseXmlFiles) {
+        //    releaseFilesList.add(releaseXml.getName());
+        //}
 
         this.hotfixSnippetTextEditor = new StringFieldEditor("snippet", "Hotfix Snippet", pageComposite);
 
@@ -166,28 +167,31 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         String title = hotfixTitle.getStringValue();
         String description = hotfixDescribtion.getStringValue();
         String hiszilla = hiszillaTickets.getStringValue();
-        HotfixInformation hf = new HotfixInformation(title, description, hiszilla);
-        ChangeSet selectedChangeSet = itemToChangeMap.get(selectedChangeTableItem.getText(1));
-        java.util.List<String> ignored = Lists.newLinkedList();
-        if (selectedChangeSet != null) {
-            java.util.List<IResource> resources = Arrays.asList(selectedChangeSet.getResources());
-            for (IResource changedResource : resources) {
-                IPath qisserver = new Path("qisserver/");
-                IPath changedResourceProjectRelativePath = changedResource.getProjectRelativePath();
-                // only resources from within qisserver are considered
-                IPath path = changedResourceProjectRelativePath.makeRelativeTo(qisserver);
-                String name = path.toString();
-                if (qisserver.isPrefixOf(changedResourceProjectRelativePath)) {
-                    hf.addFile(name);
-                } else {
-                    ignored.add(name);
+        if (selectedChangeTableItem != null) {
+            HotfixInformation hf = new HotfixInformation(title, description, hiszilla);
+            ChangeSet selectedChangeSet = itemToChangeMap.get(selectedChangeTableItem.getText(1));
+            java.util.List<String> ignored = Lists.newLinkedList();
+            if (selectedChangeSet != null) {
+                java.util.List<IResource> resources = Arrays.asList(selectedChangeSet.getResources());
+                for (IResource changedResource : resources) {
+                    IPath qisserver = new Path("qisserver/");
+                    IPath changedResourceProjectRelativePath = changedResource.getProjectRelativePath();
+                    // only resources from within qisserver are considered
+                    IPath path = changedResourceProjectRelativePath.makeRelativeTo(qisserver);
+                    String name = path.toString();
+                    if (qisserver.isPrefixOf(changedResourceProjectRelativePath)) {
+                        hf.addFile(name);
+                    } else {
+                        ignored.add(name);
+                    }
                 }
             }
+            if(!ignored.isEmpty()) {
+                setErrorMessage("Skipped files outside qisserver in selected change set!");
+            }
+            return hf;
         }
-        if(!ignored.isEmpty()) {
-            setErrorMessage("Skipped files outside qisserver in selected change set!");
-        }
-        return hf;
+        return null;
     }
 
     public IFile getSelectedReleaseFile() {
