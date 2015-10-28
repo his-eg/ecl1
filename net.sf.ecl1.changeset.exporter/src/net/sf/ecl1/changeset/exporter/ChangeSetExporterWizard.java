@@ -1,6 +1,5 @@
 package net.sf.ecl1.changeset.exporter;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IExportWizard;
@@ -19,9 +18,22 @@ public class ChangeSetExporterWizard extends Wizard implements IExportWizard {
 
     @Override
     public boolean performFinish() {
-        HotfixInformation hf = page.getHotfixDefinition();
-        IFile releaseFile = page.getSelectedReleaseFile();
-        //TODO replace contents and return true if successful
+        if (!page.hasSelectedChangeSet()) {
+            page.setErrorMessage("No Change Set selected!");
+            page.clearErrorAsync(3000);
+            return false;
+        }
+        if (!page.hasDescription()) {
+            page.setErrorMessage("No description for hotfix provided!");
+            page.clearErrorAsync(3000);
+            return false;
+        }
+        if (!page.hasHiszilla()) {
+            page.setErrorMessage("No hiszilla tickets for hotfix provided!");
+            page.clearErrorAsync(3000);
+            return false;
+        }
+        page.setHotfixInformation();
         return true;
     }
 

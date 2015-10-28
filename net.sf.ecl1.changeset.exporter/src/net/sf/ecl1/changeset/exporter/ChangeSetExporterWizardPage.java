@@ -6,7 +6,6 @@ import java.util.Map;
 
 import net.sf.ecl1.changeset.exporter.util.ReleaseXmlUtil;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -87,7 +86,7 @@ public class ChangeSetExporterWizardPage extends WizardPage {
             private void handleEvent(SelectionEvent e) {
                 TableItem tableItem = (TableItem) e.item;
                 selectedChangeTableItem = tableItem;
-                setHotfixInformation(e);
+                setHotfixInformation();
             }
         });
 
@@ -133,7 +132,7 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         setControl(pageComposite);
     }
 
-    protected void setHotfixInformation(SelectionEvent e) {
+    protected void setHotfixInformation() {
         String hotfixSnippet = getHotfixDefinition().toXml();
         // add content to clipboard
         final Display display = getControl().getDisplay();
@@ -146,9 +145,9 @@ public class ChangeSetExporterWizardPage extends WizardPage {
     }
 
     /**
-     * @param display
+     * @param duration duration till removal in ms
      */
-    private void clearErrorAsync(final int duration) {
+    void clearErrorAsync(final int duration) {
         final Display display = getControl().getDisplay();
         display.asyncExec(new Runnable() {
             @Override
@@ -194,9 +193,27 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         return null;
     }
 
-    public IFile getSelectedReleaseFile() {
-        String file = releaseFilesList.getItem(releaseFilesList.getSelectionIndex());
-        return ReleaseXmlUtil.getReleaseXmlFile(file);
+    /**
+     * @return true iff user has selected a change set
+     */
+    boolean hasSelectedChangeSet() {
+        return selectedChangeTableItem != null;
+    }
+
+    /**
+     * @return true iff user has entered a description
+     */
+    boolean hasDescription() {
+        String desc = hotfixDescribtion.getStringValue();
+        return  desc != null && !desc.isEmpty();
+    }
+
+    /**
+     * @return true iff user has entered ticket numbers
+     */
+    boolean hasHiszilla() {
+        String hiszilla = hiszillaTickets.getStringValue();
+        return hiszilla != null && !hiszilla.isEmpty();
     }
 
 }
