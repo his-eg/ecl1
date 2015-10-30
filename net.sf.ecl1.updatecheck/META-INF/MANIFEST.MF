@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Update Check
+Bundle-SymbolicName: net.sf.ecl1.updatecheck;singleton:=true
+Bundle-Version: 0.0.1.2015-10-30
+Bundle-Activator: net.sf.ecl1.updatecheck.UpdateCheckActivator
+Bundle-Vendor: HIS eG
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-ActivationPolicy: lazy
+Import-Package: org.eclipse.equinox.p2.core,
+ org.eclipse.equinox.p2.metadata;version="2.1.0",
+ org.eclipse.equinox.p2.operations;version="2.0.0"
