@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Update Check
 Bundle-SymbolicName: net.sf.ecl1.updatecheck;singleton:=true
-Bundle-Version: 0.0.1.2015-10-30
+Bundle-Version: 0.0.2.2015-11-02
 Bundle-Activator: net.sf.ecl1.updatecheck.UpdateCheckActivator
 Bundle-Vendor: HIS eG
 Require-Bundle: org.eclipse.ui,
