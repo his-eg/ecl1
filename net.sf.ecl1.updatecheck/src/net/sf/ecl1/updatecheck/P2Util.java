@@ -37,12 +37,6 @@ import org.osgi.framework.ServiceReference;
  */
 public class P2Util {
 
-	private static final String ECL1_UPDATE_SITE = "http://ecl1.sf.net/update";
-	
-	static void doUpdate() {
-		
-	}
-
 	static void doCheckForUpdates(IProgressMonitor monitor) {
 		BundleContext bundleContext = UpdateCheckActivator.getDefault().getBundle().getBundleContext();
 		@SuppressWarnings("rawtypes")
@@ -85,16 +79,6 @@ public class P2Util {
 		if(!unitsForUpdate.isEmpty()) {
 			operation = new UpdateOperation(session, unitsForUpdate);
 		}
-		URI uri = null;
-	    try {
-	      uri = new URI(ECL1_UPDATE_SITE);
-	    } catch (final URISyntaxException e) {
-	      return null;
-	    }
-
-	    // set location of artifact and metadata repo
-	    operation.getProvisioningContext().setArtifactRepositories(new URI[] { uri });
-	    operation.getProvisioningContext().setMetadataRepositories(new URI[] { uri });
 	    
 		SubMonitor sub = SubMonitor.convert(monitor, "Checking for application updates...", 200);
 		IStatus status = operation.resolveModal(sub.newChild(100));
