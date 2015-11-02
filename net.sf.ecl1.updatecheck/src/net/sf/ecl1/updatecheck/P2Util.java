@@ -9,12 +9,17 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
+import org.eclipse.equinox.p2.engine.IProfile;
+import org.eclipse.equinox.p2.engine.IProfileRegistry;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.metadata.MetadataFactory;
 import org.eclipse.equinox.p2.metadata.MetadataFactory.InstallableUnitDescription;
 import org.eclipse.equinox.p2.operations.ProvisioningJob;
 import org.eclipse.equinox.p2.operations.ProvisioningSession;
 import org.eclipse.equinox.p2.operations.UpdateOperation;
+import org.eclipse.equinox.p2.query.IQuery;
+import org.eclipse.equinox.p2.query.IQueryResult;
+import org.eclipse.equinox.p2.query.QueryUtil;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
@@ -61,8 +66,11 @@ public class P2Util {
 		// running profile, using the default profile root marker. To change
 		// which installable units are being updated, use the more detailed
 		// constructors.
-		Collection<IInstallableUnit> toBeUpdated = initUnitsForUpdate();
-		UpdateOperation operation = new UpdateOperation(session, toBeUpdated);
+		IQuery<IInstallableUnit> query = QueryUtil.createIUQuery("h1modulesfeature");
+		IProfileRegistry registry= (IProfileRegistry)agent.getService(IProfileRegistry.SERVICE_NAME);
+		final IProfile profile= registry.getProfile(IProfileRegistry.SELF);
+		IQueryResult<IInstallableUnit> result = profile.query(query, monitor);
+		UpdateOperation operation = new UpdateOperation(session, result.toUnmodifiableSet());
 		SubMonitor sub = SubMonitor.convert(monitor, "Checking for application updates...", 200);
 		IStatus status = operation.resolveModal(sub.newChild(100));
 		if (status.getCode() == UpdateOperation.STATUS_NOTHING_TO_UPDATE) {
@@ -88,13 +96,4 @@ public class P2Util {
 		return status;
 	}
 
-	private static Collection<IInstallableUnit> initUnitsForUpdate() {
-		Collection<IInstallableUnit> result = new ArrayList<>();
-		InstallableUnitDescription ecl1Description = new InstallableUnitDescription();
-		ecl1Description.setId("h1modulesfeature");
-		IInstallableUnit ecl1 = MetadataFactory.createInstallableUnit(ecl1Description);
-		result.add(ecl1);
-		return result;
-	}
-	
 }
