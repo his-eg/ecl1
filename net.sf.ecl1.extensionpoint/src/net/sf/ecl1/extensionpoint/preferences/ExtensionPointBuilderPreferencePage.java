@@ -38,13 +38,7 @@ public class ExtensionPointBuilderPreferencePage
 	 * restore itself.
 	 */
 	public void createFieldEditors() {
-		
-		addField(
-			new BooleanFieldEditor(
-				Constants.LOGGING_PREFERENCE,
-				"Console Logging",
-				getFieldEditorParent()));
-
+		addField(new BooleanFieldEditor(Constants.LOGGING_PREFERENCE, "Logging",getFieldEditorParent()));
 	}
 
 	/* (non-Javadoc)
