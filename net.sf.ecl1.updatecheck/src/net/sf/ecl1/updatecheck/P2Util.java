@@ -81,7 +81,10 @@ public class P2Util {
 		IQueryResult<IInstallableUnit> result = profile.query(query, monitor);
 		Set<IInstallableUnit> unitsForUpdate = result.toUnmodifiableSet();
 		UpdateCheckActivator.info("Installable Units for update: " + unitsForUpdate);
-		UpdateOperation operation = new UpdateOperation(session, unitsForUpdate);
+		UpdateOperation operation = new UpdateOperation(session);
+		if(!unitsForUpdate.isEmpty()) {
+			operation = new UpdateOperation(session, unitsForUpdate);
+		}
 		URI uri = null;
 	    try {
 	      uri = new URI(ECL1_UPDATE_SITE);
