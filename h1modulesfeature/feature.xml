@@ -2,11 +2,13 @@
 <feature
       id="h1modulesfeature"
       label="ecl1 - HISinOne Extension Tools"
-      version="0.4.11.2015-11-02"
+      version="0.4.12.2015-11-02"
       provider-name="HIS eG">
 
    <description url="http://ecl1.sf.net">
-      Tools for the work with modularized HISinOne. Adds wizards to create a new extension and checkers for the enrollment process.
+      Tools for the work with modularized HISinOne. Adds wizards to
+create new extensions, import extensions and to create checkers
+for the enrollment process.
    </description>
 
    <license url="https://www.apache.org/licenses/LICENSE-2.0.html">
