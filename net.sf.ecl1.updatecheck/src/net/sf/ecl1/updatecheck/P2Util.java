@@ -68,7 +68,7 @@ public class P2Util {
 	static IStatus checkForUpdates(IProvisioningAgent agent, IProgressMonitor monitor)
 			throws OperationCanceledException {
 		ProvisioningSession session = new ProvisioningSession(agent);
-		IQuery<IInstallableUnit> query = QueryUtil.createIUQuery("h1modulesfeature");
+		IQuery<IInstallableUnit> query = QueryUtil.createLatestQuery(QueryUtil.createIUQuery("h1modulesfeature"));
 		UpdateCheckActivator.info("Update Query Expression: " + query.getExpression());
 		IProfileRegistry registry= (IProfileRegistry) agent.getService(IProfileRegistry.SERVICE_NAME);
 		final IProfile profile= registry.getProfile(IProfileRegistry.SELF);
@@ -77,6 +77,7 @@ public class P2Util {
 		UpdateCheckActivator.info("Installable Units for update: " + unitsForUpdate);
 		UpdateOperation operation = new UpdateOperation(session);
 		if(!unitsForUpdate.isEmpty()) {
+			UpdateCheckActivator.info("Creating UpdateOperation for: " + unitsForUpdate);
 			operation = new UpdateOperation(session, unitsForUpdate);
 		}
 	    
