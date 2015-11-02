@@ -4,12 +4,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.equinox.internal.p2.ui.model.ElementUtils;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.engine.IProfileRegistry;
@@ -36,6 +38,10 @@ import org.osgi.framework.ServiceReference;
 public class P2Util {
 
 	private static final String ECL1_UPDATE_SITE = "http://ecl1.sf.net/update";
+	
+	static void doUpdate() {
+		
+	}
 
 	static void doCheckForUpdates(IProgressMonitor monitor) {
 		BundleContext bundleContext = UpdateCheckActivator.getDefault().getBundle().getBundleContext();
@@ -53,10 +59,12 @@ public class P2Util {
 			IStatus updateStatus = P2Util.checkForUpdates(agent, monitor);
 			UpdateCheckActivator.log(updateStatus);
 			if (updateStatus.getCode() == UpdateOperation.STATUS_NOTHING_TO_UPDATE) {
+				UpdateCheckActivator.info(updateStatus.getMessage());
 				return;
 			}
 			if (updateStatus.getSeverity() != IStatus.ERROR) {
-				System.out.println("");
+				UpdateCheckActivator.info(updateStatus.getMessage());
+				
 			}
 		} finally {
 			bundleContext.ungetService(reference);
@@ -66,15 +74,14 @@ public class P2Util {
 	static IStatus checkForUpdates(IProvisioningAgent agent, IProgressMonitor monitor)
 			throws OperationCanceledException {
 		ProvisioningSession session = new ProvisioningSession(agent);
-		// the default update operation looks for updates to the currently
-		// running profile, using the default profile root marker. To change
-		// which installable units are being updated, use the more detailed
-		// constructors.
 		IQuery<IInstallableUnit> query = QueryUtil.createIUQuery("h1modulesfeature");
-		IProfileRegistry registry= (IProfileRegistry)agent.getService(IProfileRegistry.SERVICE_NAME);
+		UpdateCheckActivator.info("Update Query Expression: " + query.getExpression());
+		IProfileRegistry registry= (IProfileRegistry) agent.getService(IProfileRegistry.SERVICE_NAME);
 		final IProfile profile= registry.getProfile(IProfileRegistry.SELF);
 		IQueryResult<IInstallableUnit> result = profile.query(query, monitor);
-		UpdateOperation operation = new UpdateOperation(session, result.toUnmodifiableSet());
+		Set<IInstallableUnit> unitsForUpdate = result.toUnmodifiableSet();
+		UpdateCheckActivator.info("Installable Units for update: " + unitsForUpdate);
+		UpdateOperation operation = new UpdateOperation(session, unitsForUpdate);
 		URI uri = null;
 	    try {
 	      uri = new URI(ECL1_UPDATE_SITE);
@@ -89,6 +96,7 @@ public class P2Util {
 		SubMonitor sub = SubMonitor.convert(monitor, "Checking for application updates...", 200);
 		IStatus status = operation.resolveModal(sub.newChild(100));
 		if (status.getCode() == UpdateOperation.STATUS_NOTHING_TO_UPDATE) {
+			UpdateCheckActivator.info("Update Status: " + status.getMessage());
 			return status;
 		}
 		if (status.getSeverity() == IStatus.CANCEL)

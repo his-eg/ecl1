@@ -50,6 +50,10 @@ public class UpdateCheckActivator extends AbstractUIPlugin {
 		return plugin;
 	}
 	
+	public static void info(String info) {
+		log(new Status(IStatus.INFO, PLUGIN_ID,info));
+	}
+	
 	public static void log(IStatus status) {
 		ILog log = getDefault().getLog();
 		if (log != null) {

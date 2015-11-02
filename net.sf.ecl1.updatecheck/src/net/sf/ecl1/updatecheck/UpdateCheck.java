@@ -12,13 +12,13 @@ public class UpdateCheck implements IStartup {
 
 	@Override
 	public void earlyStartup() {
-		System.out.println("Update Check!");
+		UpdateCheckActivator.info("Update Check!");
 		Job job = new Job("ecl1UpdateCheck") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				System.out.println("Running scheduled ecl1 update check");
+				UpdateCheckActivator.info("Running scheduled ecl1 update check");
 				doUpdateCheck(monitor);
-				System.out.println("Finished scheduled ecl1 update check");
+				UpdateCheckActivator.info("Finished scheduled ecl1 update check");
 				return Status.OK_STATUS;
 			}
 		};
