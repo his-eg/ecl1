@@ -1,5 +1,7 @@
 package net.sf.ecl1.updatecheck;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -32,6 +34,8 @@ import org.osgi.framework.ServiceReference;
  *
  */
 public class P2Util {
+
+	private static final String ECL1_UPDATE_SITE = "http://ecl1.sf.net/update";
 
 	static void doCheckForUpdates(IProgressMonitor monitor) {
 		BundleContext bundleContext = UpdateCheckActivator.getDefault().getBundle().getBundleContext();
@@ -71,6 +75,17 @@ public class P2Util {
 		final IProfile profile= registry.getProfile(IProfileRegistry.SELF);
 		IQueryResult<IInstallableUnit> result = profile.query(query, monitor);
 		UpdateOperation operation = new UpdateOperation(session, result.toUnmodifiableSet());
+		URI uri = null;
+	    try {
+	      uri = new URI(ECL1_UPDATE_SITE);
+	    } catch (final URISyntaxException e) {
+	      return null;
+	    }
+
+	    // set location of artifact and metadata repo
+	    operation.getProvisioningContext().setArtifactRepositories(new URI[] { uri });
+	    operation.getProvisioningContext().setMetadataRepositories(new URI[] { uri });
+	    
 		SubMonitor sub = SubMonitor.convert(monitor, "Checking for application updates...", 200);
 		IStatus status = operation.resolveModal(sub.newChild(100));
 		if (status.getCode() == UpdateOperation.STATUS_NOTHING_TO_UPDATE) {
