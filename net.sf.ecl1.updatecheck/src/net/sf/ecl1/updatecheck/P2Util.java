@@ -71,7 +71,7 @@ public class P2Util {
 	static IStatus checkForUpdates(IProvisioningAgent agent, IProgressMonitor monitor)
 			throws OperationCanceledException {
 		ProvisioningSession session = new ProvisioningSession(agent);
-		IQuery<IInstallableUnit> query = QueryUtil.createLatestQuery(QueryUtil.createIUQuery("h1modulesfeature"));
+		IQuery<IInstallableUnit> query = QueryUtil.createLatestQuery(QueryUtil.createIUQuery("h1modulesfeature.feature.group"));
 		UpdateCheckActivator.info("Update Query Expression: " + query.getExpression());
 		IProfileRegistry registry= (IProfileRegistry) agent.getService(IProfileRegistry.SERVICE_NAME);
 		final IProfile profile= registry.getProfile(IProfileRegistry.SELF);
@@ -125,12 +125,12 @@ public class P2Util {
 		}
 		//uncomment
 		//if(ecl1 != null) {
-			//operation.setSelectedUpdates(new Update[]{ecl1});
-			if (job == null) {
-				return new Status(IStatus.ERROR, UpdateCheckActivator.PLUGIN_ID,
-						"ProvisioningJob could not be created - does this application support p2 software installation?");
-			}
-			return job.runModal(sub.newChild(100));
+		//operation.setSelectedUpdates(new Update[]{ecl1});
+		if (job == null) {
+			return new Status(IStatus.ERROR, UpdateCheckActivator.PLUGIN_ID,
+					"ProvisioningJob could not be created - does this application support p2 software installation?");
+		}
+		return job.runModal(sub.newChild(100));
 		//}
 		//return new Status(Status.INFO, UpdateCheckActivator.PLUGIN_ID, "No update for ecl1 found.");
 	}
