@@ -3,7 +3,9 @@ package net.sf.ecl1.updatecheck;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -20,6 +22,7 @@ import org.eclipse.equinox.p2.metadata.MetadataFactory;
 import org.eclipse.equinox.p2.metadata.MetadataFactory.InstallableUnitDescription;
 import org.eclipse.equinox.p2.operations.ProvisioningJob;
 import org.eclipse.equinox.p2.operations.ProvisioningSession;
+import org.eclipse.equinox.p2.operations.Update;
 import org.eclipse.equinox.p2.operations.UpdateOperation;
 import org.eclipse.equinox.p2.query.IQuery;
 import org.eclipse.equinox.p2.query.IQueryResult;
@@ -95,16 +98,45 @@ public class P2Util {
 			// updates are available if there are multiples, differentiating
 			// patches vs. updates, etc. In this example, we simply update as
 			// suggested by the operation.
-			ProvisioningJob job = operation.getProvisioningJob(monitor);
-			if (job == null) {
-				return new Status(IStatus.ERROR, UpdateCheckActivator.PLUGIN_ID,
-						"ProvisioningJob could not be created - does this application support p2 software installation?");
-			}
-			status = job.runModal(sub.newChild(100));
+			
+			status = restrictUpdateToEcl1(operation, monitor, sub);
+			
 			if (status.getSeverity() == IStatus.CANCEL)
 				throw new OperationCanceledException();
 		}
 		return status;
+	}
+
+	private static IStatus restrictUpdateToEcl1(UpdateOperation operation, IProgressMonitor monitor, SubMonitor sub) {
+		ProvisioningJob job = operation.getProvisioningJob(monitor);
+		List<Update> chosenUpdates = Arrays.asList(operation.getPossibleUpdates());
+		Update ecl1 = null;
+		for (Update update : chosenUpdates) {
+			UpdateCheckActivator.info("Possible Update from " + update.toUpdate.getId() + " " + update.toUpdate.getVersion() + " to " + update.replacement.getVersion());
+			if(isEcl1(update)) {
+				UpdateCheckActivator.info("Is ecl1-Update: " + update.toUpdate.getId());
+				ecl1 = update;
+			}
+		}
+		//uncomment
+		//if(ecl1 != null) {
+			//operation.setSelectedUpdates(new Update[]{ecl1});
+			if (job == null) {
+				return new Status(IStatus.ERROR, UpdateCheckActivator.PLUGIN_ID,
+						"ProvisioningJob could not be created - does this application support p2 software installation?");
+			}
+			return job.runModal(sub.newChild(100));
+		//}
+		//return new Status(Status.INFO, UpdateCheckActivator.PLUGIN_ID, "No update for ecl1 found.");
+	}
+
+	private static boolean isEcl1(Update update) {
+		String updateId = update.toUpdate.getId();
+		if(updateId != null) {
+			
+			return true;
+		}
+		return false;
 	}
 
 }
