@@ -101,8 +101,13 @@ public class P2Util {
 			
 			status = restrictUpdateToEcl1(operation, monitor, sub);
 			
-			if (status.getSeverity() == IStatus.CANCEL)
+			if (status.getSeverity() == IStatus.CANCEL) {
+				UpdateCheckActivator.error(status.getMessage());
+				if(status.getException() != null) {
+					UpdateCheckActivator.log(status.getException());
+				}
 				throw new OperationCanceledException();
+			}
 		}
 		return status;
 	}
@@ -114,7 +119,7 @@ public class P2Util {
 		for (Update update : chosenUpdates) {
 			UpdateCheckActivator.info("Possible Update from " + update.toUpdate.getId() + " " + update.toUpdate.getVersion() + " to " + update.replacement.getVersion());
 			if(isEcl1(update)) {
-				UpdateCheckActivator.info("Is ecl1-Update: " + update.toUpdate.getId());
+				UpdateCheckActivator.info("Is an ecl1-Update: " + update.toUpdate.getId());
 				ecl1 = update;
 			}
 		}

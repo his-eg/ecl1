@@ -65,8 +65,12 @@ public class UpdateCheckActivator extends AbstractUIPlugin {
 		}
 	}
 	
-	public static void log(Exception e) {
+	public static void log(Throwable e) {
 		log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
+	}
+
+	public static void error(String message) {
+		log(new Status(IStatus.ERROR, PLUGIN_ID, message));
 	}
 
 }
