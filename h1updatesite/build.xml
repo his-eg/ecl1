@@ -20,13 +20,13 @@
 	</path>
 	
 	<target name="sign">
-		<!--<signjar alias="${keystore.alias}" keystore="${keystore}" 
-			storepass="${keystore.password}" lazy="true">
+		<signjar alias="${keystore.alias}" keystore="${keystore}" 
+			storepass="${keystore.password}" lazy="true" tsaurl="http://tsa.starfieldtech.com">
 			<path>
 				<path refid="plugins"/>
 				<path refid="features"/>
 			</path>
-		</signjar>-->
+		</signjar>
 	</target>
 	
 	<target name="zip">
