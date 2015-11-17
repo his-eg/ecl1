@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="extension.base" default="jar">
+<project name="extensionbase" default="jar">
 	<description>
             Build Script for HISinOne Extension
     </description>
 	
-	<property environment="env" /> 
+	<!-- Umgebungsvariablen sollen in den Builds verfügbar sein -->
+	<property environment="env"/>
 
 	<!-- Lokal koennen per Propertiesdatei Werte Ueberschrieben werden -->
 	<property file="${user.name}.ant.properties" />
@@ -40,7 +41,8 @@
 	<property name="cobertura-dir" value="${qisserver-lib-compile}" />
 	<property name="src-java" value="src/java"/>
 	<property name="src-test" value="src/test"/>
-	<property name="test-resource" location="resource"/>
+	<property name="test-resource" location="resource" />
+	<property name="resource-web" location="${test-resource}/web" />
 	<property name="pitreport" location="pitReports"/>
 	<property name="pithistory" location="${build}/history"/>
 
@@ -50,7 +52,7 @@
 	</path>
 	
 	<import file="compile-classpath.xml" optional="true" />
-	
+		
 	<path id="compile-classpath">
 		<pathelement location="${qisserver-classes}"/>
 		<fileset dir="${qisserver-lib}">
@@ -146,6 +148,7 @@
 		<javac destdir="${classes-target}" debug="on" debuglevel="source,lines,vars" includeantruntime="false" source="1.7" target="1.7" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
 			<compilerarg line="-encoding utf-8"/>
 			<compilerarg line="-enableJavadoc" />
+	                <compilerarg line="-properties .settings/org.eclipse.jdt.core.prefs"/>
 			<classpath refid="compile-classpath" />
 			<src refid="compile-sourcepath" />
 		</javac>
@@ -161,12 +164,16 @@
 	
 	<target name="git-data">
 	    <condition property="repository.version" value="${env.BUILD_TAG}-${env.GIT_COMMIT}" else="unknown">
-            <isset property="env.BUILD_TAG"/>
+            	<isset property="env.BUILD_TAG"/>
 	    </condition>
 	</target>
 	
 	<target name="jar-with-contribution" depends="git-data,compile" description="Extension JAR für die Distribution erzeugen" if="has-contribs">
-		<jar destfile="${target-file}" basedir="${classes-target}" index="true" >
+		<jar destfile="${target-file}" index="true" >
+			<fileset dir="${classes-target}" />
+			<fileset dir="${src-java}">
+				<filename name="**/*.java" />
+			</fileset>
 			<manifest>
 				<attribute name="Extension-Name" value="${extension.name}"/>
 				<attribute name="Extension-Version" value="${extension.version}"/>
@@ -177,7 +184,11 @@
 	</target>
 	
 	<target name="jar-without-contribution" depends="git-data,compile" description="Extension JAR für die Distribution erzeugen" unless="has-contribs">
-		<jar destfile="${target-file}" basedir="${classes-target}" index="true" >
+		<jar destfile="${target-file}" index="true" >
+			<fileset dir="${classes-target}" />
+			<fileset dir="${src-java}">
+				<filename name="**/*.java" />
+			</fileset>
 			<manifest>
 				<attribute name="Extension-Name" value="${extension.name}"/>
 				<attribute name="Extension-Version" value="${extension.version}"/>
@@ -199,6 +210,7 @@
 		<javac srcdir="src/test" destdir="${test-target}" debug="on" includeantruntime="false" source="1.7" target="1.7" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
 			<compilerarg line="-encoding utf-8"/>
 			<compilerarg line="-enableJavadoc" />
+	                <compilerarg line="-properties .settings/org.eclipse.jdt.core.prefs"/>
 			<classpath refid="compile-test-classpath" />
 			<sourcepath refid="compile-test-sourcepath" />
 		</javac>
@@ -305,6 +317,30 @@
 		<property name="latest-build-result" value="${build-server}job/${extension.name}_${cvs.tag}/lastSuccessfulBuild/artifact/dist/${extension.name}.jar" />
 		
 		<get dest="${qisserver-extensions}/${extension.name}.jar" src="${latest-build-result}"/>
+	</target>
+
+	<target name="pre-js">
+		<condition property="is-js-project">
+			<resourceexists>
+				<file file="${resource-web}/package.json" />
+			</resourceexists>
+		</condition>
+	</target>
+	
+	<target name="js" if="is-js-project" depends="pre-js">
+			
+			<condition property="cs.sys.horizon.core.loc" value="." else="${cs.sys.horizon.core}">
+				<equals arg1="${extension.name}" arg2="cs.sys.horizon.core" />
+			</condition>
+			
+			<exec dir="${cs.sys.horizon.core.loc}/resource/web/" executable="npm">
+				<arg line="install"/>
+			</exec>
+			
+			<exec dir="${cs.sys.horizon.core.loc}/resource/web/" executable="grunt">
+				<arg line="jenkins --path ${resource-web}/"/>
+			</exec>
+			
 	</target>
 
 	<import file="additional-targets.xml" optional="false" />
