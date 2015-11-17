@@ -10,6 +10,7 @@
 		<fileset dir="plugins">
 			<include name="*.jar"/>
 			<exclude name="com.google*.jar" />
+			<exclude name="org.apache*.jar" />
 		</fileset>
 	</path>
 	
