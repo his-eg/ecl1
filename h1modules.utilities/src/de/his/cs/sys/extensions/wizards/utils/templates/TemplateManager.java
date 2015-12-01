@@ -21,7 +21,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
@@ -127,6 +129,10 @@ public class TemplateManager {
         IFile file = project.getFile(doFolderAndFileRenaming(this.templatePath));
         InputStream is = new ByteArrayInputStream(getContent().getBytes());
         try {
+        	IContainer parent = file.getParent();
+        	if(parent instanceof IFolder) {
+        		prepareFolder((IFolder) parent);
+        	}
             file.create(is, true, null);
         } catch (CoreException e) {
             System.out.println("Error creating file from template '" + this.templatePath + "': " + e.getMessage());
@@ -149,6 +155,16 @@ public class TemplateManager {
             replacedFileName = replacedFileName.replace(replacement.getKey(), replacement.getValue());
         }
         return replacedFileName;
+    }
+    
+    private void prepareFolder(IFolder folder) throws CoreException {
+      IContainer parent = folder.getParent();
+      if (parent instanceof IFolder){
+        prepareFolder((IFolder) parent);
+      }
+      if (!folder.exists()){
+        folder.create(true, true, null);
+      }
     }
 
 }
