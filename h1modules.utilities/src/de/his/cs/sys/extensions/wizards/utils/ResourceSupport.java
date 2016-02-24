@@ -1,6 +1,7 @@
 package de.his.cs.sys.extensions.wizards.utils;
 
-import static de.his.cs.sys.extensions.wizards.utils.HISConstants.TEMPLATES_ROOT_URL;
+import static net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URL;
+import h1modules.utilities.utils.Activator;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
@@ -67,7 +68,10 @@ public class ResourceSupport {
         this.extensionAntPropertiesReplacements.put("[conditionelements]", createConditionElements());
         this.extensionAntPropertiesReplacements.put("[pathelements]", createPathElements());
 
-        Iterable<String> templates = new TemplateFetcher(TEMPLATES_ROOT_URL + "/templatelist.txt").getTemplates();
+        String templateRootUrlPreferenceValue = Activator.getPreferences().getString(TEMPLATE_ROOT_URL);
+		String templateListSourceUrl = templateRootUrlPreferenceValue + "/templatelist.txt";
+		System.out.println("Loading template list from '" + templateListSourceUrl + "'");
+		Iterable<String> templates = new TemplateFetcher(templateListSourceUrl).getTemplates();
         for (String template : templates) {
             new TemplateManager(template, extensionAntPropertiesReplacements).writeContent(project);
         }

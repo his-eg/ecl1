@@ -1,5 +1,6 @@
 package h1modules.utilities.utils;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -42,6 +43,11 @@ public class Activator extends AbstractUIPlugin {
 
     public static Activator getDefault() {
         return plugin;
+    }
+    
+    public static IPreferenceStore getPreferences() {
+        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+        return store;
     }
 
 }

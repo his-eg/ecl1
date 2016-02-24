@@ -9,7 +9,9 @@
  */
 package de.his.cs.sys.extensions.wizards.utils.templates;
 
-import static de.his.cs.sys.extensions.wizards.utils.HISConstants.TEMPLATES_ROOT_URL;
+import static net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URL;
+
+import h1modules.utilities.utils.Activator;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -80,7 +82,8 @@ public class TemplateManager {
         URL templateUrl;
         InputStream templateStream = null;
         try {
-            String fullTemplateUrlString = TEMPLATES_ROOT_URL + "/" + templatePath;
+        	String templateRootUrl = Activator.getPreferences().getString(TEMPLATE_ROOT_URL);
+            String fullTemplateUrlString = templateRootUrl + "/" + templatePath;
             System.out.println("Loading template from: " + fullTemplateUrlString);
             templateUrl = new URL(fullTemplateUrlString);
             templateStream = templateUrl.openStream();

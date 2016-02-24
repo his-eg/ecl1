@@ -22,9 +22,4 @@ public interface HISConstants {
      */
     public static final String WEBAPPS = "webapps";
 
-    /**
-     * Root URL for project template files
-     */
-    public static final String TEMPLATES_ROOT_URL = "http://ecl1.sourceforge.net/templates";
-
 }

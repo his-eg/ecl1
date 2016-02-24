@@ -21,6 +21,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE, "ssh://git@git.his.de/");
         store.setDefault(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE, "http://build.his.de/build/");
         store.setDefault(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, "HEAD");
+        store.setDefault(ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URL, "http://ecl1.sourceforge.net/templates");
     }
 
 }

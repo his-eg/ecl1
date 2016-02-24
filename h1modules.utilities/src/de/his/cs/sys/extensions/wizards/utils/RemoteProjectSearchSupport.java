@@ -52,7 +52,7 @@ public class RemoteProjectSearchSupport {
     private static final String JENKINS_API_ADDITION = "/api/json";
 
     public Collection<String> getProjects() {
-        IPreferenceStore store = getPreferenceStore();
+        IPreferenceStore store = Activator.getPreferences();
         String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE);
         String buildServerView = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE);
         String lookUpTarget = buildServer + JENKINS_VIEW_INFIX + buildServerView + JENKINS_API_ADDITION;
@@ -63,11 +63,6 @@ public class RemoteProjectSearchSupport {
             result.addAll(view.getBuildJobNames());
         }
         return result;
-    }
-
-    private IPreferenceStore getPreferenceStore() {
-        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-        return store;
     }
 
 }

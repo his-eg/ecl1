@@ -19,5 +19,10 @@ public class ExtensionToolsPreferenceConstants {
      * Preference for search view on jenkins build server
      */
     public static final String BUILD_SERVER_VIEW_PREFERENCE = "buildServerView";
+    
+    /**
+     * Preference for the root URL of the templates
+     */
+    public static final String TEMPLATE_ROOT_URL = "templateRootUrl";
 
 }
