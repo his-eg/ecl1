@@ -42,10 +42,8 @@ implements IWorkbenchPreferencePage {
     public void createFieldEditors() {
         gitServer = new StringFieldEditor(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE, "GIT Server:", getFieldEditorParent());
         buildServer = new StringFieldEditor(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE, "Build Server:", getFieldEditorParent());
-        templateRootUrl = new StringFieldEditor(ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URL, "Template Root URL:", getFieldEditorParent());
         addField(gitServer);
         addField(buildServer);
-        addField(templateRootUrl);
         addField(new StringFieldEditor(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, "Search view on Build Server (Branches):", getFieldEditorParent()));
     }
 
@@ -78,10 +76,6 @@ implements IWorkbenchPreferencePage {
         }
         if (!NetUtil.canOpenSocket(gitServerValue)) {
             errors.add("Cannot reach Git Server '" + gitServerValue + "'");
-        }
-        String templateRoot = templateRootUrl.getStringValue();
-		if (!NetUtil.canOpenSocket(templateRoot)) {
-        	errors.add(String.format("Cannot reach template root URL '%s'", templateRoot));
         }
         if(!errors.isEmpty()) {
             setErrorMessage(Joiner.on("\n").join(errors));
