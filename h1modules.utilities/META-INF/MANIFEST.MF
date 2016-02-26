@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Utilities for H1 extension tools
 Bundle-SymbolicName: net.sf.ecl1.utilities;singleton:=true
-Bundle-Version: 0.4.0.2016-02-24
+Bundle-Version: 0.4.1.2016-02-26
 Bundle-Activator: h1modules.utilities.utils.Activator
 Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  org.eclipse.core.resources;visibility:=reexport,
@@ -11,14 +11,16 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  com.google.gson;bundle-version="2.2.4",
  org.apache.httpcomponents.httpclient;bundle-version="4.2.6",
  org.apache.httpcomponents.httpcore;bundle-version="4.2.5",
- org.eclipse.ui
+ org.eclipse.ui,
+ org.junit
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Export-Package: de.his.cs.sys.extensions.wizards.utils;uses:="org.eclipse.core.resources",
  de.his.cs.sys.extensions.wizards.utils.templates,
  h1modules.utilities.utils,
  net.sf.ecl1.utilities.preferences
-Import-Package: org.eclipse.jdt.core,
+Import-Package: org.apache.commons.io,
+ org.eclipse.jdt.core,
  org.eclipse.team.ui
 Bundle-Vendor: HIS eG
 Bundle-ClassPath: lib/javax.ws.rs-api-2.0-m09.jar,
