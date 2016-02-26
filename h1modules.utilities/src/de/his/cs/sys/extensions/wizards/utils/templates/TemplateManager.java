@@ -79,14 +79,11 @@ public class TemplateManager {
      */
     public String getContent() {
         StringBuilder result = new StringBuilder();
-        URL templateUrl;
-        InputStream templateStream = null;
-        try {
+        
+        try (InputStream templateStream = DownloadHelper.getInputStreamFromUrlFollowingRedirects(templatePath);){
         	String templateRootUrl = Activator.getPreferences().getString(TEMPLATE_ROOT_URL);
             String fullTemplateUrlString = templateRootUrl + "/" + templatePath;
             System.out.println("Loading template from: " + fullTemplateUrlString);
-            templateUrl = new URL(fullTemplateUrlString);
-            templateStream = templateUrl.openStream();
             BufferedReader br = new BufferedReader(new InputStreamReader(templateStream));
             String line = "";
             while((line = br.readLine() )!= null) {
@@ -104,20 +101,6 @@ public class TemplateManager {
             System.err.println("Erro fetching Template: " + e.getMessage());
             System.err.println("TemplatePath: " + this.templatePath);
             System.err.println("Variables: " + this.variables);
-        } finally {
-            if(templateStream != null) {
-                try {
-                    templateStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    System.out.println("Erro fetching Template: " + e.getMessage());
-                    System.out.println("TemplatePath: " + this.templatePath);
-                    System.out.println("Variables: " + this.variables);
-                    System.err.println("Erro fetching Template: " + e.getMessage());
-                    System.err.println("TemplatePath: " + this.templatePath);
-                    System.err.println("Variables: " + this.variables);
-                }
-            }
         }
         return result.toString().trim();
     }

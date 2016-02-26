@@ -34,21 +34,16 @@ public class TemplateFetcher {
      */
     public Iterable<String> getTemplates() {
         HashSet<String> result = Sets.newHashSet();
-        try {
-            URL templateListUrl = new URL(templateListSourceUrl);
-            try (InputStream is = templateListUrl.openStream();) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(is));
-                String line = "";
-                while ((line = br.readLine()) != null) {
-                    result.add(line);
-                    System.out.println("TemplateFetcher found template '" + line + "' for download.");
-                }
-            } catch (IOException e) {
-                System.out.println("Could not download template list from " + templateListSourceUrl);
-                System.err.println("Could not download template list from " + templateListSourceUrl);
-                e.printStackTrace();
+        try (InputStream is = DownloadHelper.getInputStreamFromUrlFollowingRedirects(templateListSourceUrl);) {
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
+            String line = "";
+            while ((line = br.readLine()) != null) {
+                result.add(line);
+                System.out.println("TemplateFetcher found template '" + line + "' for download.");
             }
-        } catch (MalformedURLException e) {
+        } catch (IOException e) {
+            System.out.println("Could not download template list from " + templateListSourceUrl);
+            System.err.println("Could not download template list from " + templateListSourceUrl);
             e.printStackTrace();
         }
         return result;
