@@ -1,1 +1,7 @@
 /build.ant-private.properties
+/ca.pem
+/cert.cert
+/csr.csr
+/*.ks
+/*.ks
+/updatesite*.zip
