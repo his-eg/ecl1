@@ -55,6 +55,9 @@
 		<exec executable="rsync" dir=".">
 			<arg line="-a --delete -e ssh features plugins web artifacts.jar content.jar index.html site.xml ${sourceforge.user}@frs.sourceforge.net:/home/frs/project/ecl1/updatesite/" />
 		</exec>
+		<exec executable="rsync" dir=".">
+			<arg line="-a --delete -e ssh README.md ${sourceforge.user}@frs.sourceforge.net:/home/frs/project/ecl1/" />
+		</exec>
 	</target>
 	
 	<!--target name="update-website">
