@@ -3,6 +3,9 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 0.6.2.2016-03-01##
+* Bugfix: Projects containing a non-empty file named config lead to an error
+
 ##Version 0.6.1.2016-02-29##
 * Feature: Increase logging of batch pull
 * Bugfix: Catch previously uncaught exceptions in batch pull
