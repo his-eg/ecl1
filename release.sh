@@ -19,7 +19,6 @@ VERSION=$1
 cd h1updatesite
 ant sign
 git commit -am "Signed update site artifacts for version ${VERSION}"
-
 cd ..
 
 # Website
@@ -45,4 +44,6 @@ git push
 # upload update site and update site archive
 cd h1updatesite
 ant upload
+# Remove update site archive
+rm updatesite*.zip
 cd ..
