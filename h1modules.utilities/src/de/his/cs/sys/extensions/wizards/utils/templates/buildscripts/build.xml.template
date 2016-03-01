@@ -267,36 +267,6 @@
 		</cobertura-report>
 	</target>
 	
-	<!-- Pitest ausführen -->
-	<target name="mutationtest" depends="cobertura-report" >
-		<!-- Benötigte Pitest und JUnit jars -->
-		<path id="pitest.path">
-			<pathelement location="${qisserver-webinf}/internal/ant/lib/pitest-1.1.4.jar" />
-			<pathelement location="${qisserver-webinf}/internal/ant/lib/pitest-ant-1.1.4.jar" />
-			<pathelement location="${qisserver-lib}/junit-*.jar" />
-		</path>
-			
-		<taskdef name="pitest" classname="org.pitest.ant.PitestTask" classpathref="pitest.path" />
-
-		<path id="mutation.path">
-			<path refid="pitest.path"/>
-			<path refid="compile-test-classpath"/>
-		</path>	
-		<!-- hier anpassen -->
-		<pitest pitClasspath="pitest.path"  
-			classPath="mutation.path" 
-			targetTests="de.his.appclient.jsf.cs.sys.test.*,de.his.appserver.model.cs.sys.test.*,de.his.appserver.persistence.dao.impl.hibernate.cs.sys.quality.management.*"
-			targetClasses="de.his.appclient.jsf.cs.sys.quality.management.*, de.his.appserver.model.*, de.his.appserver.persistence.dao.*" 
-			reportDir="${pitreport}" 
-			sourceDir="${src-java},${src-test}" 
-			jvmArgs="-Xmx1075m,-XX:MaxPermSize=512M,-Dfile.encoding=utf-8"
-			timeoutfactor="2000"
-			threads="4"
-			outputformats="HTML,XML"
-			historyinputlocation="${pithistory}"
-			historyoutputlocation="${pithistory}"/>
-	</target>
-	
 	<target name="update-webapps">
 		<loadfile property="cvs.tag" srcFile="${webapps}/CVS/Tag" failonerror="false">
 	        <filterchain>
