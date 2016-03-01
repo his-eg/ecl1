@@ -42,7 +42,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 				for (IProject p : projects) {
 					String name = p.getName();
 					monitor.subTask("Pulling " + name);
-					File projectLocationFile = p.getLocation().toFile();
+					File projectLocationFile = p.getLocation().append(".git").toFile();
 					info(name + " with location " + projectLocationFile.getAbsolutePath());
 
 					try {
@@ -54,7 +54,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 								try {
 									PullCommand pull = git.pull();
 									pull.setRemote(remote);
-									info(name + "has remotes. Starting to pull remote '" + remote + "'.");
+									info(name + " has remotes. Starting to pull remote '" + remote + "'.");
 									pull.call();
 								} catch (GitAPIException | JGitInternalException e) {
 									error("Error pulling from " + name + ": " + e.getMessage() + ". Skipping and proceeding.");
