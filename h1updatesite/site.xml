@@ -147,7 +147,7 @@
    <feature url="features/h1modulesfeature_0.6.1.2016-02-29.jar" id="h1modulesfeature" version="0.6.1.2016-02-29">
       <category name="de.his.cs.sys.extensions"/>
    </feature>
-   <feature url="features/h1modulesfeature_0.6.2.2016-03-01.jar" id="h1modulesfeature" version="0.6.2.2016-03-01">
+   <feature url="features/h1modulesfeature_0.6.3.2016-04-11.jar" id="h1modulesfeature" version="0.6.3.2016-04-11">
       <category name="de.his.cs.sys.extensions"/>
    </feature>
    <category-def name="de.his.cs.sys.extensions" label="Extension Tools"/>
