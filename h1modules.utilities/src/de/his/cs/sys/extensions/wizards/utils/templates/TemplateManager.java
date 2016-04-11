@@ -79,10 +79,11 @@ public class TemplateManager {
      */
     public String getContent() {
         StringBuilder result = new StringBuilder();
+        String templateRootUrl = Activator.getPreferences().getString(TEMPLATE_ROOT_URL);
+        String fullTemplateUrlString = templateRootUrl + "/" + templatePath;
         
-        try (InputStream templateStream = DownloadHelper.getInputStreamFromUrlFollowingRedirects(templatePath);){
-        	String templateRootUrl = Activator.getPreferences().getString(TEMPLATE_ROOT_URL);
-            String fullTemplateUrlString = templateRootUrl + "/" + templatePath;
+        try (InputStream templateStream = DownloadHelper.getInputStreamFromUrlFollowingRedirects(fullTemplateUrlString);){
+        	
             System.out.println("Loading template from: " + fullTemplateUrlString);
             BufferedReader br = new BufferedReader(new InputStreamReader(templateStream));
             String line = "";
