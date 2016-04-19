@@ -9,6 +9,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources,
  net.sf.ecl1.utilities,
  org.eclipse.jgit,
- org.eclipse.wb.core.lib
+ com.google.guava;bundle-version="15.0.0",
+ org.apache.commons.io;bundle-version="2.2.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Import-Package: org.eclipse.core.runtime
