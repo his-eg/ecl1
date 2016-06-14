@@ -12,8 +12,8 @@
         <path refid="compile-classpath" />
     </path>
 
-    <taskdef name="macker" classname="net.innig.macker.ant.MackerAntTask" classpathref="macker.classpath" />
-    <taskdef name="macker-report" classname="net.innig.macker.ant.MackerReportAntTask" classpathref="macker.classpath" />
+    <taskdef name="macker" classname="de.andrena.tools.macker.ant.MackerAntTask" classpathref="macker.classpath" />
+    <taskdef name="macker-report" classname="de.andrena.tools.macker.ant.MackerReportAntTask" classpathref="macker.classpath" />
     
 	<target name="macker-clean">
 		<delete failonerror="false">
