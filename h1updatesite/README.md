@@ -3,11 +3,14 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 0.6.6.2016-09-13##
+* Bugfix: Update Site was broken
+
 ##Version 0.6.5.2016-04-19##
-* Bugfix: Broken dependencies of import wizard fixed 
+* Bugfix: Broken dependencies of import wizard fixed
 
 ##Version 0.6.4.2016-04-12##
-* Feature: Signed features and plugins 
+* Feature: Signed features and plugins
 
 ##Version 0.6.3.2016-04-11##
 * Bugfix: TemplateManager computed the download URL for templates wrong
