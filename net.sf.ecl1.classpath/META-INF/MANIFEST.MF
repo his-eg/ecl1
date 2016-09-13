@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: ecl1 Classpath Container Provider
 Bundle-SymbolicName: net.sf.ecl1.classpath;singleton:=true
-Bundle-Version: 0.2.3.2016-04-12
+Bundle-Version: 0.2.4.2016-09-13
 Bundle-Activator: net.sf.ecl1.classpath.Activator
 Bundle-Vendor: HIS eG
 Require-Bundle: org.eclipse.ui,
