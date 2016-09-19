@@ -2,22 +2,24 @@ package de.his.cs.sys.extensions.wizards.utils;
 
 import h1modules.utilities.utils.Activator;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.TreeSet;
 
 import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
- * Read remote projects from a jenkins view
- * Constants default to HIS context
+ * Read remote projects from a jenkins view.
+ * Constants default to HIS context.
  *
  * @author keunecke
  */
 public class RemoteProjectSearchSupport {
-
+    
     private class BuildJob {
 
         private String name;
@@ -44,18 +46,22 @@ public class RemoteProjectSearchSupport {
         }
     }
 
-    private static final String JENKINS_VIEW_INFIX = "view/";
+    public static final String JENKINS_VIEW_INFIX = "view/";
+    public static final String JENKINS_JOB_INFIX = "job/";
+    public static final String JENKINS_WORKSPACE_INFIX = "/ws/";
+    
+    /** Jenkins default addition for REST api calls */
+    public static final String JENKINS_API_ADDITION = "/api/json";
 
-    /**
-     * Jenkins default addition for REST api calls
-     */
-    private static final String JENKINS_API_ADDITION = "/api/json";
+    /** Jenkins addition to view files */
+    public static final String JENKINS_VIEW_ADDITION = "/*view*/";
 
     public Collection<String> getProjects() {
         IPreferenceStore store = Activator.getPreferences();
-        String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE);
-        String buildServerView = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE);
+        String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE); // z.B. "http://build.his.de/build/"
+        String buildServerView = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE); // branch
         String lookUpTarget = buildServer + JENKINS_VIEW_INFIX + buildServerView + JENKINS_API_ADDITION;
+        System.out.println("getProjects(): lookUpTarget = " + lookUpTarget);
         TreeSet<String> result = new TreeSet<String>();
         InputStream jsonStream = RestUtil.getJsonStream(lookUpTarget);
         if (jsonStream != null) {
@@ -65,4 +71,36 @@ public class RemoteProjectSearchSupport {
         return result;
     }
 
+    /**
+     * Returns the content of an extension project file from Jenkins as a String, or null if the file does not exist.
+     * @param extension The name of the extension project from which to get the file
+     * @param fileName the name of the file, relative to the extension project base folder
+     * @return String or null if the file does not exist
+     */
+    public String getRemoteFileContent(String extension, String fileName) {
+        IPreferenceStore store = Activator.getPreferences();
+        String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE); // z.B. "http://build.his.de/build/"
+        String buildServerView = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE); // branch
+        //String lookUpTarget = "http://build.his.de/build/job/cm.exa.common_HEAD/ws/.classpath/*view*/";
+        String lookUpTarget = buildServer + JENKINS_JOB_INFIX + extension + "_" + buildServerView + JENKINS_WORKSPACE_INFIX + fileName + JENKINS_VIEW_ADDITION;
+        System.out.println("getRemoteFileContent(): lookUpTarget = " + lookUpTarget);
+    	InputStream inStream = RestUtil.getJsonStream(lookUpTarget);
+    	if (inStream == null) {
+    		// wrong URL, file doesn't exist? 
+    		return null;
+    	}
+    	String fileContent = null;
+    	try {
+    		fileContent = IOUtils.toString(inStream);
+    	} catch (IOException ioe) {
+    		System.out.println("IOException reading remote file: " + ioe);
+    	}
+    	try {
+    		inStream.close();
+    	} catch (IOException ioe) {
+    		System.out.println("IOException closing InputStream: " + ioe);
+    	}
+    	System.out.println("result = "  + fileContent);
+    	return fileContent;
+    }
 }
