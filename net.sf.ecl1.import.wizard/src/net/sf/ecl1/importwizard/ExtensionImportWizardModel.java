@@ -36,19 +36,19 @@ public class ExtensionImportWizardModel {
     
 	private static final String JENKINS_WEBAPPS_NAME = "/webapps";
 
-    private RemoteProjectSearchSupport remoteProjectSearchSupport = null;
+    private RemoteProjectSearchSupport remoteProjectSearchSupport;
     
     // actual branch
-    private String branch = null;
+    private String branch;
     
     // All extensions existing on repo server
-    private Set<String> remoteExtensions = null;
+    private Set<String> remoteExtensions;
 
     // All extensions existing in workspace
-    private Set<String> extensionsInWorkspace = null;
+    private Set<String> extensionsInWorkspace;
 
     // Extensions chosen by the user for installation
-    private Set<String> selectedExtensions = null;
+    private Set<String> selectedExtensions;
 
     // map from extension to the extensions they need.
     // a null list means that the extension dependency has not been initialized yet.
@@ -58,19 +58,22 @@ public class ExtensionImportWizardModel {
     private Collection<String> dependencyExtensions = null;
 
     public ExtensionImportWizardModel() {
+    	initBranch();
     	remoteProjectSearchSupport = new RemoteProjectSearchSupport();
     	initRemoteExtensions();
         initExtensionsInWorkspace();
         extensions2dependencyExtensions = new HashMap<String, List<String>>();
     }
-    
-    /**
-     * @return Jenkins access helper
-     */
-    RemoteProjectSearchSupport getRemoteProjectSearchSupport() {
-    	return remoteProjectSearchSupport;
+
+    private void initBranch() {
+        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+        branch = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE);
     }
-    
+
+    String getBranch() {
+    	return branch;
+    }
+
     /**
      * Read remote extensions from configured build server.
      */
@@ -91,29 +94,19 @@ public class ExtensionImportWizardModel {
     Collection<String> getRemoteExtensions() {
     	return remoteExtensions;
     }
-
-    String getBranch() {
-    	if (branch==null) {
-            IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-            branch = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE);
-    	}
-    	return branch;
-    }
     
     /**
      * Read extensions already present in workspace.
      */
     private void initExtensionsInWorkspace() {
     	extensionsInWorkspace = new TreeSet<String>();
-        Collection<String> result = new ArrayList<String>();
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
         IWorkspaceRoot root = workspace.getRoot();
         IProject[] projects = root.getProjects();
         for (IProject iProject : projects) {
             String name = iProject.getName();
-            result.add(name);
+            extensionsInWorkspace.add(name);
         }
-        extensionsInWorkspace.addAll(result);
     }
 
 	Set<String> getExtensionsInWorkspace() {
@@ -125,7 +118,7 @@ public class ExtensionImportWizardModel {
 	}
 	
 	Set<String> getSelectedExtensions() {
-		return this.selectedExtensions;
+		return selectedExtensions;
 	}
     
 	/**
@@ -161,7 +154,7 @@ public class ExtensionImportWizardModel {
 	 * @param extension
 	 * @return list of extension names
 	 */
-	List<String> findFlatDependencyExtensions(String extension) {
+	private List<String> findFlatDependencyExtensions(String extension) {
 		List<String> dependencyExtensions = extensions2dependencyExtensions.get(extension);
 		if (dependencyExtensions != null) {
 			return dependencyExtensions;
