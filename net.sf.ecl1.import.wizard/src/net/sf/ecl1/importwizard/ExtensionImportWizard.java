@@ -122,7 +122,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
                     }
                 }
                 if (!extensionsWithDeleteErrors.isEmpty()) {
-                	// set error message but continue import
+                	// set error message
                     page2.setErrorMessage(String.format(ERROR_MESSAGE_DELETE_FAILED, extensionsWithDeleteErrors));
                     return false; // TODO: Try import anyway?
                 }
