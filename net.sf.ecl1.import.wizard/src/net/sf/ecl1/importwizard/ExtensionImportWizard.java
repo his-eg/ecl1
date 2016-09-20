@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.concurrent.TimeUnit;
 
 import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 
@@ -26,6 +27,11 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
@@ -94,50 +100,91 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     	return canFinish;
     }
     
-    /* (non-Javadoc)
+    /**
+     * Finish the extension import.
+     * This is implemented such that progress monitoring is available.
      * @see org.eclipse.jface.wizard.Wizard#performFinish()
      */
     @Override
     public boolean performFinish() {
-        Collection<String> extensionsToImport = new HashSet<String>(model.getSelectedExtensions()); // copy
+    	// variables to be used in the Job class implementation must be final
+        final Collection<String> extensionsToImport = new HashSet<String>(model.getSelectedExtensions()); // copy
         extensionsToImport.addAll(model.getDeepDependencyExtensions());
-        boolean openProjectsAfterImport = page2.openProjectsAfterImport();
-        Collection<String> existingFolders = checkForExistingFolders(extensionsToImport);
-        String extensionsString = Joiner.on(",").join(existingFolders);
+        final boolean openProjectsAfterImport = page2.openProjectsAfterImport();
+        final Collection<String> existingFolders = checkForExistingFolders(extensionsToImport);
+        final String extensionsString = Joiner.on(",").join(existingFolders);
 
-        if (!existingFolders.isEmpty()) {
-            if (page2.deleteFolders()) {
-            	ArrayList<String> extensionsWithDeleteErrors = new ArrayList<String>();
-                for (String extension : existingFolders) {
-                    IWorkspace workspace = ResourcesPlugin.getWorkspace();
-                    IWorkspaceRoot root = workspace.getRoot();
-                    File workspaceFile = root.getLocation().toFile();
-                    File extensionFolder = new File(workspaceFile, extension);
-                    try {
-                        FileUtils.deleteDirectory(extensionFolder);
-                    } catch (IOException e) {
-                    	extensionsWithDeleteErrors.add(extension);
-                    	System.err.println("Extension " + extension + " could not be deleted from workspace");
-                        e.printStackTrace();
+        // progress steps
+        final int totalSteps = existingFolders.size() + extensionsToImport.size();
+        		
+    	Job job = new Job("Extension Import") {
+	        @Override
+	        protected IStatus run(IProgressMonitor monitor) {
+                // convert to SubMonitor and set total number of work units
+                SubMonitor subMonitor = SubMonitor.convert(monitor, totalSteps);
+                // first part of the job: delete projects from workspace (if requested)
+                if (!existingFolders.isEmpty()) {
+                    if (page2.deleteFolders()) {
+                    	ArrayList<String> extensionsWithDeleteErrors = new ArrayList<String>();
+                        for (String extension : existingFolders) {
+		                    try {
+		                        // sleep a second
+		                        TimeUnit.SECONDS.sleep(1);
+		
+		                        // set the name of the current work
+		                        subMonitor.setTaskName("Delete extension project from workspace: " + extension);
+		
+		                        // do one task
+		                        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		                        IWorkspaceRoot root = workspace.getRoot();
+		                        File workspaceFile = root.getLocation().toFile();
+		                        File extensionFolder = new File(workspaceFile, extension);
+		                        try {
+		                            FileUtils.deleteDirectory(extensionFolder);
+		                        } catch (IOException e) {
+		                        	extensionsWithDeleteErrors.add(extension);
+		                        	System.err.println("Extension " + extension + " could not be deleted from workspace");
+		                            e.printStackTrace();
+		                        }
+		                        // reduce total work by 1
+		                        subMonitor.split(1);
+		                    } catch (InterruptedException e) {
+		                    	return Status.CANCEL_STATUS;
+		                    }
+                        }
+                        if (!extensionsWithDeleteErrors.isEmpty()) {
+                        	// set error message
+                            page2.setErrorMessage(String.format(ERROR_MESSAGE_DELETE_FAILED, extensionsWithDeleteErrors));
+                            return Status.CANCEL_STATUS; // TODO: Try import anyway?
+                        }
+                    } else {
+                    	page2.setErrorMessage(String.format(ERROR_MESSAGE_EXISTING_FOLDER, extensionsString));
+                        return Status.CANCEL_STATUS;
                     }
                 }
-                if (!extensionsWithDeleteErrors.isEmpty()) {
-                	// set error message
-                    page2.setErrorMessage(String.format(ERROR_MESSAGE_DELETE_FAILED, extensionsWithDeleteErrors));
-                    return false; // TODO: Try import anyway?
-                }
-            } else {
-            	page2.setErrorMessage(String.format(ERROR_MESSAGE_EXISTING_FOLDER, extensionsString));
-                return false;
-            }
-        }
+                // second part of the job: import extension projects from git repository
+                String reposerver = Activator.getDefault().getPreferenceStore().getString(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE);
+                ProjectFromGitImporter importer = new ProjectFromGitImporter(reposerver, openProjectsAfterImport);
+                for (String extension : extensionsToImport) {
+                    try {
+                        // sleep a second
+                        TimeUnit.SECONDS.sleep(1);
 
-        try {
-            String reposerver = Activator.getDefault().getPreferenceStore().getString(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE);
-            new ProjectFromGitImporter(reposerver, openProjectsAfterImport).importProjects(extensionsToImport);
-        } catch (CoreException e) {
-            e.printStackTrace();
-        }
+                        // set the name of the current work
+                        subMonitor.setTaskName("Import extension " + extension);
+
+                        // do one task
+                        importer.importProject(extension);
+                        // reduce total work by 1
+                        subMonitor.split(1);
+                    } catch (InterruptedException | CoreException e) {
+                    	return Status.CANCEL_STATUS;
+                    }
+                }
+                return Status.OK_STATUS;
+	        }
+    	};
+    	job.schedule();
         return true;
     }
 
