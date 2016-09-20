@@ -1,7 +1,8 @@
 package net.sf.ecl1.importwizard;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,16 +10,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import de.his.cs.sys.extensions.wizards.utils.RemoteProjectSearchSupport;
 import h1modules.utilities.utils.Activator;
@@ -176,26 +180,30 @@ public class ExtensionImportWizardModel {
     	
     	// create XML document
     	Document doc = null;
-    	StringReader classpathContentStream = new StringReader(classpathContent); 
+    	InputStream classpathContentStream = null;
     	try {
-        	doc = new SAXBuilder().build(classpathContentStream);
-    	} catch (IOException | JDOMException e) {
-    		System.out.println("Exception parsing '.classpath' file for extension " + extension  + ": " + e);
-    	} finally {
+        	classpathContentStream = new ByteArrayInputStream(classpathContent.getBytes("UTF-8"));
+        	doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(classpathContentStream);
     		classpathContentStream.close();
+    	} catch (IOException | SAXException | ParserConfigurationException e) {
+    		System.out.println("Exception parsing '.classpath' file for extension " + extension  + ": " + e);
     	}
     	if (doc==null) {
     		System.out.println("Could not create XML document from '.classpath' file of extension " + extension);
     		return dependencyExtensions; // return empty list
     	}
     	
-    	// parse XML: adapted from class ExtensionProjectDependencyLoader
-		Element root = doc.getRootElement();
-        @SuppressWarnings("unchecked")
-		List<Element> classpathEntries = root.getChildren("classpathentry");
-        for (Element classpathEntry : classpathEntries) {
-            if (isProjectDependency(classpathEntry)) {
-                String projectDependency = classpathEntry.getAttributeValue("path").substring(1);
+    	// parse XML: adapted from class ExtensionProjectDependencyLoader,
+    	// and converted to org.w3c.dom because there is no Eclipse Osgi bundle for org.jdom
+		Element root = doc.getDocumentElement();
+		NodeList classpathEntries = root.getElementsByTagName("classpathentry");
+        int classpathEntriesSize = classpathEntries.getLength();
+        for (int index=0; index<classpathEntriesSize; index++) {
+        	Node node = classpathEntries.item(index);
+        	if (!(node instanceof Element)) continue;
+        	Element classpathEntry = (Element) node;
+        	if (isProjectDependency(classpathEntry)) {
+                String projectDependency = classpathEntry.getAttribute("path").substring(1);
                 dependencyExtensions.add(projectDependency);
             }
         }
@@ -204,9 +212,9 @@ public class ExtensionImportWizardModel {
 
 	// adapted from class ExtensionProjectDependencyLoader
     private boolean isProjectDependency(Element classpathEntry) {
-        String kind = classpathEntry.getAttributeValue("kind");
+        String kind = classpathEntry.getAttribute("kind");
         boolean isSourceEntry = kind != null && "src".equals(kind);
-        String path = classpathEntry.getAttributeValue("path");
+        String path = classpathEntry.getAttribute("path");
         boolean isProjectRelatedEntry = path != null && !path.isEmpty() && path.startsWith("/") && !JENKINS_WEBAPPS_NAME.equals(path);
     	return isSourceEntry && isProjectRelatedEntry;
     }
