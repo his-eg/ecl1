@@ -14,6 +14,7 @@ import h1modules.utilities.utils.Activator;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -44,6 +45,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
 	private static final String WINDOW_TITLE = "Extension Import Wizard";
 
     private static final String ERROR_MESSAGE_EXISTING_FOLDER = "Workspace contains folders named like extensions you want to import. Delete them first: %s";
+    private static final String ERROR_MESSAGE_DELETE_FAILED = "Some extensions in your workspace could not be deleted: %s";
 
     /** Data used throughout the extension import wizard. */
     ExtensionImportWizardModel model;
@@ -105,6 +107,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
 
         if (!existingFolders.isEmpty()) {
             if (page2.deleteFolders()) {
+            	ArrayList<String> extensionsWithDeleteErrors = new ArrayList<String>();
                 for (String extension : existingFolders) {
                     IWorkspace workspace = ResourcesPlugin.getWorkspace();
                     IWorkspaceRoot root = workspace.getRoot();
@@ -113,11 +116,15 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
                     try {
                         FileUtils.deleteDirectory(extensionFolder);
                     } catch (IOException e) {
+                    	extensionsWithDeleteErrors.add(extension);
+                    	System.err.println("Extension " + extension + " could not be deleted from workspace");
                         e.printStackTrace();
-                        page2.setErrorMessage(String.format(ERROR_MESSAGE_EXISTING_FOLDER, extensionsString));
-                        return false;
-                        // TODO: do not exit immediately, try to delete other extensions if one goes wrong?
                     }
+                }
+                if (!extensionsWithDeleteErrors.isEmpty()) {
+                	// set error message but continue import
+                    page2.setErrorMessage(String.format(ERROR_MESSAGE_DELETE_FAILED, extensionsWithDeleteErrors));
+                    return false; // TODO: Try import anyway?
                 }
             } else {
             	page2.setErrorMessage(String.format(ERROR_MESSAGE_EXISTING_FOLDER, extensionsString));
