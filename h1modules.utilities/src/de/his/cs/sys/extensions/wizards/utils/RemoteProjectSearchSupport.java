@@ -61,7 +61,7 @@ public class RemoteProjectSearchSupport {
         String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE); // z.B. "http://build.his.de/build/"
         String buildServerView = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE); // branch
         String lookUpTarget = buildServer + JENKINS_VIEW_INFIX + buildServerView + JENKINS_API_ADDITION;
-        System.out.println("getProjects(): lookUpTarget = " + lookUpTarget);
+        System.out.println("Get projects from " + lookUpTarget);
         TreeSet<String> result = new TreeSet<String>();
         InputStream jsonStream = RestUtil.getJsonStream(lookUpTarget);
         if (jsonStream != null) {
@@ -81,9 +81,8 @@ public class RemoteProjectSearchSupport {
         IPreferenceStore store = Activator.getPreferences();
         String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE); // z.B. "http://build.his.de/build/"
         String buildServerView = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE); // branch
-        //String lookUpTarget = "http://build.his.de/build/job/cm.exa.common_HEAD/ws/.classpath/*view*/";
         String lookUpTarget = buildServer + JENKINS_JOB_INFIX + extension + "_" + buildServerView + JENKINS_WORKSPACE_INFIX + fileName + JENKINS_VIEW_ADDITION;
-        System.out.println("getRemoteFileContent(): lookUpTarget = " + lookUpTarget);
+        System.out.println("Get file " + lookUpTarget);
     	InputStream inStream = RestUtil.getJsonStream(lookUpTarget);
     	if (inStream == null) {
     		// wrong URL, file doesn't exist? 
