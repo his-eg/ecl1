@@ -75,7 +75,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
         addPage(page1);
         page2 = new ExtensionImportWizardPage2_Confirmation(model);
         addPage(page2);
-        System.out.println("pageCount = " + this.getPageCount());
+        //System.out.println("pageCount = " + this.getPageCount());
     }
 
     /**
@@ -88,7 +88,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     public boolean canFinish() {
     	IWizardPage currentPage = this.getContainer().getCurrentPage();
     	boolean canFinish = (currentPage instanceof ExtensionImportWizardPage2_Confirmation);
-    	System.out.println("canFinish(): currentPage = " + currentPage.getName() + ", canFinish = " + canFinish);
+    	System.out.println("currentPage = " + currentPage.getName() + ", canFinish = " + canFinish);
     	return canFinish;
     }
     

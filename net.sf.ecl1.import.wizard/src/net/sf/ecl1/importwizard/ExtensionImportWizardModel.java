@@ -129,8 +129,8 @@ public class ExtensionImportWizardModel {
 	 * finds dependencies of dependencies, too.
 	 */
     void findDeepDependencyExtensions() {
-    	System.out.println("remoteExtensions = " + remoteExtensions);
-    	System.out.println("selectedExtensions = " + selectedExtensions);
+    	//System.out.println("remoteExtensions = " + remoteExtensions);
+    	//System.out.println("selectedExtensions = " + selectedExtensions);
         
     	dependencyExtensions = new ArrayList<String>();
         Set<String> unprocessedExtensions = new TreeSet<String>(selectedExtensions); // copy to keep selectedExtensions unmodified

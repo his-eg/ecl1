@@ -10,15 +10,10 @@
  *******************************************************************************/
 package net.sf.ecl1.importwizard;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Set;
-import java.util.TreeSet;
 
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -27,23 +22,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-//import org.jdom.Document;
-//import org.jdom.Element;
-//import org.jdom.JDOMException;
-//import org.jdom.input.SAXBuilder;
-
-import de.his.cs.sys.extensions.wizards.utils.JsonUtil;
-import de.his.cs.sys.extensions.wizards.utils.RemoteProjectSearchSupport;
-import de.his.cs.sys.extensions.wizards.utils.RestUtil;
-import h1modules.utilities.utils.Activator;
-import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 
 /**
  * Extension import configuration wizard, page 2 handling dependent extensions.
  * 
  * @author tneumann#his.de
  */
-public class ExtensionImportWizardPage2_Confirmation extends ExtensionImportWizardPage {
+public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
 	
 	private static final String PAGE_NAME = "page2";
 	private static final String PAGE_DESCRIPTION = "Extension Import - Dependencies";
@@ -74,7 +59,7 @@ public class ExtensionImportWizardPage2_Confirmation extends ExtensionImportWiza
     
     @Override
     public void createControl(Composite parent) {
-        System.out.println("createControls() for page 2");
+        System.out.println("create controls for page 2");
         
         container = new Composite(parent, SWT.NONE);
         GridLayout gl = new GridLayout(1, false);
@@ -136,10 +121,5 @@ public class ExtensionImportWizardPage2_Confirmation extends ExtensionImportWiza
     @Override
     public IWizardPage getPreviousPage() {
 		return ((ExtensionImportWizard) this.getWizard()).page1;
-    }
-    
-    @Override
-    public IWizardPage getNextPage() {
-    	return null;
     }
 }
