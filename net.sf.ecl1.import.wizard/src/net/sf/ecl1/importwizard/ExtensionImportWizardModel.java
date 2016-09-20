@@ -25,11 +25,13 @@ import h1modules.utilities.utils.Activator;
 import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 
 /**
- * Data used throughout the Extension Import Wizard.
+ * The data model of the Extension Import Wizard.
  * @author tneumann
  */
-public class ExtensionImportWizardDataStore {
+public class ExtensionImportWizardModel {
     
+	private static final String JENKINS_WEBAPPS_NAME = "/webapps";
+
     private RemoteProjectSearchSupport remoteProjectSearchSupport = null;
     
     // actual branch
@@ -51,7 +53,7 @@ public class ExtensionImportWizardDataStore {
     // dependent extensions
     private Collection<String> dependencyExtensions = null;
 
-    public ExtensionImportWizardDataStore() {
+    public ExtensionImportWizardModel() {
     	remoteProjectSearchSupport = new RemoteProjectSearchSupport();
     	initRemoteExtensions();
         initExtensionsInWorkspace();
@@ -122,7 +124,11 @@ public class ExtensionImportWizardDataStore {
 		return this.selectedExtensions;
 	}
     
-    void initAllDependencyExtensions() {
+	/**
+	 * Find all extensions on which the current selection depends on. The evaluation is "deep", i.e. iteratively
+	 * finds dependencies of dependencies, too.
+	 */
+    void findDeepDependencyExtensions() {
     	System.out.println("remoteExtensions = " + remoteExtensions);
     	System.out.println("selectedExtensions = " + selectedExtensions);
         
@@ -133,7 +139,7 @@ public class ExtensionImportWizardDataStore {
         	String currentExtension = unprocessedExtensions.iterator().next();
         	unprocessedExtensions.remove(currentExtension);
         	// find dependencies of currentExtension
-        	Collection<String> dependencies = getDirectDependencyExtensions(currentExtension);
+        	Collection<String> dependencies = findFlatDependencyExtensions(currentExtension);
         	for (String dependency : dependencies) {
         		// is this a dependency that must be considered and has not been considered yet?
         		if (!selectedExtensions.contains(dependency) && !dependencyExtensions.contains(dependency)) {
@@ -146,12 +152,12 @@ public class ExtensionImportWizardDataStore {
 
 	/**
 	 * Returns the list of extensions directly required by the given extension.
-	 * "directly" means that there is no recurrent evaluation.
+	 * Only one dependency level is evaluated.
 	 * 
 	 * @param extension
 	 * @return list of extension names
 	 */
-	List<String> getDirectDependencyExtensions(String extension) {
+	List<String> findFlatDependencyExtensions(String extension) {
 		List<String> dependencyExtensions = extensions2dependencyExtensions.get(extension);
 		if (dependencyExtensions != null) {
 			return dependencyExtensions;
@@ -196,27 +202,19 @@ public class ExtensionImportWizardDataStore {
 		return dependencyExtensions;
 	}
 
-	// copied from class ExtensionProjectDependencyLoader
+	// adapted from class ExtensionProjectDependencyLoader
     private boolean isProjectDependency(Element classpathEntry) {
-    	return isSourceEntry(classpathEntry) && isProjectRelatedEntry(classpathEntry);
-    }
-
-	// copied from class ExtensionProjectDependencyLoader
-    private boolean isSourceEntry(Element classpathEntry) {
         String kind = classpathEntry.getAttributeValue("kind");
-        return kind != null && "src".equals(kind);
-    }
-
-	// copied from class ExtensionProjectDependencyLoader
-    private boolean isProjectRelatedEntry(Element classpathEntry) {
+        boolean isSourceEntry = kind != null && "src".equals(kind);
         String path = classpathEntry.getAttributeValue("path");
-        return path != null && !path.isEmpty() && path.startsWith("/") && !"/webapps".equals(path);
+        boolean isProjectRelatedEntry = path != null && !path.isEmpty() && path.startsWith("/") && !JENKINS_WEBAPPS_NAME.equals(path);
+    	return isSourceEntry && isProjectRelatedEntry;
     }
 
     /**
      * @return extensions that the user-selected extensions depend on.
      */
-    Collection<String> getAllDependencyExtensions() {
+    Collection<String> getDeepDependencyExtensions() {
     	return dependencyExtensions;
     }
 }

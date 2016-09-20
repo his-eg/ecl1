@@ -43,7 +43,7 @@ import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
  * 
  * @author tneumann#his.de
  */
-public class ExtensionImportWizardPage2 extends ExtensionImportWizardPage {
+public class ExtensionImportWizardPage2_Confirmation extends ExtensionImportWizardPage {
 	
 	private static final String PAGE_NAME = "page2";
 	private static final String PAGE_DESCRIPTION = "Extension Import - Dependencies";
@@ -59,17 +59,17 @@ public class ExtensionImportWizardPage2 extends ExtensionImportWizardPage {
 	private Table dependentTable;
 	private TableColumn dependentTableColumn;
 	
-    // Data used throughout the Extension Import Wizard
-    private ExtensionImportWizardDataStore data;
+    // Extension Import Wizard data model
+    private ExtensionImportWizardModel model;
     
     /**
      * Create second ExtensionImportWizardPage, containing the confirmation dialog.
-     * @param data
+     * @param model
      */
-    protected ExtensionImportWizardPage2(ExtensionImportWizardDataStore data) {
+    protected ExtensionImportWizardPage2_Confirmation(ExtensionImportWizardModel model) {
         super(PAGE_NAME);
         this.setDescription(PAGE_DESCRIPTION);
-        this.data = data;
+        this.model = model;
     }
     
     @Override
@@ -113,7 +113,7 @@ public class ExtensionImportWizardPage2 extends ExtensionImportWizardPage {
         System.out.println("create data for page 2");
         
         userSelectedTable.removeAll(); // avoid entries being added several times if the back-button is used
-    	Set<String> userSelectedExtensions = data.getSelectedExtensions();
+    	Set<String> userSelectedExtensions = model.getSelectedExtensions();
         for (String userSelectedExtension : userSelectedExtensions) {
         	TableItem tableItem = new TableItem(userSelectedTable, SWT.NONE);
         	tableItem.setText(0, userSelectedExtension); // first column has index 0
@@ -121,10 +121,10 @@ public class ExtensionImportWizardPage2 extends ExtensionImportWizardPage {
         userSelectedTableColumn.pack();
         
         // Find extension dependencies recursively
-        data.initAllDependencyExtensions();
+        model.findDeepDependencyExtensions();
 
         dependentTable.removeAll();
-        for (String dependentExtension : data.getAllDependencyExtensions()) {
+        for (String dependentExtension : model.getDeepDependencyExtensions()) {
         	TableItem tableItem = new TableItem(dependentTable, SWT.NONE);
         	tableItem.setText(0, dependentExtension); // first column has index 0
         }

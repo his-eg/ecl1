@@ -46,14 +46,14 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     private static final String ERROR_MESSAGE_EXISTING_FOLDER = "Workspace contains folders named like extensions you want to import. Delete them first: %s";
 
     /** Data used throughout the extension import wizard. */
-    ExtensionImportWizardDataStore data;
+    ExtensionImportWizardModel model;
     
-    ExtensionImportWizardPage1 page1;
-    ExtensionImportWizardPage2 page2;
+    ExtensionImportWizardPage1_Selection page1;
+    ExtensionImportWizardPage2_Confirmation page2;
 
     public ExtensionImportWizard() {
         super();
-        data = new ExtensionImportWizardDataStore();
+        model = new ExtensionImportWizardModel();
     }
 
     /* (non-Javadoc)
@@ -71,9 +71,9 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     @Override
     public void addPages() {
         super.addPages();
-        page1 = new ExtensionImportWizardPage1(data);
+        page1 = new ExtensionImportWizardPage1_Selection(model);
         addPage(page1);
-        page2 = new ExtensionImportWizardPage2(data);
+        page2 = new ExtensionImportWizardPage2_Confirmation(model);
         addPage(page2);
         System.out.println("pageCount = " + this.getPageCount());
     }
@@ -87,7 +87,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     @Override
     public boolean canFinish() {
     	IWizardPage currentPage = this.getContainer().getCurrentPage();
-    	boolean canFinish = (currentPage instanceof ExtensionImportWizardPage2);
+    	boolean canFinish = (currentPage instanceof ExtensionImportWizardPage2_Confirmation);
     	System.out.println("canFinish(): currentPage = " + currentPage.getName() + ", canFinish = " + canFinish);
     	return canFinish;
     }
@@ -97,8 +97,8 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
      */
     @Override
     public boolean performFinish() {
-        Collection<String> extensionsToImport = new HashSet<String>(data.getSelectedExtensions()); // copy
-        extensionsToImport.addAll(data.getAllDependencyExtensions());
+        Collection<String> extensionsToImport = new HashSet<String>(model.getSelectedExtensions()); // copy
+        extensionsToImport.addAll(model.getDeepDependencyExtensions());
         boolean openProjectsAfterImport = page1.openProjectsAfterImport();
         Collection<String> existingFolders = checkForExistingFolders(extensionsToImport);
         String extensionsString = Joiner.on(",").join(existingFolders);
@@ -116,6 +116,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
                         e.printStackTrace();
                         page2.setErrorMessage(String.format(ERROR_MESSAGE_EXISTING_FOLDER, extensionsString));
                         return false;
+                        // TODO: do not exit immediately, try to delete other extensions if one goes wrong?
                     }
                 }
             } else {

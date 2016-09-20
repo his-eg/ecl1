@@ -47,7 +47,7 @@ import de.his.cs.sys.extensions.wizards.utils.RemoteProjectSearchSupport;
  *
  * @author keunecke
  */
-public class ExtensionImportWizardPage1 extends ExtensionImportWizardPage {
+public class ExtensionImportWizardPage1_Selection extends ExtensionImportWizardPage {
 
 	private static final String PAGE_NAME = "page1";
 	private static final String PAGE_DESCRIPTION = "Extension Import - Selection";
@@ -63,17 +63,17 @@ public class ExtensionImportWizardPage1 extends ExtensionImportWizardPage {
     // TODO: Move to page 2?
     private Button deleteExistingFolders;
 	
-    // Data used throughout the Extension Import Wizard
-    private ExtensionImportWizardDataStore data;
+    // Extension Import Wizard data model
+    private ExtensionImportWizardModel model;
     
     /**
      * Create first ExtensionImportWizardPage, containing the extension selection dialog.
-     * @param data
+     * @param model
      */
-    protected ExtensionImportWizardPage1(ExtensionImportWizardDataStore data) {
+    protected ExtensionImportWizardPage1_Selection(ExtensionImportWizardModel model) {
         super(PAGE_NAME);
         this.setDescription(PAGE_DESCRIPTION);
-        this.data = data;
+        this.model = model;
     }
 
     @Override
@@ -87,7 +87,7 @@ public class ExtensionImportWizardPage1 extends ExtensionImportWizardPage {
         GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
 
         Label branchInfo = new Label(container, SWT.TOP);
-        branchInfo.setText("Branch: " + data.getBranch());
+        branchInfo.setText("Branch: " + model.getBranch());
         Composite openAfterImportComposite = new Composite(container, SWT.BORDER | SWT.TOP);
         openAfterImportComposite.setLayout(gl2);
         openAfterImport = new Button(openAfterImportComposite, SWT.CHECK);
@@ -138,8 +138,8 @@ public class ExtensionImportWizardPage1 extends ExtensionImportWizardPage {
             c.setText(header);
         }
 
-        Set<String> extensionsInWorkspace = data.getExtensionsInWorkspace();
-        for (String remoteExtensionName : data.getRemoteExtensions()) {
+        Set<String> extensionsInWorkspace = model.getExtensionsInWorkspace();
+        for (String remoteExtensionName : model.getRemoteExtensions()) {
             if (!extensionsInWorkspace.contains(remoteExtensionName) && !remoteExtensionName.contains(HISConstants.WEBAPPS)) {
                 TableItem tableItem = new TableItem(projectTable, SWT.NONE);
                 tableItem.setChecked(false);
@@ -174,7 +174,7 @@ public class ExtensionImportWizardPage1 extends ExtensionImportWizardPage {
     @Override
     public IWizardPage getNextPage() {
     	this.initSelectedExtensions();
-    	ExtensionImportWizardPage2 page2 = ((ExtensionImportWizard) this.getWizard()).page2;
+    	ExtensionImportWizardPage2_Confirmation page2 = ((ExtensionImportWizard) this.getWizard()).page2;
 		page2.onEnterPage();
     	return page2;
     }
@@ -191,7 +191,7 @@ public class ExtensionImportWizardPage1 extends ExtensionImportWizardPage {
                 selectedExtensions.add(text);
             }
         }
-        data.setSelectedExtensions(selectedExtensions);
+        model.setSelectedExtensions(selectedExtensions);
     }
     
     /**
