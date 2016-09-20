@@ -17,6 +17,7 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
@@ -43,7 +44,11 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
 	private Label dependentInfo;
 	private Table dependentTable;
 	private TableColumn dependentTableColumn;
-	
+
+    private Button openAfterImport;
+
+    private Button deleteExistingFolders;
+
     // Extension Import Wizard data model
     private ExtensionImportWizardModel model;
     
@@ -64,6 +69,9 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
         container = new Composite(parent, SWT.NONE);
         GridLayout gl = new GridLayout(1, false);
         container.setLayout(gl);
+        
+        Label branchInfo = new Label(container, SWT.TOP);
+        branchInfo.setText("Branch: " + model.getBranch());
 
     	// show user-selected extensions
         userSelectedInfo = new Label(container, SWT.TOP);
@@ -89,6 +97,18 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
         dependentTable.setSize(200, 600);
         dependentTableColumn = new TableColumn(dependentTable, SWT.NONE);
         dependentTableColumn.setText("Name");
+        
+        GridLayout gl2 = new GridLayout(2, false);
+        Composite openAfterImportComposite = new Composite(container, SWT.BORDER | SWT.CENTER); // was TOP
+        openAfterImportComposite.setLayout(gl2);
+        openAfterImport = new Button(openAfterImportComposite, SWT.CHECK);
+        openAfterImport.setText("Open extensions after import?");
+        openAfterImport.setToolTipText("Should wizard open extension projects after import?");
+        openAfterImport.setSelection(true);
+
+        deleteExistingFolders = new Button(openAfterImportComposite, SWT.CHECK);
+        deleteExistingFolders.setText("Delete folders?");
+        deleteExistingFolders.setToolTipText("Should wizard delete existing folders named like extensions for import?");
 
         setControl(container);
         setPageComplete(false);
@@ -121,5 +141,23 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
     @Override
     public IWizardPage getPreviousPage() {
 		return ((ExtensionImportWizard) this.getWizard()).page1;
+    }
+    
+    /**
+     * User selection if extensions should be opened after import
+     *
+     * @return true iff user wants extensions to be opened after import
+     */
+    public boolean openProjectsAfterImport() {
+        return openAfterImport.getSelection();
+    }
+
+    /**
+     * User selection if folders with names like extensions for import should be deleted directly
+     *
+     * @return true iff user wants to have folders deleted
+     */
+    public boolean deleteFolders() {
+        return deleteExistingFolders.getSelection();
     }
 }

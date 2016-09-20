@@ -99,12 +99,12 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     public boolean performFinish() {
         Collection<String> extensionsToImport = new HashSet<String>(model.getSelectedExtensions()); // copy
         extensionsToImport.addAll(model.getDeepDependencyExtensions());
-        boolean openProjectsAfterImport = page1.openProjectsAfterImport();
+        boolean openProjectsAfterImport = page2.openProjectsAfterImport();
         Collection<String> existingFolders = checkForExistingFolders(extensionsToImport);
         String extensionsString = Joiner.on(",").join(existingFolders);
 
         if (!existingFolders.isEmpty()) {
-            if (page1.deleteFolders()) {
+            if (page2.deleteFolders()) {
                 for (String extension : existingFolders) {
                     IWorkspace workspace = ResourcesPlugin.getWorkspace();
                     IWorkspaceRoot root = workspace.getRoot();

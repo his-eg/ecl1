@@ -43,12 +43,6 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 	private Composite container;
 
     private Table projectTable;
-
-    // TODO: Move to page 2?
-    private Button openAfterImport;
-
-    // TODO: Move to page 2?
-    private Button deleteExistingFolders;
 	
     // Extension Import Wizard data model
     private ExtensionImportWizardModel model;
@@ -70,22 +64,11 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
         container = new Composite(parent, SWT.NONE);
         GridLayout gl = new GridLayout(1, false);
         container.setLayout(gl);
-        GridLayout gl2 = new GridLayout(2, false);
-        GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
 
         Label branchInfo = new Label(container, SWT.TOP);
         branchInfo.setText("Branch: " + model.getBranch());
-        Composite openAfterImportComposite = new Composite(container, SWT.BORDER | SWT.TOP);
-        openAfterImportComposite.setLayout(gl2);
-        openAfterImport = new Button(openAfterImportComposite, SWT.CHECK);
-        openAfterImport.setText("Open extensions after import?");
-        openAfterImport.setToolTipText("Should wizard open extension projects after import?");
-        openAfterImport.setSelection(true);
 
-        deleteExistingFolders = new Button(openAfterImportComposite, SWT.CHECK);
-        deleteExistingFolders.setText("Delete folders?");
-        deleteExistingFolders.setToolTipText("Should wizard delete existing folders named like extensions for import?");
-
+        GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
         Composite projectChoice = new Composite(container, SWT.BORDER | SWT.TOP);
         projectChoice.setLayout(gl);
         projectChoice.setLayoutData(layoutData);
@@ -169,23 +152,5 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
             }
         }
         model.setSelectedExtensions(selectedExtensions);
-    }
-    
-    /**
-     * User selection if extensions should be opened after import
-     *
-     * @return true iff user wants extensions to be opened after import
-     */
-    public boolean openProjectsAfterImport() {
-        return openAfterImport.getSelection();
-    }
-
-    /**
-     * User selection if folders with names like extensions for import should be deleted directly
-     *
-     * @return true iff user wants to have folders deleted
-     */
-    public boolean deleteFolders() {
-        return deleteExistingFolders.getSelection();
     }
 }
