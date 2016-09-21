@@ -88,7 +88,7 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
 
         // Show required dependent extensions
         dependentInfo = new Label(container, SWT.TOP);
-        dependentInfo.setText("Required dependent extensions:");
+        dependentInfo.setText("Additionally required extensions:");
 
         dependentTable = new Table(container, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
         dependentTable.setLinesVisible(true);
