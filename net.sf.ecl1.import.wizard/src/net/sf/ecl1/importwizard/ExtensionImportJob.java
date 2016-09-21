@@ -137,9 +137,12 @@ public class ExtensionImportJob extends Job {
 
     /**
      * Check if a folder with the name of an extension to import name already exists in workspace.
-     *
+     * Any folders are returned, not just such with a valid project nature.
+     * 
      * @param extensionsToImport
      * @return the folders that already exist in workspace
+     * 
+     * @see {@link ExtensionImportWizardModel.initExtensionsInWorkspace()}
      */
     private Collection<String> checkForExistingFolders(Collection<String> extensionsToImport) {
         IWorkspace workspace = ResourcesPlugin.getWorkspace();

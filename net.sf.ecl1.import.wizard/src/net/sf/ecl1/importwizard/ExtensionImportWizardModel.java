@@ -96,7 +96,10 @@ public class ExtensionImportWizardModel {
     }
     
     /**
-     * Read extensions already present in workspace.
+     * Read extension projects already present in workspace.
+     * Only valid projects are returned, folders without project structure omitted.
+     * 
+     * @see {@link ExtensionImportJob.checkForExistingFolders()}
      */
     private void initExtensionsInWorkspace() {
     	extensionsInWorkspace = new TreeSet<String>();
