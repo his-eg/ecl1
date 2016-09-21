@@ -10,37 +10,14 @@
  *******************************************************************************/
 package net.sf.ecl1.importwizard;
 
-import h1modules.utilities.utils.Activator;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
-import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
-
-import org.apache.commons.io.FileUtils;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
-
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 
 /**
  * Wizard for import of extension projects listed on a jenkins.
@@ -112,10 +89,9 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
         boolean deleteFolders = page2.deleteFolders();
 
         ExtensionImportJob job = new ExtensionImportJob(extensionsToImport, openProjectsAfterImport, deleteFolders);
+        // register job to be started immediately as another thread
     	job.schedule();
-    	List<String> errorMessages = job.getErrorMessages();
-    	// TODO: How to display error messages delivered by the job? Before we used page2.setErrorMessage(String)
-    	// TODO: Can we get the Status return by Job.run() ?
-        return errorMessages.isEmpty(); // no errors means success 
+    	// TODO: since we do not know when the job finishes we can not evaluate it's return status here, only return true?
+        return true;
     }
 }

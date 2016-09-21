@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
@@ -26,26 +25,27 @@ import h1modules.utilities.utils.Activator;
 import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 
 /**
- * Job that actually performs deleting of existing folders in the workspace and the extension import.
- * Is called from ExtensionImportWizard's performFinish() method.
+ * The job that actually performs deleting of existing folders in the workspace and the extension import.
+ * It Is called from ExtensionImportWizard's performFinish() method and executed as a separate thread.
+ * 
  * @author Keunecke/tneumann
  */
 public class ExtensionImportJob extends Job {
 
-    private static final String ERROR_MESSAGE_EXISTING_FOLDER = "Workspace contains folders named like extensions you want to import. Delete them first: %s";
+    private static final String ERROR_MESSAGE_EXISTING_FOLDER = "Your workspace contains folders named like extensions you want to import. Delete them first: %s";
     private static final String ERROR_MESSAGE_DELETE_FAILED = "Some extensions in your workspace could not be deleted: %s";
 
 	private Collection<String> extensionsToImport;
 	private boolean openProjectsAfterImport;
 	private boolean deleteFolders;
-	
-	private ArrayList<String> errorMessages = new ArrayList<String>();
+	private String pluginId;
 	
 	public ExtensionImportJob(Collection<String> extensionsToImport, boolean openProjectsAfterImport, boolean deleteFolders) {
 		super("Extension Import");
 		this.extensionsToImport = extensionsToImport;
 		this.openProjectsAfterImport = openProjectsAfterImport;
 		this.deleteFolders = deleteFolders;
+		this.pluginId = Activator.getDefault().getBundle().getSymbolicName();
 	}
 	
     @Override
@@ -88,13 +88,13 @@ public class ExtensionImportJob extends Job {
                 }
                 if (!extensionsWithDeleteErrors.isEmpty()) {
                 	// set error message
-                    errorMessages.add(String.format(ERROR_MESSAGE_DELETE_FAILED, extensionsWithDeleteErrors));
-                    return new Status(Status.ERROR, "unknown", ""); // TODO: Use 3rd argument = message ?
-                    // TODO: Try import anyway?
+                	String message = String.format(ERROR_MESSAGE_DELETE_FAILED, extensionsWithDeleteErrors);
+                    return new Status(IStatus.ERROR, pluginId, message);
+                    // TODO: Try import anyway? Then Status could be set to IStatus.WARNING
                 }
             } else {
-            	errorMessages.add(String.format(ERROR_MESSAGE_EXISTING_FOLDER, extensionsString));
-                return new Status(Status.ERROR, "unknown", ""); // TODO: Use 3rd argument = message ?
+            	String message = String.format(ERROR_MESSAGE_EXISTING_FOLDER, extensionsString);
+                return new Status(IStatus.ERROR, pluginId, message);
             }
         }
         // second part of the job: import extension projects from git repository
@@ -120,10 +120,10 @@ public class ExtensionImportJob extends Job {
     }
 
     /**
-     * Check if a folder with an extension name already exists in workspace
+     * Check if a folder with the name of an extension to import name already exists in workspace.
      *
      * @param extensionsToImport
-     * @return
+     * @return the folders that already exist in workspace
      */
     private Collection<String> checkForExistingFolders(Collection<String> extensionsToImport) {
         IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -140,11 +140,4 @@ public class ExtensionImportJob extends Job {
         }
         return result;
     }
-
-    /**
-     * @return errors that occurred during job execution
-     */
-	public List<String> getErrorMessages() {
-		return errorMessages;
-	}
 }
