@@ -55,7 +55,7 @@ public class ExtensionImportWizardModel {
     private Map<String, List<String>> extensions2dependencyExtensions;
 
     // dependent extensions
-    private Collection<String> dependencyExtensions = null;
+    private Collection<String> totalRequiredExtensions = null;
 
     public ExtensionImportWizardModel() {
     	initBranch();
@@ -126,25 +126,29 @@ public class ExtensionImportWizardModel {
     
 	/**
 	 * Find all extensions on which the current selection depends on. The evaluation is "deep", i.e. iteratively
-	 * finds dependencies of dependencies, too.
+	 * finds dependencies of dependencies, too. Extension on which the selected extensions depend on but are
+	 * already in workspace are omitted.
 	 */
-    void findDeepDependencyExtensions() {
+    void findTotalRequiredExtensions() {
     	//System.out.println("remoteExtensions = " + remoteExtensions);
     	//System.out.println("selectedExtensions = " + selectedExtensions);
         
-    	dependencyExtensions = new ArrayList<String>();
+    	totalRequiredExtensions = new ArrayList<String>();
         Set<String> unprocessedExtensions = new TreeSet<String>(selectedExtensions); // copy to keep selectedExtensions unmodified
         while (!unprocessedExtensions.isEmpty()) {
         	// get one unprocessed extension
-        	String currentExtension = unprocessedExtensions.iterator().next();
-        	unprocessedExtensions.remove(currentExtension);
-        	// find dependencies of currentExtension
-        	Collection<String> dependencies = findFlatDependencyExtensions(currentExtension);
-        	for (String dependency : dependencies) {
-        		// is this a dependency that must be considered and has not been considered yet?
-        		if (!selectedExtensions.contains(dependency) && !dependencyExtensions.contains(dependency)) {
-        			dependencyExtensions.add(dependency);
-        			unprocessedExtensions.add(dependency);
+        	String extension = unprocessedExtensions.iterator().next();
+        	unprocessedExtensions.remove(extension);
+        	// find all required extensions
+        	Collection<String> directlyRequiredExtensions = findDirectlyRequiredExtensions(extension);
+        	for (String requiredExtension : directlyRequiredExtensions) {
+        		if (!selectedExtensions.contains(requiredExtension) && !totalRequiredExtensions.contains(requiredExtension)) {
+        			// the required extension has not been selected and not been registered before
+        			if (!extensionsInWorkspace.contains(requiredExtension)) {
+        				// the required extension does not exist yet, so it must be imported
+        				totalRequiredExtensions.add(requiredExtension);
+        			} // else: the required extension is already in workspace -> do not re-import, but check it's own dependencies
+        			unprocessedExtensions.add(requiredExtension);
         		}
         	}
         }
@@ -157,7 +161,7 @@ public class ExtensionImportWizardModel {
 	 * @param extension
 	 * @return list of extension names
 	 */
-	private List<String> findFlatDependencyExtensions(String extension) {
+	private List<String> findDirectlyRequiredExtensions(String extension) {
 		List<String> dependencyExtensions = extensions2dependencyExtensions.get(extension);
 		if (dependencyExtensions != null) {
 			return dependencyExtensions;
@@ -218,7 +222,7 @@ public class ExtensionImportWizardModel {
     /**
      * @return extensions that the user-selected extensions depend on.
      */
-    Collection<String> getDeepDependencyExtensions() {
-    	return dependencyExtensions;
+    Collection<String> getTotalRequiredExtensions() {
+    	return totalRequiredExtensions;
     }
 }

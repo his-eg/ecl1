@@ -126,10 +126,10 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
         userSelectedTableColumn.pack();
         
         // Find extension dependencies recursively
-        model.findDeepDependencyExtensions();
+        model.findTotalRequiredExtensions();
 
         dependentTable.removeAll();
-        for (String dependentExtension : model.getDeepDependencyExtensions()) {
+        for (String dependentExtension : model.getTotalRequiredExtensions()) {
         	TableItem tableItem = new TableItem(dependentTable, SWT.NONE);
         	tableItem.setText(0, dependentExtension); // first column has index 0
         }
