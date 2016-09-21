@@ -10,103 +10,33 @@
  *******************************************************************************/
 package net.sf.ecl1.importwizard;
 
-import h1modules.utilities.utils.Activator;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 
-import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
-
-import org.apache.commons.io.FileUtils;
-import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-
 /**
- * Wizard for import of extension projects listed on a jenkins
+ * Wizard for import of extension projects listed on a jenkins.
  *
  * @author keunecke
  */
 public class ExtensionImportWizard extends Wizard implements IImportWizard {
 
-    private static final String ERROR_MESSAGE_EXISTING_FOLDER = "Workspace contains folders named like extensions you want to import. Delete them first: %s";
+	private static final String WINDOW_TITLE = "Extension Import Wizard";
 
-    ExtensionImportWizardPage mainPage;
+    /** Data used throughout the extension import wizard. */
+    ExtensionImportWizardModel model;
+    
+    ExtensionImportWizardPage1_Selection page1;
+    ExtensionImportWizardPage2_Confirmation page2;
 
     public ExtensionImportWizard() {
         super();
-    }
-
-    /* (non-Javadoc)
-     * @see org.eclipse.jface.wizard.Wizard#performFinish()
-     */
-    @Override
-    public boolean performFinish() {
-        Collection<String> extensionsToImport = mainPage.getSelectedExtensions();
-        boolean openProjectsAfterImport = mainPage.openProjectsAfterImport();
-        Collection<String> existingFolders = checkForExistingFolders(extensionsToImport);
-        String extensionsString = Joiner.on(",").join(existingFolders);
-
-        if (!existingFolders.isEmpty()) {
-            if (mainPage.deleteFolders()) {
-                for (String extension : existingFolders) {
-                    IWorkspace workspace = ResourcesPlugin.getWorkspace();
-                    IWorkspaceRoot root = workspace.getRoot();
-                    File workspaceFile = root.getLocation().toFile();
-                    File extensionFolder = new File(workspaceFile, extension);
-                    try {
-                        FileUtils.deleteDirectory(extensionFolder);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        mainPage.setErrorMessage(String.format(ERROR_MESSAGE_EXISTING_FOLDER, extensionsString));
-                        return false;
-                    }
-                }
-            } else {
-                mainPage.setErrorMessage(String.format(ERROR_MESSAGE_EXISTING_FOLDER, extensionsString));
-                return false;
-            }
-        }
-
-        try {
-            String reposerver = Activator.getDefault().getPreferenceStore().getString(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE);
-            new ProjectFromGitImporter(reposerver, openProjectsAfterImport).importProjects(extensionsToImport);
-        } catch (CoreException e) {
-            e.printStackTrace();
-        }
-        return true;
-    }
-
-    /**
-     * Check if a folder with an extension name already exists in workspace
-     *
-     * @param extensionsToImport
-     * @return
-     */
-    private Collection<String> checkForExistingFolders(Collection<String> extensionsToImport) {
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        IWorkspaceRoot root = workspace.getRoot();
-        IPath fullPath = root.getLocation();
-        File workspaceFile = fullPath.toFile();
-        Collection<String> result = Lists.newArrayList();
-
-        for (String extension : extensionsToImport) {
-            File extensionFolder = new File(workspaceFile, extension);
-            if (extensionFolder.exists()) {
-                result.add(extension);
-            }
-        }
-        return result;
+        model = new ExtensionImportWizardModel();
     }
 
     /* (non-Javadoc)
@@ -114,9 +44,8 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
      */
     @Override
     public void init(IWorkbench workbench, IStructuredSelection selection) {
-        setWindowTitle("Extension Import Wizard"); //NON-NLS-1
+        setWindowTitle(WINDOW_TITLE);
         setNeedsProgressMonitor(true);
-        mainPage = new ExtensionImportWizardPage(); //NON-NLS-1
     }
 
     /* (non-Javadoc)
@@ -125,8 +54,44 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     @Override
     public void addPages() {
         super.addPages();
-        mainPage.setDescription("Extension Import Wizard");
-        addPage(mainPage);
+        page1 = new ExtensionImportWizardPage1_Selection(model);
+        addPage(page1);
+        page2 = new ExtensionImportWizardPage2_Confirmation(model);
+        addPage(page2);
+        //System.out.println("pageCount = " + this.getPageCount());
     }
 
+    /**
+     * Enable the "finish"-button only if page 2 is the current wizard page.
+     * @return true if the "finish"-button shall be enabled
+     */
+    // Implementation note: This is a better solution than using the super implementation and
+    // calling setPageComplete() to control the "finish"-button.
+    @Override
+    public boolean canFinish() {
+    	IWizardPage currentPage = this.getContainer().getCurrentPage();
+    	boolean canFinish = (currentPage instanceof ExtensionImportWizardPage2_Confirmation);
+    	System.out.println("currentPage = " + currentPage.getName() + ", canFinish = " + canFinish);
+    	return canFinish;
+    }
+    
+    /**
+     * Finish the extension import.
+     * This is implemented such that progress monitoring is available.
+     * @see org.eclipse.jface.wizard.Wizard#performFinish()
+     */
+    @Override
+    public boolean performFinish() {
+    	// variables to be used in the Job class implementation must be final
+        Collection<String> extensionsToImport = new HashSet<String>(model.getSelectedExtensions()); // copy
+        extensionsToImport.addAll(model.getTotalRequiredExtensions());
+        boolean openProjectsAfterImport = page2.openProjectsAfterImport();
+        boolean deleteFolders = page2.deleteFolders();
+
+        ExtensionImportJob job = new ExtensionImportJob(extensionsToImport, openProjectsAfterImport, deleteFolders);
+        // register job to be started immediately as another thread
+    	job.schedule();
+    	// TODO: since we do not know when the job finishes we can not evaluate it's return status here, only return true?
+        return true;
+    }
 }
