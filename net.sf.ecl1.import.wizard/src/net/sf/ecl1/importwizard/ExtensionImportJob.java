@@ -57,6 +57,7 @@ public class ExtensionImportJob extends Job {
         // convert monitor to SubMonitor and set total number of work units
         final int totalWorkSteps = existingFolders.size() + extensionsToImport.size();
         SubMonitor subMonitor = SubMonitor.convert(monitor, totalWorkSteps);
+        subMonitor.split(1); // fixes displayed progress
         
         // first part of the job: delete projects from workspace (if requested)
     	ArrayList<String> extensionsWithDeleteErrors = new ArrayList<String>();
