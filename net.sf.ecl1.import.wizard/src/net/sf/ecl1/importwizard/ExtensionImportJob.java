@@ -26,14 +26,14 @@ import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 
 /**
  * The job that actually performs deleting of existing folders in the workspace and the extension import.
- * It Is called from ExtensionImportWizard's performFinish() method and executed as a separate thread.
+ * It is called from ExtensionImportWizard's performFinish() method and executed as a separate thread.
  * 
- * @author Keunecke/tneumann
+ * @author Keunecke / tneumann
  */
 public class ExtensionImportJob extends Job {
 
-    private static final String ERROR_MESSAGE_EXISTING_FOLDER = "Your workspace contains folders named like extensions you want to import. Delete them first: %s";
-    private static final String ERROR_MESSAGE_DELETE_FAILED = "Some extensions in your workspace could not be deleted: %s";
+    private static final String ERROR_MESSAGE_EXISTING_FOLDER = "Your workspace contains folders named like extensions you want to import: %s\n\nThese folders must be deleted before the import, but first you might want to check if they contain files you want to keep. Then delete the folders manually or set the 'Delete folders?' option on the confirmation page of this wizard.";
+    private static final String ERROR_MESSAGE_DELETE_FAILED = "Some extensions could not be imported, because deleting existing folders before the import failed: %s";
 
 	private Collection<String> extensionsToImport;
 	private boolean openProjectsAfterImport;
@@ -50,63 +50,71 @@ public class ExtensionImportJob extends Job {
 	
     @Override
     protected IStatus run(IProgressMonitor monitor) {
+    	// The folders in workspace that must be scrubbed before extension import
         Collection<String> existingFolders = checkForExistingFolders(extensionsToImport);
-        String extensionsString = Joiner.on(",").join(existingFolders);
-        // progress steps
-        final int totalSteps = existingFolders.size() + extensionsToImport.size();
-        // convert to SubMonitor and set total number of work units
-        SubMonitor subMonitor = SubMonitor.convert(monitor, totalSteps);
+        String existingFoldersStr = Joiner.on(", ").join(existingFolders);
+
+        // convert monitor to SubMonitor and set total number of work units
+        final int totalWorkSteps = existingFolders.size() + extensionsToImport.size();
+        SubMonitor subMonitor = SubMonitor.convert(monitor, totalWorkSteps);
+        
         // first part of the job: delete projects from workspace (if requested)
+    	ArrayList<String> extensionsWithDeleteErrors = new ArrayList<String>();
         if (!existingFolders.isEmpty()) {
-            if (deleteFolders) {
-            	ArrayList<String> extensionsWithDeleteErrors = new ArrayList<String>();
-                for (String extension : existingFolders) {
-                    try {
-                        // sleep a second
-                        TimeUnit.SECONDS.sleep(1);
-
-                        // set the name of the current work
-                        subMonitor.setTaskName("Delete extension project from workspace: " + extension);
-
-                        // do one task
-                        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-                        IWorkspaceRoot root = workspace.getRoot();
-                        File workspaceFile = root.getLocation().toFile();
-                        File extensionFolder = new File(workspaceFile, extension);
-                        try {
-                            FileUtils.deleteDirectory(extensionFolder);
-                        } catch (IOException e) {
-                        	extensionsWithDeleteErrors.add(extension);
-                        	System.err.println("Extension " + extension + " could not be deleted from workspace");
-                            e.printStackTrace();
-                        }
-                        // reduce total work by 1
-                        subMonitor.split(1);
-                    } catch (InterruptedException e) {
-                    	return Status.CANCEL_STATUS;
-                    }
-                }
-                if (!extensionsWithDeleteErrors.isEmpty()) {
-                	// set error message
-                	String message = String.format(ERROR_MESSAGE_DELETE_FAILED, extensionsWithDeleteErrors);
-                    return new Status(IStatus.ERROR, pluginId, message);
-                    // TODO: Try import anyway? Then Status could be set to IStatus.WARNING
-                }
-            } else {
-            	String message = String.format(ERROR_MESSAGE_EXISTING_FOLDER, extensionsString);
+            if (deleteFolders==false) {
+            	// scrubbing folders is necessary but not permitted by the user
+            	String message = String.format(ERROR_MESSAGE_EXISTING_FOLDER, existingFoldersStr);
                 return new Status(IStatus.ERROR, pluginId, message);
             }
+            
+            // scrubbing folders is necessary and authorized
+            for (String extension : existingFolders) {
+                try {
+                    // sleep a second (allows users to cancel the job)
+                    TimeUnit.SECONDS.sleep(1);
+
+                    // set the name of the current work
+                    String taskName = "Delete extension folder from workspace: " + extension;
+                    subMonitor.setTaskName(taskName);
+                    System.out.println(taskName);
+                    
+                    // do one task
+                    IWorkspace workspace = ResourcesPlugin.getWorkspace();
+                    IWorkspaceRoot root = workspace.getRoot();
+                    File workspaceFile = root.getLocation().toFile();
+                    File extensionFolder = new File(workspaceFile, extension);
+                    try {
+                        FileUtils.deleteDirectory(extensionFolder);
+                    } catch (IOException e) {
+                    	extensionsWithDeleteErrors.add(extension);
+                    	System.err.println("Extension folder " + extension + " could not be deleted from workspace");
+                        e.printStackTrace();
+                    }
+                    // reduce total work by 1
+                    subMonitor.split(1);
+                } catch (InterruptedException e) {
+                	return Status.CANCEL_STATUS;
+                }
+            }
         }
-        // second part of the job: import extension projects from git repository
+        
+        // second part of the job: import extension projects from git repository.
+        // extensions with folders in the workspace that could not be deleted can not be imported.
         String reposerver = Activator.getDefault().getPreferenceStore().getString(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE);
         ProjectFromGitImporter importer = new ProjectFromGitImporter(reposerver, openProjectsAfterImport);
         for (String extension : extensionsToImport) {
+        	if (extensionsWithDeleteErrors.contains(extension)) {
+        		// delete failed -> extension can not be imported
+        		continue;
+        	}
             try {
                 // sleep a second
                 TimeUnit.SECONDS.sleep(1);
 
                 // set the name of the current work
-                subMonitor.setTaskName("Import extension " + extension);
+                String taskName = "Import extension " + extension;
+                subMonitor.setTaskName("Import extension " + taskName);
+                System.out.println(taskName);
 
                 // do one task
                 importer.importProject(extension);
@@ -116,7 +124,15 @@ public class ExtensionImportJob extends Job {
             	return Status.CANCEL_STATUS;
             }
         }
-        return Status.OK_STATUS;
+        
+        // result
+        if (!extensionsWithDeleteErrors.isEmpty()) {
+        	// some extensions could not be imported because existing folders could not be deleted
+        	String extensionsWithDeleteErrorsStr = Joiner.on(", ").join(extensionsWithDeleteErrors);
+        	String message = String.format(ERROR_MESSAGE_DELETE_FAILED, extensionsWithDeleteErrorsStr);
+            return new Status(IStatus.ERROR, pluginId, message);
+        }
+    	return Status.OK_STATUS;
     }
 
     /**
