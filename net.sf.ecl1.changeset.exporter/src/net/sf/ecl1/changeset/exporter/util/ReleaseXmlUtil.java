@@ -143,17 +143,21 @@ public class ReleaseXmlUtil {
         	// read hotfix version
         	String hotfixStr = patchEntry.getAttribute("name");
         	if (hotfixStr==null || !hotfixStr.startsWith(HOTFIX_PREFIX)) {
-        		// log but otherwise ignore if there are other patches
+        		// log found problem but otherwise ignore it if there are other <patch> elements
         		System.err.println("Patch '" + hotfixStr + "': name does not start with expected prefix 'Hotfix '");
         		continue;
         	}
-        	int lastPointPos = hotfixStr.lastIndexOf('.');
-        	if (lastPointPos<0) {
-        		// log but otherwise ignore if there are other patches
-        		System.err.println("Patch '" + hotfixStr + "': name does not contain '.' as major/minor version separator");
+        	// count points in version
+        	int pointCount = 0;
+        	int pos = -1;
+        	while ((pos = hotfixStr.indexOf('.', pos+1)) > -1) {
+        		pointCount++;
+        	}
+        	if (pointCount != 3) {
+        		System.err.println("Patch '" + hotfixStr + "': version does not have the expected format x.x.x.x");
         		continue;
         	}
-        	
+        	int lastPointPos = hotfixStr.lastIndexOf('.');
         	String majorVersion = hotfixStr.substring(HOTFIX_PREFIX.length(), lastPointPos).trim();
         	String minorVersion = hotfixStr.substring(lastPointPos+1).trim();
         	int minorVersionInt;
@@ -169,7 +173,7 @@ public class ReleaseXmlUtil {
         		firstMajorVersion = majorVersion;
         	} else {
         		if (!majorVersion.equals(firstMajorVersion)) {
-            		System.err.println("Patch '" + hotfixStr + "': major version differs from first element major version " + firstMajorVersion);
+            		System.err.println("Patch '" + hotfixStr + "': major version differs from first major version " + firstMajorVersion);
             		// ignore otherwise
         		}
         	}
