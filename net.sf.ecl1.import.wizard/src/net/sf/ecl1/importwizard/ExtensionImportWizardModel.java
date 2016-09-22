@@ -197,16 +197,18 @@ public class ExtensionImportWizardModel {
     	// and converted to org.w3c.dom because there is no Eclipse Osgi bundle for org.jdom
 		Element root = doc.getDocumentElement();
 		NodeList classpathEntries = root.getElementsByTagName("classpathentry");
-        int classpathEntriesSize = classpathEntries.getLength();
-        for (int index=0; index<classpathEntriesSize; index++) {
-        	Node node = classpathEntries.item(index);
-        	if (!(node instanceof Element)) continue;
-        	Element classpathEntry = (Element) node;
-        	if (isProjectDependency(classpathEntry)) {
-                String projectDependency = classpathEntry.getAttribute("path").substring(1);
-                dependencyExtensions.add(projectDependency);
-            }
-        }
+		if (classpathEntries!=null) {
+	        int classpathEntriesCount = classpathEntries.getLength();
+	        for (int index=0; index<classpathEntriesCount; index++) {
+	        	Node node = classpathEntries.item(index);
+	        	if (!(node instanceof Element)) continue;
+	        	Element classpathEntry = (Element) node;
+	        	if (isProjectDependency(classpathEntry)) {
+	                String projectDependency = classpathEntry.getAttribute("path").substring(1);
+	                dependencyExtensions.add(projectDependency);
+	            }
+	        }
+		}
 		return dependencyExtensions;
 	}
 
