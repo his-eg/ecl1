@@ -1,12 +1,18 @@
 package net.sf.ecl1.changeset.exporter.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -16,6 +22,11 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import com.google.common.collect.Sets;
 
@@ -27,6 +38,10 @@ import com.google.common.collect.Sets;
  */
 public class ReleaseXmlUtil {
 
+	private static final String RELEASE_XML_FOLDER = "qisserver/WEB-INF/conf/service/patches/hisinone";
+	
+	private static final String HOTFIX_PREFIX = "Hotfix ";
+	
     /**
      * Find release xml files in workspace
      * @return
@@ -52,7 +67,7 @@ public class ReleaseXmlUtil {
      * @return
      */
     public static IFolder getReleaseXmlFolder() {
-        return getWebapps().getFolder("qisserver/WEB-INF/conf/service/patches/hisinone");
+        return getWebapps().getFolder(RELEASE_XML_FOLDER);
     }
 
     /**
@@ -70,6 +85,111 @@ public class ReleaseXmlUtil {
     }
 
     /**
+     * @return the next required hotfix version in short notation, like "7.1.0.140".
+     * "next required" means the biggest version from the release.xml file with the minor version incremented by 1.
+     */
+    public static String getIncrementedReleaseXmlVersionShortString() {
+    	IFile releaseFile = getReleaseXmlFile("release.xml");
+    	if (releaseFile==null) {
+    		System.err.println("File 'release.xml' does not exist");
+    		return "UNKNOWN_VERSION";
+    	}
+        String contents = readContent(releaseFile);
+        if (contents==null) {
+    		System.err.println("IOException occurred reading file 'release.xml'");
+    		return "UNKNOWN_VERSION";
+        }
+
+    	// create XML document
+    	Document doc = null;
+    	InputStream classpathContentStream = null;
+    	try {
+        	classpathContentStream = new ByteArrayInputStream(contents.getBytes("UTF-8"));
+        	DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        	// The release.xml refers to a release.dtd file, which can not be found by the document builder.
+        	// This is caused by the builder trying to locate the dtd file directly in the Eclipse main directory,
+        	// e.g. C:\HIS-Workspace\Programme\eclipse_neon\release.dtd.
+        	// Probably we could pass the right location to the builder factory, but since we do not need validation here,
+        	// we simply turn it off following http://stackoverflow.com/questions/155101/make-documentbuilder-parse-ignore-dtd-references
+        	factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+        	// now create a builder and parse the release.xml
+        	DocumentBuilder builder = factory.newDocumentBuilder();
+        	doc = builder.parse(classpathContentStream);
+    		classpathContentStream.close();
+    	} catch (IOException | SAXException | ParserConfigurationException e) {
+    		System.err.println("Exception parsing 'release.xml' file: " + e);
+    		return "UNKNOWN_VERSION";
+    	}
+    	if (doc==null) {
+    		System.err.println("Could not create XML document from 'release.xml' file");
+    		return "UNKNOWN_VERSION";
+    	}
+    	
+    	// parse XML
+		Element root = doc.getDocumentElement();
+		NodeList patchEntries = root.getElementsByTagName("patch");
+		int patchEntriesCount;
+		if (patchEntries==null || (patchEntriesCount = patchEntries.getLength()) == 0) {
+    		System.err.println("'release.xml' file does not contain <patch> elements");
+    		return "UNKNOWN_VERSION";
+		}
+		
+    	String firstMajorVersion = null;
+    	int maxMinorVersion = Integer.MIN_VALUE;
+        for (int index=0; index<patchEntriesCount; index++) {
+        	Node node = patchEntries.item(index);
+        	if (!(node instanceof Element)) continue;
+        	Element patchEntry = (Element) node;
+        	// read hotfix version
+        	String hotfixStr = patchEntry.getAttribute("name");
+        	if (hotfixStr==null || !hotfixStr.startsWith(HOTFIX_PREFIX)) {
+        		// log but otherwise ignore if there are other patches
+        		System.err.println("Patch '" + hotfixStr + "': name does not start with expected prefix 'Hotfix '");
+        		continue;
+        	}
+        	int lastPointPos = hotfixStr.lastIndexOf('.');
+        	if (lastPointPos<0) {
+        		// log but otherwise ignore if there are other patches
+        		System.err.println("Patch '" + hotfixStr + "': name does not contain '.' as major/minor version separator");
+        		continue;
+        	}
+        	
+        	String majorVersion = hotfixStr.substring(HOTFIX_PREFIX.length(), lastPointPos).trim();
+        	String minorVersion = hotfixStr.substring(lastPointPos+1).trim();
+        	int minorVersionInt;
+        	try {
+        		minorVersionInt = Integer.parseInt(minorVersion);
+        	} catch (NumberFormatException nfe) {
+        		System.err.println("Patch '" + hotfixStr + "': minor version " + minorVersion + " is not a number");
+        		continue;
+        	}
+        	
+        	// check major version consistency
+        	if (firstMajorVersion==null) {
+        		firstMajorVersion = majorVersion;
+        	} else {
+        		if (!majorVersion.equals(firstMajorVersion)) {
+            		System.err.println("Patch '" + hotfixStr + "': major version differs from first element major version " + firstMajorVersion);
+            		// ignore otherwise
+        		}
+        	}
+
+        	// check if current minor version is the new greatest
+        	if (minorVersionInt > maxMinorVersion) {
+        		maxMinorVersion = minorVersionInt;
+        	}
+        }
+        
+        if (firstMajorVersion==null) {
+        	// there was no valid <patch> element
+    		System.err.println("'release.xml' does not contain valid <patch> elements");
+    		return "UNKNOWN_VERSION";
+        }
+        // return highest version with minor version incremented by 1
+        return firstMajorVersion + "." + String.valueOf(maxMinorVersion + 1);
+    }
+    
+    /**
      * Utility method for determining webapps project branch and respective version number
      *
      * examples:
@@ -77,7 +197,7 @@ public class ReleaseXmlUtil {
      * - HISinOne_VERSION_06_RELEASE_01 --> 6.1
      * @return
      */
-    public static String getVersionShortString() {
+    public static String getCvsTagVersionShortString() {
         IProject webapps = getWebapps();
         IFile file = webapps.getFile("CVS/Tag");
         if (!file.exists()) {
@@ -128,5 +248,4 @@ public class ReleaseXmlUtil {
     private static boolean isWebapps(IProject project) {
         return project.exists(new Path("qisserver"));
     }
-
 }

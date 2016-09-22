@@ -61,8 +61,10 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         pageComposite.setLayout(oneColumnGrid);
 
         hotfixTitle = new StringFieldEditor("title", "Title", pageComposite);
-        String version = ReleaseXmlUtil.getVersionShortString();
-        hotfixTitle.setStringValue("Hotfix " + version + ".");
+        // Get version from release.xml incremented by 1 for next hotfix
+        String version = ReleaseXmlUtil.getIncrementedReleaseXmlVersionShortString();
+        System.out.println("version from release.xml incremented by 1 = " + version);;
+        hotfixTitle.setStringValue("Hotfix " + version);
         hotfixDescribtion = new StringFieldEditor("description", "Description", pageComposite);
         hiszillaTickets = new StringFieldEditor("hiszilla", "Hiszilla", pageComposite);
 
@@ -215,5 +217,4 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         String hiszilla = hiszillaTickets.getStringValue();
         return hiszilla != null && !hiszilla.isEmpty();
     }
-
 }
