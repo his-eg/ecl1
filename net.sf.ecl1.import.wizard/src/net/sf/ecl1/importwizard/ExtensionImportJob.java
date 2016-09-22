@@ -55,9 +55,11 @@ public class ExtensionImportJob extends Job {
         String existingFoldersStr = Joiner.on(", ").join(existingFolders);
 
         // convert monitor to SubMonitor and set total number of work units
-        final int totalWorkSteps = existingFolders.size() + extensionsToImport.size();
-        SubMonitor subMonitor = SubMonitor.convert(monitor, totalWorkSteps);
-        subMonitor.split(1); // fixes displayed progress
+        final int totalWork = existingFolders.size() + extensionsToImport.size();
+        SubMonitor subMonitor = SubMonitor.convert(monitor, totalWork);
+        // TODO: is the next line required, e.g. for Eclipse versions <= 4.5 ?
+        // subMonitor.beginTask("Extension Import", totalWork);
+        subMonitor.split(1); // fixes displayed progress percentage
         
         // first part of the job: delete projects from workspace (if requested)
     	ArrayList<String> extensionsWithDeleteErrors = new ArrayList<String>();
