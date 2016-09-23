@@ -24,6 +24,8 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.Sets;
 
+import h1modules.utilities.utils.HISinOneFileUtil;
+
 /**
  * Utilities for management of release.xml files
  *
