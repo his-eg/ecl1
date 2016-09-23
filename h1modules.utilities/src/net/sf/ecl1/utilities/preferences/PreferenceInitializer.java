@@ -20,7 +20,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         IPreferenceStore store = Activator.getDefault().getPreferenceStore();
         store.setDefault(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE, "ssh://git@git.his.de/");
         store.setDefault(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE, "http://build.his.de/build/");
-        store.setDefault(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, "HEAD");
+        String branch = "HEAD"; // TODO: read from webapps/CVS/Tag
+        store.setDefault(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, branch);
         store.setDefault(ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URL, "http://ecl1.sourceforge.net/templates");
     }
 
