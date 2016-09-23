@@ -24,6 +24,7 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.Sets;
 
+import h1modules.utilities.utils.CvsTagUtil;
 import h1modules.utilities.utils.HISinOneFileUtil;
 
 /**
@@ -95,12 +96,12 @@ public class ReleaseXmlUtil {
     	IFile releaseFile = getReleaseXmlFile("release.xml");
     	if (releaseFile==null) {
     		System.err.println("File 'release.xml' does not exist");
-    		return "UNKNOWN_VERSION";
+    		return CvsTagUtil.UNKNOWN_VERSION;
     	}
         String contents = HISinOneFileUtil.readContent(releaseFile);
         if (contents==null) {
     		System.err.println("IOException occurred reading file 'release.xml'");
-    		return "UNKNOWN_VERSION";
+    		return CvsTagUtil.UNKNOWN_VERSION;
         }
 
     	// create XML document
@@ -121,11 +122,11 @@ public class ReleaseXmlUtil {
     		classpathContentStream.close();
     	} catch (IOException | SAXException | ParserConfigurationException e) {
     		System.err.println("Exception parsing 'release.xml' file: " + e);
-    		return "UNKNOWN_VERSION";
+    		return CvsTagUtil.UNKNOWN_VERSION;
     	}
     	if (doc==null) {
     		System.err.println("Could not create XML document from 'release.xml' file");
-    		return "UNKNOWN_VERSION";
+    		return CvsTagUtil.UNKNOWN_VERSION;
     	}
     	
     	// parse XML
@@ -134,11 +135,16 @@ public class ReleaseXmlUtil {
 		int patchEntriesCount;
 		if (patchEntries==null || (patchEntriesCount = patchEntries.getLength()) == 0) {
     		System.err.println("'release.xml' file does not contain <patch> elements");
-    		return "UNKNOWN_VERSION";
+    		return CvsTagUtil.UNKNOWN_VERSION;
 		}
 		
-    	String firstMajorVersion = null;
+    	String referenceMajorVersion = CvsTagUtil.getCvsTagVersionShortString();
+    	if (referenceMajorVersion.equals(CvsTagUtil.HEAD_VERSION) || referenceMajorVersion.equals(CvsTagUtil.UNKNOWN_VERSION)) {
+    		// the reference version string is not comparable with the entries in release.xml -> determine dynamically 
+    		referenceMajorVersion = null;
+    	}
     	int maxMinorVersion = Integer.MIN_VALUE;
+    	
         for (int index=0; index<patchEntriesCount; index++) {
         	Node node = patchEntries.item(index);
         	if (!(node instanceof Element)) continue;
@@ -172,11 +178,11 @@ public class ReleaseXmlUtil {
         	}
         	
         	// check major version consistency
-        	if (firstMajorVersion==null) {
-        		firstMajorVersion = majorVersion;
+        	if (referenceMajorVersion==null) {
+        		referenceMajorVersion = majorVersion;
         	} else {
-        		if (!majorVersion.equals(firstMajorVersion)) {
-            		System.err.println("Patch '" + hotfixStr + "': major version differs from first major version " + firstMajorVersion);
+        		if (!majorVersion.equals(referenceMajorVersion)) {
+            		System.err.println("Patch '" + hotfixStr + "': major version differs from first major version " + referenceMajorVersion);
             		// ignore otherwise
         		}
         	}
@@ -187,12 +193,12 @@ public class ReleaseXmlUtil {
         	}
         }
         
-        if (firstMajorVersion==null) {
+        if (referenceMajorVersion==null) {
         	// there was no valid <patch> element
     		System.err.println("'release.xml' does not contain valid <patch> elements");
-    		return "UNKNOWN_VERSION";
+    		return CvsTagUtil.UNKNOWN_VERSION;
         }
         // return highest version with minor version incremented by 1
-        return firstMajorVersion + "." + String.valueOf(maxMinorVersion + 1);
+        return referenceMajorVersion + "." + String.valueOf(maxMinorVersion + 1);
     }
 }

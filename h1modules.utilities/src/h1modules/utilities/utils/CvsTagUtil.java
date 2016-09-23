@@ -13,6 +13,11 @@ import org.eclipse.core.resources.IProject;
  */
 public class CvsTagUtil {
     
+	public static final String CVS_TAG = "CVS/Tag";
+	public static final String HEAD_VERSION = "HEAD";
+	public static final String UNKNOWN_VERSION = "UNKNOWN_VERSION";
+	public static final String HISINONE_PREFIX = "HISinOne_";
+	
     /**
      * @return webapps project branch version in long notation, read from webapps/CVS/Tag.</br>
      * 
@@ -22,16 +27,16 @@ public class CvsTagUtil {
      */
     public static String getCvsTagVersionLongString() {
         IProject webapps = HISinOneFileUtil.getWebapps();
-        IFile file = webapps.getFile("CVS/Tag");
+        IFile file = webapps.getFile(CVS_TAG);
         if (!file.exists()) {
-            return "HEAD";
+            return HEAD_VERSION;
         }
         String contents = HISinOneFileUtil.readContent(file);
         if (contents != null) {
         	// CVS/Tag content is "T" followed by version string -> remove the "T"
         	return contents.trim().substring(1);
         }
-        return "UNKNOWN_VERSION";
+        return UNKNOWN_VERSION;
     }
     
     /**
@@ -43,12 +48,12 @@ public class CvsTagUtil {
      */
     public static String getCvsTagVersionShortString() {
         String longVersion = getCvsTagVersionLongString();
-        if (longVersion.equals("HEAD") || longVersion.equals("UNKNOWN_VERSION")) {
+        if (longVersion.equals(HEAD_VERSION) || longVersion.equals(UNKNOWN_VERSION)) {
         	return longVersion;
         }
 
         // extract short version from old long version format
-        String reducedBranch = longVersion.trim().replace("HISinOne_", "");
+        String reducedBranch = longVersion.trim().replace(HISINONE_PREFIX, "");
         List<String> branchNameComponents = Arrays.asList(reducedBranch.split("_"));
         String majorVersion = Integer.toString(Integer.parseInt(branchNameComponents.get(1)));
         String minorVersion = "0";
