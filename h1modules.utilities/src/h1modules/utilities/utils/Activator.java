@@ -50,4 +50,10 @@ public class Activator extends AbstractUIPlugin {
         return store;
     }
 
+    /**
+     * @return pluginId required for example by Status constructors.
+     */
+    public static String getPluginId() {
+    	return Activator.getDefault().getBundle().getSymbolicName();
+    }
 }

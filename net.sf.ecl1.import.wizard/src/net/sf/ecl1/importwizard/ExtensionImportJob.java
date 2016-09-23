@@ -45,7 +45,7 @@ public class ExtensionImportJob extends Job {
 		this.extensionsToImport = extensionsToImport;
 		this.openProjectsAfterImport = openProjectsAfterImport;
 		this.deleteFolders = deleteFolders;
-		this.pluginId = Activator.getDefault().getBundle().getSymbolicName();
+		this.pluginId = Activator.getPluginId();
 	}
 	
     @Override
