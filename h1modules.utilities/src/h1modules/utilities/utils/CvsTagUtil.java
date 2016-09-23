@@ -47,6 +47,7 @@ public class CvsTagUtil {
         	return longVersion;
         }
 
+        // extract short version from old long version format
         String reducedBranch = longVersion.trim().replace("HISinOne_", "");
         List<String> branchNameComponents = Arrays.asList(reducedBranch.split("_"));
         String majorVersion = Integer.toString(Integer.parseInt(branchNameComponents.get(1)));
@@ -55,5 +56,6 @@ public class CvsTagUtil {
             minorVersion = Integer.toString(Integer.parseInt(branchNameComponents.get(3)));
         }
         return majorVersion + "." + minorVersion;
+        // TODO: extract short version from new long version format (e.g. HISinOne_2017_06 ?) when it is exactly known
     }
 }
