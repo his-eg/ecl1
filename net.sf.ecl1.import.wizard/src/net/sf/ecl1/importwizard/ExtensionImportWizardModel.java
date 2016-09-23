@@ -58,16 +58,11 @@ public class ExtensionImportWizardModel {
     private Collection<String> totalRequiredExtensions = null;
 
     public ExtensionImportWizardModel() {
-    	initBranch();
+    	branch = Activator.getHISinOneBranch();
     	remoteProjectSearchSupport = new RemoteProjectSearchSupport();
     	initRemoteExtensions();
         initExtensionsInWorkspace();
         extensions2dependencyExtensions = new HashMap<String, List<String>>();
-    }
-
-    private void initBranch() {
-        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-        branch = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE);
     }
 
     String getBranch() {

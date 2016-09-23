@@ -4,6 +4,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
+
 
 /**
  * Activator
@@ -46,8 +48,7 @@ public class Activator extends AbstractUIPlugin {
     }
     
     public static IPreferenceStore getPreferences() {
-        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-        return store;
+        return Activator.getDefault().getPreferenceStore();
     }
 
     /**
@@ -55,5 +56,13 @@ public class Activator extends AbstractUIPlugin {
      */
     public static String getPluginId() {
     	return Activator.getDefault().getBundle().getSymbolicName();
+    }
+    
+    /**
+     * @return long version identifier of the HisInOne branch declared on the preferences page,
+     * like "HEAD" or "HISinOne_VERSION_07_RELEASE_01".
+     */
+    public static String getHISinOneBranch() {
+        return getPreferences().getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE);
     }
 }
