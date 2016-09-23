@@ -6,6 +6,8 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -137,14 +139,9 @@ public class ReleaseXmlUtil {
     		System.err.println("'release.xml' file does not contain <patch> elements");
     		return CvsTagUtil.UNKNOWN_VERSION;
 		}
-		
-    	String referenceMajorVersion = CvsTagUtil.getCvsTagVersionShortString();
-    	if (referenceMajorVersion.equals(CvsTagUtil.HEAD_VERSION) || referenceMajorVersion.equals(CvsTagUtil.UNKNOWN_VERSION)) {
-    		// the reference version string is not comparable with the entries in release.xml -> determine dynamically 
-    		referenceMajorVersion = null;
-    	}
-    	int maxMinorVersion = Integer.MIN_VALUE;
-    	
+
+    	int maxMinorVersion = Integer.MIN_VALUE;    	
+    	TreeMap<String, Integer> distinctMajorVersions2Count = new TreeMap<String, Integer>(); // Set  registers only distinct values
         for (int index=0; index<patchEntriesCount; index++) {
         	Node node = patchEntries.item(index);
         	if (!(node instanceof Element)) continue;
@@ -153,22 +150,14 @@ public class ReleaseXmlUtil {
         	String hotfixStr = patchEntry.getAttribute("name");
         	if (hotfixStr==null || !hotfixStr.startsWith(HOTFIX_PREFIX)) {
         		// log found problem but otherwise ignore it if there are other <patch> elements
-        		System.err.println("Patch '" + hotfixStr + "': name does not start with expected prefix 'Hotfix '");
+        		System.err.println("Patch '" + hotfixStr + "': name does not start with expected prefix '" + HOTFIX_PREFIX + "'");
         		continue;
         	}
-        	// count points in version
-        	int pointCount = 0;
-        	int pos = -1;
-        	while ((pos = hotfixStr.indexOf('.', pos+1)) > -1) {
-        		pointCount++;
-        	}
-        	if (pointCount != 3) {
-        		System.err.println("Patch '" + hotfixStr + "': version does not have the expected format x.x.x.x");
-        		continue;
-        	}
-        	int lastPointPos = hotfixStr.lastIndexOf('.');
-        	String majorVersion = hotfixStr.substring(HOTFIX_PREFIX.length(), lastPointPos).trim();
-        	String minorVersion = hotfixStr.substring(lastPointPos+1).trim();
+
+        	String versionStr = hotfixStr.substring(HOTFIX_PREFIX.length());
+        	int lastPointPos = versionStr.lastIndexOf('.');
+        	String majorVersion = versionStr.substring(0, lastPointPos).trim();
+        	String minorVersion = versionStr.substring(lastPointPos+1).trim();
         	int minorVersionInt;
         	try {
         		minorVersionInt = Integer.parseInt(minorVersion);
@@ -176,29 +165,40 @@ public class ReleaseXmlUtil {
         		System.err.println("Patch '" + hotfixStr + "': minor version " + minorVersion + " is not a number");
         		continue;
         	}
-        	
-        	// check major version consistency
-        	if (referenceMajorVersion==null) {
-        		referenceMajorVersion = majorVersion;
-        	} else {
-        		if (!majorVersion.equals(referenceMajorVersion)) {
-            		System.err.println("Patch '" + hotfixStr + "': major version differs from first major version " + referenceMajorVersion);
-            		// ignore otherwise
-        		}
-        	}
 
-        	// check if current minor version is the new greatest
+        	// patch is valid, register major version
+        	Integer count = distinctMajorVersions2Count.get(majorVersion);
+        	int countInt = (count==null) ? 1 : count.intValue()+1; // increment
+        	distinctMajorVersions2Count.put(majorVersion, Integer.valueOf(countInt));
+        	// check if current minor version is the greatest one so far
         	if (minorVersionInt > maxMinorVersion) {
         		maxMinorVersion = minorVersionInt;
         	}
         }
         
-        if (referenceMajorVersion==null) {
+        if (distinctMajorVersions2Count.isEmpty()) {
         	// there was no valid <patch> element
     		System.err.println("'release.xml' does not contain valid <patch> elements");
     		return CvsTagUtil.UNKNOWN_VERSION;
         }
+        
+        // find the major version that occurred most often
+        String maxCountMajorVersion = null;
+        if (distinctMajorVersions2Count.size()==1) {
+        	maxCountMajorVersion = distinctMajorVersions2Count.firstKey();
+        } else {
+        	// there were distinct major versions
+            int maxCount = 0;
+            for (Map.Entry<String, Integer> entry : distinctMajorVersions2Count.entrySet()) {
+            	int count = entry.getValue().intValue();
+            	if (count > maxCount) {
+            		maxCount = count;
+            		maxCountMajorVersion = entry.getKey();
+            	}
+            }
+    		System.err.println("'release.xml' contains distinct major versions: " + distinctMajorVersions2Count.keySet() + ". Only one of them can be correct.");
+        }
         // return highest version with minor version incremented by 1
-        return referenceMajorVersion + "." + String.valueOf(maxMinorVersion + 1);
+        return maxCountMajorVersion + "." + String.valueOf(maxMinorVersion + 1);
     }
 }
