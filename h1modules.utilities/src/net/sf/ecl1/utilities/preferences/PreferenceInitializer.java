@@ -23,6 +23,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE, "http://build.his.de/build/");
         // initialize HISinOne version preference setting from webapps/CVS/Tag
         String branch = CvsTagUtil.getCvsTagVersionLongString();
+        if (branch==null || branch.equals(CvsTagUtil.UNKNOWN_VERSION)) {
+        	// there is no webapps project yet, use HEAD as default
+        	branch = CvsTagUtil.HEAD_VERSION;
+        }
         store.setDefault(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, branch);
         store.setDefault(ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URL, "http://ecl1.sourceforge.net/templates");
     }
