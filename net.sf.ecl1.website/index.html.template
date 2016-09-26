@@ -3,7 +3,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Style-Type" content="text/css">
-<link href="style.css?3" rel="stylesheet" type="text/css">
+<link href="style.css" rel="stylesheet" type="text/css">
 <title>Ecl1: Eclipse Plugin for HISinOne Extensions</title>
 <link rel="icon" href="icon.png" type="image/png">
 </head>
@@ -16,11 +16,11 @@
 <h1>Ecl1: Eclipse Plugin for HISinOne Extensions</h1>
 
 	<p>Ecl1 is an Eclipse plugin that supports the development of <a href="http://www.hisinone.de">HISinOne</a> extensions. The current released version of the ecl1 toolset is ECL1VERSION</p>
-	
+
 <h2 id="features">Features</h2>
-	
+
 	<p>Ecl1 provides a toolset, that supports the development of extensions for the campus management software HISinOne.</p>
-	
+
 	<ul>
 		<li>Wizard for new extension projects, that creates an empty project fitting to the required structure</li>
 		<li>Import Wizard for existing extension projects</li>
@@ -55,24 +55,24 @@
 		<p>To create a new extension select "HISinOne Extension Project" from the category "HISinOne" after selecting New from File menu or pressing Ctrl + N.</p>
 		<img src="ecl1-new-wizzard.png">
 
-		<p>After selecting the wizard for a new HISinOne Extension Project, you need to choose a name for the extension you want to develop. 
+		<p>After selecting the wizard for a new HISinOne Extension Project, you need to choose a name for the extension you want to develop.
 		Ideally you pick a name that follows the java package naming conventions, as you can see in the following screenshot.</p>
 		<img src="ecl1-project-name.png">
 
 		<p><img src="ecl1-project-structure.png"></p>
-		
+
 		<p>Finally you now have a fully operational HISinOne-extension skeleton. It even has a <a href="http://git-scm.com/">Git</a> repository prepared for sharing with fellow developers.</p>
 
-<!-- TODO 
+<!-- TODO
 <h3>Create a new EnrollChecker</h3>
  -->
  	<h3>Import existing extensions</h3>
- 	
+
  	<p>Invisibility of other extensions is a challenge. We try to tackle this hurdle with a dedicated import wizard for HISinOne-Extensions</p>
- 	
+
  	<p>In the category HISinOne the wizard Extension Import offers a simple one click way of importing a set of existing extensions into your workspace.
  	<img alt="Screenshot of import wizard showing a list of HISinOne extensions for import" src="ecl1-import-wizard.png"></p>
- 	
+
  	<p>To make the import suitable to your custom environment, build server as source for available extensions and git server as version control system are configurable.
  	<img alt="Screenshot of preferences dialogue showing configuration parameters for extension import." src="ecl1-import-preferences.png"></p>
 
