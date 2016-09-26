@@ -27,7 +27,7 @@ import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 /**
  * The job that actually performs deleting of existing folders in the workspace and the extension import.
  * It is called from ExtensionImportWizard's performFinish() method and executed as a separate thread.
- * 
+ *
  * @author Keunecke / tneumann
  */
 public class ExtensionImportJob extends Job {
@@ -39,7 +39,7 @@ public class ExtensionImportJob extends Job {
 	private boolean openProjectsAfterImport;
 	private boolean deleteFolders;
 	private String pluginId;
-	
+
 	public ExtensionImportJob(Collection<String> extensionsToImport, boolean openProjectsAfterImport, boolean deleteFolders) {
 		super("Extension Import");
 		this.extensionsToImport = extensionsToImport;
@@ -47,7 +47,7 @@ public class ExtensionImportJob extends Job {
 		this.deleteFolders = deleteFolders;
 		this.pluginId = Activator.getPluginId();
 	}
-	
+
     @Override
     protected IStatus run(IProgressMonitor monitor) {
     	// The folders in workspace that must be scrubbed before extension import
@@ -57,10 +57,8 @@ public class ExtensionImportJob extends Job {
         // convert monitor to SubMonitor and set total number of work units
         final int totalWork = existingFolders.size() + extensionsToImport.size();
         SubMonitor subMonitor = SubMonitor.convert(monitor, totalWork);
-        // TODO: is the next line required, e.g. for Eclipse versions <= 4.5 ?
-        // subMonitor.beginTask("Extension Import", totalWork);
-        subMonitor.split(1); // fixes displayed progress percentage
-        
+        subMonitor.worked(1); // fixes displayed progress percentage
+
         // first part of the job: delete projects from workspace (if requested)
     	ArrayList<String> extensionsWithDeleteErrors = new ArrayList<String>();
         if (!existingFolders.isEmpty()) {
@@ -69,7 +67,7 @@ public class ExtensionImportJob extends Job {
             	String message = String.format(ERROR_MESSAGE_EXISTING_FOLDER, existingFoldersStr);
                 return new Status(IStatus.ERROR, pluginId, message);
             }
-            
+
             // scrubbing folders is necessary and authorized
             for (String extension : existingFolders) {
                 try {
@@ -80,7 +78,7 @@ public class ExtensionImportJob extends Job {
                     String taskName = "Delete extension folder from workspace: " + extension;
                     subMonitor.setTaskName(taskName);
                     System.out.println(taskName);
-                    
+
                     // do one task
                     IWorkspace workspace = ResourcesPlugin.getWorkspace();
                     IWorkspaceRoot root = workspace.getRoot();
@@ -94,13 +92,13 @@ public class ExtensionImportJob extends Job {
                         e.printStackTrace();
                     }
                     // reduce total work by 1
-                    subMonitor.split(1);
+                    subMonitor.worked(1);
                 } catch (InterruptedException e) {
                 	return Status.CANCEL_STATUS;
                 }
             }
         }
-        
+
         // second part of the job: import extension projects from git repository.
         // extensions with folders in the workspace that could not be deleted can not be imported.
         String reposerver = Activator.getDefault().getPreferenceStore().getString(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE);
@@ -122,12 +120,12 @@ public class ExtensionImportJob extends Job {
                 // do one task
                 importer.importProject(extension);
                 // reduce total work by 1
-                subMonitor.split(1);
+                subMonitor.worked(1);
             } catch (InterruptedException | CoreException e) {
             	return Status.CANCEL_STATUS;
             }
         }
-        
+
         // result
         if (!extensionsWithDeleteErrors.isEmpty()) {
         	// some extensions could not be imported because existing folders could not be deleted
@@ -141,10 +139,10 @@ public class ExtensionImportJob extends Job {
     /**
      * Check if a folder with the name of an extension to import name already exists in workspace.
      * Any folders are returned, not just such with a valid project nature.
-     * 
+     *
      * @param extensionsToImport
      * @return the folders that already exist in workspace
-     * 
+     *
      * @see {@link ExtensionImportWizardModel.initExtensionsInWorkspace()}
      */
     private Collection<String> checkForExistingFolders(Collection<String> extensionsToImport) {
