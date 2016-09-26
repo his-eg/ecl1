@@ -5,8 +5,6 @@ Bundle-SymbolicName: net.sf.ecl1.import.wizard;singleton:=true
 Bundle-Version: 0.2.4.2016-09-13
 Bundle-Vendor: HIS eG
 Require-Bundle: org.eclipse.ui,
- org.eclipse.ui.ide,
- org.eclipse.core.resources,
  net.sf.ecl1.utilities,
  org.eclipse.jgit,
  com.google.guava;bundle-version="15.0.0",
