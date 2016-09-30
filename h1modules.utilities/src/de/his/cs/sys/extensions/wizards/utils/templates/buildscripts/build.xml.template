@@ -3,14 +3,14 @@
 	<description>
             Build Script for HISinOne Extension
     </description>
-	
+
 	<!-- Umgebungsvariablen sollen in den Builds verfügbar sein -->
 	<property environment="env"/>
 
 	<!-- Lokal koennen per Propertiesdatei Werte Ueberschrieben werden -->
 	<property file="${user.name}.ant.properties" />
-	
-	<!-- 
+
+	<!--
 	Parameter, die modulspezifisch sind, werden in der modul.ant.properties gepflegt:
 	- Modulname: extension.name
 	-->
@@ -41,18 +41,17 @@
 	<property name="cobertura-dir" value="${qisserver-lib-compile}" />
 	<property name="src-java" value="src/java"/>
 	<property name="src-test" value="src/test"/>
-	<property name="test-resource" location="resource" />
-	<property name="resource-web" location="${test-resource}/web" />
+	<property name="test-resource" location="resource"/>
 	<property name="pitreport" location="pitReports"/>
 	<property name="pithistory" location="${build}/history"/>
 
 	<property name="build-server" value="http://build.his.de/build/" />
-	
+
 	<path id="additional-classpath">
 	</path>
-	
+
 	<import file="compile-classpath.xml" optional="true" />
-		
+
 	<path id="compile-classpath">
 		<pathelement location="${qisserver-classes}"/>
 		<fileset dir="${qisserver-lib}">
@@ -66,12 +65,12 @@
 		</fileset>
 		<path refid="additional-classpath" />
 	</path>
-	
+
 	<path id="additional-sourcepath">
 	</path>
-	
+
 	<import file="compile-sourcepath.xml" optional="true" />
-	
+
 	<path id="compile-sourcepath">
 		<dirset dir="src">
 			<include name="java" />
@@ -79,7 +78,7 @@
 		</dirset>
 		<path refid="additional-sourcepath"/>
 	</path>
-	
+
 	<path id="compile-test-classpath">
 		<pathelement location="${qisserver-classes}"/>
 		<pathelement location="${classes-target}" />
@@ -96,11 +95,11 @@
 		</fileset>
 		<path refid="additional-classpath" />
 	</path>
-	
+
 	<property name="build_cobertura" value="${build}/cobertura_build"/>
-		
+
 	<property name="build_cobertura_report" value="${build}/coveragereport"/>
-	
+
 	<path id="cobertura-classpath">
 		<fileset dir="${qisserver-lib}">
 			<include name="*.jar" />
@@ -109,9 +108,9 @@
 		</fileset>
 		<fileset dir="${qisserver-webinf}/internal/ant/lib">
 			<include name="*.jar" />
-		</fileset>		
+		</fileset>
 	</path>
-	
+
 	<path id="cobertura-test-classpath">
 		<pathelement location="${build_cobertura}" />
 		<pathelement location="${test-target}" />
@@ -119,15 +118,15 @@
 		<path refid="compile-test-classpath" />
 		<path refid="cobertura-classpath" />
 	</path>
-	
+
 	<taskdef classpathref="cobertura-classpath" resource="tasks.properties" />
-	
+
 	<path id="compile-test-sourcepath">
 		<dirset dir="src">
 			<include name="test" />
 		</dirset>
 	</path>
-	
+
 	<target name="clean">
 		<delete includeemptydirs="true" failonerror="false" >
 			<fileset dir="${build}" />
@@ -161,14 +160,30 @@
 			<fileset dir="resource" />
 		</copy>
 	</target>
-	
-	<target name="git-data">
-	    <condition property="repository.version" value="${env.BUILD_TAG}-${env.GIT_COMMIT}" else="unknown">
+
+	<available file=".git" type="dir" property="git.present"/>
+	<target name="git-revision" description="Store git revision in ${repository.version}" if="git.present">
+	    <exec executable="git" outputproperty="git.revision" failifexecutionfails="false" errorproperty="">
+	        <arg value="describe"/>
+	        <arg value="--tags"/>
+	        <arg value="--always"/>
+	        <arg value="HEAD"/>
+	    </exec>
+	    <condition property="repository.version" value="${env.GIT_COMMIT}" else="unknown">
+	        <and>
+	            <isset property="git.revision"/>
+	            <length string="${git.revision}" trim="yes" length="0" when="greater"/>
+	        </and>
+	    </condition>
+	</target>
+
+	<target name="jenkins-data" depends="git-revision">
+	    <condition property="extension.revision" value="${env.BUILD_TAG}-${env.GIT_COMMIT}" else="unknown">
             	<isset property="env.BUILD_TAG"/>
 	    </condition>
 	</target>
-	
-	<target name="jar-with-contribution" depends="git-data,compile" description="Extension JAR für die Distribution erzeugen" if="has-contribs">
+
+	<target name="jar-with-contribution" depends="jenkins-data,compile" description="Extension JAR für die Distribution erzeugen" if="has-contribs">
 		<jar destfile="${target-file}" index="true" >
 			<fileset dir="${classes-target}" />
 			<fileset dir="${src-java}">
@@ -178,12 +193,13 @@
 				<attribute name="Extension-Name" value="${extension.name}"/>
 				<attribute name="Extension-Version" value="${extension.version}"/>
 				<attribute name="Extension-ExtendedPoints" value="${extension.extended-points}"/>
-				<attribute name="Extension-Revision" value="${repository.version}"/>
+				<attribute name="Extension-Revision" value="${extension.revision}"/>
+				<attribute name="Extension-Git-Commit" value="${repository.version}" />
 			</manifest>
 		</jar>
 	</target>
-	
-	<target name="jar-without-contribution" depends="git-data,compile" description="Extension JAR für die Distribution erzeugen" unless="has-contribs">
+
+	<target name="jar-without-contribution" depends="jenkins-data,compile" description="Extension JAR für die Distribution erzeugen" unless="has-contribs">
 		<jar destfile="${target-file}" index="true" >
 			<fileset dir="${classes-target}" />
 			<fileset dir="${src-java}">
@@ -192,20 +208,21 @@
 			<manifest>
 				<attribute name="Extension-Name" value="${extension.name}"/>
 				<attribute name="Extension-Version" value="${extension.version}"/>
-				<attribute name="Extension-Revision" value="${repository.version}"/>
+				<attribute name="Extension-Revision" value="${extension.revision}"/>
+				<attribute name="Extension-Git-Commit" value="${repository.version}" />
 			</manifest>
 		</jar>
 	</target>
-	
+
 	<target name="jar-has-contribs">
 		<condition property="has-contribs">
 			<isset property="extension.extended-points"/>
 		</condition>
 	</target>
-	
+
 	<target name="jar" description="Extension JAR für die Distribution erzeugen" depends="jar-has-contribs,jar-with-contribution,jar-without-contribution" >
 	</target>
-	
+
 	<target name="compile-tests" depends="compile">
 		<javac srcdir="src/test" destdir="${test-target}" debug="on" includeantruntime="false" source="1.7" target="1.7" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
 			<compilerarg line="-encoding utf-8"/>
@@ -220,7 +237,7 @@
 			</fileset>
 		</copy>
 	</target>
-	
+
 	<target name="cobertura-instrument" depends="compile-tests">
 		<delete file="cobertura.ser" quiet="true" />
 
@@ -240,7 +257,7 @@
 			</auxClasspath>
 		</cobertura-instrument>
 	</target>
-	
+
 	<target name="cobertura-test" depends="cobertura-instrument">
 		<junit printsummary="yes" haltonerror="false" fork="true" forkmode="once">
 			<sysproperty key="net.sourceforge.cobertura.datafile"
@@ -257,8 +274,8 @@
 			</batchtest>
 		</junit>
 	</target>
-	
-	<target name="cobertura-report" depends="cobertura-test">
+
+	<target name="cobertura-report" depends="cobertura-test,macker-check-ci-build">
 		<cobertura-report format="html" destdir="${build_cobertura_report}" datafile="cobertura.ser">
 			<fileset dir="${src-java}" />
 		</cobertura-report>
@@ -266,7 +283,7 @@
 			<fileset dir="${src-java}" />
 		</cobertura-report>
 	</target>
-	
+
 	<target name="update-webapps">
 		<loadfile property="cvs.tag" srcFile="${webapps}/CVS/Tag" failonerror="false">
 	        <filterchain>
@@ -277,15 +294,15 @@
 	            </tokenfilter>
 	        </filterchain>
 	    </loadfile>
-	 
+
 		<condition property="cvs.tag" value="${cvs.tag}" else="HEAD">
 			<resourceexists>
 				  <file file="${webapps}/CVS/Tag" />
 			</resourceexists>
 		</condition>
-		
+
 		<property name="latest-build-result" value="${build-server}job/${extension.name}_${cvs.tag}/lastSuccessfulBuild/artifact/dist/${extension.name}.jar" />
-		
+
 		<get dest="${qisserver-extensions}/${extension.name}.jar" src="${latest-build-result}"/>
 	</target>
 
@@ -296,23 +313,23 @@
 			</resourceexists>
 		</condition>
 	</target>
-	
+
 	<target name="js" if="is-js-project" depends="pre-js">
-			
+
 			<condition property="cs.sys.horizon.core.loc" value="." else="${cs.sys.horizon.core}">
 				<equals arg1="${extension.name}" arg2="cs.sys.horizon.core" />
 			</condition>
-			
+
 			<exec dir="${cs.sys.horizon.core.loc}/resource/web/" executable="npm">
 				<arg line="install"/>
 			</exec>
-			
+
 			<exec dir="${cs.sys.horizon.core.loc}/resource/web/" executable="grunt">
 				<arg line="jenkins --path ${resource-web}/"/>
 			</exec>
-			
+
 	</target>
 
 	<import file="additional-targets.xml" optional="false" />
-	
+
 </project>
