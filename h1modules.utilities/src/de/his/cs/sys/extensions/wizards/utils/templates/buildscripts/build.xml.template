@@ -262,6 +262,8 @@
 		<junit printsummary="yes" haltonerror="false" fork="true" forkmode="once">
 			<sysproperty key="net.sourceforge.cobertura.datafile"
 						file="cobertura.ser" />
+			<sysproperty key="extension.name"
+						value="${extension.name}" />
 			<jvmarg value="-XX:MaxPermSize=512M"/>
 			<classpath refid="cobertura-test-classpath" />
 			<batchtest todir="${build-results}">
