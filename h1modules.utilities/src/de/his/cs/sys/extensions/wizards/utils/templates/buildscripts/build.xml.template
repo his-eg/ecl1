@@ -144,7 +144,7 @@
 	</target>
 
 	<target name="compile" depends="init">
-		<javac destdir="${classes-target}" debug="on" debuglevel="source,lines,vars" includeantruntime="false" source="1.7" target="1.7" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
+		<javac destdir="${classes-target}" debug="on" debuglevel="source,lines,vars" includeantruntime="false" source="1.8" target="1.8" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
 			<compilerarg line="-encoding utf-8"/>
 			<compilerarg line="-enableJavadoc" />
 	                <compilerarg line="-properties .settings/org.eclipse.jdt.core.prefs"/>
@@ -224,7 +224,7 @@
 	</target>
 
 	<target name="compile-tests" depends="compile">
-		<javac srcdir="src/test" destdir="${test-target}" debug="on" includeantruntime="false" source="1.7" target="1.7" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
+		<javac srcdir="src/test" destdir="${test-target}" debug="on" includeantruntime="false" source="1.8" target="1.8" encoding="UTF-8" compiler="org.eclipse.jdt.core.JDTCompilerAdapter">
 			<compilerarg line="-encoding utf-8"/>
 			<compilerarg line="-enableJavadoc" />
 	                <compilerarg line="-properties .settings/org.eclipse.jdt.core.prefs"/>
