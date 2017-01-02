@@ -10,7 +10,7 @@ Require-Bundle: org.eclipse.ui,
  org.junit,
  org.eclipse.swt,
  net.sf.ecl1.utilities;bundle-version="0.4.5"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: com.google.common.base;version="15.0.0",
  com.google.common.collect,

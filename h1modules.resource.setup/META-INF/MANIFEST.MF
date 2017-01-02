@@ -11,5 +11,5 @@ Require-Bundle: org.eclipse.core.runtime,
  net.sf.ecl1.utilities,
  org.eclipse.jgit
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: HIS eG
