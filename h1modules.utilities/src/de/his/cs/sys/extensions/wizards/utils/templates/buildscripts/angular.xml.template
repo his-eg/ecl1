@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="angularextension" default="jar">
+	<description>
+		Build Script for HISinOne Extension based on Angular 2
+	</description>
+
+	<!-- Umgebungsvariablen sollen in den Builds verfügbar sein -->
+	<property environment="env"/>
+
+	<!-- Lokal koennen per Propertiesdatei Werte Ueberschrieben werden -->
+	<property file="${user.name}.ant.properties" />
+
+	<!--
+	Parameter, die modulspezifisch sind, werden in der modul.ant.properties gepflegt:
+	- Modulname: extension.name
+	-->
+	<property file="extension.ant.properties" />
+
+
+	<!-- Windows fails to execute "ng" unless it is invoked as "ng.cmd" -->
+	<condition property="executable.suffix" value=".cmd">
+		<os family="windows" />
+	</condition>
+	<property name="executable.suffix" value="" />
+
+	<!-- find cs.sys.angularbase extension -->
+	<available file="../cs.sys.angularbase" property="cs.sys.angularbase" value="../cs.sys.angularbase" />
+	<available file="../../cs.sys.angularbase_${REQUIRED-VERSION}/workspace" property="cs.sys.angularbase" value="../../cs.sys.angularbase_${REQUIRED-VERSION}/workspace" />
+	<fail message="Extension cs.sys.angularbase is required as project for angular builds but it was not found." unless="cs.sys.angularbase" />
+
+
+	<!-- targets (names are compatible with java.xml) -->
+
+
+	<target name="clean">
+		<delete includeemptydirs="true" failonerror="false" >
+			<fileset dir="build" />
+			<fileset dir="dist" />
+		</delete>
+	</target>
+
+	<target name="update-dependencies">
+		<sync todir="node_modules">
+			<fileset dir="${cs.sys.angularbase}/node_modules" defaultexcludes="false" />
+		</sync>
+
+		<antcall target="internal-update-dependencies-notwindows" />
+	</target>
+
+	<!-- .bin contains symlinks on Linux. Ant's sync-task replaced them with the file content, 
+	resulting in ngc being unable to find its dependencies --> 
+	<target name="internal-update-dependencies-notwindows" unless="${executable.suffix}">
+		<delete dir="node_modules/.bin" />
+		<mkdir dir="node_modules/.bin" />
+		<echo>Copying symlinks</echo>
+		<exec executable="/bin/cp">
+			<arg value="-ax" />
+			<arg value="${cs.sys.angularbase}/node_modules/.bin" />
+			<arg value="node_modules/" />
+		</exec>
+		<chmod dir="node_modules/.bin" perm="ugo+rx" includes="**"/>
+	</target>
+
+	<target name="build" depends="update-dependencies">
+		<exec executable="node_modules/.bin/ng${executable.suffix}">
+			<arg value="build"/>
+			<arg value="--prod"/>
+			<arg value="--aot"/>
+		</exec>
+	</target>
+
+
+	<target name="jar" depends="build">
+	    <condition property="extension.revision" value="${env.BUILD_TAG}-${env.GIT_COMMIT}" else="unknown">
+           	<isset property="env.BUILD_TAG"/>
+	    </condition>
+
+	    <exec executable="git" outputproperty="git.revision" failifexecutionfails="false" errorproperty="">
+	        <arg value="describe"/>
+	        <arg value="--tags"/>
+	        <arg value="--always"/>
+	        <arg value="HEAD"/>
+	    </exec>
+	    <condition property="repository.version" value="${env.GIT_COMMIT}" else="unknown">
+	        <and>
+	            <isset property="git.revision"/>
+	            <length string="${git.revision}" trim="yes" length="0" when="greater"/>
+	        </and>
+	    </condition>
+
+
+		<jar destfile="dist/${extension.name}.jar">
+			<zipfileset prefix="META-INF/resources/web/${extension.name}" dir="dist" includes="*" excludes="*.jar" />
+			<zipfileset dir="." includes="**" excludes="dist/**,node_modules/**" />
+			<manifest>
+				<attribute name="Extension-Name" value="${extension.name}"/>
+				<attribute name="Extension-Version" value="${extension.version}"/>
+				<attribute name="Extension-Revision" value="${extension.revision}"/>
+				<attribute name="Extension-Git-Commit" value="${repository.version}" />
+			</manifest>
+		</jar>
+	</target>
+
+
+	<target name="serve">
+		<exec executable="node_modules/.bin/ng${executable.suffix}">
+			<arg value="server"/>
+			<arg value="--port"/>
+			<arg value="${extension.port}"/>
+		</exec>
+	</target>
+
+
+	<target name="test" depends="update-dependencies">
+		<parallel>
+			<daemons>
+				<exec executable="/usr/bin/Xvfb" failonerror="false" osfamily="unix">
+					<arg value=":10" />
+					<arg value="-screen" />
+					<arg value="0" />
+					<arg value="1920x1200x24" />
+				</exec>
+			</daemons>
+			<exec executable="node_modules/.bin/ng${executable.suffix}" errorproperty="prevent-screen-clear">
+				<arg value="test"/>
+				<arg value="--watch=false" />
+				<arg value="--with-coverage" />
+				<env key="DISPLAY" value=":10" />
+			</exec>
+		</parallel>
+	</target>
+
+
+	<!-- compatibility -->
+	<target name="cobertura-report" depends="cobertura-test" />
+	<target name="cobertura-test" depends="test" />
+
+</project>
