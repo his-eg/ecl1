@@ -14,10 +14,13 @@ import org.eclipse.core.resources.IProject;
 public class CvsTagUtil {
     
 	public static final String CVS_TAG = "CVS/Tag";
+	
 	public static final String HEAD_VERSION = "HEAD";
 	public static final String UNKNOWN_VERSION = "UNKNOWN_VERSION";
-	public static final String HISINONE_PREFIX = "HISinOne_";
 	
+	public static final String HISINONE_PREFIX = "HISinOne_";
+	public static final String VERSION_PREFIX = "VERSION";
+
     /**
      * @return webapps project branch version in long notation, read from webapps/CVS/Tag.</br>
      * 
@@ -43,8 +46,11 @@ public class CvsTagUtil {
      * @return webapps project branch and respective version number in short notation, read from webapps/CVS/Tag.</br>
      *
      * Examples:</br>
+     * old convention:
      * HISinOne_VERSION_07 --> 7.0</br>
      * HISinOne_VERSION_06_RELEASE_01 --> 6.1
+     * new convention:
+     * HISinOne_2017_06 -> 2017.6
      */
     public static String getCvsTagVersionShortString() {
         String longVersion = getCvsTagVersionLongString();
@@ -55,12 +61,19 @@ public class CvsTagUtil {
         // extract short version from old long version format
         String reducedBranch = longVersion.trim().replace(HISINONE_PREFIX, "");
         List<String> branchNameComponents = Arrays.asList(reducedBranch.split("_"));
-        String majorVersion = Integer.toString(Integer.parseInt(branchNameComponents.get(1)));
-        String minorVersion = "0";
-        if (branchNameComponents.size() > 2) {
-            minorVersion = Integer.toString(Integer.parseInt(branchNameComponents.get(3)));
+        if (reducedBranch.startsWith(VERSION_PREFIX)) {
+        	// old convention like HISinOne_VERSION_07 or HISinOne_VERSION_06_RELEASE_01
+	        String majorVersion = Integer.toString(Integer.parseInt(branchNameComponents.get(1)));
+	        String minorVersion = "0";
+	        if (branchNameComponents.size() > 2) {
+	            minorVersion = Integer.toString(Integer.parseInt(branchNameComponents.get(3)));
+	        }
+	        return majorVersion + "." + minorVersion;
+        } else {
+        	// new convention like HISinOne_2017_06
+        	String majorVersion = Integer.toString(Integer.parseInt(branchNameComponents.get(0)));
+        	String minorVersion = Integer.toString(Integer.parseInt(branchNameComponents.get(1)));
+	        return majorVersion + "." + minorVersion;
         }
-        return majorVersion + "." + minorVersion;
-        // TODO: extract short version from new long version format (e.g. HISinOne_2017_06 ?) when it is exactly known
     }
 }
