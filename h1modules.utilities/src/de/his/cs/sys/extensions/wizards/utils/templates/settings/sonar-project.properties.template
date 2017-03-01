@@ -10,7 +10,7 @@ sonar.sources=src/java
 sonar.tests=src/test
  
 # path to project binaries (optional), for example directory of Java bytecode
-sonar.java.binaries=build/classes,../../webapps_HEAD/workspace/webapps/qisserver/WEB-INF/classes[dependencies]
+sonar.java.binaries=build/classes
  
 # optional comma-separated list of paths to libraries. Only path to JAR file and path to directory of classes are supported.
 sonar.java.libraries=../../cs.sys.base.library_HEAD/workspace/lib/*.jar,../../webapps_HEAD/workspace/webapps/qisserver/WEB-INF/lib/*.jar
