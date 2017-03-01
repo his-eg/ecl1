@@ -85,13 +85,7 @@ public class ProjectSupport {
 		list.add(containerEntry);
 		javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
 		
-		// compiler compliance settings
-		Map<String, String> options = new HashMap<String, String>();
-		options.put(JavaCore.COMPILER_COMPLIANCE, "1.8");
-		// The following two options need specification only if they differ from COMPILER_COMPLIANCE
-		//options.put(JavaCore.COMPILER_SOURCE, "1.8");
-		//options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, "1.8");
-		javaProject.setOptions(options);
+		// compiler compliance settings are set with help of org.eclipse.core.resources.prefs template
 	}
 
 	/**
