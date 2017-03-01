@@ -68,6 +68,8 @@ public class ResourceSupport {
         this.extensionAntPropertiesReplacements.put("[conditionelements]", createConditionElements());
         this.extensionAntPropertiesReplacements.put("[pathelements]", createPathElements());
 
+        // Downloading the template list from SF requires a JDK with strong encryption!
+        // See http://stackoverflow.com/questions/38203971/javax-net-ssl-sslhandshakeexception-received-fatal-alert-handshake-failure/
         String templateRootUrlPreferenceValue = Activator.getPreferences().getString(TEMPLATE_ROOT_URL);
 		String templateListSourceUrl = templateRootUrlPreferenceValue + "/templatelist.txt";
 		System.out.println("Loading template list from '" + templateListSourceUrl + "'");
