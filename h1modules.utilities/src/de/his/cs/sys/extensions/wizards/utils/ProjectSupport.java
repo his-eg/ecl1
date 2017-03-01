@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -31,16 +33,16 @@ public class ProjectSupport {
     
     private final Collection<String> packagesToCreate;
 
-	        /**
-    * Create a new ProjectSupport
-    * 
-    * @param packages packages that should be created 
-    */
+    /**
+     * Create a new ProjectSupport
+     * 
+     * @param packages packages that should be created 
+     */
 	public ProjectSupport(Collection<String> packages) {
 	    this.packagesToCreate = packages;
 	}
 
-	    /**
+	/**
      * creates a new project with a skeleton
      *
      * @param choices choices container from the setup pages 
@@ -65,7 +67,7 @@ public class ProjectSupport {
         }
 
 		return project;
-		}
+	}
 
 	/**
 	 * configure the project's jre environment
@@ -75,11 +77,21 @@ public class ProjectSupport {
 	 */
 	public void setJreEnvironment(IProject project) throws JavaModelException {
 		IJavaProject javaProject = createJavaProject(project);
+		
+		// add JRE container to classpath
 		IClasspathEntry containerEntry = JavaCore.newContainerEntry(new Path("org.eclipse.jdt.launching.JRE_CONTAINER"), false);
 		IClasspathEntry[] oldClassPath = javaProject.getRawClasspath();
 		ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>(Arrays.asList(oldClassPath));
 		list.add(containerEntry);
 		javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
+		
+		// compiler compliance settings
+		Map<String, String> options = new HashMap<String, String>();
+		options.put(JavaCore.COMPILER_COMPLIANCE, "1.8");
+		// The following two options need specification only if they differ from COMPILER_COMPLIANCE
+		//options.put(JavaCore.COMPILER_SOURCE, "1.8");
+		//options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, "1.8");
+		javaProject.setOptions(options);
 	}
 
 	/**
@@ -98,7 +110,7 @@ public class ProjectSupport {
     			IClasspathEntry[] oldClassPath = javaProject.getRawClasspath();
     			ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>(Arrays.asList(oldClassPath));
     			list.add(projectEntry);
-                    javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
+    			javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
     		}
 	    } catch (JavaModelException e) {
 	        e.printStackTrace();
@@ -138,13 +150,10 @@ public class ProjectSupport {
      * @return the new project
      */
 	public IProject createBaseProject(String name, URI location) {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot()
-				.getProject(name);
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 		if (!project.exists()) {
-			IProjectDescription desc = project.getWorkspace()
-					.newProjectDescription(project.getName());
-			URI workspaceLocation = ResourcesPlugin.getWorkspace().getRoot()
-					.getLocationURI();
+			IProjectDescription desc = project.getWorkspace().newProjectDescription(project.getName());
+			URI workspaceLocation = ResourcesPlugin.getWorkspace().getRoot().getLocationURI();
 			URI projectLocation = location;
 			if (location != null && location.equals(workspaceLocation)) {
 				projectLocation = null;
@@ -200,6 +209,7 @@ public class ProjectSupport {
 	public void addNatures(IProject project) throws CoreException {
 		addNature(project, ProjectNature.JAVA);
         addNature(project, ProjectNature.ECL1);
+        addNature(project, ProjectNature.MACKER);
 	}
 
 	private void addNature(IProject project, ProjectNature nature) throws CoreException {
@@ -214,5 +224,4 @@ public class ProjectSupport {
 			project.setDescription(description, monitor);
 		}
 	}
-
 }
