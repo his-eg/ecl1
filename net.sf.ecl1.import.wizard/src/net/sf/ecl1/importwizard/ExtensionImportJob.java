@@ -114,7 +114,7 @@ public class ExtensionImportJob extends Job {
 
                 // set the name of the current work
                 String taskName = "Import extension " + extension;
-                subMonitor.setTaskName("Import extension " + taskName);
+                subMonitor.setTaskName(taskName);
                 System.out.println(taskName);
 
                 // do one task
