@@ -96,10 +96,10 @@ public class TemplateManager {
             }
         } catch (IOException e) {
             e.printStackTrace();
-            System.out.println("Erro fetching Template: " + e.getMessage());
+            System.out.println("Error fetching Template: " + e.getMessage());
             System.out.println("TemplatePath: " + this.templatePath);
             System.out.println("Variables: " + this.variables);
-            System.err.println("Erro fetching Template: " + e.getMessage());
+            System.err.println("Error fetching Template: " + e.getMessage());
             System.err.println("TemplatePath: " + this.templatePath);
             System.err.println("Variables: " + this.variables);
         }
