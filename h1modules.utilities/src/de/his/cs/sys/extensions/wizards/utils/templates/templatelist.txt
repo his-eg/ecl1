@@ -1,5 +1,7 @@
 build.xml.template
 buildscripts/build.xml.template
+buildscripts/java.xml.template
+buildscripts/angular.xml.template
 buildscripts/additional-targets.xml.template
 buildscripts/compile-classpath.xml.template
 jenkins.ant.properties.template
