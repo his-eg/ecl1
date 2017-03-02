@@ -47,6 +47,7 @@
 			<fileset dir=".">
 				<include name="**/*.jar"/>
 				<include name="**/*.xml" />
+				<exclude name="**/build.xml" />
 				<include name="**/*.html" />
 				<include name="**/*.css" />
 				<include name="**/*.xsl" />
