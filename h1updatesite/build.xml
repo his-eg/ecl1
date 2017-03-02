@@ -28,7 +28,7 @@
 	</path>
 	
 	<target name="sign">
-		<signjar keystore="${keystore}" storepass="${keystore.password}" alias="${key.alias}"
+		<signjar keystore="${keystore}" storepass="${keystore.password}" alias="${key.alias}" sigfile="HIS_EG"
 			keypass="${key.password}" lazy="true" tsaurl="http://tsa.starfieldtech.com">
 			<path>
 				<path refid="plugins"/>
