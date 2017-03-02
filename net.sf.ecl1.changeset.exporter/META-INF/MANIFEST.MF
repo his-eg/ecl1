@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Changeset Exporter
 Bundle-SymbolicName: net.sf.ecl1.changeset.exporter;singleton:=true
-Bundle-Version: 0.1.0.2016-09-26
+Bundle-Version: 0.1.1.2017-03-02
 Bundle-Activator: net.sf.ecl1.changeset.exporter.ChangeSetExportWizardPlugin
 Bundle-Vendor: HIS eG
 Require-Bundle: org.eclipse.ui,
