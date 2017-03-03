@@ -22,8 +22,7 @@
 	
 	<path id="features">
 		<fileset dir="features">
-			<include name="de.his.*.jar"/>
-			<include name="net.sf.ecl1.*.jar"/>
+			<include name="*.jar"/>
 		</fileset>
 	</path>
 	
