@@ -3,6 +3,11 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 0.7.2.2017-03-06##
+* cleaned up build, removed old artifacts
+* now all artifacts are signed
+* better key file names
+
 ##Version 0.7.1.2017-03-02##
 * ecl1 is now built with Java 8
 * Compiler compliance level for new H1 extension projects is Java 8
