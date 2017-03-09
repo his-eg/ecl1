@@ -3,6 +3,9 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 0.7.3.2017-03-09##
+* new project template URLs are now a list and configurable via preferences; the first choice is devtools.his.de (much faster than SF)
+
 ##Version 0.7.2.2017-03-06##
 * cleaned up build, removed old artifacts
 * now all artifacts are signed
