@@ -1,12 +1,7 @@
-/**
- * 
- */
 package de.his.cs.sys.extensions.wizards.utils.templates;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Set;
@@ -14,7 +9,7 @@ import java.util.Set;
 import com.google.common.collect.Sets;
 
 /**
- * Class to help with downloading files from sourceforge whilst allowing to follow redirects
+ * Class to help with downloading files from sourceforge whilst allowing to follow redirects.
  * 
  * @author keunecke
  */
@@ -75,5 +70,4 @@ public abstract class DownloadHelper {
 		
 		return redirect;
 	}
-
 }

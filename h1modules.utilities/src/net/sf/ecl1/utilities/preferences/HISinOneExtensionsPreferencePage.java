@@ -15,16 +15,12 @@ import com.google.common.collect.Lists;
 /**
  * HISinOne-Extension-Tools preferences page
  */
-
-public class HISinOneExtensionsPreferencePage
-extends FieldEditorPreferencePage
-implements IWorkbenchPreferencePage {
+public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
     private StringFieldEditor gitServer;
-
-    private StringFieldEditor buildServer;
-    
-    private StringFieldEditor templateRootUrl;
+    private StringFieldEditor buildServer;    
+    private StringFieldEditor buildServerView;
+    private StringFieldEditor templateRootUrls;
 
     public HISinOneExtensionsPreferencePage() {
         super(GRID);
@@ -42,12 +38,13 @@ implements IWorkbenchPreferencePage {
     public void createFieldEditors() {
         gitServer = new StringFieldEditor(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE, "GIT Server:", getFieldEditorParent());
         buildServer = new StringFieldEditor(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE, "Build Server:", getFieldEditorParent());
+        buildServerView = new StringFieldEditor(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, "Search view on Build Server (Branches):", getFieldEditorParent());
+        templateRootUrls = new StringFieldEditor(ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URLS, "URLs for new project templates (comma-separated):", getFieldEditorParent());
         addField(gitServer);
         addField(buildServer);
-        addField(new StringFieldEditor(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, "Search view on Build Server (Branches):", getFieldEditorParent()));
+        addField(buildServerView);
+        addField(templateRootUrls);
     }
-
-
 
     /* (non-Javadoc)
      * @see org.eclipse.jface.preference.PreferencePage#performApply()
@@ -80,6 +77,7 @@ implements IWorkbenchPreferencePage {
         if(!errors.isEmpty()) {
             setErrorMessage(Joiner.on("\n").join(errors));
         }
+        // TODO: validate template root URLs
     }
 
     /* (non-Javadoc)
@@ -102,5 +100,4 @@ implements IWorkbenchPreferencePage {
     public void init(IWorkbench workbench) {
         //nop
     }
-
 }

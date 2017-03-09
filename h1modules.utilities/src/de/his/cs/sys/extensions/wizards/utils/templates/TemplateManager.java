@@ -9,7 +9,7 @@
  */
 package de.his.cs.sys.extensions.wizards.utils.templates;
 
-import static net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URL;
+import static net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URLS;
 
 import h1modules.utilities.utils.Activator;
 
@@ -18,8 +18,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -52,6 +53,8 @@ public class TemplateManager {
 
     private String templatePath;
 
+	private final List<String> templateRootUrls;
+
     /**
      * Create a new template manager with a template and variables to replace in the template
      *
@@ -59,6 +62,8 @@ public class TemplateManager {
      * @param variables
      */
     public TemplateManager(String templatePath, Map<String, String> variables) {
+        String templateRootUrlPreferenceValue = Activator.getPreferences().getString(TEMPLATE_ROOT_URLS);
+        templateRootUrls = Arrays.asList(templateRootUrlPreferenceValue.split(","));
         this.templatePath = templatePath;
         this.variables = variables;
     }
@@ -73,13 +78,32 @@ public class TemplateManager {
     }
 
     /**
-     * Do line-wise variable replacement on template
+     * Do line-wise variable replacement on template, trying to read the template from several source URLs.
      *
-     * @return result string with replaced variables
+     * @return result string with replaced variables, or null if the template could not be read
      */
     public String getContent() {
+        for (String templateRootUrl : templateRootUrls) {
+        	String trimmedTemplateRootUrl = templateRootUrl.trim();
+        	if (trimmedTemplateRootUrl.isEmpty()) continue;
+        	String content = getContent(trimmedTemplateRootUrl);
+        	if (content!=null) {
+        		return content;
+        	}
+        	// else: log warning and try next URL
+        	System.out.println("Failed to load template '" + templatePath + "' from '" + trimmedTemplateRootUrl + "', server not available?");
+        }
+        return null; // complete fail
+    }
+
+    /**
+     * Do line-wise variable replacement on template.
+     *
+     * @param templateRootUrl the template root URL from which to try to read
+     * @return result string with replaced variables, or null if the template could not be read
+     */
+    private String getContent(String templateRootUrl) {
         StringBuilder result = new StringBuilder();
-        String templateRootUrl = Activator.getPreferences().getString(TEMPLATE_ROOT_URL);
         String fullTemplateUrlString = templateRootUrl + "/" + templatePath;
         
         try (InputStream templateStream = DownloadHelper.getInputStreamFromUrlFollowingRedirects(fullTemplateUrlString);){
@@ -95,13 +119,11 @@ public class TemplateManager {
                 result.append(temp + System.getProperty("line.separator"));
             }
         } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Error fetching Template: " + e.getMessage());
-            System.out.println("TemplatePath: " + this.templatePath);
-            System.out.println("Variables: " + this.variables);
-            System.err.println("Error fetching Template: " + e.getMessage());
+            System.err.println("Error fetching template '" + fullTemplateUrlString + "': " + e.getClass() + ": " + e.getMessage());
             System.err.println("TemplatePath: " + this.templatePath);
             System.err.println("Variables: " + this.variables);
+            //e.printStackTrace();
+            return null;
         }
         return result.toString().trim();
     }
@@ -111,10 +133,11 @@ public class TemplateManager {
      * The suffix ".template" is removed on file creation.
      *
      * @param project
+     * @param content the content to write to the project
      */
-    public void writeContent(IProject project) {
+    public void writeContent(IProject project, String content) {
         IFile file = project.getFile(doFolderAndFileRenaming(this.templatePath));
-        InputStream is = new ByteArrayInputStream(getContent().getBytes());
+        InputStream is = new ByteArrayInputStream(content.getBytes());
         try {
         	IContainer parent = file.getParent();
         	if(parent instanceof IFolder) {
@@ -145,13 +168,12 @@ public class TemplateManager {
     }
     
     private void prepareFolder(IFolder folder) throws CoreException {
-      IContainer parent = folder.getParent();
-      if (parent instanceof IFolder){
-        prepareFolder((IFolder) parent);
-      }
-      if (!folder.exists()){
-        folder.create(true, true, null);
-      }
+    	IContainer parent = folder.getParent();
+    	if (parent instanceof IFolder){
+    		prepareFolder((IFolder) parent);
+    	}
+    	if (!folder.exists()){
+    		folder.create(true, true, null);
+    	}
     }
-
 }

@@ -21,8 +21,8 @@ public class ExtensionToolsPreferenceConstants {
     public static final String BUILD_SERVER_VIEW_PREFERENCE = "buildServerView";
 
     /**
-     * Preference for the root URL of the templates
+     * Preference for the root URLs of the templates (comma-separated list)
      */
-    public static final String TEMPLATE_ROOT_URL = "templateRootUrl";
+    public static final String TEMPLATE_ROOT_URLS = "templateRootUrls";
 
 }

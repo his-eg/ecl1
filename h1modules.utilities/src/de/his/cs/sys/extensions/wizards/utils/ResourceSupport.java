@@ -1,8 +1,5 @@
 package de.his.cs.sys.extensions.wizards.utils;
 
-import static net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URL;
-import h1modules.utilities.utils.Activator;
-
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,7 +13,7 @@ import de.his.cs.sys.extensions.wizards.utils.templates.TemplateFetcher;
 import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
 
 /**
- * Simple Resource access support
+ * Simple Resource access support.
  *
  * @author keunecke, brummermann
  */
@@ -62,7 +59,7 @@ public class ResourceSupport {
      */
     public void createFiles() throws CoreException, UnsupportedEncodingException {
 
-        //prepare variables
+        // Prepare variables
         this.extensionAntPropertiesReplacements.put(DEPENDENCIES_VARIABLE_NAME, createAdditionalClassesFolderReferencesForSonar());
         this.extensionAntPropertiesReplacements.put("[additionaldependencies]", createAdditionalDependencyProperties());
         this.extensionAntPropertiesReplacements.put("[conditionelements]", createConditionElements());
@@ -70,12 +67,23 @@ public class ResourceSupport {
 
         // Downloading the template list from SF requires a JDK with strong encryption!
         // See http://stackoverflow.com/questions/38203971/javax-net-ssl-sslhandshakeexception-received-fatal-alert-handshake-failure/
-        String templateRootUrlPreferenceValue = Activator.getPreferences().getString(TEMPLATE_ROOT_URL);
-		String templateListSourceUrl = templateRootUrlPreferenceValue + "/templatelist.txt";
-		System.out.println("Loading template list from '" + templateListSourceUrl + "'");
-		Iterable<String> templates = new TemplateFetcher(templateListSourceUrl).getTemplates();
+        Collection<String> templates = new TemplateFetcher().getTemplates();
+		if (templates == null) {
+			System.err.println("Error: Could not load template list. The new project could not be set up completely.");
+			return;
+		}
+		
+		// Now download the templates one-by-one and copy them to the project
         for (String template : templates) {
-            new TemplateManager(template, extensionAntPropertiesReplacements).writeContent(project);
+        	TemplateManager manager = new TemplateManager(template, extensionAntPropertiesReplacements);
+            String content = manager.getContent();
+            if (content != null) {
+            	// write to project
+            	manager.writeContent(project, content);
+            } else {
+    			System.err.println("Error: Could not load template '" + template + "'. The new project could not be set up completely.");
+    			// continue anyway (?)
+            }
         }
 
         // if no additional dependencies delete additional classpath definition file
@@ -163,5 +171,4 @@ public class ResourceSupport {
         }
         return sb.toString();
     }
-
 }

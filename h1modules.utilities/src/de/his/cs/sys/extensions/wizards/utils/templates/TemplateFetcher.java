@@ -1,40 +1,65 @@
 package de.his.cs.sys.extensions.wizards.utils.templates;
 
+import static net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URLS;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import com.google.common.collect.Sets;
 
+import h1modules.utilities.utils.Activator;
+
 /**
- * A utility to fetch templates from given URLs
+ * A utility to fetch templates from the URLs specified in preferences.
  *
  * @author keunecke
  */
 public class TemplateFetcher {
 
-    private final String templateListSourceUrl;
+	private final List<String> templateRootUrls;
 
     /**
-     * Create a Fetcher reading from given source
-     *
-     * @param templateListSourceUrl
+     * Create a Fetcher that is able to try to read from several sources
      */
-    public TemplateFetcher(String templateListSourceUrl) {
-        this.templateListSourceUrl = templateListSourceUrl;
+    public TemplateFetcher() {
+        String templateRootUrlPreferenceValue = Activator.getPreferences().getString(TEMPLATE_ROOT_URLS);
+        templateRootUrls = Arrays.asList(templateRootUrlPreferenceValue.split(","));
     }
 
     /**
-     * Fetch templates to add from sf.net
-     * @return iterable of strings containing template names
+     * Fetch templates to add, trying all template root URLs defined in preferences
+     * @return collection of strings containing template names, or null if template list could not be read
      */
-    public Iterable<String> getTemplates() {
+    public Collection<String> getTemplates() {
+        for (String templateRootUrl : templateRootUrls) {
+        	String trimmedTemplateRootUrl = templateRootUrl.trim();
+        	if (trimmedTemplateRootUrl.isEmpty()) continue;
+    		String templateListUrl = trimmedTemplateRootUrl + "/templatelist.txt";
+    		Collection<String> templates = getTemplates(templateListUrl);
+    		if (templates != null) {
+        		System.out.println("Loaded template list from '" + templateListUrl + "'");
+        		return templates;
+    		}
+    		// else: log a warning and try next URL
+    		System.out.println("Failed loading template list from '" + templateListUrl + "', server not available?");
+        }
+        return null; // complete fail
+    }
+
+    /**
+     * Fetch templates to add from the given URL.
+     * @param templateListUrl the URL of the template list file
+     * @return collection of strings containing template names, or null if template list could not be read
+     */
+    private Collection<String> getTemplates(String templateListUrl) {
         HashSet<String> result = Sets.newHashSet();
-        try (InputStream is = DownloadHelper.getInputStreamFromUrlFollowingRedirects(templateListSourceUrl);) {
+        try (InputStream is = DownloadHelper.getInputStreamFromUrlFollowingRedirects(templateListUrl);) {
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
             String line = "";
             while ((line = br.readLine()) != null) {
@@ -42,11 +67,10 @@ public class TemplateFetcher {
                 System.out.println("TemplateFetcher found template '" + line + "' for download.");
             }
         } catch (IOException e) {
-            System.out.println("Could not download template list from " + templateListSourceUrl);
-            System.err.println("Could not download template list from " + templateListSourceUrl);
-            e.printStackTrace();
+            System.err.println("Error downloading template list '" + templateListUrl + "': " + e.getClass() + ": " + e.getMessage());
+            //e.printStackTrace();
+            return null;
         }
         return result;
     }
-
 }
