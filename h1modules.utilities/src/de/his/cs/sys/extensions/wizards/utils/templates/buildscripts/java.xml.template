@@ -40,6 +40,7 @@
 	<property name="build-results" value="${build}/results"/>
 	<property name="cobertura-dir" value="${qisserver-lib-compile}" />
 	<property name="src-java" value="src/java"/>
+	<property name="src-generated" value="src/generated"/>
 	<property name="src-test" value="src/test"/>
 	<property name="test-resource" location="resource"/>
 	<property name="pitreport" location="pitReports"/>
@@ -189,6 +190,9 @@
 			<fileset dir="${src-java}">
 				<filename name="**/*.java" />
 			</fileset>
+			<fileset dir="${src-generated}">
+				<filename name="**/*.java" />
+			</fileset>
 			<manifest>
 				<attribute name="Extension-Name" value="${extension.name}"/>
 				<attribute name="Extension-Version" value="${extension.version}"/>
@@ -203,6 +207,9 @@
 		<jar destfile="${target-file}" index="true" >
 			<fileset dir="${classes-target}" />
 			<fileset dir="${src-java}">
+				<filename name="**/*.java" />
+			</fileset>
+			<fileset dir="${src-generated}">
 				<filename name="**/*.java" />
 			</fileset>
 			<manifest>
