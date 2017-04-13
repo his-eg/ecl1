@@ -30,14 +30,17 @@ public class CvsTagUtil {
      */
     public static String getCvsTagVersionLongString() {
         IProject webapps = HISinOneFileUtil.getWebapps();
-        IFile file = webapps.getFile(CVS_TAG);
-        if (!file.exists()) {
-            return HEAD_VERSION;
-        }
-        String contents = HISinOneFileUtil.readContent(file);
-        if (contents != null) {
-        	// CVS/Tag content is "T" followed by version string -> remove the "T"
-        	return contents.trim().substring(1);
+        if (webapps != null) {
+        	// webapps project exists. all branches except HEAD have a webapps/CVS/Tag file:
+            IFile file = webapps.getFile(CVS_TAG);
+            if (!file.exists()) {
+                return HEAD_VERSION;
+            }
+            String contents = HISinOneFileUtil.readContent(file);
+            if (contents != null) {
+            	// CVS/Tag content is "T" followed by version string -> remove the "T"
+            	return contents.trim().substring(1);
+            }
         }
         return UNKNOWN_VERSION;
     }
