@@ -4,8 +4,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -16,6 +14,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -33,6 +32,8 @@ public class ProjectSupport {
     
     private final Collection<String> packagesToCreate;
 
+    private ConsoleLogger logger;
+    
     /**
      * Create a new ProjectSupport
      * 
@@ -54,16 +55,24 @@ public class ProjectSupport {
 		Assert.isNotNull(choices.getName());
 		Assert.isTrue(choices.getName().trim().length() > 0);
 
-		IProject project = createBaseProject(choices.getName(), location);
+		String projectName = choices.getName();
+		IProject project = createBaseProject(projectName, location);
+		logger = new ConsoleLogger(projectName, "ecl1");
+		
 		try {
             addNatures(project);
             addToProjectStructure(project, PATHS);
             setSourceFolders(project, PATHS);
             addProjectDependencies(project, choices.getProjectsToReference());
-            setJreEnvironment(project);
+    		setJreEnvironment(project);
         } catch (CoreException e) {
             e.printStackTrace();
-            project = null;
+            logger.logToConsole("Exception creating new project '" + projectName + "': " + e);
+            StackTraceElement[] stacktrace = e.getStackTrace();
+            for (StackTraceElement elem : stacktrace) {
+            	logger.logToConsole("   " + elem);
+            }
+            project = null; // XXX: This may cause an NPE somewhere else, like in TemplateManager.writeContent()
         }
 
 		return project;
@@ -207,15 +216,23 @@ public class ProjectSupport {
 	}
 
 	private void addNature(IProject project, ProjectNature nature) throws CoreException {
-		if (!project.hasNature(nature.getNature())) {
+		String natureStr = nature.getNature();
+		if (!project.hasNature(natureStr)) {
 			IProjectDescription description = project.getDescription();
 			String[] prevNatures = description.getNatureIds();
 			String[] newNatures = new String[prevNatures.length + 1];
 			System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
-			newNatures[prevNatures.length] = nature.getNature();
-			description.setNatureIds(newNatures);
-			IProgressMonitor monitor = null;
-			project.setDescription(description, monitor);
+			newNatures[prevNatures.length] = natureStr;
+			// Check if the new nature is known in the workspace. Otherwise (e.g. if we'ld try to add the Macker nature
+			// without having Eclipse Macker installed) we'ld get an Eclipse CoreException thrown by project.setDescription()
+			IStatus status = project.getWorkspace().validateNatureSet(newNatures);
+			if (status.getCode() == IStatus.OK) {
+				description.setNatureIds(newNatures);
+				IProgressMonitor monitor = null; // here we could create a proper progress monitor
+				project.setDescription(description, monitor);
+			} else {
+				logger.logToConsole("Warning: Project nature '" + natureStr + "' could not be added. Probably it is not supported in the workspace.");
+			}
 		}
 	}
 }
