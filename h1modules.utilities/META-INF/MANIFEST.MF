@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Utilities for H1 extension tools
 Bundle-SymbolicName: net.sf.ecl1.utilities;singleton:=true
-Bundle-Version: 0.4.8.2017-03-09
+Bundle-Version: 0.4.9.2017-04-19
 Bundle-Activator: h1modules.utilities.utils.Activator
 Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  org.eclipse.core.resources;visibility:=reexport,
@@ -12,7 +12,8 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  org.apache.httpcomponents.httpclient;bundle-version="4.3.6",
  org.apache.httpcomponents.httpcore;bundle-version="4.3.3",
  org.eclipse.ui,
- org.junit
+ org.junit,
+ org.eclipse.ui.console;bundle-version="3.6.201"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: de.his.cs.sys.extensions.wizards.utils;uses:="org.eclipse.core.resources",
