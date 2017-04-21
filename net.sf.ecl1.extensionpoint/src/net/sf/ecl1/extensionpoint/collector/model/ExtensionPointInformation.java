@@ -1,7 +1,8 @@
 package net.sf.ecl1.extensionpoint.collector.model;
 
 import net.sf.ecl1.extensionpoint.Constants;
-import net.sf.ecl1.extensionpoint.collector.util.ConsoleLoggingHelper;
+import net.sf.ecl1.extensionpoint.ExtensionPointBuilderPlugin;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IMemberValuePair;
@@ -33,9 +34,8 @@ public class ExtensionPointInformation {
      * @throws JavaModelException
      */
     public static ExtensionPointInformation create(IAnnotation a, IType type) throws JavaModelException {
-        ConsoleLoggingHelper logger = new ConsoleLoggingHelper(a.getJavaProject(), 
-        														Constants.CONSOLE_NAME, 
-        														Constants.LOGGING_PREFERENCE);
+        ConsoleLogger logger = new ConsoleLogger(a.getJavaProject().getElementName(), Constants.CONSOLE_NAME,
+        													   ExtensionPointBuilderPlugin.isLoggingEnabled());
         String idValue = null;
         String nameValue = null;
         String ifaceValue = null;
@@ -83,8 +83,7 @@ public class ExtensionPointInformation {
 	
 	@Override
 	public String toString() {
-		return "ExtensionPointInformation [id=" + id + ", name=" + name
-				+ ", iface=" + iface + "]";
+		return "ExtensionPointInformation [id=" + id + ", name=" + name + ", iface=" + iface + "]";
 	}
 
     @Override
@@ -100,5 +99,4 @@ public class ExtensionPointInformation {
         }
         return false;
     }
-
 }

@@ -5,9 +5,10 @@ import java.util.Collection;
 import java.util.TreeSet;
 
 import net.sf.ecl1.extensionpoint.Constants;
+import net.sf.ecl1.extensionpoint.ExtensionPointBuilderPlugin;
 import net.sf.ecl1.extensionpoint.collector.manager.ExtensionPointManager;
 import net.sf.ecl1.extensionpoint.collector.model.ExtensionPointInformation;
-import net.sf.ecl1.extensionpoint.collector.util.ConsoleLoggingHelper;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -22,7 +23,7 @@ import org.eclipse.jdt.core.JavaModelException;
 
 class ExtensionPointVisitor implements IResourceVisitor {
 
-    private final ConsoleLoggingHelper logger;
+    private final ConsoleLogger logger;
 
     private static final String JAVA_FILE_EXTENSION = "java";
 
@@ -40,7 +41,8 @@ class ExtensionPointVisitor implements IResourceVisitor {
      * @param project
      */
     public ExtensionPointVisitor(IJavaProject project) {
-        this.logger = new ConsoleLoggingHelper(project, Constants.CONSOLE_NAME, Constants.LOGGING_PREFERENCE);
+        this.logger = new ConsoleLogger(project.getElementName(), Constants.CONSOLE_NAME, 
+        									   ExtensionPointBuilderPlugin.isLoggingEnabled());
         this.project = project;
     }
 

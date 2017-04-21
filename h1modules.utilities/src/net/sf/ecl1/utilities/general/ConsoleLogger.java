@@ -1,4 +1,4 @@
-package de.his.cs.sys.extensions.wizards.utils;
+package net.sf.ecl1.utilities.general;
 
 import java.io.IOException;
 
@@ -16,21 +16,23 @@ import org.eclipse.ui.console.MessageConsoleStream;
 public class ConsoleLogger {
 
     /** project in which context we are logging */
-    private String targetProjectName;
+    private final String targetProjectName;
 
-    private String consoleName;
+    private final String consoleName;
 
-    private boolean debugging = true;
+    private boolean loggingEnabled;
 
     /**
      * Create a new ConsoleLogger.
      * 
      * @param targetProjectName the name of the project ecl1 is currently working on 
-     * @param consoleName The name of the console (should be something like ECL1)
+     * @param consoleName The name of the console (should be something like "Extensions")
+     * @param loggingEnabled
      */
-    public ConsoleLogger(String targetProjectName, String consoleName) {
+    public ConsoleLogger(String targetProjectName, String consoleName, boolean loggingEnabled) {
         this.targetProjectName = targetProjectName;
         this.consoleName = consoleName;
+        this.loggingEnabled = loggingEnabled;
     }
 
     /**
@@ -39,7 +41,7 @@ public class ConsoleLogger {
      * @param message
      */
     public void logToConsole(String message) {
-        if (debugging) {
+        if (loggingEnabled) {
             MessageConsole console = findConsole(consoleName);
             MessageConsoleStream newMessageStream = console.newMessageStream();
             try {
@@ -61,8 +63,11 @@ public class ConsoleLogger {
         ConsolePlugin plugin = ConsolePlugin.getDefault();
         IConsoleManager conMan = plugin.getConsoleManager();
         IConsole[] existing = conMan.getConsoles();
-        for (int i = 0; i < existing.length; i++)
-            if (name.equals(existing[i].getName())) return (MessageConsole) existing[i];
+        for (int i = 0; i < existing.length; i++) {
+            if (name.equals(existing[i].getName())) {
+            	return (MessageConsole) existing[i];
+            }
+        }
         //no console found, so create a new one
         MessageConsole myConsole = new MessageConsole(name, null);
         conMan.addConsoles(new IConsole[] { myConsole });

@@ -60,4 +60,11 @@ public class ExtensionPointBuilderPlugin extends AbstractUIPlugin {
 	public static ImageDescriptor getImageDescriptor(String path) {
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
 	}
+	
+	/**
+	 * @return true if console logging is enabled in preferences
+	 */
+	public static boolean isLoggingEnabled() {
+		return getDefault().getPreferenceStore().getBoolean(Constants.LOGGING_PREFERENCE);
+	}
 }

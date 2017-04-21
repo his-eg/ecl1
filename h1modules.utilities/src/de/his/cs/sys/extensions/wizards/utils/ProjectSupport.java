@@ -21,6 +21,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
+import net.sf.ecl1.utilities.general.ConsoleLogger;
+
 /**
  * manages project creation
  *
@@ -57,7 +59,7 @@ public class ProjectSupport {
 
 		String projectName = choices.getName();
 		IProject project = createBaseProject(projectName, location);
-		logger = new ConsoleLogger(projectName, "ecl1");
+		logger = new ConsoleLogger(projectName, "Extensions", true);
 		
 		try {
             addNatures(project);
