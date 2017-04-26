@@ -9,14 +9,11 @@ import org.eclipse.core.resources.IProject;
  * @author keunecke / tneumann
  */
 public class CvsTagUtil {
-    
-	public static final String CVS_TAG = "CVS/Tag";
 	
 	public static final String HEAD_VERSION = "HEAD";
 	public static final String UNKNOWN_VERSION = "UNKNOWN_VERSION";
-	
-	public static final String HISINONE_PREFIX = "HISinOne_";
-	public static final String VERSION_PREFIX = "VERSION";
+    
+	private static final String CVS_TAG = "CVS/Tag";
 
     /**
      * @return webapps project branch version in long notation, read from webapps/CVS/Tag.</br>
