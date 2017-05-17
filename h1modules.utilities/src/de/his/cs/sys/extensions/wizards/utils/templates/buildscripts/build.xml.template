@@ -3,7 +3,7 @@
             Build Script for HISinOne Extension
     </description>
 
-	<available file="angular-cli.json" property="extension.type" value="angular" />
+	<available file=".angular-cli.json" property="extension.type" value="angular" />
 	<property name="extension.type">java</property>
 
 	<import file="${extension.type}.xml" />

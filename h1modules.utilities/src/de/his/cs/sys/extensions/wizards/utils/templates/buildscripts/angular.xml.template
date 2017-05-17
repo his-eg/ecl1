@@ -44,12 +44,15 @@
 			<fileset dir="${cs.sys.angularbase}/node_modules" defaultexcludes="false" />
 		</sync>
 
+		<condition property="windows" value="windows">
+			<os family="windows" />
+		</condition>
 		<antcall target="internal-update-dependencies-notwindows" />
 	</target>
 
 	<!-- .bin contains symlinks on Linux. Ant's sync-task replaced them with the file content, 
 	resulting in ngc being unable to find its dependencies --> 
-	<target name="internal-update-dependencies-notwindows" unless="${executable.suffix}">
+	<target name="internal-update-dependencies-notwindows" unless="windows">
 		<delete dir="node_modules/.bin" />
 		<mkdir dir="node_modules/.bin" />
 		<echo>Copying symlinks</echo>
@@ -66,9 +69,10 @@
 			<arg value="build"/>
 			<arg value="--prod"/>
 			<arg value="--aot"/>
+			<arg value="--progress"/>
+			<arg value="false"/>
 		</exec>
 	</target>
-
 
 	<target name="jar" depends="build">
 	    <condition property="extension.revision" value="${env.BUILD_TAG}-${env.GIT_COMMIT}" else="unknown">
@@ -125,6 +129,8 @@
 				<arg value="test"/>
 				<arg value="--watch=false" />
 				<arg value="--with-coverage" />
+				<arg value="--progress"/>
+				<arg value="false"/>
 				<env key="DISPLAY" value=":10" />
 			</exec>
 		</parallel>

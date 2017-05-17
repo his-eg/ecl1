@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="extension">
+<project name="extension" default="jar">
+	<description>
+            Build Script for HISinOne Extension
+    </description>
 
-	<import file="buildscripts/build.xml"/>
-	
-	<target name="dummy">
-		<!-- do nothing -->
-	</target>
+
+	<import file="buildscripts/build.xml" />
 	
 </project>
