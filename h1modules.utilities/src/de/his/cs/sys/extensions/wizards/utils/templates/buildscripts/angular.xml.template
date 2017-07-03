@@ -39,32 +39,43 @@
 		</delete>
 	</target>
 
-	<target name="update-dependencies">
-		<sync todir="node_modules">
-			<fileset dir="${cs.sys.angularbase}/node_modules" defaultexcludes="false" />
-		</sync>
+	
+	<!-- init node_modules, if it does not exist -->
+	<target name="init">
+		<available file="node_modules" property="node_modules" />
+		<antcall target="internal-init" />
+	</target>
 
+	<target name="internal-init" unless="node_modules">
 		<condition property="windows" value="windows">
 			<os family="windows" />
 		</condition>
-		<antcall target="internal-update-dependencies-notwindows" />
+		<antcall target="internal-init-windows" />
+		<antcall target="internal-init-notwindows" />
 	</target>
 
-	<!-- .bin contains symlinks on Linux. Ant's sync-task replaced them with the file content, 
-	resulting in ngc being unable to find its dependencies --> 
-	<target name="internal-update-dependencies-notwindows" unless="windows">
-		<delete dir="node_modules/.bin" />
-		<mkdir dir="node_modules/.bin" />
-		<echo>Copying symlinks</echo>
-		<exec executable="/bin/cp">
-			<arg value="-ax" />
-			<arg value="${cs.sys.angularbase}/node_modules/.bin" />
-			<arg value="node_modules/" />
+	<target name="internal-init-windows" if="windows">
+		<exec executable="cmd.exe">
+			<arg value="/c" />
+			<arg value="mklink" />
+			<arg value="/j" />
+			<arg value="node_modules" />
+			<arg value="..\cs.sys.angularbase\node_modules" />
 		</exec>
-		<chmod dir="node_modules/.bin" perm="ugo+rx" includes="**"/>
+	</target>
+	
+	<target name="internal-init-notwindows" unless="windows">
+		<exec executable="/bin/ln">
+			<arg value="-s" />
+			<arg value="../cs.sys.angularbase/node_modules" />
+			<arg value="node_modules" />
+		</exec>
 	</target>
 
-	<target name="build" depends="update-dependencies">
+
+
+
+	<target name="build" depends="init">
 		<exec executable="node_modules/.bin/ng${executable.suffix}">
 			<arg value="build"/>
 			<arg value="--prod"/>
@@ -106,7 +117,7 @@
 	</target>
 
 
-	<target name="serve">
+	<target name="serve" depends="init">
 		<exec executable="node_modules/.bin/ng${executable.suffix}">
 			<arg value="server"/>
 			<arg value="--port"/>
@@ -115,7 +126,7 @@
 	</target>
 
 
-	<target name="test" depends="update-dependencies">
+	<target name="test" depends="init">
 		<parallel>
 			<daemons>
 				<exec executable="/usr/bin/Xvfb" failonerror="false" osfamily="unix">
