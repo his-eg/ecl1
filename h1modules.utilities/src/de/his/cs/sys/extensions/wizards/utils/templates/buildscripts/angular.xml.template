@@ -140,6 +140,7 @@
 				<arg value="test"/>
 				<arg value="--watch=false" />
 				<arg value="--with-coverage" />
+				<arg value="--sourcemap=false" />
 				<arg value="--progress"/>
 				<arg value="false"/>
 				<env key="DISPLAY" value=":10" />
