@@ -40,6 +40,7 @@
 	</target>
 
 	
+
 	<!-- init node_modules, if it does not exist -->
 	<target name="init">
 		<available file="node_modules" property="node_modules" />
@@ -67,7 +68,7 @@
 	<target name="internal-init-notwindows" unless="windows">
 		<exec executable="/bin/ln">
 			<arg value="-s" />
-			<arg value="../cs.sys.angularbase/node_modules" />
+			<arg value="${cs.sys.angularbase}/node_modules" />
 			<arg value="node_modules" />
 		</exec>
 	</target>
@@ -76,12 +77,13 @@
 
 
 	<target name="build" depends="init">
-		<exec executable="node_modules/.bin/ng${executable.suffix}">
-			<arg value="build"/>
-			<arg value="--prod"/>
-			<arg value="--aot"/>
-			<arg value="--progress"/>
-			<arg value="false"/>
+		<exec executable="node_modules/.bin/ng${executable.suffix}" failonerror="true">
+			<arg value="build" />
+			<arg value="--preserve-symlinks" />
+			<arg value="--prod" />
+			<arg value="--aot" />
+			<arg value="--progress" />
+			<arg value="false" />
 		</exec>
 	</target>
 
@@ -119,9 +121,12 @@
 
 	<target name="serve" depends="init">
 		<exec executable="node_modules/.bin/ng${executable.suffix}">
-			<arg value="server"/>
+			<arg value="serve"/>
+			<arg value="--preserve-symlinks" />
 			<arg value="--port"/>
 			<arg value="${extension.port}"/>
+			<arg value="--live-reload-client"/>
+			<arg value="localhost:${extension.port}"/>
 		</exec>
 	</target>
 
@@ -138,6 +143,7 @@
 			</daemons>
 			<exec executable="node_modules/.bin/ng${executable.suffix}" errorproperty="prevent-screen-clear">
 				<arg value="test"/>
+				<arg value="--preserve-symlinks" />
 				<arg value="--watch=false" />
 				<arg value="--with-coverage" />
 				<arg value="--sourcemap=false" />
