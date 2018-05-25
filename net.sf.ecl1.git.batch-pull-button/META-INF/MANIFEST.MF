@@ -13,5 +13,6 @@ Require-Bundle: org.eclipse.core.commands,
  org.eclipse.core.jobs,
  org.eclipse.egit.ui,
  org.eclipse.ui.workbench,
- org.eclipse.osgi
+ org.eclipse.osgi,
+ net.sf.ecl1.utilities
 Import-Package: org.eclipse.core.runtime

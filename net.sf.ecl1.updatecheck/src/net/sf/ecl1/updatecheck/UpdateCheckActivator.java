@@ -6,10 +6,14 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import net.sf.ecl1.utilities.general.ConsoleLogger;
+
 /**
  * The activator class controls the plug-in life cycle
  */
 public class UpdateCheckActivator extends AbstractUIPlugin {
+
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "net.sf.ecl1.updatecheck"; //$NON-NLS-1$
@@ -55,11 +59,11 @@ public class UpdateCheckActivator extends AbstractUIPlugin {
 	}
 	
 	public static void log(IStatus status) {
+		logger.log(status.getMessage());
 		ILog log = getDefault().getLog();
 		if (log != null) {
-			log.log(status);
+			log.log(status); // TODO logs to std:out and "Error Log" view
 		} else {
-			System.out.println(status.getMessage());
 			if (status.getException() != null)
 				status.getException().printStackTrace();
 		}

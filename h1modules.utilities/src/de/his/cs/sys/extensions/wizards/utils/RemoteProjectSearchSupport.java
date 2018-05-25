@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.TreeSet;
 
+import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 
 import org.apache.commons.io.IOUtils;
@@ -19,7 +20,9 @@ import org.eclipse.jface.preference.IPreferenceStore;
  * @author keunecke
  */
 public class RemoteProjectSearchSupport {
-    
+
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+
     private class BuildJob {
 
         private String name;
@@ -55,13 +58,13 @@ public class RemoteProjectSearchSupport {
 
     /** Jenkins addition to view files */
     public static final String JENKINS_VIEW_ADDITION = "/*view*/";
-
+    
     public Collection<String> getProjects() {
         IPreferenceStore store = Activator.getPreferences();
         String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE); // z.B. "http://build.his.de/build/"
         String buildServerView = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE); // branch
         String lookUpTarget = buildServer + JENKINS_VIEW_INFIX + buildServerView + JENKINS_API_ADDITION;
-        System.out.println("Get projects from " + lookUpTarget);
+        logger.log("Get projects from " + lookUpTarget);
         TreeSet<String> result = new TreeSet<String>();
         InputStream jsonStream = RestUtil.getJsonStream(lookUpTarget);
         if (jsonStream != null) {
@@ -82,7 +85,16 @@ public class RemoteProjectSearchSupport {
         String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE); // z.B. "http://build.his.de/build/"
         String buildServerView = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE); // branch
         String lookUpTarget = buildServer + JENKINS_JOB_INFIX + extension + "_" + buildServerView + JENKINS_WORKSPACE_INFIX + fileName + JENKINS_VIEW_ADDITION;
-        System.out.println("Get file " + lookUpTarget);
+        return getRemoteFileContent(lookUpTarget);
+    }
+    
+    /**
+     * Read the content of an arbitrary file from Jenkins.
+     * @param lookUpTarget the REST-URL of the file to read
+     * @return file content as String
+     */
+    public String getRemoteFileContent(String lookUpTarget) {
+        logger.log("Get file " + lookUpTarget);
     	InputStream inStream = RestUtil.getJsonStream(lookUpTarget);
     	if (inStream == null) {
     		// wrong URL, file doesn't exist? 
@@ -92,14 +104,15 @@ public class RemoteProjectSearchSupport {
     	try {
     		fileContent = IOUtils.toString(inStream);
     	} catch (IOException ioe) {
-    		System.out.println("IOException reading remote file: " + ioe);
+    		logger.error("IOException reading remote file: " + ioe);
     	}
     	try {
     		inStream.close();
     	} catch (IOException ioe) {
-    		System.out.println("IOException closing InputStream: " + ioe);
+    		logger.error("IOException closing InputStream: " + ioe);
     	}
-    	System.out.println("result = "  + fileContent);
+    	logger.log("result = "  + fileContent);
     	return fileContent;
+
     }
 }

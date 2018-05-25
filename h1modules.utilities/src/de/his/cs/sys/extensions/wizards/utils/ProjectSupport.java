@@ -29,12 +29,12 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  * @author keunecke
  */
 public class ProjectSupport {
-    
+
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+
     private static final String[] PATHS = { "src/java", "src/test", "src/generated", "resource", ".settings" };
     
     private final Collection<String> packagesToCreate;
-
-    private ConsoleLogger logger;
     
     /**
      * Create a new ProjectSupport
@@ -59,20 +59,19 @@ public class ProjectSupport {
 
 		String projectName = choices.getName();
 		IProject project = createBaseProject(projectName, location);
-		logger = new ConsoleLogger(projectName, "Extensions", true);
 		
 		try {
-            addNatures(project);
+            addNatures(project, projectName);
             addToProjectStructure(project, PATHS);
             setSourceFolders(project, PATHS);
             addProjectDependencies(project, choices.getProjectsToReference());
     		setJreEnvironment(project);
         } catch (CoreException e) {
             e.printStackTrace();
-            logger.logToConsole("Exception creating new project '" + projectName + "': " + e);
+            logger.log(projectName, "Exception creating new project '" + projectName + "': " + e);
             StackTraceElement[] stacktrace = e.getStackTrace();
             for (StackTraceElement elem : stacktrace) {
-            	logger.logToConsole("   " + elem);
+            	logger.log(projectName, "   " + elem);
             }
             project = null; // XXX: This may cause an NPE somewhere else, like in TemplateManager.writeContent()
         }
@@ -209,15 +208,16 @@ public class ProjectSupport {
     /**
      * Add natures to the project
      * @param project
+     * @param projectName
      * @throws CoreException
      */
-	public void addNatures(IProject project) throws CoreException {
-		addNature(project, ProjectNature.JAVA);
-        addNature(project, ProjectNature.ECL1);
-        addNature(project, ProjectNature.MACKER);
+	public void addNatures(IProject project, String projectName) throws CoreException {
+		addNature(project, projectName, ProjectNature.JAVA);
+        addNature(project, projectName, ProjectNature.ECL1);
+        addNature(project, projectName, ProjectNature.MACKER);
 	}
 
-	private void addNature(IProject project, ProjectNature nature) throws CoreException {
+	private void addNature(IProject project, String projectName, ProjectNature nature) throws CoreException {
 		String natureStr = nature.getNature();
 		if (!project.hasNature(natureStr)) {
 			IProjectDescription description = project.getDescription();
@@ -233,7 +233,7 @@ public class ProjectSupport {
 				IProgressMonitor monitor = null; // here we could create a proper progress monitor
 				project.setDescription(description, monitor);
 			} else {
-				logger.logToConsole("Warning: Project nature '" + natureStr + "' could not be added. Probably it is not supported in the workspace.");
+				logger.log(projectName, "Warning: Project nature '" + natureStr + "' could not be added. Probably it is not supported in the workspace.");
 			}
 		}
 	}

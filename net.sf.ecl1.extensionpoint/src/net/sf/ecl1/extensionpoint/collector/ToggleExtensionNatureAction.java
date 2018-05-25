@@ -12,12 +12,16 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
+import net.sf.ecl1.utilities.general.ConsoleLogger;
+
 /**
  * Action to add/remove the extension nature from a project
  *  
  * @author keunecke
  */
 public class ToggleExtensionNatureAction implements IObjectActionDelegate {
+
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
 	private ISelection selection;
 
@@ -96,8 +100,8 @@ public class ToggleExtensionNatureAction implements IObjectActionDelegate {
 			description.setNatureIds(newNatures);
 			project.setDescription(description, null);
 		} catch (CoreException e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
+			logger.error(e.getMessage());
+            e.printStackTrace(); // TODO print via logger
 		}
 	}
 

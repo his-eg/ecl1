@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
 package net.sf.ecl1.importwizard;
 
 import java.util.Collection;
@@ -19,12 +9,16 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 
+import net.sf.ecl1.utilities.general.ConsoleLogger;
+
 /**
  * Wizard for import of extension projects listed on a jenkins.
  *
  * @author keunecke
  */
 public class ExtensionImportWizard extends Wizard implements IImportWizard {
+
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
 	private static final String WINDOW_TITLE = "Extension Import Wizard";
 
@@ -33,7 +27,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     
     ExtensionImportWizardPage1_Selection page1;
     ExtensionImportWizardPage2_Confirmation page2;
-
+    
     public ExtensionImportWizard() {
         super();
         model = new ExtensionImportWizardModel();
@@ -58,7 +52,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
         addPage(page1);
         page2 = new ExtensionImportWizardPage2_Confirmation(model);
         addPage(page2);
-        //System.out.println("pageCount = " + this.getPageCount());
+        //logger.log("pageCount = " + this.getPageCount());
     }
 
     /**
@@ -71,7 +65,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     public boolean canFinish() {
     	IWizardPage currentPage = this.getContainer().getCurrentPage();
     	boolean canFinish = (currentPage instanceof ExtensionImportWizardPage2_Confirmation);
-    	System.out.println("currentPage = " + currentPage.getName() + ", canFinish = " + canFinish);
+    	logger.log("currentPage = " + currentPage.getName() + ", canFinish = " + canFinish);
     	return canFinish;
     }
     

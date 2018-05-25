@@ -11,6 +11,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 
 import de.his.cs.sys.extensions.wizards.utils.templates.TemplateFetcher;
 import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.general.Ecl1Constants;
 
 /**
  * Simple Resource access support.
@@ -18,6 +20,8 @@ import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
  * @author keunecke, brummermann
  */
 public class ResourceSupport {
+
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
     private static final String DEPENDENCIES_VARIABLE_NAME = "[dependencies]";
 
@@ -28,7 +32,7 @@ public class ResourceSupport {
     private static final String SONARBINARIESELEMENT_TEMPLATE = "sonarbinarieselement" + TEMPLATE;
 
     private static final String COMPILE_CLASSPATH_XML = "buildscript/compile-classpath.xml";
-
+    
     private final Map<String, String> extensionAntPropertiesReplacements = new HashMap<String, String>();
 
     private final IProject project;
@@ -69,7 +73,7 @@ public class ResourceSupport {
         // See http://stackoverflow.com/questions/38203971/javax-net-ssl-sslhandshakeexception-received-fatal-alert-handshake-failure/
         Collection<String> templates = new TemplateFetcher().getTemplates();
 		if (templates == null) {
-			System.err.println("Error: Could not load template list. The new project could not be set up completely.");
+			logger.error("Error: Could not load template list. The new project could not be set up completely.");
 			return;
 		}
 		
@@ -81,7 +85,7 @@ public class ResourceSupport {
             	// write to project
             	manager.writeContent(project, content);
             } else {
-    			System.err.println("Error: Could not load template '" + template + "'. The new project could not be set up completely.");
+    			logger.error("Error: Could not load template '" + template + "'. The new project could not be set up completely.");
     			// continue anyway (?)
             }
         }
@@ -101,7 +105,7 @@ public class ResourceSupport {
         StringBuilder classesReferences = new StringBuilder();
         HashMap<String, String> variables = new HashMap<String, String>();
         for (String project : requiredProjects) {
-            boolean projectIsWebapps = HISConstants.WEBAPPS.equals(project);
+            boolean projectIsWebapps = Ecl1Constants.WEBAPPS.equals(project);
             if(!projectIsWebapps) {
                 variables.put(DEPENDENCY_VARIABLE_NAME, project);
                 String pathElement = new TemplateManager(SONARBINARIESELEMENT_TEMPLATE, variables).getContent();
@@ -122,7 +126,7 @@ public class ResourceSupport {
         StringBuilder pathElementsStringBuilder = new StringBuilder();
         Map<String, String> variables = new HashMap<String, String>();
         for (String project : requiredProjects) {
-            boolean projectIsWebapps = HISConstants.WEBAPPS.equals(project);
+            boolean projectIsWebapps = Ecl1Constants.WEBAPPS.equals(project);
             if(!projectIsWebapps) {
                 variables.put(DEPENDENCY_VARIABLE_NAME, project);
                 String pathElement = new TemplateManager("pathelement.template", variables).getContent();
@@ -142,7 +146,7 @@ public class ResourceSupport {
     private String createConditionElements() {
         StringBuilder conditionElementsStringBuilder = new StringBuilder();
         for (String project : requiredProjects) {
-            boolean projectIsWebapps = HISConstants.WEBAPPS.equals(project);
+            boolean projectIsWebapps = Ecl1Constants.WEBAPPS.equals(project);
             if(!projectIsWebapps) {
                 Map<String, String> variables = new HashMap<String, String>();
                 variables.put(DEPENDENCY_VARIABLE_NAME, project);
@@ -162,7 +166,7 @@ public class ResourceSupport {
     private String createAdditionalDependencyProperties() {
         StringBuilder sb = new StringBuilder();
         for (String project : requiredProjects) {
-            boolean projectIsWebapps = HISConstants.WEBAPPS.equals(project);
+            boolean projectIsWebapps = Ecl1Constants.WEBAPPS.equals(project);
             if(!projectIsWebapps) {
                 String additionalDependencyProperty = PROPERTY_DEPENDENCY_TEMPLATE.replace(DEPENDENCY_VARIABLE_NAME, project);
                 sb.append(additionalDependencyProperty);

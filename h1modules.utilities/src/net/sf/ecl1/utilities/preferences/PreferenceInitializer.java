@@ -29,5 +29,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         }
         store.setDefault(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, branch);
         store.setDefault(ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URLS, "http://devtools.his.de/ecl1/templates,http://ecl1.sourceforge.net/templates");
+		store.setDefault(ExtensionToolsPreferenceConstants.LOGGING_PREFERENCE, false);
     }
 }

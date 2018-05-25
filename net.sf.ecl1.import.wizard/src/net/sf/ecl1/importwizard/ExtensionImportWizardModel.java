@@ -17,7 +17,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -26,7 +25,7 @@ import org.xml.sax.SAXException;
 
 import de.his.cs.sys.extensions.wizards.utils.RemoteProjectSearchSupport;
 import h1modules.utilities.utils.Activator;
-import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /**
  * The data model of the Extension Import Wizard.
@@ -34,6 +33,8 @@ import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
  */
 public class ExtensionImportWizardModel {
     
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+
 	private static final String JENKINS_WEBAPPS_NAME = "/webapps";
 
     private RemoteProjectSearchSupport remoteProjectSearchSupport;
@@ -78,7 +79,7 @@ public class ExtensionImportWizardModel {
         String branch = getBranch();
         for (String remoteProjectIncludingBranch : remoteProjectsIncludingBranch) {
             String remoteProject = remoteProjectIncludingBranch.replace("_" + branch, "");
-            System.out.println("Replacing original '" + remoteProjectIncludingBranch + "' with '" + remoteProject + "'");
+            logger.log("Replacing original '" + remoteProjectIncludingBranch + "' with '" + remoteProject + "'");
             remoteExtensions.add(remoteProject);
         }
     }
@@ -125,8 +126,8 @@ public class ExtensionImportWizardModel {
 	 * already in workspace are omitted.
 	 */
     void findTotalRequiredExtensions() {
-    	//System.out.println("remoteExtensions = " + remoteExtensions);
-    	//System.out.println("selectedExtensions = " + selectedExtensions);
+    	//ConsoleLogger.getEcl1Logger().log("remoteExtensions = " + remoteExtensions);
+    	//ConsoleLogger.getEcl1Logger().log("selectedExtensions = " + selectedExtensions);
         
     	totalRequiredExtensions = new ArrayList<String>();
         Set<String> unprocessedExtensions = new TreeSet<String>(selectedExtensions); // copy to keep selectedExtensions unmodified
@@ -181,10 +182,10 @@ public class ExtensionImportWizardModel {
         	doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(classpathContentStream);
     		classpathContentStream.close();
     	} catch (IOException | SAXException | ParserConfigurationException e) {
-    		System.out.println("Exception parsing '.classpath' file for extension " + extension  + ": " + e);
+    		logger.error("Exception parsing '.classpath' file for extension " + extension  + ": " + e);
     	}
     	if (doc==null) {
-    		System.out.println("Could not create XML document from '.classpath' file of extension " + extension);
+    		logger.error("Could not create XML document from '.classpath' file of extension " + extension);
     		return dependencyExtensions; // return empty list
     	}
     	

@@ -6,6 +6,12 @@ package net.sf.ecl1.utilities.preferences;
 public class ExtensionToolsPreferenceConstants {
 
     /**
+     * The name of the preference value determining if detailed logging should occur
+     */
+    public static final String LOGGING_PREFERENCE = "net.sf.ecl1.extensionpoint.extensionsLogging";
+    // TODO choose more general name
+    
+    /**
      * Preference for URI to git server
      */
     public static final String GIT_SERVER_PREFERENCE = "gitServer";

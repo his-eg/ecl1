@@ -11,6 +11,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
 import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /**
  * Initialize a git repository in the project root
@@ -18,6 +19,8 @@ import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices
  * @author keunecke
  */
 public class GitInitSetupStep implements ProjectSetupStep {
+
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
     @Override
     public void performStep(IProject project, InitialProjectConfigurationChoices choices) {
@@ -28,10 +31,9 @@ public class GitInitSetupStep implements ProjectSetupStep {
         	initCommand.setDirectory(new File(ws, rawLocation.lastSegment()));
 			initCommand.call();
 		} catch (GitAPIException e) {
-			System.out.println("init of git repo failed");
-			System.out.println(e.getMessage());
-			e.printStackTrace();
+			logger.error("init of git repo failed");
+			logger.error(e.getMessage());
+			e.printStackTrace(); // TODO print via logger
 		}
     }
-
 }

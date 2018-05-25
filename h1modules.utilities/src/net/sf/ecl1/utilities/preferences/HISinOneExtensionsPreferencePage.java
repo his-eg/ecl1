@@ -4,6 +4,7 @@ import h1modules.utilities.utils.Activator;
 
 import java.util.Collection;
 
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
@@ -44,6 +45,7 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
         addField(buildServer);
         addField(buildServerView);
         addField(templateRootUrls);
+		addField(new BooleanFieldEditor(ExtensionToolsPreferenceConstants.LOGGING_PREFERENCE, "Logging", getFieldEditorParent()));
     }
 
     /* (non-Javadoc)

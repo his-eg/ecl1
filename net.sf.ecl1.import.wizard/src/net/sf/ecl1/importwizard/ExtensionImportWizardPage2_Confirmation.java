@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
 package net.sf.ecl1.importwizard;
 
 import java.util.Set;
@@ -31,6 +21,8 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
 	
+    //private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+
 	private static final String PAGE_NAME = "page2";
 	private static final String PAGE_DESCRIPTION = "Extension Import - Dependencies";
 
@@ -64,7 +56,7 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
     
     @Override
     public void createControl(Composite parent) {
-        System.out.println("create controls for page 2");
+    	//logger.log("create controls for page 2");
         
         container = new Composite(parent, SWT.NONE);
         GridLayout gl = new GridLayout(1, false);
@@ -115,7 +107,7 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
     }
     
     void onEnterPage() {
-        System.out.println("create data for page 2");
+    	//logger.log("create data for page 2");
         
         userSelectedTable.removeAll(); // avoid entries being added several times if the back-button is used
     	Set<String> userSelectedExtensions = model.getSelectedExtensions();

@@ -12,6 +12,7 @@ package de.his.cs.sys.extensions.wizards.utils.templates;
 import static net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URLS;
 
 import h1modules.utilities.utils.Activator;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -42,13 +43,15 @@ import com.google.common.collect.Maps;
  */
 public class TemplateManager {
 
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+
     private static final Map<String, String> nameReplacements = Maps.newHashMap();
     static {
         nameReplacements.put("settings", ".settings");
         nameReplacements.put(".template", "");
         nameReplacements.put("gitignore", ".gitignore");
     }
-
+    
     private final Map<String, String> variables;
 
     private String templatePath;
@@ -91,7 +94,7 @@ public class TemplateManager {
         		return content;
         	}
         	// else: log warning and try next URL
-        	System.out.println("Failed to load template '" + templatePath + "' from '" + trimmedTemplateRootUrl + "', server not available?");
+        	logger.error("Failed to load template '" + templatePath + "' from '" + trimmedTemplateRootUrl + "', server not available?");
         }
         return null; // complete fail
     }
@@ -108,7 +111,7 @@ public class TemplateManager {
         
         try (InputStream templateStream = DownloadHelper.getInputStreamFromUrlFollowingRedirects(fullTemplateUrlString);){
         	
-            System.out.println("Loading template from: " + fullTemplateUrlString);
+        	logger.log("Loading template from: " + fullTemplateUrlString);
             BufferedReader br = new BufferedReader(new InputStreamReader(templateStream));
             String line = "";
             while((line = br.readLine() )!= null) {
@@ -119,9 +122,9 @@ public class TemplateManager {
                 result.append(temp + System.getProperty("line.separator"));
             }
         } catch (IOException e) {
-            System.err.println("Error fetching template '" + fullTemplateUrlString + "': " + e.getClass() + ": " + e.getMessage());
-            System.err.println("TemplatePath: " + this.templatePath);
-            System.err.println("Variables: " + this.variables);
+        	logger.error("Error fetching template '" + fullTemplateUrlString + "': " + e.getClass() + ": " + e.getMessage());
+        	logger.error("TemplatePath: " + this.templatePath);
+        	logger.error("Variables: " + this.variables);
             //e.printStackTrace();
             return null;
         }
@@ -145,15 +148,15 @@ public class TemplateManager {
         	}
             file.create(is, true, null);
         } catch (CoreException e) {
-            System.out.println("Error creating file from template '" + this.templatePath + "': " + e.getMessage());
-            System.err.println("Error creating file from template '" + this.templatePath + "': " + e.getMessage());
+        	logger.error("Error creating file from template '" + this.templatePath + "': " + e.getMessage());
+        	logger.error("Error creating file from template '" + this.templatePath + "': " + e.getMessage());
             e.printStackTrace();
         } finally {
             try {
                 is.close();
             } catch (IOException e1) {
-                System.out.println("Error creating file from template '" + this.templatePath + "': " + e1.getMessage());
-                System.err.println("Error creating file from template '" + this.templatePath + "': " + e1.getMessage());
+            	logger.error("Error creating file from template '" + this.templatePath + "': " + e1.getMessage());
+            	logger.error("Error creating file from template '" + this.templatePath + "': " + e1.getMessage());
                 e1.printStackTrace();
             }
         }

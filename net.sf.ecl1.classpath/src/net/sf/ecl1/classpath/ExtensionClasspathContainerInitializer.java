@@ -32,13 +32,16 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
+import net.sf.ecl1.utilities.general.ConsoleLogger;
+
 /**
  * Classpath Initializer for HISinOne-Extension projects
  *
  * @author keunecke
  */
-public class ExtensionClasspathContainerInitializer extends
-ClasspathContainerInitializer {
+public class ExtensionClasspathContainerInitializer extends ClasspathContainerInitializer {
+
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
     private final Collection<String> extensionsForClassPath = new HashSet<>();
 
@@ -46,12 +49,12 @@ ClasspathContainerInitializer {
     public void initialize(IPath containerPath, IJavaProject javaProject) throws CoreException {
         try {
             if (containerPath != null) {
-                System.out.println("Supplied path: " + containerPath.toOSString());
+            	logger.log("Supplied path: " + containerPath.toOSString());
             }
             updateClasspathContainer(containerPath, javaProject);
         } catch (CoreException e) {
             e.printStackTrace();
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage());
             throw e;
         }
     }
@@ -72,7 +75,7 @@ ClasspathContainerInitializer {
         try {
             updateClasspathContainer(containerPath, project);
         } catch (JavaModelException e) {
-            System.out.println(e.getMessage());
+        	logger.error(e.getMessage());
             e.printStackTrace();
         }
     }
@@ -92,7 +95,7 @@ ClasspathContainerInitializer {
             IJavaProject[] iJavaProjects = new IJavaProject[] { project };
             JavaCore.setClasspathContainer(containerPath, iJavaProjects, iClasspathContainers, new NullProgressMonitor());
         } else {
-            System.out.println("No entries for classpath container '" + containerPath + "' in  '" + project.getElementName() + "'.");
+        	logger.log("No entries for classpath container '" + containerPath + "' in  '" + project.getElementName() + "'.");
         }
     }
 
@@ -116,7 +119,7 @@ ClasspathContainerInitializer {
                 }
             }
         }
-        System.out.println("Extensions for export: " + extensionsForClassPath);
+        logger.log("Extensions for export: " + extensionsForClassPath);
     }
 
     private IClasspathEntry[] createEntries(IJavaProject javaProject) {
@@ -144,17 +147,17 @@ ClasspathContainerInitializer {
                     IPath sourceAttachmentRootPath = null;
                     IClasspathEntry libraryEntry = JavaCore.newLibraryEntry(path, sourceAttachmentPath, sourceAttachmentRootPath, true);
                     result.add(libraryEntry);
-                    System.out.println("Creating new container library entry for: " + path.toString() + "\n * exported: " + extensionNeedsToBeExported
-                                       + "\n * sourceAttachmentPath: " + sourceAttachmentPath + "\n * sourceAttachmentRootPath: " + sourceAttachmentRootPath);
+                    logger.log("Creating new container library entry for: " + path.toString() + "\n * exported: " + extensionNeedsToBeExported
+                    		+ "\n * sourceAttachmentPath: " + sourceAttachmentPath + "\n * sourceAttachmentRootPath: " + sourceAttachmentRootPath);
                 } else {
                     IProject project = root.getProject(extensionPath);
                     if (project.exists()) {
-                        System.out.println("Creating new container entry for project: " + project.getName() + " exported: " + extensionNeedsToBeExported);
+                    	logger.log("Creating new container entry for project: " + project.getName() + " exported: " + extensionNeedsToBeExported);
                         IPath location = project.getLocation();
                         IClasspathEntry newProjectEntry = JavaCore.newProjectEntry(location.makeRelativeTo(workspace).makeAbsolute(), true);
                         result.add(newProjectEntry);
                     } else {
-                        System.out.println("Extension does not exist as project: " + extensionPath);
+                    	logger.log("Extension does not exist as project: " + extensionPath);
                     }
                 }
             }

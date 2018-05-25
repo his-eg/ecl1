@@ -28,6 +28,7 @@ import com.google.common.collect.Sets;
 
 import h1modules.utilities.utils.CvsTagUtil;
 import h1modules.utilities.utils.HISinOneFileUtil;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /**
  * Utilities for management of release.xml files
@@ -35,6 +36,8 @@ import h1modules.utilities.utils.HISinOneFileUtil;
  * @author keunecke / tneumann
  */
 public class ReleaseXmlUtil {
+
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
 	private static final String RELEASE_XML_FOLDER = "qisserver/WEB-INF/conf/service/patches/hisinone";
 	
@@ -49,7 +52,7 @@ public class ReleaseXmlUtil {
     	if (webappsProject!=null) {
     		return webappsProject.getFolder(RELEASE_XML_FOLDER);
     	}
-		System.err.println("There is no webapps project in your workspace");
+		logger.error("There is no webapps project in your workspace");
 		return null;
     }
 
@@ -97,12 +100,12 @@ public class ReleaseXmlUtil {
     public static String getIncrementedReleaseXmlVersionShortString() {
     	IFile releaseFile = getReleaseXmlFile("release.xml");
     	if (releaseFile==null) {
-    		System.err.println("File 'release.xml' does not exist");
+    		logger.error("File 'release.xml' does not exist");
     		return CvsTagUtil.UNKNOWN_VERSION;
     	}
         String contents = HISinOneFileUtil.readContent(releaseFile);
         if (contents==null) {
-    		System.err.println("IOException occurred reading file 'release.xml'");
+        	logger.error("IOException occurred reading file 'release.xml'");
     		return CvsTagUtil.UNKNOWN_VERSION;
         }
 
@@ -123,11 +126,11 @@ public class ReleaseXmlUtil {
         	doc = builder.parse(classpathContentStream);
     		classpathContentStream.close();
     	} catch (IOException | SAXException | ParserConfigurationException e) {
-    		System.err.println("Exception parsing 'release.xml' file: " + e);
+    		logger.error("Exception parsing 'release.xml' file: " + e);
     		return CvsTagUtil.UNKNOWN_VERSION;
     	}
     	if (doc==null) {
-    		System.err.println("Could not create XML document from 'release.xml' file");
+    		logger.error("Could not create XML document from 'release.xml' file");
     		return CvsTagUtil.UNKNOWN_VERSION;
     	}
     	
@@ -136,7 +139,7 @@ public class ReleaseXmlUtil {
 		NodeList patchEntries = root.getElementsByTagName("patch");
 		int patchEntriesCount;
 		if (patchEntries==null || (patchEntriesCount = patchEntries.getLength()) == 0) {
-    		System.err.println("'release.xml' file does not contain <patch> elements");
+			logger.error("'release.xml' file does not contain <patch> elements");
     		return CvsTagUtil.UNKNOWN_VERSION;
 		}
 
@@ -150,7 +153,7 @@ public class ReleaseXmlUtil {
         	String hotfixStr = patchEntry.getAttribute("name");
         	if (hotfixStr==null || !hotfixStr.startsWith(HOTFIX_PREFIX)) {
         		// log found problem but otherwise ignore it if there are other <patch> elements
-        		System.err.println("Patch '" + hotfixStr + "': name does not start with expected prefix '" + HOTFIX_PREFIX + "'");
+        		logger.error("Patch '" + hotfixStr + "': name does not start with expected prefix '" + HOTFIX_PREFIX + "'");
         		continue;
         	}
 
@@ -162,7 +165,7 @@ public class ReleaseXmlUtil {
         	try {
         		minorVersionInt = Integer.parseInt(minorVersion);
         	} catch (NumberFormatException nfe) {
-        		System.err.println("Patch '" + hotfixStr + "': minor version " + minorVersion + " is not a number");
+        		logger.error("Patch '" + hotfixStr + "': minor version " + minorVersion + " is not a number");
         		continue;
         	}
 
@@ -178,7 +181,7 @@ public class ReleaseXmlUtil {
         
         if (distinctMajorVersions2Count.isEmpty()) {
         	// there was no valid <patch> element
-    		System.err.println("'release.xml' does not contain valid <patch> elements");
+        	logger.error("'release.xml' does not contain valid <patch> elements");
     		return CvsTagUtil.UNKNOWN_VERSION;
         }
         
@@ -196,7 +199,7 @@ public class ReleaseXmlUtil {
             		maxCountMajorVersion = entry.getKey();
             	}
             }
-    		System.err.println("'release.xml' contains distinct major versions: " + distinctMajorVersions2Count.keySet() + ". Only one of them can be correct.");
+            logger.error("'release.xml' contains distinct major versions: " + distinctMajorVersions2Count.keySet() + ". Only one of them can be correct.");
         }
         // return highest version with minor version incremented by 1
         return maxCountMajorVersion + "." + String.valueOf(maxMinorVersion + 1);

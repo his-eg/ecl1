@@ -5,6 +5,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+
+import net.sf.ecl1.utilities.general.ConsoleLogger;
 /**
  * Plugin life cycle management
  *  
@@ -12,6 +14,8 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends AbstractUIPlugin {
 	
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+
 	public static String PLUGIN_ID = "net.sf.ecl1.git.batch-pull-button";
 	
 
@@ -56,11 +60,11 @@ public class Activator extends AbstractUIPlugin {
 	}
 	
 	public static void log(IStatus status) {
+		logger.log(status.getMessage());
 		ILog log = getDefault().getLog();
 		if (log != null) {
 			log.log(status);
 		} else {
-			System.out.println(status.getMessage());
 			if (status.getException() != null)
 				status.getException().printStackTrace();
 		}
@@ -73,5 +77,4 @@ public class Activator extends AbstractUIPlugin {
 	public static void error(String message) {
 		log(new Status(IStatus.ERROR, PLUGIN_ID, message));
 	}
-
 }

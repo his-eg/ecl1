@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.text.ParseException;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IWorkspace;
@@ -17,11 +19,15 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
+import de.his.cs.sys.extensions.wizards.utils.RemoteProjectSearchSupport;
 import h1modules.utilities.utils.Activator;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.general.PropertyUtil;
 import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 
 /**
@@ -32,8 +38,13 @@ import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
  */
 public class ExtensionImportJob extends Job {
 
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+
     private static final String ERROR_MESSAGE_EXISTING_FOLDER = "Your workspace contains folders named like extensions you want to import: %s\n\nThese folders must be deleted before the import, but first you might want to check if they contain files you want to keep. Then delete the folders manually or set the 'Delete folders?' option on the confirmation page of this wizard.";
     private static final String ERROR_MESSAGE_DELETE_FAILED = "Some extensions could not be imported, because deleting existing folders before the import failed: %s";
+    
+    // extension import configuration
+    private Map<String, String> configProps;
 
 	private Collection<String> extensionsToImport;
 	private boolean openProjectsAfterImport;
@@ -46,6 +57,17 @@ public class ExtensionImportJob extends Job {
 		this.openProjectsAfterImport = openProjectsAfterImport;
 		this.deleteFolders = deleteFolders;
 		this.pluginId = Activator.getPluginId();
+		
+		// read configuration from Jenkins
+        IPreferenceStore store = Activator.getPreferences();
+        String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE); // z.B. "http://build.his.de/build/"
+        String configFile = buildServer + "userContent/ecl1.properties";
+        String configStr = new RemoteProjectSearchSupport().getRemoteFileContent(configFile);
+        try {
+        	configProps = PropertyUtil.stringToProperties(configStr);
+        } catch (ParseException e) {
+        	logger.error("Error parsing extension import configuration: " + e.getMessage());
+		}
 	}
 
     @Override
@@ -77,7 +99,7 @@ public class ExtensionImportJob extends Job {
                     // set the name of the current work
                     String taskName = "Delete extension folder from workspace: " + extension;
                     subMonitor.setTaskName(taskName);
-                    System.out.println(taskName);
+                    logger.log(taskName);
 
                     // do one task
                     IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -88,7 +110,7 @@ public class ExtensionImportJob extends Job {
                         FileUtils.deleteDirectory(extensionFolder);
                     } catch (IOException e) {
                     	extensionsWithDeleteErrors.add(extension);
-                    	System.err.println("Extension folder " + extension + " could not be deleted from workspace");
+                    	logger.error("Extension folder " + extension + " could not be deleted from workspace");
                         e.printStackTrace();
                     }
                     // reduce total work by 1
@@ -115,10 +137,10 @@ public class ExtensionImportJob extends Job {
                 // set the name of the current work
                 String taskName = "Import extension " + extension;
                 subMonitor.setTaskName(taskName);
-                System.out.println(taskName);
+                logger.log(taskName);
 
                 // do one task
-                importer.importProject(extension);
+                importer.importProject(extension, configProps);
                 // reduce total work by 1
                 subMonitor.worked(1);
             } catch (InterruptedException | CoreException e) {

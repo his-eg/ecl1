@@ -6,7 +6,8 @@ Bundle-Version: 0.0.13.2017-03-02
 Bundle-Activator: net.sf.ecl1.updatecheck.UpdateCheckActivator
 Bundle-Vendor: HIS eG
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime
+ org.eclipse.core.runtime,
+ net.sf.ecl1.utilities
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eclipse.equinox.internal.p2.ui.model,

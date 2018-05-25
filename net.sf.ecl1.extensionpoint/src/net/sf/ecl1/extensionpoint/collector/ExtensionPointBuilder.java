@@ -11,6 +11,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import net.sf.ecl1.extensionpoint.collector.manager.ExtensionPointManager;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -29,6 +30,8 @@ import com.google.common.collect.Lists;
  * @author keunecke
  */
 public class ExtensionPointBuilder extends IncrementalProjectBuilder {
+	
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
     private static final String EXTENSION_EXTENDED_POINTS_PROPERTY = "extension.extended-points";
 
@@ -110,7 +113,7 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
 		try {
             getProject().accept(visitor);
 		} catch (CoreException e) {
-            System.out.println(e.getMessage());
+			logger.error(e.getMessage());
             e.printStackTrace();
 		}
 	}

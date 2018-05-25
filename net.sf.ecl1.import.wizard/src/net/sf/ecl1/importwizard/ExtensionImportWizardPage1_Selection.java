@@ -1,13 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2006 IBM Corporation and others.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- *
- * Contributors:
- *     IBM Corporation - initial API and implementation
- *******************************************************************************/
 package net.sf.ecl1.importwizard;
 
 import java.util.Set;
@@ -27,7 +17,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import de.his.cs.sys.extensions.wizards.utils.HISConstants;
+import net.sf.ecl1.utilities.general.Ecl1Constants;
 
 /**
  * Extension import configuration wizard page.
@@ -35,6 +25,8 @@ import de.his.cs.sys.extensions.wizards.utils.HISConstants;
  * @author keunecke
  */
 public class ExtensionImportWizardPage1_Selection extends WizardPage {
+
+    //private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
 	private static final String PAGE_NAME = "page1";
 	private static final String PAGE_DESCRIPTION = "Extension Import - Selection";
@@ -59,7 +51,7 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 
     @Override
     public void createControl(Composite parent) {
-        System.out.println("create controls for page 1");
+    	//logger.log("create controls for page 1");
         
         container = new Composite(parent, SWT.NONE);
         GridLayout gl = new GridLayout(1, false);
@@ -110,7 +102,7 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 
         Set<String> extensionsInWorkspace = model.getExtensionsInWorkspace();
         for (String remoteExtensionName : model.getRemoteExtensions()) {
-            if (!extensionsInWorkspace.contains(remoteExtensionName) && !remoteExtensionName.contains(HISConstants.WEBAPPS)) {
+            if (!extensionsInWorkspace.contains(remoteExtensionName) && !remoteExtensionName.contains(Ecl1Constants.WEBAPPS)) {
                 TableItem tableItem = new TableItem(projectTable, SWT.NONE);
                 tableItem.setChecked(false);
                 tableItem.setText(1, remoteExtensionName);

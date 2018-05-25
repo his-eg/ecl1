@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import net.sf.ecl1.changeset.exporter.util.ReleaseXmlUtil;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
@@ -31,6 +32,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class ChangeSetExporterWizardPage extends WizardPage {
+
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
     private Table changeSetTable;
 
@@ -63,7 +66,7 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         hotfixTitle = new StringFieldEditor("title", "Title", pageComposite);
         // Get version from release.xml incremented by 1 for next hotfix
         String version = ReleaseXmlUtil.getIncrementedReleaseXmlVersionShortString();
-        System.out.println("version from release.xml incremented by 1 = " + version);;
+        logger.log("ChangesetExporter: version from release.xml incremented by 1 = " + version);;
         hotfixTitle.setStringValue("Hotfix " + version);
         hotfixDescribtion = new StringFieldEditor("description", "Description", pageComposite);
         hiszillaTickets = new StringFieldEditor("hiszilla", "Hiszilla", pageComposite);

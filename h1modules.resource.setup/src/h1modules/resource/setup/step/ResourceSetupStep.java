@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
 import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
 import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /**
  * @author keunecke
@@ -24,9 +25,11 @@ import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
  */
 public class ResourceSetupStep implements ProjectSetupStep {
     
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+
     @Override
     public void performStep(IProject project, InitialProjectConfigurationChoices choices) {
-        System.out.println("starting resource setup");
+    	logger.log("starting resource setup");
         try {
             new ResourceSupport(project, choices).createFiles();
         } catch (CoreException e) {
@@ -34,7 +37,7 @@ public class ResourceSetupStep implements ProjectSetupStep {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        System.out.println("finished resource setup");
+        logger.log("finished resource setup");
     }
 
 }

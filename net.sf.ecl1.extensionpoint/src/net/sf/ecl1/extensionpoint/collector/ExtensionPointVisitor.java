@@ -4,11 +4,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.TreeSet;
 
-import net.sf.ecl1.extensionpoint.Constants;
-import net.sf.ecl1.extensionpoint.ExtensionPointBuilderPlugin;
 import net.sf.ecl1.extensionpoint.collector.manager.ExtensionPointManager;
 import net.sf.ecl1.extensionpoint.collector.model.ExtensionPointInformation;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.general.Ecl1Constants;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -23,7 +22,7 @@ import org.eclipse.jdt.core.JavaModelException;
 
 class ExtensionPointVisitor implements IResourceVisitor {
 
-    private final ConsoleLogger logger;
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
     private static final String JAVA_FILE_EXTENSION = "java";
 
@@ -41,8 +40,6 @@ class ExtensionPointVisitor implements IResourceVisitor {
      * @param project
      */
     public ExtensionPointVisitor(IJavaProject project) {
-        this.logger = new ConsoleLogger(project.getElementName(), Constants.CONSOLE_NAME, 
-        									   ExtensionPointBuilderPlugin.isLoggingEnabled());
         this.project = project;
     }
 
@@ -70,6 +67,7 @@ class ExtensionPointVisitor implements IResourceVisitor {
 
     private void handleFile(IFile resource) throws JavaModelException {
         // handle only java files
+    	String projectName = project.getElementName();
         if (JAVA_FILE_EXTENSION.equals(resource.getFileExtension())) {
             if (project.isOnClasspath(resource)) {
                 try {
@@ -85,13 +83,13 @@ class ExtensionPointVisitor implements IResourceVisitor {
                             if (EXTENSION_ANNOTATION_NAME.equals(extensionAnnotation.getElementName())) {
                                 if (extensionAnnotation.exists()) {
                                     this.contributors.add(type.getFullyQualifiedName());
-                                    logger.logToConsole("Found contribution: " + type.getFullyQualifiedName());
+                                    logger.log(projectName, "Found contribution: " + type.getFullyQualifiedName());
                                 }
                             }
                             if (EXTENSION_POINT_ANNOTATION_NAME.equals(extensionAnnotation.getElementName())) {
                                 if (extensionAnnotation != null && extensionAnnotation.exists()) {
                                     ExtensionPointInformation epi = ExtensionPointInformation.create(extensionAnnotation, type);
-                                    logger.logToConsole("Found Extension Point: " + epi);
+                                    logger.log(projectName, "Found Extension Point: " + epi);
                                     ExtensionPointManager.get().addExtensions(type, Arrays.asList(epi));
                                 }
                             }

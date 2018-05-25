@@ -1,7 +1,5 @@
 package net.sf.ecl1.extensionpoint.collector.model;
 
-import net.sf.ecl1.extensionpoint.Constants;
-import net.sf.ecl1.extensionpoint.ExtensionPointBuilderPlugin;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 import org.eclipse.jdt.core.IAnnotation;
@@ -19,6 +17,8 @@ import com.google.common.base.Objects;
  */
 public class ExtensionPointInformation {
 	
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+
 	private final String id;
 	
 	private final String name;
@@ -34,8 +34,7 @@ public class ExtensionPointInformation {
      * @throws JavaModelException
      */
     public static ExtensionPointInformation create(IAnnotation a, IType type) throws JavaModelException {
-        ConsoleLogger logger = new ConsoleLogger(a.getJavaProject().getElementName(), Constants.CONSOLE_NAME,
-        													   ExtensionPointBuilderPlugin.isLoggingEnabled());
+    	String projectName = a.getJavaProject().getElementName();
         String idValue = null;
         String nameValue = null;
         String ifaceValue = null;
@@ -54,8 +53,8 @@ public class ExtensionPointInformation {
                 if (resolveType != null && resolveType.length > 0) {
                     ifaceValue = resolveType[0][0] + "." + resolveType[0][1];
                 } else {
-                    logger.logToConsole("Missing information for extension point: \n" + a.getSource());
-                    logger.logToConsole("Could not find referenced type from iface attribute: " + ifaceValue);
+                    logger.log(projectName, "Missing information for extension point: \n" + a.getSource());
+                    logger.log(projectName, "Could not find referenced type from iface attribute: " + ifaceValue);
                 }
             }
             if ("name".equals(pair.getMemberName())) {
@@ -63,7 +62,7 @@ public class ExtensionPointInformation {
             }
         }
         if (idValue == null || nameValue == null || ifaceValue == null) {
-            logger.logToConsole("Missing information for extension point: " + a.getSource());
+            logger.log(projectName, "Missing information for extension point: " + a.getSource());
         }
         return new ExtensionPointInformation(idValue, nameValue, ifaceValue);
     }

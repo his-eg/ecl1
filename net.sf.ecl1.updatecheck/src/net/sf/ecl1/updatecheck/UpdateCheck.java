@@ -10,7 +10,7 @@ public class UpdateCheck implements IStartup {
 
 	@Override
 	public void earlyStartup() {
-		UpdateCheckActivator.info("Update Check!");
+		UpdateCheckActivator.info("Update Check!"); // TODO logs in std:out console and "Error Log" view
 		Job job = new Job("ecl1UpdateCheck") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
@@ -26,5 +26,4 @@ public class UpdateCheck implements IStartup {
 	void doUpdateCheck(IProgressMonitor monitor) {
 		P2Util.doCheckForUpdates(monitor);
 	}
-	
 }

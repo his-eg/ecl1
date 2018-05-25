@@ -14,6 +14,7 @@ import java.util.List;
 import com.google.common.collect.Sets;
 
 import h1modules.utilities.utils.Activator;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /**
  * A utility to fetch templates from the URLs specified in preferences.
@@ -21,6 +22,8 @@ import h1modules.utilities.utils.Activator;
  * @author keunecke
  */
 public class TemplateFetcher {
+
+    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
 	private final List<String> templateRootUrls;
 
@@ -43,11 +46,11 @@ public class TemplateFetcher {
     		String templateListUrl = trimmedTemplateRootUrl + "/templatelist.txt";
     		Collection<String> templates = getTemplates(templateListUrl);
     		if (templates != null) {
-        		System.out.println("Loaded template list from '" + templateListUrl + "'");
+    			logger.log("Loaded template list from '" + templateListUrl + "'");
         		return templates;
     		}
     		// else: log a warning and try next URL
-    		System.out.println("Failed loading template list from '" + templateListUrl + "', server not available?");
+    		logger.error("Failed loading template list from '" + templateListUrl + "', server not available?");
         }
         return null; // complete fail
     }
@@ -64,10 +67,10 @@ public class TemplateFetcher {
             String line = "";
             while ((line = br.readLine()) != null) {
                 result.add(line);
-                System.out.println("TemplateFetcher found template '" + line + "' for download.");
+                logger.log("TemplateFetcher found template '" + line + "' for download.");
             }
         } catch (IOException e) {
-            System.err.println("Error downloading template list '" + templateListUrl + "': " + e.getClass() + ": " + e.getMessage());
+        	logger.error("Error downloading template list '" + templateListUrl + "': " + e.getClass() + ": " + e.getMessage());
             //e.printStackTrace();
             return null;
         }
