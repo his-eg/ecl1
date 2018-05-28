@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
@@ -116,25 +117,31 @@ public class ConsoleLogger {
     private void log(LogLevel logLevel, String message) {
     	LogLevel visibleLogLevel = LogLevel.valueOf(getVisibleLogLevel());
 		if (logLevel.ordinal() >= visibleLogLevel.ordinal()) {
-            MessageConsoleStream newMessageStream = console.newMessageStream();
-            if (logLevel == LogLevel.ERROR) {
-            	Color red = new Color(null, 255, 0, 0);
-            	newMessageStream.setColor(red); 
-            }
-            try {
-            	String logLevelStr = logLevel.toString() + ": ";
-            	if (logLevelStr.length()==6) logLevelStr += " ";
-                newMessageStream.write(logLevelStr + message + "\n");
-                newMessageStream.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    newMessageStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+			// https://www.eclipse.org/forums/index.php/t/172855/ :
+			// Setting colors must be run synchronized to avoid an illegal thread access exception.
+			Display.getDefault().syncExec(new Runnable() {
+				public void run() {
+					MessageConsoleStream newMessageStream = console.newMessageStream();
+		            if (logLevel == LogLevel.ERROR) {
+		            	Color red = new Color(null, 255, 0, 0);
+		            	newMessageStream.setColor(red); 
+		            } 
+		            try {
+		            	String logLevelStr = logLevel.toString() + ": ";
+		            	if (logLevelStr.length()==6) logLevelStr += " ";
+		                newMessageStream.write(logLevelStr + message + "\n");
+		                newMessageStream.flush();
+		            } catch (IOException e) {
+		                e.printStackTrace();
+		            } finally {
+		                try {
+		                    newMessageStream.close();
+		                } catch (IOException e) {
+		                    e.printStackTrace();
+		                }
+		            }
+				}
+			});
         }
     }
     
