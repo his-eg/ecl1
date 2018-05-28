@@ -59,7 +59,7 @@ public class UpdateCheckActivator extends AbstractUIPlugin {
 	}
 	
 	public static void log(IStatus status) {
-		logger.log(status.getMessage());
+		logger.debug(status.getMessage());
 		ILog log = getDefault().getLog();
 		if (log != null) {
 			log.log(status); // TODO logs to std:out and "Error Log" view

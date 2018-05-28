@@ -53,8 +53,8 @@ public class ExtensionPointInformation {
                 if (resolveType != null && resolveType.length > 0) {
                     ifaceValue = resolveType[0][0] + "." + resolveType[0][1];
                 } else {
-                    logger.log(projectName, "Missing information for extension point: \n" + a.getSource());
-                    logger.log(projectName, "Could not find referenced type from iface attribute: " + ifaceValue);
+                    logger.debug(projectName, "Missing information for extension point: \n" + a.getSource());
+                    logger.debug(projectName, "Could not find referenced type from iface attribute: " + ifaceValue);
                 }
             }
             if ("name".equals(pair.getMemberName())) {
@@ -62,7 +62,7 @@ public class ExtensionPointInformation {
             }
         }
         if (idValue == null || nameValue == null || ifaceValue == null) {
-            logger.log(projectName, "Missing information for extension point: " + a.getSource());
+            logger.debug(projectName, "Missing information for extension point: " + a.getSource());
         }
         return new ExtensionPointInformation(idValue, nameValue, ifaceValue);
     }

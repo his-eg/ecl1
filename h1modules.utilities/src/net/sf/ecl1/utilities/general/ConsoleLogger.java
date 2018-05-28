@@ -3,6 +3,7 @@ package net.sf.ecl1.utilities.general;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
@@ -23,6 +24,13 @@ public class ConsoleLogger {
     
     private MessageConsole console;
 
+    private enum LogLevel {
+    	DEBUG,
+    	INFO,
+    	WARN,
+    	ERROR;
+    }
+    
     public static ConsoleLogger getLogger(String name) {
     	ConsoleLogger logger = NAME_TO_LOGGER_MAP.get(name);
     	if (logger == null) {
@@ -60,30 +68,63 @@ public class ConsoleLogger {
         return myConsole;
     }
 
-    /**
-     * Log a message to the console.
-     * 
-     * @param targetProjectName the name of the project ecl1 is currently working on (optional)
-     * @param message
-     */
-    public void log(String targetProjectName, String message) {
-    	if (targetProjectName!=null && !targetProjectName.trim().isEmpty()) {
-    		log("[" + targetProjectName + "] " + message);
-    	} else {
-    		log(message);
-    	}
+    public void debug(String targetProjectName, String message) {
+    	debug(decorateMessage(targetProjectName, message));
     }
 
+    public void debug(String message) {
+    	log(LogLevel.DEBUG, message);
+    }
+
+    public void info(String targetProjectName, String message) {
+    	info(decorateMessage(targetProjectName, message));
+    }
+
+    public void info(String message) {
+    	log(LogLevel.INFO, message);
+    }
+
+    public void warn(String targetProjectName, String message) {
+    	warn(decorateMessage(targetProjectName, message));
+    }
+
+    public void warn(String message) {
+    	log(LogLevel.WARN, message);
+    }
+
+    public void error(String targetProjectName, String message) {
+    	error(decorateMessage(targetProjectName, message));
+    }
+
+    public void error(String message) {
+    	log(LogLevel.ERROR, message);
+    }
+
+    private String decorateMessage(String targetProjectName, String message) {
+    	if (targetProjectName!=null && !targetProjectName.trim().isEmpty()) {
+    		return "[" + targetProjectName + "] " + message;
+    	} else {
+    		return message;
+    	}
+    }
+    
     /**
      * Log a message to the console.
      * 
      * @param message
      */
-    public void log(String message) {
-		if (isLoggingEnabled()) {
+    private void log(LogLevel logLevel, String message) {
+    	LogLevel visibleLogLevel = LogLevel.valueOf(getVisibleLogLevel());
+		if (logLevel.ordinal() >= visibleLogLevel.ordinal()) {
             MessageConsoleStream newMessageStream = console.newMessageStream();
+            if (logLevel == LogLevel.ERROR) {
+            	Color red = new Color(null, 255, 0, 0);
+            	newMessageStream.setColor(red); 
+            }
             try {
-                newMessageStream.write(message + "\n");
+            	String logLevelStr = logLevel.toString() + ": ";
+            	if (logLevelStr.length()==6) logLevelStr += " ";
+                newMessageStream.write(logLevelStr + message + "\n");
                 newMessageStream.flush();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -96,14 +137,8 @@ public class ConsoleLogger {
             }
         }
     }
-
-    public void error(String message) {
-    	// TODO red text color
-    	String errorMessage = "ERROR: " + message;
-    	log(errorMessage);
-    }
     
-    private boolean isLoggingEnabled() {
-    	return Activator.getDefault().getPreferenceStore().getBoolean(ExtensionToolsPreferenceConstants.LOGGING_PREFERENCE);
+    private String getVisibleLogLevel() {
+    	return Activator.getDefault().getPreferenceStore().getString(ExtensionToolsPreferenceConstants.LOG_LEVEL_PREFERENCE);
     }
 }

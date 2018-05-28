@@ -66,7 +66,7 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         hotfixTitle = new StringFieldEditor("title", "Title", pageComposite);
         // Get version from release.xml incremented by 1 for next hotfix
         String version = ReleaseXmlUtil.getIncrementedReleaseXmlVersionShortString();
-        logger.log("ChangesetExporter: version from release.xml incremented by 1 = " + version);;
+        logger.debug("ChangesetExporter: version from release.xml incremented by 1 = " + version);;
         hotfixTitle.setStringValue("Hotfix " + version);
         hotfixDescribtion = new StringFieldEditor("description", "Description", pageComposite);
         hiszillaTickets = new StringFieldEditor("hiszilla", "Hiszilla", pageComposite);

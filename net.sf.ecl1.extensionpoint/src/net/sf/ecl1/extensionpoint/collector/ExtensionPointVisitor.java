@@ -83,13 +83,13 @@ class ExtensionPointVisitor implements IResourceVisitor {
                             if (EXTENSION_ANNOTATION_NAME.equals(extensionAnnotation.getElementName())) {
                                 if (extensionAnnotation.exists()) {
                                     this.contributors.add(type.getFullyQualifiedName());
-                                    logger.log(projectName, "Found contribution: " + type.getFullyQualifiedName());
+                                    logger.debug(projectName, "Found contribution: " + type.getFullyQualifiedName());
                                 }
                             }
                             if (EXTENSION_POINT_ANNOTATION_NAME.equals(extensionAnnotation.getElementName())) {
                                 if (extensionAnnotation != null && extensionAnnotation.exists()) {
                                     ExtensionPointInformation epi = ExtensionPointInformation.create(extensionAnnotation, type);
-                                    logger.log(projectName, "Found Extension Point: " + epi);
+                                    logger.debug(projectName, "Found Extension Point: " + epi);
                                     ExtensionPointManager.get().addExtensions(type, Arrays.asList(epi));
                                 }
                             }

@@ -60,7 +60,7 @@ public class Activator extends AbstractUIPlugin {
 	}
 	
 	public static void log(IStatus status) {
-		logger.log(status.getMessage());
+		logger.debug(status.getMessage());
 		ILog log = getDefault().getLog();
 		if (log != null) {
 			log.log(status);

@@ -79,7 +79,7 @@ public class ExtensionImportWizardModel {
         String branch = getBranch();
         for (String remoteProjectIncludingBranch : remoteProjectsIncludingBranch) {
             String remoteProject = remoteProjectIncludingBranch.replace("_" + branch, "");
-            logger.log("Replacing original '" + remoteProjectIncludingBranch + "' with '" + remoteProject + "'");
+            //logger.debug("Found remote project '" + remoteProjectIncludingBranch + "' , store it as '" + remoteProject + "'");
             remoteExtensions.add(remoteProject);
         }
     }
@@ -182,10 +182,10 @@ public class ExtensionImportWizardModel {
         	doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(classpathContentStream);
     		classpathContentStream.close();
     	} catch (IOException | SAXException | ParserConfigurationException e) {
-    		logger.error("Exception parsing '.classpath' file for extension " + extension  + ": " + e);
+    		logger.error(extension, "Exception parsing '.classpath' file for extension " + extension  + ": " + e);
     	}
     	if (doc==null) {
-    		logger.error("Could not create XML document from '.classpath' file of extension " + extension);
+    		logger.error(extension, "Could not create XML document from '.classpath' file of extension " + extension);
     		return dependencyExtensions; // return empty list
     	}
     	

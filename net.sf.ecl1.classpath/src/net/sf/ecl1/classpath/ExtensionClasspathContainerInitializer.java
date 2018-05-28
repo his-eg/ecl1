@@ -49,7 +49,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
     public void initialize(IPath containerPath, IJavaProject javaProject) throws CoreException {
         try {
             if (containerPath != null) {
-            	logger.log("Supplied path: " + containerPath.toOSString());
+            	logger.debug("Supplied path: " + containerPath.toOSString());
             }
             updateClasspathContainer(containerPath, javaProject);
         } catch (CoreException e) {
@@ -95,7 +95,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
             IJavaProject[] iJavaProjects = new IJavaProject[] { project };
             JavaCore.setClasspathContainer(containerPath, iJavaProjects, iClasspathContainers, new NullProgressMonitor());
         } else {
-        	logger.log("No entries for classpath container '" + containerPath + "' in  '" + project.getElementName() + "'.");
+        	logger.debug("No entries for classpath container '" + containerPath + "' in  '" + project.getElementName() + "'.");
         }
     }
 
@@ -119,7 +119,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
                 }
             }
         }
-        logger.log("Extensions for export: " + extensionsForClassPath);
+        logger.debug("Extensions for export: " + extensionsForClassPath);
     }
 
     private IClasspathEntry[] createEntries(IJavaProject javaProject) {
@@ -147,17 +147,17 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
                     IPath sourceAttachmentRootPath = null;
                     IClasspathEntry libraryEntry = JavaCore.newLibraryEntry(path, sourceAttachmentPath, sourceAttachmentRootPath, true);
                     result.add(libraryEntry);
-                    logger.log("Creating new container library entry for: " + path.toString() + "\n * exported: " + extensionNeedsToBeExported
+                    logger.debug("Creating new container library entry for: " + path.toString() + "\n * exported: " + extensionNeedsToBeExported
                     		+ "\n * sourceAttachmentPath: " + sourceAttachmentPath + "\n * sourceAttachmentRootPath: " + sourceAttachmentRootPath);
                 } else {
                     IProject project = root.getProject(extensionPath);
                     if (project.exists()) {
-                    	logger.log("Creating new container entry for project: " + project.getName() + " exported: " + extensionNeedsToBeExported);
+                    	logger.debug("Creating new container entry for project: " + project.getName() + " exported: " + extensionNeedsToBeExported);
                         IPath location = project.getLocation();
                         IClasspathEntry newProjectEntry = JavaCore.newProjectEntry(location.makeRelativeTo(workspace).makeAbsolute(), true);
                         result.add(newProjectEntry);
                     } else {
-                    	logger.log("Extension does not exist as project: " + extensionPath);
+                    	logger.debug("Extension does not exist as project: " + extensionPath);
                     }
                 }
             }

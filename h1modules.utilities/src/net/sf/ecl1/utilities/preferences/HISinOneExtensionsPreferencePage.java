@@ -5,6 +5,7 @@ import h1modules.utilities.utils.Activator;
 import java.util.Collection;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
@@ -45,7 +46,13 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
         addField(buildServer);
         addField(buildServerView);
         addField(templateRootUrls);
-		addField(new BooleanFieldEditor(ExtensionToolsPreferenceConstants.LOGGING_PREFERENCE, "Logging", getFieldEditorParent()));
+        // Loglevel Combobox
+		final String[][] logLevels = new String[4][2];
+		logLevels[0][0] = logLevels[0][1] = "DEBUG";
+		logLevels[1][0] = logLevels[1][1] = "INFO";
+		logLevels[2][0] = logLevels[2][1] = "WARN";
+		logLevels[3][0] = logLevels[3][1] = "ERROR";
+		addField(new ComboFieldEditor(ExtensionToolsPreferenceConstants.LOG_LEVEL_PREFERENCE, "Log-Level", logLevels, getFieldEditorParent()));
     }
 
     /* (non-Javadoc)

@@ -99,7 +99,7 @@ public class ExtensionImportJob extends Job {
                     // set the name of the current work
                     String taskName = "Delete extension folder from workspace: " + extension;
                     subMonitor.setTaskName(taskName);
-                    logger.log(taskName);
+                    logger.info(extension, taskName);
 
                     // do one task
                     IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -110,7 +110,7 @@ public class ExtensionImportJob extends Job {
                         FileUtils.deleteDirectory(extensionFolder);
                     } catch (IOException e) {
                     	extensionsWithDeleteErrors.add(extension);
-                    	logger.error("Extension folder " + extension + " could not be deleted from workspace");
+                    	logger.error(extension, "Extension folder " + extension + " could not be deleted from workspace");
                         e.printStackTrace();
                     }
                     // reduce total work by 1
@@ -137,7 +137,7 @@ public class ExtensionImportJob extends Job {
                 // set the name of the current work
                 String taskName = "Import extension " + extension;
                 subMonitor.setTaskName(taskName);
-                logger.log(taskName);
+                logger.info(extension, taskName);
 
                 // do one task
                 importer.importProject(extension, configProps);

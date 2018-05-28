@@ -6,10 +6,9 @@ package net.sf.ecl1.utilities.preferences;
 public class ExtensionToolsPreferenceConstants {
 
     /**
-     * The name of the preference value determining if detailed logging should occur
+     * Messages with a log level greater or equal than this preference are logged, others not.
      */
-    public static final String LOGGING_PREFERENCE = "net.sf.ecl1.extensionpoint.extensionsLogging";
-    // TODO choose more general name
+    public static final String LOG_LEVEL_PREFERENCE = "net.sf.ecl1.logLevel";
     
     /**
      * Preference for URI to git server

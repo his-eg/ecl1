@@ -65,7 +65,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     public boolean canFinish() {
     	IWizardPage currentPage = this.getContainer().getCurrentPage();
     	boolean canFinish = (currentPage instanceof ExtensionImportWizardPage2_Confirmation);
-    	logger.log("currentPage = " + currentPage.getName() + ", canFinish = " + canFinish);
+    	//logger.debug("currentPage = " + currentPage.getName() + ", canFinish = " + canFinish);
     	return canFinish;
     }
     

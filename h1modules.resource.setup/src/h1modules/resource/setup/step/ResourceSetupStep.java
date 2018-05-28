@@ -29,7 +29,7 @@ public class ResourceSetupStep implements ProjectSetupStep {
 
     @Override
     public void performStep(IProject project, InitialProjectConfigurationChoices choices) {
-    	logger.log("starting resource setup");
+    	logger.debug("starting resource setup");
         try {
             new ResourceSupport(project, choices).createFiles();
         } catch (CoreException e) {
@@ -37,7 +37,7 @@ public class ResourceSetupStep implements ProjectSetupStep {
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        logger.log("finished resource setup");
+        logger.debug("finished resource setup");
     }
 
 }

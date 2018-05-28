@@ -46,7 +46,7 @@ public class TemplateFetcher {
     		String templateListUrl = trimmedTemplateRootUrl + "/templatelist.txt";
     		Collection<String> templates = getTemplates(templateListUrl);
     		if (templates != null) {
-    			logger.log("Loaded template list from '" + templateListUrl + "'");
+    			logger.debug("Loaded template list from '" + templateListUrl + "'");
         		return templates;
     		}
     		// else: log a warning and try next URL
@@ -67,7 +67,7 @@ public class TemplateFetcher {
             String line = "";
             while ((line = br.readLine()) != null) {
                 result.add(line);
-                logger.log("TemplateFetcher found template '" + line + "' for download.");
+                logger.debug("TemplateFetcher found template '" + line + "' for download.");
             }
         } catch (IOException e) {
         	logger.error("Error downloading template list '" + templateListUrl + "': " + e.getClass() + ": " + e.getMessage());

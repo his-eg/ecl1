@@ -111,7 +111,7 @@ public class TemplateManager {
         
         try (InputStream templateStream = DownloadHelper.getInputStreamFromUrlFollowingRedirects(fullTemplateUrlString);){
         	
-        	logger.log("Loading template from: " + fullTemplateUrlString);
+        	logger.debug("Loading template from: " + fullTemplateUrlString);
             BufferedReader br = new BufferedReader(new InputStreamReader(templateStream));
             String line = "";
             while((line = br.readLine() )!= null) {

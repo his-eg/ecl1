@@ -24,17 +24,11 @@ public class RemoteProjectSearchSupport {
     private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
     private class BuildJob {
-
         private String name;
-
-        private String url;
-
-        private String color;
 
         public String getName() {
             return name;
         }
-
     }
 
     private class BuildJobView {
@@ -64,7 +58,7 @@ public class RemoteProjectSearchSupport {
         String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE); // z.B. "http://build.his.de/build/"
         String buildServerView = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE); // branch
         String lookUpTarget = buildServer + JENKINS_VIEW_INFIX + buildServerView + JENKINS_API_ADDITION;
-        logger.log("Get projects from " + lookUpTarget);
+        logger.info("Get projects from " + lookUpTarget);
         TreeSet<String> result = new TreeSet<String>();
         InputStream jsonStream = RestUtil.getJsonStream(lookUpTarget);
         if (jsonStream != null) {
@@ -94,7 +88,7 @@ public class RemoteProjectSearchSupport {
      * @return file content as String
      */
     public String getRemoteFileContent(String lookUpTarget) {
-        logger.log("Get file " + lookUpTarget);
+        logger.debug("Get file " + lookUpTarget);
     	InputStream inStream = RestUtil.getJsonStream(lookUpTarget);
     	if (inStream == null) {
     		// wrong URL, file doesn't exist? 
@@ -111,7 +105,7 @@ public class RemoteProjectSearchSupport {
     	} catch (IOException ioe) {
     		logger.error("IOException closing InputStream: " + ioe);
     	}
-    	logger.log("result = "  + fileContent);
+    	logger.debug("File content = "  + fileContent);
     	return fileContent;
 
     }
