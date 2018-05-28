@@ -140,6 +140,7 @@ public class ConsoleLogger {
 		                    e.printStackTrace();
 		                }
 		            }
+		            // TODO log warnings and errors in "Error Log" view, too, using ILog
 				}
 			});
         }

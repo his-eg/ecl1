@@ -54,12 +54,22 @@ public class UpdateCheckActivator extends AbstractUIPlugin {
 		return plugin;
 	}
 	
+	// Info messages are logged to console only
 	public static void info(String info) {
-		log(new Status(IStatus.INFO, PLUGIN_ID,info));
+		logger.info(info);
+	}
+
+	public static void error(String message) {
+		log(new Status(IStatus.ERROR, PLUGIN_ID, message));
 	}
 	
-	public static void log(IStatus status) {
-		logger.debug(status.getMessage());
+	public static void error(Throwable e) {
+		log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
+	}
+
+	// warn/error messages are logged to console and "Error Log" view
+	private static void log(IStatus status) {
+		logger.error(status.getMessage());
 		ILog log = getDefault().getLog();
 		if (log != null) {
 			log.log(status); // TODO logs to std:out and "Error Log" view
@@ -68,13 +78,4 @@ public class UpdateCheckActivator extends AbstractUIPlugin {
 				status.getException().printStackTrace();
 		}
 	}
-	
-	public static void log(Throwable e) {
-		log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
-	}
-
-	public static void error(String message) {
-		log(new Status(IStatus.ERROR, PLUGIN_ID, message));
-	}
-
 }
