@@ -7,7 +7,6 @@ import java.util.TreeSet;
 import net.sf.ecl1.extensionpoint.collector.manager.ExtensionPointManager;
 import net.sf.ecl1.extensionpoint.collector.model.ExtensionPointInformation;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
-import net.sf.ecl1.utilities.general.Ecl1Constants;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -83,13 +82,13 @@ class ExtensionPointVisitor implements IResourceVisitor {
                             if (EXTENSION_ANNOTATION_NAME.equals(extensionAnnotation.getElementName())) {
                                 if (extensionAnnotation.exists()) {
                                     this.contributors.add(type.getFullyQualifiedName());
-                                    logger.debug(projectName, "Found contribution: " + type.getFullyQualifiedName());
+                                    logger.info("Extension " + projectName + ": Found contribution: " + type.getFullyQualifiedName());
                                 }
                             }
                             if (EXTENSION_POINT_ANNOTATION_NAME.equals(extensionAnnotation.getElementName())) {
                                 if (extensionAnnotation != null && extensionAnnotation.exists()) {
                                     ExtensionPointInformation epi = ExtensionPointInformation.create(extensionAnnotation, type);
-                                    logger.debug(projectName, "Found Extension Point: " + epi);
+                                    logger.info("Extension " + projectName + ": Found Extension Point: " + epi);
                                     ExtensionPointManager.get().addExtensions(type, Arrays.asList(epi));
                                 }
                             }

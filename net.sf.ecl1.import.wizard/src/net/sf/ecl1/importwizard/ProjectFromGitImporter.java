@@ -62,7 +62,7 @@ public class ProjectFromGitImporter {
         
         // Compute full repository URL depending on configuration
         String fullRepositoryPath = getFullRepositoryPath(extensionToImport, configProps);
-    	logger.debug(extensionToImport, "fullRepositoryPath = " + fullRepositoryPath);
+    	logger.debug("Extension " + extensionToImport + ": fullRepositoryPath = " + fullRepositoryPath);
     	if (fullRepositoryPath != null) {
             IWorkspace workspace = ResourcesPlugin.getWorkspace();
             IPath workspacePath = workspace.getRoot().getLocation();
@@ -103,9 +103,9 @@ public class ProjectFromGitImporter {
     }
     
     private String getFullRepositoryPath(String extensionToImport, Map<String, String> configProps) {
-    	logger.debug(extensionToImport, "Extension importer config = " + configProps);
-    	logger.info(extensionToImport, "Import extension project " + extensionToImport + " ...");
-    	logger.debug(extensionToImport, "baseRepositoryPath = " + baseRepositoryPath);
+    	logger.debug("Extension " + extensionToImport + ": Extension importer config = " + configProps);
+    	logger.info("Extension" + extensionToImport + ": Import extension project " + extensionToImport + " ...");
+    	logger.debug("Extension" + extensionToImport + ": baseRepositoryPath = " + baseRepositoryPath);
     	
         String urlStyle = configProps!=null ? configProps.get("urlStyle") : null;
         
@@ -117,7 +117,7 @@ public class ProjectFromGitImporter {
 		// git lab style, e.g. ssh://git@gitlab.his.de/h1/cs/cs.sys/cs.sys.build.utilities
 		int c1Pos = extensionToImport.indexOf('.');
 		if (c1Pos < 0) {
-	    	logger.warn(extensionToImport, "Illegal extension name! An extension name should have at least 3 dot-separated segments!");
+	    	logger.warn("Extension" + extensionToImport + ": Illegal extension name! An extension name should have at least 3 dot-separated segments!");
 	    	return null;
 		}
 		String segment1 = extensionToImport.substring(0, c1Pos);

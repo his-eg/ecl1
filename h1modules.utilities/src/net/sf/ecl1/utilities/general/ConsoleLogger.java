@@ -69,44 +69,36 @@ public class ConsoleLogger {
         return myConsole;
     }
 
-    public void debug(String targetProjectName, String message) {
-    	debug(decorateMessage(targetProjectName, message));
-    }
-
     public void debug(String message) {
-    	log(LogLevel.DEBUG, message);
+    	log(LogLevel.DEBUG, message, null);
     }
 
-    public void info(String targetProjectName, String message) {
-    	info(decorateMessage(targetProjectName, message));
+    public void debug(String message, StackTraceElement[] stackTrace) {
+    	log(LogLevel.DEBUG, message, stackTrace);
     }
 
     public void info(String message) {
-    	log(LogLevel.INFO, message);
+    	log(LogLevel.INFO, message, null);
     }
 
-    public void warn(String targetProjectName, String message) {
-    	warn(decorateMessage(targetProjectName, message));
+    public void info(String message, StackTraceElement[] stackTrace) {
+    	log(LogLevel.INFO, message, stackTrace);
     }
 
     public void warn(String message) {
-    	log(LogLevel.WARN, message);
+    	log(LogLevel.WARN, message, null);
     }
 
-    public void error(String targetProjectName, String message) {
-    	error(decorateMessage(targetProjectName, message));
+    public void warn(String message, StackTraceElement[] stackTrace) {
+    	log(LogLevel.WARN, message, stackTrace);
     }
 
     public void error(String message) {
-    	log(LogLevel.ERROR, message);
+    	log(LogLevel.ERROR, message, null);
     }
 
-    private String decorateMessage(String targetProjectName, String message) {
-    	if (targetProjectName!=null && !targetProjectName.trim().isEmpty()) {
-    		return "[" + targetProjectName + "] " + message;
-    	} else {
-    		return message;
-    	}
+    public void error(String message, StackTraceElement[] stackTrace) {
+    	log(LogLevel.ERROR, message, stackTrace);
     }
     
     /**
@@ -114,7 +106,7 @@ public class ConsoleLogger {
      * 
      * @param message
      */
-    private void log(LogLevel logLevel, String message) {
+    private void log(LogLevel logLevel, String message, StackTraceElement[] stackTrace) {
     	LogLevel visibleLogLevel = LogLevel.valueOf(getVisibleLogLevel());
 		if (logLevel.ordinal() >= visibleLogLevel.ordinal()) {
 			// https://www.eclipse.org/forums/index.php/t/172855/ :
@@ -130,6 +122,12 @@ public class ConsoleLogger {
 		            	String logLevelStr = logLevel.toString() + ": ";
 		            	if (logLevelStr.length()==6) logLevelStr += " ";
 		                newMessageStream.write(logLevelStr + message + "\n");
+		                // log stack trace if available
+		                if (stackTrace != null) {
+		                    for (StackTraceElement elem : stackTrace) {
+				                newMessageStream.write("   " + elem + "\n");
+		                    }
+		                }
 		                newMessageStream.flush();
 		            } catch (IOException e) {
 		                e.printStackTrace();
