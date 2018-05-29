@@ -38,18 +38,15 @@ public class P2Util {
 
 	static void doCheckForUpdates(IProgressMonitor monitor) {
 		BundleContext bundleContext = UpdateCheckActivator.getDefault().getBundle().getBundleContext();
-		@SuppressWarnings("rawtypes")
-		ServiceReference reference = bundleContext.getServiceReference(IProvisioningAgent.SERVICE_NAME);
+		ServiceReference<?> reference = bundleContext.getServiceReference(IProvisioningAgent.SERVICE_NAME);
 		if (reference == null) {
-			logger.error("No provisioning agent found.  This application is not set up for updates.");
+			logger.error("No provisioning agent found. This application is not set up for updates.");
 			return;
 		}
-
-		@SuppressWarnings("unchecked")
+		
 		final IProvisioningAgent agent = (IProvisioningAgent) bundleContext.getService(reference);
 		try {
-			@SuppressWarnings("unused") // in case we need it later
-			IStatus updateStatus = P2Util.checkForUpdates(agent, monitor);
+			checkForUpdates(agent, monitor);
 		} finally {
 			bundleContext.ungetService(reference);
 		}
@@ -59,24 +56,26 @@ public class P2Util {
 		
 		// Here we restrict the possible updates to ecl1
 		IQuery<IInstallableUnit> query = QueryUtil.createLatestQuery(QueryUtil.createIUQuery("h1modulesfeature.feature.group"));
-		//UpdateCheckActivator.info("Update Query Expression: " + query.getExpression());
-		IProfileRegistry registry= (IProfileRegistry) agent.getService(IProfileRegistry.SERVICE_NAME);
-		final IProfile profile= registry.getProfile(IProfileRegistry.SELF);
+		logger.debug("Update Query Expression: " + query.getExpression());
+		IProfileRegistry registry = (IProfileRegistry) agent.getService(IProfileRegistry.SERVICE_NAME);
+		final IProfile profile = registry.getProfile(IProfileRegistry.SELF);
 		IQueryResult<IInstallableUnit> result = profile.query(query, monitor);
 		Set<IInstallableUnit> unitsForUpdate = result.toUnmodifiableSet();
+		logger.debug("Installable Units for update: " + unitsForUpdate);
 		
-		logger.info("Installable Units for update: " + unitsForUpdate);
 		ProvisioningSession session = new ProvisioningSession(agent);
 		UpdateOperation operation = new UpdateOperation(session);
 		if(!unitsForUpdate.isEmpty()) {
 			logger.info("Creating UpdateOperation for: " + unitsForUpdate);
 			operation = new UpdateOperation(session, unitsForUpdate);
 		}
-	    
+		
 		// Check if updates for ecl1 are available
 		SubMonitor sub = SubMonitor.convert(monitor, "Checking for application updates...", 200);
 		IStatus status = operation.resolveModal(sub.newChild(100));
 		logger.info("Status after update check: " + status.getMessage());
+		// TODO Currently all available software sites are searched for ecl1 updates (see #171739).
+		// It would be much faster to identify the repository first and then do repository.query(...)
 
 		// React on the update check result
 		if (status.getCode() == UpdateOperation.STATUS_NOTHING_TO_UPDATE) {

@@ -18,15 +18,11 @@ public class UpdateCheck implements IStartup {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				logger.info("Running scheduled ecl1 update check");
-				doUpdateCheck(monitor);
+				P2Util.doCheckForUpdates(monitor);
 				logger.info("Finished scheduled ecl1 update check");
 				return Status.OK_STATUS;
 			}
 		};
 		job.schedule();
-	}
-	
-	void doUpdateCheck(IProgressMonitor monitor) {
-		P2Util.doCheckForUpdates(monitor);
 	}
 }
