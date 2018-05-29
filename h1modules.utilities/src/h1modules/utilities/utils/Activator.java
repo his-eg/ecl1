@@ -6,7 +6,6 @@ import org.osgi.framework.BundleContext;
 
 import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 
-
 /**
  * Activator
  *
@@ -14,8 +13,10 @@ import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
  */
 public class Activator extends AbstractUIPlugin {
 
-    private static BundleContext context;
+    public static final String PLUGIN_ID = "net.sf.ecl1.utilities";
 
+    private static BundleContext context;
+    
     // The shared instance
     private static Activator plugin;
 
@@ -49,13 +50,6 @@ public class Activator extends AbstractUIPlugin {
     
     public static IPreferenceStore getPreferences() {
         return Activator.getDefault().getPreferenceStore();
-    }
-
-    /**
-     * @return pluginId required for example by Status constructors.
-     */
-    public static String getPluginId() {
-    	return Activator.getDefault().getBundle().getSymbolicName();
     }
     
     /**

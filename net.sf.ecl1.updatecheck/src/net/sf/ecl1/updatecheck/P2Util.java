@@ -34,14 +34,14 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  *
  */
 public class P2Util {
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+    private static final ConsoleLogger logger = new ConsoleLogger(UpdateCheckActivator.getDefault().getLog(), UpdateCheckActivator.PLUGIN_ID);
 
 	static void doCheckForUpdates(IProgressMonitor monitor) {
 		BundleContext bundleContext = UpdateCheckActivator.getDefault().getBundle().getBundleContext();
 		@SuppressWarnings("rawtypes")
 		ServiceReference reference = bundleContext.getServiceReference(IProvisioningAgent.SERVICE_NAME);
 		if (reference == null) {
-			UpdateCheckActivator.error("No provisioning agent found.  This application is not set up for updates.");
+			logger.error("No provisioning agent found.  This application is not set up for updates.");
 			return;
 		}
 
@@ -65,18 +65,18 @@ public class P2Util {
 		IQueryResult<IInstallableUnit> result = profile.query(query, monitor);
 		Set<IInstallableUnit> unitsForUpdate = result.toUnmodifiableSet();
 		
-		UpdateCheckActivator.info("Installable Units for update: " + unitsForUpdate);
+		logger.info("Installable Units for update: " + unitsForUpdate);
 		ProvisioningSession session = new ProvisioningSession(agent);
 		UpdateOperation operation = new UpdateOperation(session);
 		if(!unitsForUpdate.isEmpty()) {
-			UpdateCheckActivator.info("Creating UpdateOperation for: " + unitsForUpdate);
+			logger.info("Creating UpdateOperation for: " + unitsForUpdate);
 			operation = new UpdateOperation(session, unitsForUpdate);
 		}
 	    
 		// Check if updates for ecl1 are available
 		SubMonitor sub = SubMonitor.convert(monitor, "Checking for application updates...", 200);
 		IStatus status = operation.resolveModal(sub.newChild(100));
-		UpdateCheckActivator.info("Status after update check: " + status.getMessage());
+		logger.info("Status after update check: " + status.getMessage());
 
 		// React on the update check result
 		if (status.getCode() == UpdateOperation.STATUS_NOTHING_TO_UPDATE) {
@@ -93,12 +93,13 @@ public class P2Util {
 			
 			// Do the update
 			status = restrictUpdateToEcl1(operation, monitor, sub);
-			UpdateCheckActivator.info("Status after update: " + status.getMessage());
+			logger.info("Status after update: " + status.getMessage());
 			
 			if (status.getSeverity() == IStatus.CANCEL) {
-				UpdateCheckActivator.error(status.getMessage());
-				if(status.getException() != null) {
-					UpdateCheckActivator.error(status.getException());
+				logger.error(status.getMessage());
+				Throwable t = status.getException();
+				if (t != null) {
+					logger.error(t.getMessage(), t);
 				}
 				throw new OperationCanceledException();
 			}
@@ -114,9 +115,9 @@ public class P2Util {
 		List<Update> chosenUpdates = Arrays.asList(operation.getPossibleUpdates());
 		Update ecl1 = null;
 		for (Update update : chosenUpdates) {
-			UpdateCheckActivator.info("Possible Update from " + update.toUpdate.getId() + " " + update.toUpdate.getVersion() + " to " + update.replacement.getVersion());
+			logger.info("Possible Update from " + update.toUpdate.getId() + " " + update.toUpdate.getVersion() + " to " + update.replacement.getVersion());
 			if(isEcl1(update)) {
-				UpdateCheckActivator.info("Identified ecl1-Update: " + update.toUpdate.getId());
+				logger.info("Identified ecl1-Update: " + update.toUpdate.getId());
 				ecl1 = update;
 			}
 		}

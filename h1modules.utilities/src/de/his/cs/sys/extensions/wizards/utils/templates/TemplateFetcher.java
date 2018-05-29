@@ -23,7 +23,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  */
 public class TemplateFetcher {
 
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
 	private final List<String> templateRootUrls;
 
@@ -70,8 +70,7 @@ public class TemplateFetcher {
                 logger.debug("TemplateFetcher found template '" + line + "' for download.");
             }
         } catch (IOException e) {
-        	logger.error("Error downloading template list '" + templateListUrl + "': " + e.getClass() + ": " + e.getMessage());
-            //e.printStackTrace();
+        	logger.error("Error downloading template list '" + templateListUrl + "': " + e.getClass() + ": " + e.getMessage(), e);
             return null;
         }
         return result;

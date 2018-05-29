@@ -8,8 +8,11 @@ import org.osgi.framework.BundleContext;
  * 
  * @author keunecke
  */
+// TODO Should implement AbstractUIPlugin to permit access to ILog ?
 public class Activator implements BundleActivator {
 
+	public static final String PLUGIN_ID = "net.sf.ecl1.resource.setup";
+	
 	private static BundleContext context;
 
 	static BundleContext getContext() {

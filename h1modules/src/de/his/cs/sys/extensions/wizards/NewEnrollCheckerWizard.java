@@ -25,6 +25,8 @@ import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
+import de.his.cs.sys.extensions.Activator;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /**
  * creates a new EnrollChecker
@@ -33,6 +35,8 @@ import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
  */
 public class NewEnrollCheckerWizard extends Wizard implements INewWizard {
 
+	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+	
 	private IStructuredSelection selection;
 	private NewEnrollCheckerWizardPage newFileWizardPage;
 
@@ -122,10 +126,8 @@ public class NewEnrollCheckerWizard extends Wizard implements INewWizard {
 				br.close();
 				writer.close();
 				file.setContents(new ByteArrayInputStream(buffer.toByteArray()), true, true, null);
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (CoreException e) {
-				e.printStackTrace();
+			} catch (IOException | CoreException e) {
+	    		logger.error(e.getMessage(), e);
 			}
 		}
 

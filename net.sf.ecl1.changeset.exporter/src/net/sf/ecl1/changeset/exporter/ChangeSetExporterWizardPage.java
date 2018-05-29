@@ -33,7 +33,7 @@ import com.google.common.collect.Maps;
 
 public class ChangeSetExporterWizardPage extends WizardPage {
 
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+    private static final ConsoleLogger logger = new ConsoleLogger(ChangeSetExportWizardPlugin.getDefault().getLog(), ChangeSetExportWizardPlugin.PLUGIN_ID);
 
     private Table changeSetTable;
 

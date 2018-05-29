@@ -24,20 +24,18 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  * @version $Revision$ 
  */
 public class ResourceSetupStep implements ProjectSetupStep {
-    
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+
+    private static final ConsoleLogger logger = new ConsoleLogger(); // TODO We can't get an ILog here
 
     @Override
     public void performStep(IProject project, InitialProjectConfigurationChoices choices) {
-    	logger.debug("starting resource setup");
+    	logger.debug("Starting resource setup");
         try {
             new ResourceSupport(project, choices).createFiles();
-        } catch (CoreException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        } catch (CoreException | UnsupportedEncodingException e) {
+    		logger.error(e.getMessage(), e);
         }
-        logger.debug("finished resource setup");
+        logger.debug("Finished resource setup");
     }
 
 }

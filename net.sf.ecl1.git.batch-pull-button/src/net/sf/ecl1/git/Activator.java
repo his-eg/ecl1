@@ -1,23 +1,16 @@
 package net.sf.ecl1.git;
 
-import org.eclipse.core.runtime.ILog;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
-import net.sf.ecl1.utilities.general.ConsoleLogger;
 /**
  * Plugin life cycle management
  *  
  * @author keunecke
  */
 public class Activator extends AbstractUIPlugin {
-	
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
-	public static String PLUGIN_ID = "net.sf.ecl1.git.batch-pull-button";
-	
+	public static final String PLUGIN_ID = "net.sf.ecl1.git.batch-pull-button";
 
 	// The shared instance
 	private static Activator plugin;
@@ -53,28 +46,5 @@ public class Activator extends AbstractUIPlugin {
 	 */
 	public static Activator getDefault() {
 		return plugin;
-	}
-	
-	public static void info(String info) {
-		log(new Status(IStatus.INFO, PLUGIN_ID,info));
-	}
-	
-	public static void log(IStatus status) {
-		logger.debug(status.getMessage());
-		ILog log = getDefault().getLog();
-		if (log != null) {
-			log.log(status);
-		} else {
-			if (status.getException() != null)
-				status.getException().printStackTrace();
-		}
-	}
-	
-	public static void error(String message, Throwable e) {
-		log(new Status(IStatus.ERROR, PLUGIN_ID, message, e));
-	}
-
-	public static void error(String message) {
-		log(new Status(IStatus.ERROR, PLUGIN_ID, message));
 	}
 }

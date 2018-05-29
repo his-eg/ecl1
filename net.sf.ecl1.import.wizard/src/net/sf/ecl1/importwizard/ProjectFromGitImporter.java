@@ -27,7 +27,7 @@ public class ProjectFromGitImporter {
 	private static final String GIT_BASE_REPOSITORY_PATH = "ssh://git@git.his.de/";
 	private static final String GITLAB_BASE_REPOSITORY_PATH = "ssh://git@gitlab.his.de/";
 	
-	private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+	private static final ConsoleLogger logger = new ConsoleLogger();
 	
     // base path of the source repo configured in preferences, e.g. "ssh://git@git.his.de/"
     private final String baseRepositoryPath;
@@ -79,7 +79,7 @@ public class ProjectFromGitImporter {
                     clone.setDirectory(extensionFolder).setURI(fullRepositoryPath).setCloneAllBranches(true);
                     clone.call();
                 } catch (GitAPIException e) {
-                    e.printStackTrace();
+            		logger.error(e.getMessage(), e);
                 }
 
                 IProject extensionProject = workspace.getRoot().getProject(extensionToImport);
@@ -103,9 +103,8 @@ public class ProjectFromGitImporter {
     }
     
     private String getFullRepositoryPath(String extensionToImport, Map<String, String> configProps) {
-    	logger.debug("Extension " + extensionToImport + ": Extension importer config = " + configProps);
-    	logger.info("Extension" + extensionToImport + ": Import extension project " + extensionToImport + " ...");
-    	logger.debug("Extension" + extensionToImport + ": baseRepositoryPath = " + baseRepositoryPath);
+    	logger.debug("Extension " + extensionToImport + ": Extension importer configProps = " + configProps);
+    	logger.debug("Extension " + extensionToImport + ": baseRepositoryPath = " + baseRepositoryPath);
     	
         String urlStyle = configProps!=null ? configProps.get("urlStyle") : null;
         
@@ -117,7 +116,7 @@ public class ProjectFromGitImporter {
 		// git lab style, e.g. ssh://git@gitlab.his.de/h1/cs/cs.sys/cs.sys.build.utilities
 		int c1Pos = extensionToImport.indexOf('.');
 		if (c1Pos < 0) {
-	    	logger.warn("Extension" + extensionToImport + ": Illegal extension name! An extension name should have at least 3 dot-separated segments!");
+	    	logger.error("Extension " + extensionToImport + ": Illegal extension name! An extension name should have at least 3 dot-separated segments!");
 	    	return null;
 		}
 		String segment1 = extensionToImport.substring(0, c1Pos);

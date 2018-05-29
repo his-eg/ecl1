@@ -13,12 +13,16 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 
+import net.sf.ecl1.utilities.general.ConsoleLogger;
+
 /**
  * Utility methods to access files in a HISinOne project.
  * 
  * @author keunecke / tneumann
  */
 public class HISinOneFileUtil {
+
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
     /**
      * Read a file's content to a string
@@ -32,7 +36,7 @@ public class HISinOneFileUtil {
             encoded = Files.readAllBytes(Paths.get(file.getLocationURI()));
             return new String(encoded, Charset.defaultCharset()).trim();
         } catch (IOException e) {
-            e.printStackTrace();
+    		logger.error(e.getMessage(), e);
         }
         return null;
     }

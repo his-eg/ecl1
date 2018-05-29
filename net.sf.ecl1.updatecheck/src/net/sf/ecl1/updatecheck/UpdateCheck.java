@@ -6,17 +6,20 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.IStartup;
 
+import net.sf.ecl1.utilities.general.ConsoleLogger;
+
 public class UpdateCheck implements IStartup {
+    private static final ConsoleLogger logger = new ConsoleLogger(UpdateCheckActivator.getDefault().getLog(), UpdateCheckActivator.PLUGIN_ID);
 
 	@Override
 	public void earlyStartup() {
-		UpdateCheckActivator.info("Update Check!"); // TODO logs in std:out console and "Error Log" view
+		logger.info("Update Check!");
 		Job job = new Job("ecl1UpdateCheck") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				UpdateCheckActivator.info("Running scheduled ecl1 update check");
+				logger.info("Running scheduled ecl1 update check");
 				doUpdateCheck(monitor);
-				UpdateCheckActivator.info("Finished scheduled ecl1 update check");
+				logger.info("Finished scheduled ecl1 update check");
 				return Status.OK_STATUS;
 			}
 		};

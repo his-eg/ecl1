@@ -33,7 +33,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  */
 public class ExtensionImportWizardModel {
     
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+    private static final ConsoleLogger logger = new ConsoleLogger();
 
 	private static final String JENKINS_WEBAPPS_NAME = "/webapps";
 
@@ -182,7 +182,7 @@ public class ExtensionImportWizardModel {
         	doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(classpathContentStream);
     		classpathContentStream.close();
     	} catch (IOException | SAXException | ParserConfigurationException e) {
-    		logger.error("Exception parsing '.classpath' file for extension " + extension  + ": " + e);
+    		logger.error("Exception parsing '.classpath' file for extension " + extension  + ": " + e.getMessage(), e);
     	}
     	if (doc==null) {
     		logger.error("Could not create XML document from '.classpath' file of extension " + extension);

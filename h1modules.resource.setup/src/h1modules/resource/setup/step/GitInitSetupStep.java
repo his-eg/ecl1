@@ -20,7 +20,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  */
 public class GitInitSetupStep implements ProjectSetupStep {
 
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+    private static final ConsoleLogger logger = new ConsoleLogger(); // TODO We can't get an ILog here
 
     @Override
     public void performStep(IProject project, InitialProjectConfigurationChoices choices) {
@@ -31,9 +31,7 @@ public class GitInitSetupStep implements ProjectSetupStep {
         	initCommand.setDirectory(new File(ws, rawLocation.lastSegment()));
 			initCommand.call();
 		} catch (GitAPIException e) {
-			logger.error("init of git repo failed");
-			logger.error(e.getMessage());
-			e.printStackTrace(); // TODO print via logger
+			logger.error("Init of git repo failed: " + e.getMessage(), e);
 		}
     }
 }

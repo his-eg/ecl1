@@ -16,15 +16,19 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
 
+import de.his.cs.sys.extensions.Activator;
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
 import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /**
  * @author keunecke
  * @version $Revision$ 
  */
 public class ForEachProjectSetupStepHandler {
-	
+
+	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+
 	private final IProject project;
 	private final InitialProjectConfigurationChoices initialChoice;
 	
@@ -47,7 +51,7 @@ public class ForEachProjectSetupStepHandler {
 				Object object = element.createExecutableExtension("class");
 				evaluate(object);
 			} catch (CoreException e) {
-				e.printStackTrace();
+	    		logger.error(e.getMessage(), e);
 			}
 		}
 	}

@@ -43,7 +43,7 @@ import com.google.common.collect.Maps;
  */
 public class TemplateManager {
 
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
     private static final Map<String, String> nameReplacements = Maps.newHashMap();
     static {
@@ -122,10 +122,9 @@ public class TemplateManager {
                 result.append(temp + System.getProperty("line.separator"));
             }
         } catch (IOException e) {
-        	logger.error("Error fetching template '" + fullTemplateUrlString + "': " + e.getClass() + ": " + e.getMessage());
+        	logger.error("Error fetching template '" + fullTemplateUrlString + "': " + e.getClass() + ": " + e.getMessage(), e);
         	logger.error("TemplatePath: " + this.templatePath);
         	logger.error("Variables: " + this.variables);
-            //e.printStackTrace();
             return null;
         }
         return result.toString().trim();
@@ -148,16 +147,12 @@ public class TemplateManager {
         	}
             file.create(is, true, null);
         } catch (CoreException e) {
-        	logger.error("Error creating file from template '" + this.templatePath + "': " + e.getMessage());
-        	logger.error("Error creating file from template '" + this.templatePath + "': " + e.getMessage());
-            e.printStackTrace();
+        	logger.error("Error creating file from template '" + this.templatePath + "': " + e.getMessage(), e);
         } finally {
             try {
                 is.close();
             } catch (IOException e1) {
-            	logger.error("Error creating file from template '" + this.templatePath + "': " + e1.getMessage());
-            	logger.error("Error creating file from template '" + this.templatePath + "': " + e1.getMessage());
-                e1.printStackTrace();
+            	logger.error("Error creating file from template '" + this.templatePath + "': " + e1.getMessage(), e1);
             }
         }
     }

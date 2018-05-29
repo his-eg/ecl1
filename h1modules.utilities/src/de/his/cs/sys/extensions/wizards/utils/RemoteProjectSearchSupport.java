@@ -21,7 +21,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class RemoteProjectSearchSupport {
 
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
     private class BuildJob {
         private String name;
@@ -97,13 +97,13 @@ public class RemoteProjectSearchSupport {
     	String fileContent = null;
     	try {
     		fileContent = IOUtils.toString(inStream);
-    	} catch (IOException ioe) {
-    		logger.error("IOException reading remote file: " + ioe);
+    	} catch (IOException e) {
+    		logger.error("IOException reading remote file: " + e.getMessage(), e);
     	}
     	try {
     		inStream.close();
-    	} catch (IOException ioe) {
-    		logger.error("IOException closing InputStream: " + ioe);
+    	} catch (IOException e) {
+    		logger.error("IOException closing InputStream: " + e.getMessage(), e);
     	}
     	logger.debug("File content = "  + fileContent);
     	return fileContent;

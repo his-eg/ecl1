@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
+import h1modules.utilities.utils.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /**
@@ -30,7 +31,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  */
 public class ProjectSupport {
 
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
     private static final String[] PATHS = { "src/java", "src/test", "src/generated", "resource", ".settings" };
     
@@ -67,7 +68,7 @@ public class ProjectSupport {
             addProjectDependencies(project, choices.getProjectsToReference());
     		setJreEnvironment(project);
         } catch (CoreException e) {
-            logger.error("Exception creating new project '" + projectName + "': " + e.getMessage(), e.getStackTrace());
+            logger.error("Exception creating new project '" + projectName + "': " + e.getMessage(), e);
             project = null; // XXX: This may cause an NPE somewhere else, like in TemplateManager.writeContent()
         }
 
@@ -112,7 +113,7 @@ public class ProjectSupport {
     			javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
     		}
 	    } catch (JavaModelException e) {
-	        e.printStackTrace();
+    		logger.error(e.getMessage(), e);
 	    }
 	}
 
@@ -164,7 +165,7 @@ public class ProjectSupport {
 					project.open(null);
 				}
 			} catch (CoreException e) {
-				e.printStackTrace();
+	    		logger.error(e.getMessage(), e);
 			}
 		}
 		return project;

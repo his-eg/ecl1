@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 
 import de.his.cs.sys.extensions.wizards.utils.templates.TemplateFetcher;
 import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
+import h1modules.utilities.utils.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.Ecl1Constants;
 
@@ -21,7 +22,7 @@ import net.sf.ecl1.utilities.general.Ecl1Constants;
  */
 public class ResourceSupport {
 
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
     private static final String DEPENDENCIES_VARIABLE_NAME = "[dependencies]";
 
@@ -73,7 +74,7 @@ public class ResourceSupport {
         // See http://stackoverflow.com/questions/38203971/javax-net-ssl-sslhandshakeexception-received-fatal-alert-handshake-failure/
         Collection<String> templates = new TemplateFetcher().getTemplates();
 		if (templates == null) {
-			logger.error("Error: Could not load template list. The new project could not be set up completely.");
+			logger.error("Could not load template list. The new project could not be set up completely.");
 			return;
 		}
 		
@@ -85,7 +86,7 @@ public class ResourceSupport {
             	// write to project
             	manager.writeContent(project, content);
             } else {
-    			logger.error("Error: Could not load template '" + template + "'. The new project could not be set up completely.");
+    			logger.error("Could not load template '" + template + "'. The new project could not be set up completely.");
     			// continue anyway (?)
             }
         }

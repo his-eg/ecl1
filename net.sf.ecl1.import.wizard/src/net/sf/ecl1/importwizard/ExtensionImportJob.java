@@ -38,8 +38,8 @@ import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
  */
 public class ExtensionImportJob extends Job {
 
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
-
+    private static final ConsoleLogger logger = new ConsoleLogger(); // TODO can't get an ILog here?
+    
     private static final String ERROR_MESSAGE_EXISTING_FOLDER = "Your workspace contains folders named like extensions you want to import: %s\n\nThese folders must be deleted before the import, but first you might want to check if they contain files you want to keep. Then delete the folders manually or set the 'Delete folders?' option on the confirmation page of this wizard.";
     private static final String ERROR_MESSAGE_DELETE_FAILED = "Some extensions could not be imported, because deleting existing folders before the import failed: %s";
     
@@ -49,14 +49,12 @@ public class ExtensionImportJob extends Job {
 	private Collection<String> extensionsToImport;
 	private boolean openProjectsAfterImport;
 	private boolean deleteFolders;
-	private String pluginId;
 
 	public ExtensionImportJob(Collection<String> extensionsToImport, boolean openProjectsAfterImport, boolean deleteFolders) {
 		super("Extension Import");
 		this.extensionsToImport = extensionsToImport;
 		this.openProjectsAfterImport = openProjectsAfterImport;
 		this.deleteFolders = deleteFolders;
-		this.pluginId = Activator.getPluginId();
 		
 		// read configuration from Jenkins
         IPreferenceStore store = Activator.getPreferences();
@@ -66,7 +64,7 @@ public class ExtensionImportJob extends Job {
         try {
         	configProps = PropertyUtil.stringToProperties(configStr);
         } catch (ParseException e) {
-        	logger.error("Error parsing extension import configuration: " + e.getMessage());
+        	logger.error("Error parsing extension import configuration: " + e.getMessage(), e);
 		}
 	}
 
@@ -87,7 +85,7 @@ public class ExtensionImportJob extends Job {
             if (deleteFolders==false) {
             	// scrubbing folders is necessary but not permitted by the user
             	String message = String.format(ERROR_MESSAGE_EXISTING_FOLDER, existingFoldersStr);
-                return new Status(IStatus.ERROR, pluginId, message);
+                return new Status(IStatus.ERROR, PluginConstants.PLUGIN_ID, message);
             }
 
             // scrubbing folders is necessary and authorized
@@ -110,8 +108,7 @@ public class ExtensionImportJob extends Job {
                         FileUtils.deleteDirectory(extensionFolder);
                     } catch (IOException e) {
                     	extensionsWithDeleteErrors.add(extension);
-                    	logger.error("Extension folder " + extension + " could not be deleted from workspace");
-                        e.printStackTrace();
+                    	logger.error("Extension folder " + extension + " could not be deleted from workspace", e);
                     }
                     // reduce total work by 1
                     subMonitor.worked(1);
@@ -153,7 +150,7 @@ public class ExtensionImportJob extends Job {
         	// some extensions could not be imported because existing folders could not be deleted
         	String extensionsWithDeleteErrorsStr = Joiner.on(", ").join(extensionsWithDeleteErrors);
         	String message = String.format(ERROR_MESSAGE_DELETE_FAILED, extensionsWithDeleteErrorsStr);
-            return new Status(IStatus.ERROR, pluginId, message);
+            return new Status(IStatus.ERROR, PluginConstants.PLUGIN_ID, message);
         }
     	return Status.OK_STATUS;
     }

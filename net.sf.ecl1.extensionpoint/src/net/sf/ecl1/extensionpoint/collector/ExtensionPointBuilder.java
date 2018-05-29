@@ -10,6 +10,7 @@ import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import net.sf.ecl1.extensionpoint.ExtensionPointBuilderPlugin;
 import net.sf.ecl1.extensionpoint.collector.manager.ExtensionPointManager;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
@@ -31,7 +32,7 @@ import com.google.common.collect.Lists;
  */
 public class ExtensionPointBuilder extends IncrementalProjectBuilder {
 	
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+    private static final ConsoleLogger logger = new ConsoleLogger(ExtensionPointBuilderPlugin.getDefault().getLog(), ExtensionPointBuilderPlugin.PLUGIN_ID);
 
     private static final String EXTENSION_EXTENDED_POINTS_PROPERTY = "extension.extended-points";
 
@@ -70,10 +71,8 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
                     file.setContents(source, IFile.FORCE, null);
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (CoreException e) {
-            e.printStackTrace();
+        } catch (IOException | CoreException e) {
+    		logger.error(e.getMessage(), e);
         }
     }
 
@@ -113,8 +112,7 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
 		try {
             getProject().accept(visitor);
 		} catch (CoreException e) {
-			logger.error(e.getMessage());
-            e.printStackTrace();
+    		logger.error(e.getMessage(), e);
 		}
 	}
 

@@ -41,7 +41,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  */
 public class ExtensionClasspathContainerInitializer extends ClasspathContainerInitializer {
 
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
     private final Collection<String> extensionsForClassPath = new HashSet<>();
 
@@ -53,8 +53,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
             }
             updateClasspathContainer(containerPath, javaProject);
         } catch (CoreException e) {
-            e.printStackTrace();
-            logger.error(e.getMessage());
+            logger.error(e.getMessage(), e);
             throw e;
         }
     }
@@ -75,8 +74,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
         try {
             updateClasspathContainer(containerPath, project);
         } catch (JavaModelException e) {
-        	logger.error(e.getMessage());
-            e.printStackTrace();
+        	logger.error(e.getMessage(), e);
         }
     }
 

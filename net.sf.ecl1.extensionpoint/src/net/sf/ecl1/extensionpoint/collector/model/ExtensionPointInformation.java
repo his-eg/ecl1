@@ -1,5 +1,6 @@
 package net.sf.ecl1.extensionpoint.collector.model;
 
+import net.sf.ecl1.extensionpoint.ExtensionPointBuilderPlugin;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 import org.eclipse.jdt.core.IAnnotation;
@@ -17,7 +18,7 @@ import com.google.common.base.Objects;
  */
 public class ExtensionPointInformation {
 	
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+    private static final ConsoleLogger logger = new ConsoleLogger(ExtensionPointBuilderPlugin.getDefault().getLog(), ExtensionPointBuilderPlugin.PLUGIN_ID);
 
 	private final String id;
 	

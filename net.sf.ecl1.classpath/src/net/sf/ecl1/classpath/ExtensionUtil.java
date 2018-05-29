@@ -18,12 +18,16 @@ import org.eclipse.core.runtime.Path;
 
 import com.google.common.collect.Lists;
 
+import net.sf.ecl1.utilities.general.ConsoleLogger;
+
 /**
  * Utilities for extension handling
  * @author keunecke
  *
  */
 public class ExtensionUtil {
+
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
     public boolean doesExtensionJarExist(String extension) {
         return doesExtensionExistAsJar(extension);
@@ -100,7 +104,7 @@ public class ExtensionUtil {
                     }
                 }
             } catch (CoreException e) {
-                e.printStackTrace();
+        		logger.error(e.getMessage(), e);
             }
         }
         return result;

@@ -13,6 +13,9 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import h1modules.utilities.utils.Activator;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
+
 /**
  * simple util for calling rest services
  *
@@ -20,6 +23,8 @@ import org.apache.http.util.EntityUtils;
  *
  */
 public class RestUtil {
+
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
     public static InputStream getJsonStream(final String defaultTarget) {
         try {
@@ -38,7 +43,7 @@ public class RestUtil {
             HttpClient c = new DefaultHttpClient();
             return c.execute(get, responseHandler);
         } catch (IOException e) {
-            e.printStackTrace();
+    		logger.error(e.getMessage(), e);
         }
         return null;
     }

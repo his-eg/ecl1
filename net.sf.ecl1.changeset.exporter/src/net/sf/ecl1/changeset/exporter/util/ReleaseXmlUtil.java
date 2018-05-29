@@ -28,6 +28,7 @@ import com.google.common.collect.Sets;
 
 import h1modules.utilities.utils.CvsTagUtil;
 import h1modules.utilities.utils.HISinOneFileUtil;
+import net.sf.ecl1.changeset.exporter.ChangeSetExportWizardPlugin;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /**
@@ -37,7 +38,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  */
 public class ReleaseXmlUtil {
 
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+    private static final ConsoleLogger logger = new ConsoleLogger(ChangeSetExportWizardPlugin.getDefault().getLog(), ChangeSetExportWizardPlugin.PLUGIN_ID);
 
 	private static final String RELEASE_XML_FOLDER = "qisserver/WEB-INF/conf/service/patches/hisinone";
 	
@@ -70,7 +71,7 @@ public class ReleaseXmlUtil {
                     result.add((IFile) releaseFileResource);
                 }
             } catch (CoreException e) {
-                e.printStackTrace();
+        		logger.error(e.getMessage(), e);
             }
         }
         return result;

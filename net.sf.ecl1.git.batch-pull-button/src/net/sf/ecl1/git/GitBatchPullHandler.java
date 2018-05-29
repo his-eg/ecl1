@@ -1,8 +1,5 @@
 package net.sf.ecl1.git;
 
-import static net.sf.ecl1.git.Activator.info;
-import static net.sf.ecl1.git.Activator.error;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
@@ -23,6 +20,8 @@ import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
 
+import net.sf.ecl1.utilities.general.ConsoleLogger;
+
 /**
  * Executes a pull command on all open projects using Git as SCM
  *  
@@ -30,46 +29,46 @@ import org.eclipse.jgit.api.errors.JGitInternalException;
  */
 public class GitBatchPullHandler extends AbstractHandler {
 
+	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		info("Starting ecl1GitBatchPull");
+		logger.info("Starting ecl1GitBatchPull");
 		Job job = new Job("ecl1GitBatchPull") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				List<IProject> projects = Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects());
-				info("Found projects in Workspace: " + projects);
+				logger.info("Found projects in Workspace: " + projects);
 				monitor.beginTask("Batch Git Pull", projects.size());
 				for (IProject p : projects) {
 					String name = p.getName();
 					monitor.subTask("Pulling " + name);
 					File projectLocationFile = p.getLocation().append(".git").toFile();
-					info(name + " with location " + projectLocationFile.getAbsolutePath());
+					logger.info(name + " with location " + projectLocationFile.getAbsolutePath());
 
 					try {
 						Git git = Git.open(projectLocationFile);
-						info("Getting remotes of " + name);
+						logger.info("Getting remotes of " + name);
 						Set<String> remotes = git.getRepository().getRemoteNames();
 						if(remotes != null && !remotes.isEmpty()) {
 							for (String remote : remotes) {
 								try {
 									PullCommand pull = git.pull();
 									pull.setRemote(remote);
-									info(name + " has remotes. Starting to pull remote '" + remote + "'.");
+									logger.info(name + " has remotes. Starting to pull remote '" + remote + "'.");
 									pull.call();
 								} catch (GitAPIException | JGitInternalException e) {
-									error("Error pulling from " + name + ": " + e.getMessage() + ". Skipping and proceeding.");
-									e.printStackTrace();
+									logger.error("Error pulling from " + name + ": " + e.getMessage() + ". Skipping and proceeding.", e);
 								}
 							}
 						}
 					} catch (org.eclipse.jgit.errors.RepositoryNotFoundException rnfe) {
 						// ignore
-						info(name + " is not managed via Git: " + rnfe.getMessage());
+						logger.info(name + " is not managed via Git: " + rnfe.getMessage());
 					} catch (IOException e) {
-						error("Error pulling " + name + ": " + e.getMessage(), e);
-						e.printStackTrace();
+						logger.error("Error pulling " + name + ": " + e.getMessage(), e);
 					}
-					info("Finished " + name);
+					logger.info("Finished " + name);
 					monitor.worked(1);
 				}				
 				monitor.done();

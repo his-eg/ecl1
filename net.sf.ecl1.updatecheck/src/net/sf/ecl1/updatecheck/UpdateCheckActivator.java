@@ -1,19 +1,12 @@
 package net.sf.ecl1.updatecheck;
 
-import org.eclipse.core.runtime.ILog;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-
-import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /**
  * The activator class controls the plug-in life cycle
  */
 public class UpdateCheckActivator extends AbstractUIPlugin {
-
-    private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "net.sf.ecl1.updatecheck"; //$NON-NLS-1$
@@ -52,30 +45,5 @@ public class UpdateCheckActivator extends AbstractUIPlugin {
 	 */
 	public static UpdateCheckActivator getDefault() {
 		return plugin;
-	}
-	
-	// Info messages are logged to console only
-	public static void info(String info) {
-		logger.info(info);
-	}
-
-	public static void error(String message) {
-		log(new Status(IStatus.ERROR, PLUGIN_ID, message));
-	}
-	
-	public static void error(Throwable e) {
-		log(new Status(IStatus.ERROR, PLUGIN_ID, e.getMessage(), e));
-	}
-
-	// warn/error messages are logged to console and "Error Log" view
-	private static void log(IStatus status) {
-		logger.error(status.getMessage());
-		ILog log = getDefault().getLog();
-		if (log != null) {
-			log.log(status); // TODO logs to std:out and "Error Log" view
-		} else {
-			if (status.getException() != null)
-				status.getException().printStackTrace();
-		}
 	}
 }
