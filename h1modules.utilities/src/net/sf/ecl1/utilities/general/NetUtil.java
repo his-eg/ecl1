@@ -1,4 +1,4 @@
-package net.sf.ecl1.utilities.preferences;
+package net.sf.ecl1.utilities.general;
 
 import java.io.IOException;
 import java.net.Socket;

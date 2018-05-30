@@ -1,4 +1,4 @@
-package h1modules.utilities.utils;
+package net.sf.ecl1.utilities.general;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -13,14 +13,14 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import h1modules.utilities.utils.Activator;
 
 /**
  * Utility methods to access files in a HISinOne project.
  * 
  * @author keunecke / tneumann
  */
-public class HISinOneFileUtil {
+public class FileUtil {
 
     private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
@@ -39,20 +39,5 @@ public class HISinOneFileUtil {
     		logger.error(e.getMessage(), e);
         }
         return null;
-    }
-
-    public static IProject getWebapps() {
-        IWorkspace ws = ResourcesPlugin.getWorkspace();
-        List<IProject> projects = Arrays.asList(ws.getRoot().getProjects());
-        for (IProject project : projects) {
-            if (isWebapps(project)) {
-                return project;
-            }
-        }
-        return null;
-    }
-
-    private static boolean isWebapps(IProject project) {
-        return project.exists(new Path("qisserver"));
     }
 }

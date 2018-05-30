@@ -23,14 +23,19 @@ import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
  */
 public class ConsoleLogger {
 
-    private enum LogLevel {
+    enum LogLevel {
     	DEBUG,
     	INFO,
     	WARN,
     	ERROR;
     }
 
-    private static final MessageConsole console = findConsole(Ecl1Constants.CONSOLE_NAME);
+    /**
+     * The name of the console this project should always acquire
+     */
+    public static final String CONSOLE_NAME = "Extensions";
+
+    private static final MessageConsole console = findConsole(CONSOLE_NAME);
     
     private static MessageConsole findConsole(String name) {
         ConsolePlugin plugin = ConsolePlugin.getDefault();

@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
-import net.sf.ecl1.utilities.general.Ecl1Constants;
+import net.sf.ecl1.utilities.hisinone.HisConstants;
 
 /**
  * Extension import configuration wizard page.
@@ -102,7 +102,7 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 
         Set<String> extensionsInWorkspace = model.getExtensionsInWorkspace();
         for (String remoteExtensionName : model.getRemoteExtensions()) {
-            if (!extensionsInWorkspace.contains(remoteExtensionName) && !remoteExtensionName.contains(Ecl1Constants.WEBAPPS)) {
+            if (!extensionsInWorkspace.contains(remoteExtensionName) && !remoteExtensionName.contains(HisConstants.WEBAPPS)) {
                 TableItem tableItem = new TableItem(projectTable, SWT.NONE);
                 tableItem.setChecked(false);
                 tableItem.setText(1, remoteExtensionName);

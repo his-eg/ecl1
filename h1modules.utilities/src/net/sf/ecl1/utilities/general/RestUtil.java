@@ -1,4 +1,4 @@
-package de.his.cs.sys.extensions.wizards.utils;
+package net.sf.ecl1.utilities.general;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -14,7 +14,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
 import h1modules.utilities.utils.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /**
  * simple util for calling rest services

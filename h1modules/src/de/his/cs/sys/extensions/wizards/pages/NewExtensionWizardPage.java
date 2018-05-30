@@ -24,7 +24,7 @@ import de.his.cs.sys.extensions.wizards.pages.packages.HISinOneStrategy;
 import de.his.cs.sys.extensions.wizards.pages.packages.PackageStructureStrategy;
 import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
 import de.his.cs.sys.extensions.wizards.utils.WorkspaceSupport;
-import net.sf.ecl1.utilities.general.Ecl1Constants;
+import net.sf.ecl1.utilities.hisinone.HisConstants;
 
 /**
  * Extended New Project Wizard Page asking for additional information on extensions
@@ -70,7 +70,7 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 		int index = 0;
 		for (String ref : references) {
 			projectList.add(ref);
-			if(Ecl1Constants.WEBAPPS.equals(ref)) {
+			if(HisConstants.WEBAPPS.equals(ref)) {
 				index = references.indexOf(ref);
 			}
 		}

@@ -1,7 +1,9 @@
-package h1modules.utilities.utils;
+package net.sf.ecl1.utilities.hisinone;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+
+import net.sf.ecl1.utilities.general.FileUtil;
 
 /**
  * Utility methods to extract version strings from webapps/CVS/Tag file.
@@ -24,14 +26,14 @@ public class CvsTagUtil {
      * HISinOne_VERSION_06_RELEASE_01 (old convention)
      */
     public static String getCvsTagVersionLongString() {
-        IProject webapps = HISinOneFileUtil.getWebapps();
+        IProject webapps = WebappsUtil.findWebappsProject();
         if (webapps != null) {
         	// webapps project exists. all branches except HEAD have a webapps/CVS/Tag file:
             IFile file = webapps.getFile(CVS_TAG);
             if (!file.exists()) {
                 return HEAD_VERSION;
             }
-            String contents = HISinOneFileUtil.readContent(file);
+            String contents = FileUtil.readContent(file);
             if (contents != null) {
             	// CVS/Tag content is "T" followed by version string -> remove the "T"
             	return contents.trim().substring(1);

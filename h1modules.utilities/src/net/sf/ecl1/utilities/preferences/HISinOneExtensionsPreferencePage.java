@@ -1,6 +1,7 @@
 package net.sf.ecl1.utilities.preferences;
 
 import h1modules.utilities.utils.Activator;
+import net.sf.ecl1.utilities.general.NetUtil;
 
 import java.util.Collection;
 

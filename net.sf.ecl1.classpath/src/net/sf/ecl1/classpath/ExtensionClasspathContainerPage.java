@@ -1,9 +1,4 @@
-/**
- *
- */
 package net.sf.ecl1.classpath;
-
-import static net.sf.ecl1.classpath.ClasspathContainerConstants.NET_SF_ECL1_ECL1_CONTAINER_ID;
 
 import java.util.Collection;
 import java.util.List;
@@ -32,12 +27,16 @@ import com.google.common.collect.Sets;
  * @author keunecke
  *
  */
-public class ExtensionClasspathContainerPage extends WizardPage
-implements IClasspathContainerPage {
+public class ExtensionClasspathContainerPage extends WizardPage implements IClasspathContainerPage {
 
-    private IPath selection;
+    /**
+     * ClasspathContainer ID
+     */
+    private static final String NET_SF_ECL1_ECL1_CONTAINER_ID = "net.sf.ecl1.ECL1_CONTAINER";
 
     private static final String ECL1_CLASSPATH_CONTAINER = "ecl1 Classpath Container";
+
+    private IPath selection;
 
     private Table extensionsTable;
 
@@ -48,7 +47,7 @@ implements IClasspathContainerPage {
         super(ECL1_CLASSPATH_CONTAINER, ECL1_CLASSPATH_CONTAINER , null);
         setDescription(ECL1_CLASSPATH_CONTAINER);
         setPageComplete(true);
-        this.selection = new Path(ClasspathContainerConstants.NET_SF_ECL1_ECL1_CONTAINER_ID);
+        this.selection = new Path(NET_SF_ECL1_ECL1_CONTAINER_ID);
     }
 
     @Override
@@ -88,9 +87,7 @@ implements IClasspathContainerPage {
     }
 
     private Collection<String> findExtensionJarsEligibleForClassPathAddition() {
-        Collection<String> result = Lists.newArrayList();
-        result = new ExtensionUtil().findExtensionJars();
-        return result;
+        return new ExtensionUtil().findExtensionJars();
     }
 
     @Override

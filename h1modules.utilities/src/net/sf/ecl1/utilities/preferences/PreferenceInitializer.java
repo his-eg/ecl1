@@ -1,7 +1,7 @@
 package net.sf.ecl1.utilities.preferences;
 
 import h1modules.utilities.utils.Activator;
-import h1modules.utilities.utils.CvsTagUtil;
+import net.sf.ecl1.utilities.hisinone.CvsTagUtil;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;

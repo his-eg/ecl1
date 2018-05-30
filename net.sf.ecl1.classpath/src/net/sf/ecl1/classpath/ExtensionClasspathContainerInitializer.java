@@ -33,6 +33,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Lists;
 
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.hisinone.HisConstants;
 
 /**
  * Classpath Initializer for HISinOne-Extension projects
@@ -108,9 +109,10 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
             String commaSeparatedExtensionsToIgnore = containerPath.segment(1);
             if (commaSeparatedExtensionsToIgnore != null) {
                 List<String> extensionsToIgnore = Splitter.on(",").splitToList(commaSeparatedExtensionsToIgnore);
+                ExtensionUtil extensionUtil = new ExtensionUtil(); // avoids searching webapps for each checked project
                 for (String extension : extensionsToIgnore) {
-                    boolean projectExists = new ExtensionUtil().doesExtensionProjectExist(extension);
-                    boolean jarExists = new ExtensionUtil().doesExtensionJarExist(extension);
+                    boolean projectExists = extensionUtil.doesExtensionProjectExist(extension);
+                    boolean jarExists = extensionUtil.doesExtensionJarExist(extension);
                     if (projectExists || jarExists) {
                         extensionsForClassPath.add(extension);
                     }
@@ -139,23 +141,23 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
                 IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
                 IPath workspace = root.getRawLocation();
                 if (extensionPath.endsWith(".jar")) {
-                    IPath path = javaProject.getPath().append(ClasspathContainerConstants.EXTENSIONS_FOLDER).append(extensionPath);
+                    IPath path = javaProject.getPath().append(HisConstants.EXTENSIONS_FOLDER).append(extensionPath);
                     //create a lib entry
                     IPath sourceAttachmentPath = workspace.append(path);
                     IPath sourceAttachmentRootPath = null;
                     IClasspathEntry libraryEntry = JavaCore.newLibraryEntry(path, sourceAttachmentPath, sourceAttachmentRootPath, true);
                     result.add(libraryEntry);
-                    logger.debug("Creating new container library entry for: " + path.toString() + "\n * exported: " + extensionNeedsToBeExported
+                    logger.info("Creating new container library entry for: " + path.toString() + "\n * exported: " + extensionNeedsToBeExported
                     		+ "\n * sourceAttachmentPath: " + sourceAttachmentPath + "\n * sourceAttachmentRootPath: " + sourceAttachmentRootPath);
                 } else {
                     IProject project = root.getProject(extensionPath);
                     if (project.exists()) {
-                    	logger.debug("Creating new container entry for project: " + project.getName() + " exported: " + extensionNeedsToBeExported);
+                    	logger.info("Creating new container entry for project: " + project.getName() + " exported: " + extensionNeedsToBeExported);
                         IPath location = project.getLocation();
                         IClasspathEntry newProjectEntry = JavaCore.newProjectEntry(location.makeRelativeTo(workspace).makeAbsolute(), true);
                         result.add(newProjectEntry);
                     } else {
-                    	logger.debug("Extension does not exist as project: " + extensionPath);
+                    	logger.warn("Extension does not exist as project: " + extensionPath);
                     }
                 }
             }
@@ -184,8 +186,9 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
         //scan workspace for extension projects
         IWorkspaceRoot ws = ResourcesPlugin.getWorkspace().getRoot();
         List<IProject> projects = Arrays.asList(ws.getProjects(0));
+        ExtensionUtil extensionUtil = new ExtensionUtil(); // avoids searching webapps for each checked project
         for (IProject project : projects) {
-            if (new ExtensionUtil().isExtensionProject(project)) {
+            if (extensionUtil.isExtensionProject(project)) {
                 extensions.put(project.getName(), project.getName());
             }
         }
@@ -199,7 +202,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
      */
     private void scanForExtensionJars(IJavaProject javaProject, Map<String, String> extensions) {
         //scan workspace for extension jars
-        IFolder extensionsFolder = javaProject.getProject().getFolder(ClasspathContainerConstants.EXTENSIONS_FOLDER);
+        IFolder extensionsFolder = javaProject.getProject().getFolder(HisConstants.EXTENSIONS_FOLDER);
         if (extensionsFolder.exists()) {
             //if there is an extensions folder, scan it
             IPath rawLocation = extensionsFolder.getRawLocation();

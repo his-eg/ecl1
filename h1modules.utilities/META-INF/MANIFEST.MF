@@ -20,6 +20,7 @@ Export-Package: de.his.cs.sys.extensions.wizards.utils;uses:="org.eclipse.core.r
  de.his.cs.sys.extensions.wizards.utils.templates,
  h1modules.utilities.utils,
  net.sf.ecl1.utilities.general,
+ net.sf.ecl1.utilities.hisinone,
  net.sf.ecl1.utilities.preferences
 Import-Package: org.apache.commons.io,
  org.eclipse.jdt.core,

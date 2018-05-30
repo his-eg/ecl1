@@ -26,10 +26,11 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.Sets;
 
-import h1modules.utilities.utils.CvsTagUtil;
-import h1modules.utilities.utils.HISinOneFileUtil;
 import net.sf.ecl1.changeset.exporter.ChangeSetExportWizardPlugin;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.general.FileUtil;
+import net.sf.ecl1.utilities.hisinone.CvsTagUtil;
+import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
 /**
  * Utilities for management of release.xml files
@@ -49,7 +50,7 @@ public class ReleaseXmlUtil {
      * @return
      */
     public static IFolder getReleaseXmlFolder() {
-    	IProject webappsProject = HISinOneFileUtil.getWebapps();
+    	IProject webappsProject = WebappsUtil.findWebappsProject();
     	if (webappsProject!=null) {
     		return webappsProject.getFolder(RELEASE_XML_FOLDER);
     	}
@@ -104,7 +105,7 @@ public class ReleaseXmlUtil {
     		logger.error("File 'release.xml' does not exist");
     		return CvsTagUtil.UNKNOWN_VERSION;
     	}
-        String contents = HISinOneFileUtil.readContent(releaseFile);
+        String contents = FileUtil.readContent(releaseFile);
         if (contents==null) {
         	logger.error("IOException occurred reading file 'release.xml'");
     		return CvsTagUtil.UNKNOWN_VERSION;

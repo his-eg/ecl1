@@ -13,7 +13,7 @@ public class UpdateCheck implements IStartup {
 
 	@Override
 	public void earlyStartup() {
-		logger.info("Update Check!");
+		logger.debug("Update Check!");
 		Job job = new Job("ecl1UpdateCheck") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {

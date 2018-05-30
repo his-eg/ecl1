@@ -13,7 +13,7 @@ import de.his.cs.sys.extensions.wizards.utils.templates.TemplateFetcher;
 import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
 import h1modules.utilities.utils.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
-import net.sf.ecl1.utilities.general.Ecl1Constants;
+import net.sf.ecl1.utilities.hisinone.HisConstants;
 
 /**
  * Simple Resource access support.
@@ -106,7 +106,7 @@ public class ResourceSupport {
         StringBuilder classesReferences = new StringBuilder();
         HashMap<String, String> variables = new HashMap<String, String>();
         for (String project : requiredProjects) {
-            boolean projectIsWebapps = Ecl1Constants.WEBAPPS.equals(project);
+            boolean projectIsWebapps = HisConstants.WEBAPPS.equals(project);
             if(!projectIsWebapps) {
                 variables.put(DEPENDENCY_VARIABLE_NAME, project);
                 String pathElement = new TemplateManager(SONARBINARIESELEMENT_TEMPLATE, variables).getContent();
@@ -127,7 +127,7 @@ public class ResourceSupport {
         StringBuilder pathElementsStringBuilder = new StringBuilder();
         Map<String, String> variables = new HashMap<String, String>();
         for (String project : requiredProjects) {
-            boolean projectIsWebapps = Ecl1Constants.WEBAPPS.equals(project);
+            boolean projectIsWebapps = HisConstants.WEBAPPS.equals(project);
             if(!projectIsWebapps) {
                 variables.put(DEPENDENCY_VARIABLE_NAME, project);
                 String pathElement = new TemplateManager("pathelement.template", variables).getContent();
@@ -147,7 +147,7 @@ public class ResourceSupport {
     private String createConditionElements() {
         StringBuilder conditionElementsStringBuilder = new StringBuilder();
         for (String project : requiredProjects) {
-            boolean projectIsWebapps = Ecl1Constants.WEBAPPS.equals(project);
+            boolean projectIsWebapps = HisConstants.WEBAPPS.equals(project);
             if(!projectIsWebapps) {
                 Map<String, String> variables = new HashMap<String, String>();
                 variables.put(DEPENDENCY_VARIABLE_NAME, project);
@@ -167,7 +167,7 @@ public class ResourceSupport {
     private String createAdditionalDependencyProperties() {
         StringBuilder sb = new StringBuilder();
         for (String project : requiredProjects) {
-            boolean projectIsWebapps = Ecl1Constants.WEBAPPS.equals(project);
+            boolean projectIsWebapps = HisConstants.WEBAPPS.equals(project);
             if(!projectIsWebapps) {
                 String additionalDependencyProperty = PROPERTY_DEPENDENCY_TEMPLATE.replace(DEPENDENCY_VARIABLE_NAME, project);
                 sb.append(additionalDependencyProperty);

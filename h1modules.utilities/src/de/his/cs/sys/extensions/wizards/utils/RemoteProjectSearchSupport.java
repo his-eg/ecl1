@@ -8,6 +8,8 @@ import java.util.Collection;
 import java.util.TreeSet;
 
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.general.JsonUtil;
+import net.sf.ecl1.utilities.general.RestUtil;
 import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 
 import org.apache.commons.io.IOUtils;

@@ -1,4 +1,4 @@
-package de.his.cs.sys.extensions.wizards.utils;
+package net.sf.ecl1.utilities.general;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;

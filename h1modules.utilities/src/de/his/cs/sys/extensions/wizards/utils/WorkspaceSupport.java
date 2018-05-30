@@ -19,7 +19,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
-import net.sf.ecl1.utilities.general.Ecl1Constants;
+import net.sf.ecl1.utilities.hisinone.HisConstants;
 
 /**
  * @author keunecke
@@ -55,7 +55,7 @@ public class WorkspaceSupport {
      * @return true if project may be referenced by a new project
      */
     private boolean isEligibleForReferencing(IProject iProject) {
-        if(Ecl1Constants.WEBAPPS.equals(iProject.getName())) {
+        if(HisConstants.WEBAPPS.equals(iProject.getName())) {
             return true;
         }
         if(isExtensionProject(iProject)) {
