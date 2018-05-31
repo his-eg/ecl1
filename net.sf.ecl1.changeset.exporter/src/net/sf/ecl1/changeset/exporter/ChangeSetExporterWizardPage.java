@@ -1,16 +1,19 @@
 package net.sf.ecl1.changeset.exporter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import net.sf.ecl1.changeset.exporter.util.ReleaseXmlUtil;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.hisinone.ReleaseXmlUtil;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
@@ -31,9 +34,11 @@ import org.eclipse.team.internal.core.subscribers.ChangeSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+import org.junit.Assert;
+
 public class ChangeSetExporterWizardPage extends WizardPage {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(ChangeSetExportWizardPlugin.getDefault().getLog(), ChangeSetExportWizardPlugin.PLUGIN_ID);
+	private static final ConsoleLogger logger = new ConsoleLogger(ChangeSetExportWizardPlugin.getDefault().getLog(), ChangeSetExportWizardPlugin.PLUGIN_ID);
 
     private Table changeSetTable;
 
@@ -45,37 +50,61 @@ public class ChangeSetExporterWizardPage extends WizardPage {
 
     private StringFieldEditor hotfixTitle;
 
-    private StringFieldEditor hotfixDescribtion;
+    private StringFieldEditor hotfixDescription;
 
     private StringFieldEditor hiszillaTickets;
 
+    private BooleanFieldEditor dbUpdateRequired;
+
     private StringFieldEditor hotfixSnippetTextEditor;
 
-    private List releaseFilesList;
-
+    private ArrayList<String> hotfixFileNames = null;
+    
+    private List releaseFilesList; // see outcommented code
+    
+    private SimplePropertyChangeListener propertyChangeListener;
+    
     public ChangeSetExporterWizardPage() {
         super("Change Set Exporter Wizard");
+        this.setTitle("Describe the hotfix and select a change set");
+        propertyChangeListener = new SimplePropertyChangeListener(this);
     }
 
     @Override
     public void createControl(Composite parent) {
         Composite pageComposite = new Composite(parent, SWT.NONE);
-        GridLayout oneColumnGrid = new GridLayout(1, false);
-        pageComposite.setLayout(oneColumnGrid);
-
+        GridLayout gridLayout = new GridLayout(2, true);
+        pageComposite.setLayout(gridLayout);
+        
         hotfixTitle = new StringFieldEditor("title", "Title", pageComposite);
         // Get version from release.xml incremented by 1 for next hotfix
         String version = ReleaseXmlUtil.getIncrementedReleaseXmlVersionShortString();
         logger.debug("ChangesetExporter: version from release.xml incremented by 1 = " + version);;
         hotfixTitle.setStringValue("Hotfix " + version);
-        hotfixDescribtion = new StringFieldEditor("description", "Description", pageComposite);
+        hotfixTitle.setPropertyChangeListener(propertyChangeListener);
+
+        hotfixDescription = new StringFieldEditor("description", "Description", pageComposite);
+        hotfixDescription.setPropertyChangeListener(propertyChangeListener);
+        
         hiszillaTickets = new StringFieldEditor("hiszilla", "Hiszilla", pageComposite);
+        hiszillaTickets.setPropertyChangeListener(propertyChangeListener);
+
+        // Explicit label and BooleanFieldEditor required to fix layout
+        Label dbUpdateLabel = new Label(pageComposite, SWT.LEFT);
+        dbUpdateLabel.setText("Database update required?");
+        dbUpdateRequired = new BooleanFieldEditor("dbUpdate", "", pageComposite);
+        dbUpdateRequired.fillIntoGrid(pageComposite, 1);
+        dbUpdateRequired.setPropertyChangeListener(propertyChangeListener);
 
         Label tableLabel = new Label(pageComposite, SWT.LEFT);
         tableLabel.setText("Change Sets");
         changeSetTable = new Table(pageComposite, SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.SINGLE | SWT.FILL);
         changeSetTable.setLinesVisible(true);
         changeSetTable.setHeaderVisible(true);
+//        TableLayout tableLayout = new TableLayout();
+//        tableLayout.computeSize(pageComposite, 200, 40, true);
+//        changeSetTable.setLayout(new TableLayout()); // TODO
+//        changeSetTable.computeSize(pageComposite, 200, 40, true);
         changeSetTable.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -91,7 +120,16 @@ public class ChangeSetExporterWizardPage extends WizardPage {
             private void handleEvent(SelectionEvent e) {
                 TableItem tableItem = (TableItem) e.item;
                 selectedChangeTableItem = tableItem;
-                setHotfixInformation();
+            	// clear previous messages
+                setMessage(null);
+                setErrorMessage(null);
+                // get files from changeSet
+                checkSetHotfixFileNames();
+                // if there was no error yet, check all the other required informations
+                // and create hotfix snippet if everything is ok
+                if (getErrorMessage() == null) {
+                	checkSetHotfixInformation();
+                }
             }
         });
 
@@ -137,65 +175,85 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         setControl(pageComposite);
     }
 
-    protected void setHotfixInformation() {
-        String hotfixSnippet = getHotfixDefinition().toXml();
+    protected void checkSetHotfixInformation() {
+        if (!hasDescription()) {
+        	setLogError("No description for hotfix provided!");
+            return;
+        }
+        if (!hasHiszilla()) {
+        	setLogError("No hiszilla tickets for hotfix provided!");
+            return;
+        }
+        if (!hasSelectedChangeSet()) {
+        	setLogError("No Change Set selected!");
+            return;
+        }
+    	if (hotfixFileNames==null || hotfixFileNames.size()==0) {
+            setLogError("Selected ChangeSet contains no files...");
+            return;
+    	}
+    	
+    	// looks good -> create hotfix snippet
+        String title = hotfixTitle.getStringValue();
+        String description = hotfixDescription.getStringValue();
+        String hiszilla = hiszillaTickets.getStringValue();
+        boolean isDbUpdateRequired = dbUpdateRequired.getBooleanValue();
+        String hotfixSnippet = new HotfixInformation(title, description, hiszilla, isDbUpdateRequired, hotfixFileNames).toXml();
+        logger.debug("Created hotfix snippet:\n" + hotfixSnippet);
+        
         // add content to clipboard
         final Display display = getControl().getDisplay();
         final Clipboard cb = new Clipboard(display);
         TextTransfer textTransfer = TextTransfer.getInstance();
         cb.setContents(new Object[] { hotfixSnippet }, new Transfer[] { textTransfer });
         this.hotfixSnippetTextEditor.setStringValue(hotfixSnippet);
-        setMessage("Hotfix XML snippet copied to clipboard!");
-        clearErrorAsync(3000);
+        setLogInfo("Hotfix XML snippet copied to clipboard!");
     }
 
-    /**
-     * @param duration duration till removal in ms
-     */
-    void clearErrorAsync(final int duration) {
-        final Display display = getControl().getDisplay();
-        display.asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                display.timerExec(duration, new Runnable() {
-                    @Override
-                    public void run() {
-                        setMessage("");
-                    }
-                });
+    private void checkSetHotfixFileNames() {
+    	this.hotfixFileNames = new ArrayList<>();
+        Assert.assertNotNull(selectedChangeTableItem); // verified by ChangeSetExportWizard.finish()
+        ChangeSet selectedChangeSet = itemToChangeMap.get(selectedChangeTableItem.getText(1));
+        java.util.List<String> ignored = Lists.newLinkedList();
+        if (selectedChangeSet != null) {
+            java.util.List<IResource> resources = Arrays.asList(selectedChangeSet.getResources());
+            if (resources != null) {
+            	if (resources.size() > 0) {
+	                for (IResource changedResource : resources) {
+	                    IPath qisserver = new Path("qisserver/");
+	                    IPath changedResourceProjectRelativePath = changedResource.getProjectRelativePath();
+	                    // only resources from within qisserver are considered
+	                    IPath path = changedResourceProjectRelativePath.makeRelativeTo(qisserver);
+	                    String name = path.toString();
+	                    if (qisserver.isPrefixOf(changedResourceProjectRelativePath)) {
+	                    	hotfixFileNames.add(name);
+	                    } else {
+	                        ignored.add(name);
+	                    }
+	                }
+            	} else {
+            		logger.warn("resources is empty");
+            	}
+            } else {
+            	logger.warn("resources is null");
             }
-        });
-    }
-
-    HotfixInformation getHotfixDefinition() {
-        String title = hotfixTitle.getStringValue();
-        String description = hotfixDescribtion.getStringValue();
-        String hiszilla = hiszillaTickets.getStringValue();
-        if (selectedChangeTableItem != null) {
-            HotfixInformation hf = new HotfixInformation(title, description, hiszilla);
-            ChangeSet selectedChangeSet = itemToChangeMap.get(selectedChangeTableItem.getText(1));
-            java.util.List<String> ignored = Lists.newLinkedList();
-            if (selectedChangeSet != null) {
-                java.util.List<IResource> resources = Arrays.asList(selectedChangeSet.getResources());
-                for (IResource changedResource : resources) {
-                    IPath qisserver = new Path("qisserver/");
-                    IPath changedResourceProjectRelativePath = changedResource.getProjectRelativePath();
-                    // only resources from within qisserver are considered
-                    IPath path = changedResourceProjectRelativePath.makeRelativeTo(qisserver);
-                    String name = path.toString();
-                    if (qisserver.isPrefixOf(changedResourceProjectRelativePath)) {
-                        hf.addFile(name);
-                    } else {
-                        ignored.add(name);
-                    }
-                }
-            }
-            if(!ignored.isEmpty()) {
-                setErrorMessage("Skipped files outside qisserver in selected change set!");
-            }
-            return hf;
+        } else {
+        	logger.warn("selectedChangeSet is null"); // should not happen?
         }
-        return null;
+        boolean filesIgnored = !ignored.isEmpty();
+        int foundFilesCount = hotfixFileNames.size();
+        if (foundFilesCount == 0) {
+        	if (filesIgnored) {
+            	setLogError("The selected changeset contains only files outside qisserver!");
+        	} else {
+            	setLogError("The selected changeset contains no files!");
+        	}
+        } else if (filesIgnored) {
+        	setLogError("Skipped files outside qisserver in selected change set!");
+        } else {
+        	// delete previous error messages
+            logger.debug("ChangeSet contains " + foundFilesCount + " files.");
+        }
     }
 
     /**
@@ -209,7 +267,7 @@ public class ChangeSetExporterWizardPage extends WizardPage {
      * @return true iff user has entered a description
      */
     boolean hasDescription() {
-        String desc = hotfixDescribtion.getStringValue();
+        String desc = hotfixDescription.getStringValue();
         return  desc != null && !desc.isEmpty();
     }
 
@@ -219,5 +277,37 @@ public class ChangeSetExporterWizardPage extends WizardPage {
     boolean hasHiszilla() {
         String hiszilla = hiszillaTickets.getStringValue();
         return hiszilla != null && !hiszilla.isEmpty();
+    }
+    
+    private void setLogInfo(String message) {
+    	logger.info(message);
+        setMessage(message);
+    }
+
+    private void setLogError(String message) {
+    	// log debug instead error message to avoid spamming the "Error Log" view
+    	logger.debug(message);
+    	// message displayed in dialog window
+        setErrorMessage(message);
+        // delete eventually old hotfix snippet
+        hotfixSnippetTextEditor.setStringValue(null);
+    }
+    
+    /**
+     * @param duration duration till removal in ms
+     */
+    void clearErrorAsync(final int duration) {
+        final Display display = getControl().getDisplay();
+        display.asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                display.timerExec(duration, new Runnable() {
+                    @Override
+                    public void run() {
+                        setErrorMessage(null);
+                    }
+                });
+            }
+        });
     }
 }

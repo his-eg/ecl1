@@ -18,23 +18,7 @@ public class ChangeSetExporterWizard extends Wizard implements IExportWizard {
 
     @Override
     public boolean performFinish() {
-        if (!page.hasSelectedChangeSet()) {
-            page.setErrorMessage("No Change Set selected!");
-            page.clearErrorAsync(3000);
-            return false;
-        }
-        if (!page.hasDescription()) {
-            page.setErrorMessage("No description for hotfix provided!");
-            page.clearErrorAsync(3000);
-            return false;
-        }
-        if (!page.hasHiszilla()) {
-            page.setErrorMessage("No hiszilla tickets for hotfix provided!");
-            page.clearErrorAsync(3000);
-            return false;
-        }
-        page.setHotfixInformation();
-        return true;
+        page.checkSetHotfixInformation();
+        return (page.getErrorMessage() == null);
     }
-
 }

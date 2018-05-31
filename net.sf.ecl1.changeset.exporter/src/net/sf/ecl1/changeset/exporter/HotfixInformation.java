@@ -1,15 +1,24 @@
 package net.sf.ecl1.changeset.exporter;
 
-import java.util.Collection;
-
-import com.google.common.collect.Sets;
+import java.util.ArrayList;
 
 /**
  * Information about a hotfix
- * @author keunecke
- *
+ * @author keunecke, tneumann
  */
 public class HotfixInformation {
+
+    private static final String FILE_ELEMENT = "<file name=\"%s\" />";
+
+    private static final String DESC_START = "<desc>";
+
+    private static final String DESC_END = "</desc>";
+
+    private static final String PATCH_START = "<patch name=\"%s\" hiszilla=\"%s\" dbUpdate=\"%s\">";
+
+    private static final String PATCH_END = "</patch>";
+
+    private static final String INDENT = "    ";
 
     private static final String NEW_LINE = "\n";
 
@@ -19,43 +28,33 @@ public class HotfixInformation {
 
     private String title;
 
-    private Collection<String> fileNames = Sets.newHashSet();
-
-    private static final String FILE_ELEMENT = "<file name=\"%s\" />";
-
-    private static final String DESC_START = "<desc>";
-
-    private static final String DESC_END = "</desc>";
-
-    private static final String PATCH_START = "<patch name=\"%s\" hiszilla=\"%s\">";
-
-    private static final String PATCH_END = "</patch>";
-
-    private static final String INDENT = "    ";
+    private String dbUpdate;
+    
+    private ArrayList<String> fileNames = new ArrayList<>();
 
     /**
-     * Create a new HotfixInformation with given title, description and hiszilla data
+     * Create a new HotfixInformation with all data given.
      * @param title
      * @param describtion
      * @param hiszilla
+     * @param dbUpdate
+     * @param fileNames
      */
-    public HotfixInformation(String title, String describtion, String hiszilla) {
+    public HotfixInformation(String title, String describtion, String hiszilla, boolean dbUpdate, ArrayList<String> fileNames) {
         this.title = title;
         this.describtion = describtion;
         this.hiszilla = hiszilla;
+        this.dbUpdate = dbUpdate ? "true" : "false";
+        this.fileNames = fileNames;
     }
-
-    public void addFile(String file) {
-        fileNames.add(file);
-    }
-
+    
     /**
      * Plot HotfixInformation to XML
      * @return xml string
      */
     public String toXml() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format(PATCH_START + NEW_LINE, title, hiszilla));
+        sb.append(String.format(PATCH_START + NEW_LINE, title, hiszilla, dbUpdate));
         for (String fileName : fileNames) {
             sb.append(String.format(INDENT + FILE_ELEMENT + NEW_LINE, fileName));
         }
@@ -65,5 +64,4 @@ public class HotfixInformation {
         sb.append(PATCH_END);
         return sb.toString();
     }
-
 }

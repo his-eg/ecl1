@@ -1,4 +1,4 @@
-package net.sf.ecl1.changeset.exporter.util;
+package net.sf.ecl1.utilities.hisinone;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -26,11 +26,9 @@ import org.xml.sax.SAXException;
 
 import com.google.common.collect.Sets;
 
-import net.sf.ecl1.changeset.exporter.ChangeSetExportWizardPlugin;
+import h1modules.utilities.utils.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.FileUtil;
-import net.sf.ecl1.utilities.hisinone.CvsTagUtil;
-import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
 /**
  * Utilities for management of release.xml files
@@ -39,7 +37,7 @@ import net.sf.ecl1.utilities.hisinone.WebappsUtil;
  */
 public class ReleaseXmlUtil {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(ChangeSetExportWizardPlugin.getDefault().getLog(), ChangeSetExportWizardPlugin.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
 	private static final String RELEASE_XML_FOLDER = "qisserver/WEB-INF/conf/service/patches/hisinone";
 	
