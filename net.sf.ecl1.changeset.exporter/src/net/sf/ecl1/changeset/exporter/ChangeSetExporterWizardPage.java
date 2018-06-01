@@ -222,7 +222,7 @@ public class ChangeSetExporterWizardPage extends WizardPage {
     }
 
     private void checkSetHotfixFileNames() {
-    	checkSetValidationRequired();
+    	// validation is always on when reading files from Change Set
     	
     	this.hotfixFileNames = new ArrayList<>();
         Assert.assertNotNull(selectedChangeTableItem); // verified by ChangeSetExportWizard.finish()
@@ -251,7 +251,7 @@ public class ChangeSetExporterWizardPage extends WizardPage {
             	logger.debug("resources is null");
             }
         } else {
-        	logger.debug("selectedChangeSet is null"); // should not happen?
+        	logger.debug("selectedChangeSet is null");
         }
         boolean filesIgnored = !ignored.isEmpty();
         int foundFilesCount = hotfixFileNames.size();
