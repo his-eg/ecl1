@@ -24,10 +24,20 @@ import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
 public class ConsoleLogger {
 
     enum LogLevel {
-    	DEBUG,
-    	INFO,
-    	WARN,
-    	ERROR;
+    	DEBUG {
+    		int toIStatus() { return IStatus.OK; }
+    	},
+    	INFO {
+    		int toIStatus() { return IStatus.INFO; }
+    	},
+    	WARN {
+    		int toIStatus() { return IStatus.WARNING; }
+    	},
+    	ERROR {
+    		int toIStatus() { return IStatus.ERROR; }
+    	};
+    	
+    	abstract int toIStatus();
     }
 
     /**
@@ -73,44 +83,87 @@ public class ConsoleLogger {
     	}
     }
 
+    /**
+     * Logs a debug log to the console.
+     * @param message
+     */
     public void debug(String message) {
-    	log(LogLevel.DEBUG, message, null);
+    	log(LogLevel.DEBUG, message, null, false);
     }
 
     public void debug(String message, Throwable t) {
-    	log(LogLevel.DEBUG, message, t);
+    	log(LogLevel.DEBUG, message, t, false);
     }
 
+    /**
+     * Logs an info log to the console.
+     * @param message
+     */
     public void info(String message) {
-    	log(LogLevel.INFO, message, null);
+    	log(LogLevel.INFO, message, null, false);
     }
 
     public void info(String message, Throwable t) {
-    	log(LogLevel.INFO, message, t);
+    	log(LogLevel.INFO, message, t, false);
     }
 
+    /**
+     * Logs an error to the console.
+     * @param message
+     */
     public void warn(String message) {
-    	log(LogLevel.WARN, message, null);
+    	log(LogLevel.WARN, message, null, false);
     }
 
     public void warn(String message, Throwable t) {
-    	log(LogLevel.WARN, message, t);
+    	log(LogLevel.WARN, message, t, false);
     }
 
+    /**
+     * Logs a warning to console and the "Error Log" view.
+     * @param message
+     */
+    public void warn2(String message) {
+    	log(LogLevel.WARN, message, null, true);
+    }
+
+    public void warn2(String message, Throwable t) {
+    	log(LogLevel.WARN, message, t, true);
+    }
+
+    /**
+     * Logs an error to the console .
+     * @param message
+     */
     public void error(String message) {
-    	log(LogLevel.ERROR, message, null);
+    	log(LogLevel.ERROR, message, null, false);
     }
 
     public void error(String message, Throwable t) {
-    	log(LogLevel.ERROR, message, t);
+    	log(LogLevel.ERROR, message, t, false);
+    }
+
+    /**
+     * Logs an error to console and the "Error Log" view.
+     * @param message
+     */
+    public void error2(String message) {
+    	log(LogLevel.ERROR, message, null, true);
+    }
+
+    public void error2(String message, Throwable t) {
+    	log(LogLevel.ERROR, message, t, true);
     }
     
     /**
      * Log a message to the console.
      * 
+     * @param logLevel DEBUG, INFO, WARN or ERROR
      * @param message
+     * @param t Throwable (optional)
+     * @param insertIntoErrorLogView if true then the message is also posted to the "Error Log" view
      */
-    private void log(LogLevel logLevel, String message, Throwable t) {
+    private void log(LogLevel logLevel, String message, Throwable t, boolean insertIntoErrorLogView) {
     	LogLevel visibleLogLevel = LogLevel.valueOf(getVisibleLogLevel());
 		if (logLevel.ordinal() >= visibleLogLevel.ordinal()) {
 			// https://www.eclipse.org/forums/index.php/t/172855/ :
@@ -153,12 +206,15 @@ public class ConsoleLogger {
 			});
         }
 		
-        // Always log warnings and errors in "Error Log" view
-        if (errorLogLogger!=null && (logLevel == LogLevel.ERROR || logLevel == LogLevel.WARN)) {
-        	int statusCode = (logLevel == LogLevel.ERROR) ? IStatus.ERROR : IStatus.WARNING;
-        	IStatus status = new Status(statusCode, pluginId, message, t);
-        	errorLogLogger.log(status);
-        }
+        // Also log in "Error Log" view?
+		if (insertIntoErrorLogView) {
+			if (errorLogLogger != null) {
+	        	IStatus status = new Status(logLevel.toIStatus(), pluginId, message, t);
+	        	errorLogLogger.log(status);
+			} else {
+				warn("errorLogLogger is null, cannot log to 'Error Log' view!", new Throwable());
+			}
+		}
     }
     
     private String getVisibleLogLevel() {

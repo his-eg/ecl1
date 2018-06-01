@@ -18,6 +18,7 @@ public class ChangeSetExporterWizard extends Wizard implements IExportWizard {
 
     @Override
     public boolean performFinish() {
+    	page.setValidationRequired();
         page.checkSetHotfixInformation();
         return (page.getErrorMessage() == null);
     }

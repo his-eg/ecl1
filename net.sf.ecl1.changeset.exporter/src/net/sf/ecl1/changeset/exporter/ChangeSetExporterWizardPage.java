@@ -13,7 +13,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
-import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
@@ -64,6 +63,8 @@ public class ChangeSetExporterWizardPage extends WizardPage {
     
     private SimplePropertyChangeListener propertyChangeListener;
     
+    private boolean validate = false;
+    
     public ChangeSetExporterWizardPage() {
         super("Change Set Exporter Wizard");
         this.setTitle("Describe the hotfix and select a change set");
@@ -101,10 +102,6 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         changeSetTable = new Table(pageComposite, SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.SINGLE | SWT.FILL);
         changeSetTable.setLinesVisible(true);
         changeSetTable.setHeaderVisible(true);
-//        TableLayout tableLayout = new TableLayout();
-//        tableLayout.computeSize(pageComposite, 200, 40, true);
-//        changeSetTable.setLayout(new TableLayout()); // TODO
-//        changeSetTable.computeSize(pageComposite, 200, 40, true);
         changeSetTable.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -117,14 +114,22 @@ public class ChangeSetExporterWizardPage extends WizardPage {
             /**
              * @param e
              */
-            private void handleEvent(SelectionEvent e) {
-                TableItem tableItem = (TableItem) e.item;
+            private void handleEvent(SelectionEvent event) {
+                TableItem tableItem = (TableItem) event.item;
                 selectedChangeTableItem = tableItem;
             	// clear previous messages
                 setMessage(null);
                 setErrorMessage(null);
                 // get files from changeSet
-                checkSetHotfixFileNames();
+                try {
+                	checkSetHotfixFileNames();
+                } catch (Exception e) {
+                	// program errors shall be written to the Error Log view, too
+                	String msg = "Reading file names from the selected Change Set failed! ";
+                	logger.error2(msg + e.getMessage(), e);
+                    setErrorMessage(msg + "See the console logs for details.");
+                    hotfixSnippetTextEditor.setStringValue(null);
+                }
                 // if there was no error yet, check all the other required informations
                 // and create hotfix snippet if everything is ok
                 if (getErrorMessage() == null) {
@@ -154,7 +159,7 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         }
 
         if(containsEmptyChangeSets) {
-            setErrorMessage("There were empty change sets! Did you run CVS synchronization?");
+            setLogError("There were empty change sets! Did you run CVS synchronization?");
         }
 
         for (int i = 0; i < headers.length; i++) {
@@ -175,21 +180,27 @@ public class ChangeSetExporterWizardPage extends WizardPage {
         setControl(pageComposite);
     }
 
-    protected void checkSetHotfixInformation() {
+    void checkSetHotfixInformation() {
+    	checkSetValidationRequired();
+    	
+        if (!hasTitle()) {
+        	if (validate) setLogError("No hotfix title provided!");
+            return;
+        }
         if (!hasDescription()) {
-        	setLogError("No description for hotfix provided!");
+        	if (validate) setLogError("No description for hotfix provided!");
             return;
         }
         if (!hasHiszilla()) {
-        	setLogError("No hiszilla tickets for hotfix provided!");
+        	if (validate) setLogError("No hiszilla tickets for hotfix provided!");
             return;
         }
         if (!hasSelectedChangeSet()) {
-        	setLogError("No Change Set selected!");
+        	if (validate) setLogError("No ChangeSet selected!");
             return;
         }
     	if (hotfixFileNames==null || hotfixFileNames.size()==0) {
-            setLogError("Selected ChangeSet contains no files...");
+    		if (validate) setLogError("The selected ChangeSet contains no files!");
             return;
     	}
     	
@@ -211,6 +222,8 @@ public class ChangeSetExporterWizardPage extends WizardPage {
     }
 
     private void checkSetHotfixFileNames() {
+    	checkSetValidationRequired();
+    	
     	this.hotfixFileNames = new ArrayList<>();
         Assert.assertNotNull(selectedChangeTableItem); // verified by ChangeSetExportWizard.finish()
         ChangeSet selectedChangeSet = itemToChangeMap.get(selectedChangeTableItem.getText(1));
@@ -232,24 +245,24 @@ public class ChangeSetExporterWizardPage extends WizardPage {
 	                    }
 	                }
             	} else {
-            		logger.warn("resources is empty");
+            		logger.debug("resources is empty");
             	}
             } else {
-            	logger.warn("resources is null");
+            	logger.debug("resources is null");
             }
         } else {
-        	logger.warn("selectedChangeSet is null"); // should not happen?
+        	logger.debug("selectedChangeSet is null"); // should not happen?
         }
         boolean filesIgnored = !ignored.isEmpty();
         int foundFilesCount = hotfixFileNames.size();
         if (foundFilesCount == 0) {
         	if (filesIgnored) {
-            	setLogError("The selected changeset contains only files outside qisserver!");
+            	setLogError("The selected ChangeSet contains only files outside qisserver!");
         	} else {
-            	setLogError("The selected changeset contains no files!");
+            	setLogError("The selected ChangeSet contains no files!");
         	}
         } else if (filesIgnored) {
-        	setLogError("Skipped files outside qisserver in selected change set!");
+        	setLogError("Skipped files outside qisserver in selected ChangeSet!");
         } else {
         	// delete previous error messages
             logger.debug("ChangeSet contains " + foundFilesCount + " files.");
@@ -257,16 +270,17 @@ public class ChangeSetExporterWizardPage extends WizardPage {
     }
 
     /**
-     * @return true iff user has selected a change set
+     * @return true iff user has entered a hotfix name
      */
-    boolean hasSelectedChangeSet() {
-        return selectedChangeTableItem != null;
+    private boolean hasTitle() {
+        String title = hotfixTitle.getStringValue();
+        return  title != null && !title.isEmpty();
     }
 
     /**
      * @return true iff user has entered a description
      */
-    boolean hasDescription() {
+    private boolean hasDescription() {
         String desc = hotfixDescription.getStringValue();
         return  desc != null && !desc.isEmpty();
     }
@@ -274,18 +288,41 @@ public class ChangeSetExporterWizardPage extends WizardPage {
     /**
      * @return true iff user has entered ticket numbers
      */
-    boolean hasHiszilla() {
+    private boolean hasHiszilla() {
         String hiszilla = hiszillaTickets.getStringValue();
         return hiszilla != null && !hiszilla.isEmpty();
     }
-    
+
+    /**
+     * @return true iff user has selected a change set
+     */
+    private boolean hasSelectedChangeSet() {
+        return selectedChangeTableItem != null;
+    }
+
+    /**
+     * Turn on validation when the finish button was clicked.
+     */
+    void setValidationRequired() {
+    	validate = true;
+    }
+
+    /**
+     * Turn on validation when all data was provided
+     */
+    private void checkSetValidationRequired() {
+    	if (!validate) {
+    		validate = hasTitle() && hasDescription() && hasHiszilla() && hasSelectedChangeSet();
+    	}
+    }
+
     private void setLogInfo(String message) {
     	logger.info(message);
         setMessage(message);
     }
 
     private void setLogError(String message) {
-    	// log debug instead error message to avoid spamming the "Error Log" view
+    	// validation errors are logged as debug messages only
     	logger.debug(message);
     	// message displayed in dialog window
         setErrorMessage(message);
@@ -296,7 +333,7 @@ public class ChangeSetExporterWizardPage extends WizardPage {
     /**
      * @param duration duration till removal in ms
      */
-    void clearErrorAsync(final int duration) {
+    private void clearErrorAsync(final int duration) {
         final Display display = getControl().getDisplay();
         display.asyncExec(new Runnable() {
             @Override
