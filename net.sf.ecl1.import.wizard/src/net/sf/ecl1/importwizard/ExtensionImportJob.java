@@ -64,7 +64,7 @@ public class ExtensionImportJob extends Job {
         try {
         	configProps = PropertyUtil.stringToProperties(configStr);
         } catch (ParseException e) {
-        	logger.error("Error parsing extension import configuration: " + e.getMessage(), e);
+        	logger.error2("Error parsing extension import configuration: " + e.getMessage(), e);
 		}
 	}
 
@@ -108,7 +108,7 @@ public class ExtensionImportJob extends Job {
                         FileUtils.deleteDirectory(extensionFolder);
                     } catch (IOException e) {
                     	extensionsWithDeleteErrors.add(extension);
-                    	logger.error("Extension folder " + extension + " could not be deleted from workspace", e);
+                    	logger.error2("Extension folder " + extension + " could not be deleted from workspace", e);
                     }
                     // reduce total work by 1
                     subMonitor.worked(1);

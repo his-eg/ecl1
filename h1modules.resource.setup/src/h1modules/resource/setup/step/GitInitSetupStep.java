@@ -31,7 +31,7 @@ public class GitInitSetupStep implements ProjectSetupStep {
         	initCommand.setDirectory(new File(ws, rawLocation.lastSegment()));
 			initCommand.call();
 		} catch (GitAPIException e) {
-			logger.error("Init of git repo failed: " + e.getMessage(), e);
+			logger.error2("Git repository initialization failed: " + e.getMessage(), e);
 		}
     }
 }

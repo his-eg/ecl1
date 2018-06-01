@@ -74,7 +74,7 @@ public class ResourceSupport {
         // See http://stackoverflow.com/questions/38203971/javax-net-ssl-sslhandshakeexception-received-fatal-alert-handshake-failure/
         Collection<String> templates = new TemplateFetcher().getTemplates();
 		if (templates == null) {
-			logger.error("Could not load template list. The new project could not be set up completely.");
+			logger.error2("Could not load template list. The new project could not be set up completely.");
 			return;
 		}
 		
@@ -86,7 +86,7 @@ public class ResourceSupport {
             	// write to project
             	manager.writeContent(project, content);
             } else {
-    			logger.error("Could not load template '" + template + "'. The new project could not be set up completely.");
+    			logger.error2("Could not load template '" + template + "'. The new project could not be set up completely.");
     			// continue anyway (?)
             }
         }

@@ -33,7 +33,7 @@ public class ResourceSetupStep implements ProjectSetupStep {
         try {
             new ResourceSupport(project, choices).createFiles();
         } catch (CoreException | UnsupportedEncodingException e) {
-    		logger.error(e.getMessage(), e);
+    		logger.error2(e.getMessage(), e);
         }
         logger.debug("Finished resource setup");
     }

@@ -100,12 +100,12 @@ public class RemoteProjectSearchSupport {
     	try {
     		fileContent = IOUtils.toString(inStream);
     	} catch (IOException e) {
-    		logger.error("IOException reading remote file: " + e.getMessage(), e);
+    		logger.error2("IOException reading remote file: " + e.getMessage(), e);
     	}
     	try {
     		inStream.close();
     	} catch (IOException e) {
-    		logger.error("IOException closing InputStream: " + e.getMessage(), e);
+    		logger.error2("IOException closing InputStream: " + e.getMessage(), e);
     	}
     	logger.debug("File content = "  + fileContent);
     	return fileContent;

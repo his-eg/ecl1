@@ -40,7 +40,7 @@ public class P2Util {
 		BundleContext bundleContext = UpdateCheckActivator.getDefault().getBundle().getBundleContext();
 		ServiceReference<?> reference = bundleContext.getServiceReference(IProvisioningAgent.SERVICE_NAME);
 		if (reference == null) {
-			logger.error("No provisioning agent found. This application is not set up for updates.");
+			logger.error2("No provisioning agent found. This application is not set up for updates.");
 			return;
 		}
 		
@@ -95,10 +95,11 @@ public class P2Util {
 			logger.info("Status after update: " + status.getMessage());
 			
 			if (status.getSeverity() == IStatus.CANCEL) {
-				logger.error(status.getMessage());
 				Throwable t = status.getException();
 				if (t != null) {
-					logger.error(t.getMessage(), t);
+					logger.error2(status.getMessage() + ": " + t.getMessage(), t);
+				} else {
+					logger.error2(status.getMessage());
 				}
 				throw new OperationCanceledException();
 			}

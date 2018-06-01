@@ -89,7 +89,7 @@ public class ExtensionUtil {
                     }
                 }
             } catch (CoreException e) {
-        		logger.error(e.getMessage(), e);
+        		logger.error2(e.getMessage(), e);
             }
         }
         return result;

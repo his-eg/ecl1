@@ -79,7 +79,7 @@ public class ProjectFromGitImporter {
                     clone.setDirectory(extensionFolder).setURI(fullRepositoryPath).setCloneAllBranches(true);
                     clone.call();
                 } catch (GitAPIException e) {
-            		logger.error(e.getMessage(), e);
+            		logger.error2(e.getMessage(), e);
                 }
 
                 IProject extensionProject = workspace.getRoot().getProject(extensionToImport);
@@ -116,7 +116,7 @@ public class ProjectFromGitImporter {
 		// git lab style, e.g. ssh://git@gitlab.his.de/h1/cs/cs.sys/cs.sys.build.utilities
 		int c1Pos = extensionToImport.indexOf('.');
 		if (c1Pos < 0) {
-	    	logger.error("Extension " + extensionToImport + ": Illegal extension name! An extension name should have at least 3 dot-separated segments!");
+	    	logger.error2("Extension " + extensionToImport + ": Illegal extension name! An extension name must have at least 3 dot-separated segments!");
 	    	return null;
 		}
 		String segment1 = extensionToImport.substring(0, c1Pos);

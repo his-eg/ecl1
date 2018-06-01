@@ -182,10 +182,10 @@ public class ExtensionImportWizardModel {
         	doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(classpathContentStream);
     		classpathContentStream.close();
     	} catch (IOException | SAXException | ParserConfigurationException e) {
-    		logger.error("Exception parsing '.classpath' file for extension " + extension  + ": " + e.getMessage(), e);
+    		logger.error2("Exception parsing '.classpath' file for extension " + extension  + ": " + e.getMessage(), e);
     	}
     	if (doc==null) {
-    		logger.error("Could not create XML document from '.classpath' file of extension " + extension);
+    		logger.error2("Could not create XML document from '.classpath' file of extension " + extension);
     		return dependencyExtensions; // return empty list
     	}
     	

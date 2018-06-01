@@ -49,7 +49,7 @@ class ExtensionPointVisitor implements IResourceVisitor {
         try {
             handleResource(resource);
         } catch (JavaModelException e) {
-    		logger.error(e.getMessage(), e);
+    		logger.error2(e.getMessage(), e);
         }
         return true;
     }
@@ -73,7 +73,7 @@ class ExtensionPointVisitor implements IResourceVisitor {
                 try {
                     resource.refreshLocal(0, null);
                 } catch (CoreException e) {
-            		logger.error(e.getMessage(), e);
+            		logger.error2(e.getMessage(), e);
                 }
                 ICompilationUnit compilationUnit = JavaCore.createCompilationUnitFrom(resource);
                 for (IType type : compilationUnit.getTypes()) {

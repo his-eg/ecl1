@@ -42,7 +42,7 @@ public class RestUtil {
             HttpClient c = new DefaultHttpClient();
             return c.execute(get, responseHandler);
         } catch (IOException e) {
-    		logger.error(e.getMessage(), e);
+    		logger.error2(e.getMessage(), e);
         }
         return null;
     }

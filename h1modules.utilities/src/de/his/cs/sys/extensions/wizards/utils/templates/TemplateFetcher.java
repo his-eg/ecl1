@@ -50,7 +50,7 @@ public class TemplateFetcher {
         		return templates;
     		}
     		// else: log a warning and try next URL
-    		logger.error("Failed loading template list from '" + templateListUrl + "', server not available?");
+    		logger.error2("Failed loading template list from '" + templateListUrl + "', server not available?");
         }
         return null; // complete fail
     }
@@ -70,7 +70,7 @@ public class TemplateFetcher {
                 logger.debug("TemplateFetcher found template '" + line + "' for download.");
             }
         } catch (IOException e) {
-        	logger.error("Error downloading template list '" + templateListUrl + "': " + e.getClass() + ": " + e.getMessage(), e);
+        	logger.error2("Error downloading template list '" + templateListUrl + "': " + e.getClass() + ": " + e.getMessage(), e);
             return null;
         }
         return result;

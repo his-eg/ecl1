@@ -51,7 +51,7 @@ public class ForEachProjectSetupStepHandler {
 				Object object = element.createExecutableExtension("class");
 				evaluate(object);
 			} catch (CoreException e) {
-	    		logger.error(e.getMessage(), e);
+	    		logger.error2(e.getMessage(), e);
 			}
 		}
 	}

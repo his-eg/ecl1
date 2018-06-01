@@ -54,7 +54,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
             }
             updateClasspathContainer(containerPath, javaProject);
         } catch (CoreException e) {
-            logger.error(e.getMessage(), e);
+            logger.error2(e.getMessage(), e);
             throw e;
         }
     }
@@ -75,7 +75,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
         try {
             updateClasspathContainer(containerPath, project);
         } catch (JavaModelException e) {
-        	logger.error(e.getMessage(), e);
+        	logger.error2(e.getMessage(), e);
         }
     }
 

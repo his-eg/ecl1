@@ -127,7 +127,7 @@ public class NewEnrollCheckerWizard extends Wizard implements INewWizard {
 				writer.close();
 				file.setContents(new ByteArrayInputStream(buffer.toByteArray()), true, true, null);
 			} catch (IOException | CoreException e) {
-	    		logger.error(e.getMessage(), e);
+	    		logger.error2(e.getMessage(), e);
 			}
 		}
 

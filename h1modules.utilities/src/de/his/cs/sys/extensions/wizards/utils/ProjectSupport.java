@@ -68,7 +68,7 @@ public class ProjectSupport {
             addProjectDependencies(project, choices.getProjectsToReference());
     		setJreEnvironment(project);
         } catch (CoreException e) {
-            logger.error("Exception creating new project '" + projectName + "': " + e.getMessage(), e);
+            logger.error2("Exception creating new project '" + projectName + "': " + e.getMessage(), e);
             project = null; // XXX: This may cause an NPE somewhere else, like in TemplateManager.writeContent()
         }
 
@@ -113,7 +113,7 @@ public class ProjectSupport {
     			javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
     		}
 	    } catch (JavaModelException e) {
-    		logger.error(e.getMessage(), e);
+    		logger.error2(e.getMessage(), e);
 	    }
 	}
 
@@ -165,7 +165,7 @@ public class ProjectSupport {
 					project.open(null);
 				}
 			} catch (CoreException e) {
-	    		logger.error(e.getMessage(), e);
+	    		logger.error2(e.getMessage(), e);
 			}
 		}
 		return project;
@@ -229,7 +229,7 @@ public class ProjectSupport {
 				IProgressMonitor monitor = null; // here we could create a proper progress monitor
 				project.setDescription(description, monitor);
 			} else {
-				logger.warn("Project nature '" + natureStr + "' could not be added. Probably it is not supported in the workspace.");
+				logger.error2("Project nature '" + natureStr + "' could not be added. Probably it is not supported in the workspace.");
 			}
 		}
 	}

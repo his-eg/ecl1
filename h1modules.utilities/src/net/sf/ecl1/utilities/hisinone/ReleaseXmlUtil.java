@@ -52,7 +52,7 @@ public class ReleaseXmlUtil {
     	if (webappsProject!=null) {
     		return webappsProject.getFolder(RELEASE_XML_FOLDER);
     	}
-		logger.error("There is no webapps project in your workspace");
+		logger.error2("There is no webapps project in your workspace");
 		return null;
     }
 
@@ -70,7 +70,7 @@ public class ReleaseXmlUtil {
                     result.add((IFile) releaseFileResource);
                 }
             } catch (CoreException e) {
-        		logger.error(e.getMessage(), e);
+        		logger.error2(e.getMessage(), e);
             }
         }
         return result;
@@ -100,12 +100,12 @@ public class ReleaseXmlUtil {
     public static String getIncrementedReleaseXmlVersionShortString() {
     	IFile releaseFile = getReleaseXmlFile("release.xml");
     	if (releaseFile==null) {
-    		logger.error("File 'release.xml' does not exist");
+    		logger.error2("File 'release.xml' does not exist");
     		return CvsTagUtil.UNKNOWN_VERSION;
     	}
         String contents = FileUtil.readContent(releaseFile);
         if (contents==null) {
-        	logger.error("IOException occurred reading file 'release.xml'");
+        	logger.error2("IOException occurred reading file 'release.xml'");
     		return CvsTagUtil.UNKNOWN_VERSION;
         }
 
@@ -126,11 +126,11 @@ public class ReleaseXmlUtil {
         	doc = builder.parse(classpathContentStream);
     		classpathContentStream.close();
     	} catch (IOException | SAXException | ParserConfigurationException e) {
-    		logger.error("Exception parsing 'release.xml' file: " + e);
+    		logger.error2("Exception parsing 'release.xml' file: " + e);
     		return CvsTagUtil.UNKNOWN_VERSION;
     	}
     	if (doc==null) {
-    		logger.error("Could not create XML document from 'release.xml' file");
+    		logger.error2("Could not create XML document from 'release.xml' file");
     		return CvsTagUtil.UNKNOWN_VERSION;
     	}
     	
@@ -139,7 +139,7 @@ public class ReleaseXmlUtil {
 		NodeList patchEntries = root.getElementsByTagName("patch");
 		int patchEntriesCount;
 		if (patchEntries==null || (patchEntriesCount = patchEntries.getLength()) == 0) {
-			logger.error("'release.xml' file does not contain <patch> elements");
+			logger.error2("'release.xml' file does not contain <patch> elements");
     		return CvsTagUtil.UNKNOWN_VERSION;
 		}
 
@@ -153,7 +153,7 @@ public class ReleaseXmlUtil {
         	String hotfixStr = patchEntry.getAttribute("name");
         	if (hotfixStr==null || !hotfixStr.startsWith(HOTFIX_PREFIX)) {
         		// log found problem but otherwise ignore it if there are other <patch> elements
-        		logger.error("Patch '" + hotfixStr + "': name does not start with expected prefix '" + HOTFIX_PREFIX + "'");
+        		logger.error2("Patch '" + hotfixStr + "': name does not start with expected prefix '" + HOTFIX_PREFIX + "'");
         		continue;
         	}
 
@@ -165,7 +165,7 @@ public class ReleaseXmlUtil {
         	try {
         		minorVersionInt = Integer.parseInt(minorVersion);
         	} catch (NumberFormatException nfe) {
-        		logger.error("Patch '" + hotfixStr + "': minor version " + minorVersion + " is not a number");
+        		logger.error2("Patch '" + hotfixStr + "': minor version " + minorVersion + " is not a number");
         		continue;
         	}
 
@@ -181,7 +181,7 @@ public class ReleaseXmlUtil {
         
         if (distinctMajorVersions2Count.isEmpty()) {
         	// there was no valid <patch> element
-        	logger.error("'release.xml' does not contain valid <patch> elements");
+        	logger.error2("'release.xml' does not contain valid <patch> elements");
     		return CvsTagUtil.UNKNOWN_VERSION;
         }
         
@@ -199,7 +199,7 @@ public class ReleaseXmlUtil {
             		maxCountMajorVersion = entry.getKey();
             	}
             }
-            logger.error("'release.xml' contains distinct major versions: " + distinctMajorVersions2Count.keySet() + ". Only one of them can be correct.");
+            logger.error2("'release.xml' contains distinct major versions: " + distinctMajorVersions2Count.keySet() + ". Only one of them can be correct.");
         }
         // return highest version with minor version incremented by 1
         return maxCountMajorVersion + "." + String.valueOf(maxMinorVersion + 1);

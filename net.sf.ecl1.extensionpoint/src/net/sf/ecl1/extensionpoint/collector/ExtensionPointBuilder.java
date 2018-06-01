@@ -72,7 +72,7 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
                 }
             }
         } catch (IOException | CoreException e) {
-    		logger.error(e.getMessage(), e);
+    		logger.error2(e.getMessage(), e);
         }
     }
 
@@ -112,7 +112,7 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
 		try {
             getProject().accept(visitor);
 		} catch (CoreException e) {
-    		logger.error(e.getMessage(), e);
+    		logger.error2(e.getMessage(), e);
 		}
 	}
 

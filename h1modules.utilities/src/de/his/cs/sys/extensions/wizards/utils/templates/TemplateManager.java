@@ -94,7 +94,7 @@ public class TemplateManager {
         		return content;
         	}
         	// else: log warning and try next URL
-        	logger.error("Failed to load template '" + templatePath + "' from '" + trimmedTemplateRootUrl + "', server not available?");
+        	logger.error2("Failed to load template '" + templatePath + "' from '" + trimmedTemplateRootUrl + "', server not available?");
         }
         return null; // complete fail
     }
@@ -122,9 +122,9 @@ public class TemplateManager {
                 result.append(temp + System.getProperty("line.separator"));
             }
         } catch (IOException e) {
-        	logger.error("Error fetching template '" + fullTemplateUrlString + "': " + e.getClass() + ": " + e.getMessage(), e);
-        	logger.error("TemplatePath: " + this.templatePath);
-        	logger.error("Variables: " + this.variables);
+        	logger.error2("Error fetching template '" + fullTemplateUrlString + "': " + e.getClass() + ": " + e.getMessage(), e);
+        	logger.error2("TemplatePath: " + this.templatePath);
+        	logger.error2("Variables: " + this.variables);
             return null;
         }
         return result.toString().trim();
@@ -147,12 +147,12 @@ public class TemplateManager {
         	}
             file.create(is, true, null);
         } catch (CoreException e) {
-        	logger.error("Error creating file from template '" + this.templatePath + "': " + e.getMessage(), e);
+        	logger.error2("Error creating file from template '" + this.templatePath + "': " + e.getMessage(), e);
         } finally {
             try {
                 is.close();
             } catch (IOException e1) {
-            	logger.error("Error creating file from template '" + this.templatePath + "': " + e1.getMessage(), e1);
+            	logger.error2("Error creating file from template '" + this.templatePath + "': " + e1.getMessage(), e1);
             }
         }
     }

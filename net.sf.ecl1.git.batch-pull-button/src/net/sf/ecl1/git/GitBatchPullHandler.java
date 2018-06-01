@@ -58,7 +58,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 									logger.info(name + " has remotes. Starting to pull remote '" + remote + "'.");
 									pull.call();
 								} catch (GitAPIException | JGitInternalException e) {
-									logger.error("Error pulling from " + name + ": " + e.getMessage() + ". Skipping and proceeding.", e);
+									logger.error2("Error pulling from " + name + ": " + e.getMessage() + ". Skipping and proceeding.", e);
 								}
 							}
 						}
@@ -66,7 +66,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 						// ignore
 						logger.info(name + " is not managed via Git: " + rnfe.getMessage());
 					} catch (IOException e) {
-						logger.error("Error pulling " + name + ": " + e.getMessage(), e);
+						logger.error2("Error pulling " + name + ": " + e.getMessage(), e);
 					}
 					logger.info("Finished " + name);
 					monitor.worked(1);

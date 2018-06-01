@@ -101,7 +101,7 @@ public class ToggleExtensionNatureAction implements IObjectActionDelegate {
 			description.setNatureIds(newNatures);
 			project.setDescription(description, null);
 		} catch (CoreException e) {
-			logger.error(e.getMessage(), e);
+			logger.error2(e.getMessage(), e);
 		}
 	}
 
