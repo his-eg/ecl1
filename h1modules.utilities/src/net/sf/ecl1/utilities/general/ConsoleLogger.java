@@ -23,7 +23,7 @@ import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
  */
 public class ConsoleLogger {
 
-    enum LogLevel {
+    public enum LogLevel {
     	DEBUG {
     		int toIStatus() { return IStatus.OK; }
     	},
@@ -218,6 +218,11 @@ public class ConsoleLogger {
     }
     
     private String getVisibleLogLevel() {
-    	return Activator.getDefault().getPreferenceStore().getString(ExtensionToolsPreferenceConstants.LOG_LEVEL_PREFERENCE);
+    	String visibleLogLevel = Activator.getDefault().getPreferenceStore().getString(ExtensionToolsPreferenceConstants.LOG_LEVEL_PREFERENCE);
+    	if (visibleLogLevel == null || visibleLogLevel.isEmpty()) {
+    		// preference store not initialized yet
+    		return "DEBUG";
+    	}
+    	return visibleLogLevel;
     }
 }
