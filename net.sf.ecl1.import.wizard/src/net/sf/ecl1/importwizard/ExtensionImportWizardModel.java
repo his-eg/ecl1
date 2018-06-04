@@ -79,8 +79,10 @@ public class ExtensionImportWizardModel {
         String branch = getBranch();
         for (String remoteProjectIncludingBranch : remoteProjectsIncludingBranch) {
             String remoteProject = remoteProjectIncludingBranch.replace("_" + branch, "");
-            //logger.debug("Found remote project '" + remoteProjectIncludingBranch + "' , store it as '" + remoteProject + "'");
-            remoteExtensions.add(remoteProject);
+            if (remoteProject!=null && !remoteProject.trim().isEmpty()) {
+            	//logger.debug("Found remote project '" + remoteProjectIncludingBranch + "' , store it as '" + remoteProject + "'");
+            	remoteExtensions.add(remoteProject);
+            }
         }
     }
 
