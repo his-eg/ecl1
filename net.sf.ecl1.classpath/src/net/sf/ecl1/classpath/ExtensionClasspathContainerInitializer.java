@@ -147,12 +147,12 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
                     IPath sourceAttachmentRootPath = null;
                     IClasspathEntry libraryEntry = JavaCore.newLibraryEntry(path, sourceAttachmentPath, sourceAttachmentRootPath, true);
                     result.add(libraryEntry);
-                    logger.info("Creating new container library entry for: " + path.toString() + "\n * exported: " + extensionNeedsToBeExported
+                    logger.debug("Creating new container library entry for: " + path.toString() + "\n * exported: " + extensionNeedsToBeExported
                     		+ "\n * sourceAttachmentPath: " + sourceAttachmentPath + "\n * sourceAttachmentRootPath: " + sourceAttachmentRootPath);
                 } else {
                     IProject project = root.getProject(extensionPath);
                     if (project.exists()) {
-                    	logger.info("Creating new container entry for project: " + project.getName() + " exported: " + extensionNeedsToBeExported);
+                    	logger.debug("Creating new container entry for project: " + project.getName() + " exported: " + extensionNeedsToBeExported);
                         IPath location = project.getLocation();
                         IClasspathEntry newProjectEntry = JavaCore.newProjectEntry(location.makeRelativeTo(workspace).makeAbsolute(), true);
                         result.add(newProjectEntry);
