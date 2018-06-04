@@ -212,7 +212,7 @@ public class ConsoleLogger {
 	        	IStatus status = new Status(logLevel.toIStatus(), pluginId, message, t);
 	        	errorLogLogger.log(status);
 			} else {
-				warn("errorLogLogger is null, cannot log to 'Error Log' view!", new Throwable());
+				debug("errorLogLogger is null, cannot log to 'Error Log' view!", new Throwable());
 			}
 		}
     }

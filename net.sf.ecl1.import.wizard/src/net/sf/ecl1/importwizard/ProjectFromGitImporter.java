@@ -2,6 +2,7 @@ package net.sf.ecl1.importwizard;
 
 import h1modules.utilities.utils.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.preferences.PreferenceInitializer;
 
 import java.io.File;
 import java.util.Map;
@@ -23,9 +24,6 @@ import org.eclipse.jgit.api.errors.GitAPIException;
  * @author keunecke
  */
 public class ProjectFromGitImporter {
-
-	private static final String GIT_BASE_REPOSITORY_PATH = "ssh://git@git.his.de/";
-	private static final String GITLAB_BASE_REPOSITORY_PATH = "ssh://git@gitlab.his.de/";
 	
 	private static final ConsoleLogger logger = new ConsoleLogger();
 	
@@ -52,16 +50,15 @@ public class ProjectFromGitImporter {
      * Import an extension into local eclipse workspace
      *
      * @param extensionToImport name to the extension
-     * @param config configuration from Jenkins
      * 
      * @throws CoreException
      */
-    public void importProject(String extensionToImport, Map<String, String> configProps) throws CoreException {
+    public void importProject(String extensionToImport) throws CoreException {
     	
         disableAutoBuild();
         
         // Compute full repository URL depending on configuration
-        String fullRepositoryPath = getFullRepositoryPath(extensionToImport, configProps);
+        String fullRepositoryPath = getFullRepositoryPath(extensionToImport);
     	logger.debug("Extension " + extensionToImport + ": fullRepositoryPath = " + fullRepositoryPath);
     	if (fullRepositoryPath != null) {
             IWorkspace workspace = ResourcesPlugin.getWorkspace();
@@ -102,13 +99,10 @@ public class ProjectFromGitImporter {
     	}
     }
     
-    private String getFullRepositoryPath(String extensionToImport, Map<String, String> configProps) {
-    	logger.debug("Extension " + extensionToImport + ": Extension importer configProps = " + configProps);
+    private String getFullRepositoryPath(String extensionToImport) {
     	logger.debug("Extension " + extensionToImport + ": baseRepositoryPath = " + baseRepositoryPath);
-    	
-        String urlStyle = configProps!=null ? configProps.get("urlStyle") : null;
         
-    	if (urlStyle!=null && urlStyle.equals("legacy")) {
+    	if (PreferenceInitializer.IS_LEGACY_GIT_URL_STYLE) {
     		// traditional git URL, e.g. ssh://git@git.his.de/cs.sys.build.utilities
     		return baseRepositoryPath + extensionToImport;
     	}
@@ -130,7 +124,7 @@ public class ProjectFromGitImporter {
 		}
 		// Create new URL according to https://hiszilla.his.de/hiszilla/show_bug.cgi?id=194146
 		// The old HIS git default is overwritten by the new gitlab; other values (e.g. from universities) are left untouched.
-		String basePath = GIT_BASE_REPOSITORY_PATH.equals(baseRepositoryPath) ? GITLAB_BASE_REPOSITORY_PATH : baseRepositoryPath;
+		String basePath = PreferenceInitializer.GIT_BASE_REPOSITORY_PATH.equals(baseRepositoryPath) ? PreferenceInitializer.GITLAB_BASE_REPOSITORY_PATH : baseRepositoryPath;
 		return basePath + "h1/" + segment1 + "/" + segment1 + "." + segment2 + "/" + extensionToImport;
     }
     

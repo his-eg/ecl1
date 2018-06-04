@@ -42,9 +42,6 @@ public class ExtensionImportJob extends Job {
     
     private static final String ERROR_MESSAGE_EXISTING_FOLDER = "Your workspace contains folders named like extensions you want to import: %s\n\nThese folders must be deleted before the import, but first you might want to check if they contain files you want to keep. Then delete the folders manually or set the 'Delete folders?' option on the confirmation page of this wizard.";
     private static final String ERROR_MESSAGE_DELETE_FAILED = "Some extensions could not be imported, because deleting existing folders before the import failed: %s";
-    
-    // extension import configuration
-    private Map<String, String> configProps;
 
 	private Collection<String> extensionsToImport;
 	private boolean openProjectsAfterImport;
@@ -55,17 +52,6 @@ public class ExtensionImportJob extends Job {
 		this.extensionsToImport = extensionsToImport;
 		this.openProjectsAfterImport = openProjectsAfterImport;
 		this.deleteFolders = deleteFolders;
-		
-		// read configuration from Jenkins
-        IPreferenceStore store = Activator.getPreferences();
-        String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE); // z.B. "http://build.his.de/build/"
-        String configFile = buildServer + "userContent/ecl1.properties";
-        String configStr = new RemoteProjectSearchSupport().getRemoteFileContent(configFile);
-        try {
-        	configProps = PropertyUtil.stringToProperties(configStr);
-        } catch (ParseException e) {
-        	logger.error2("Error parsing extension import configuration: " + e.getMessage(), e);
-		}
 	}
 
     @Override
@@ -137,7 +123,7 @@ public class ExtensionImportJob extends Job {
                 logger.info(taskName);
 
                 // do one task
-                importer.importProject(extension, configProps);
+                importer.importProject(extension);
                 // reduce total work by 1
                 subMonitor.worked(1);
             } catch (InterruptedException | CoreException e) {

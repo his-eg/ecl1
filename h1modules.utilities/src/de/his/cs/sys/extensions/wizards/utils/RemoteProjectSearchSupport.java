@@ -60,7 +60,7 @@ public class RemoteProjectSearchSupport {
         String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE); // z.B. "http://build.his.de/build/"
         String buildServerView = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE); // branch
         String lookUpTarget = buildServer + JENKINS_VIEW_INFIX + buildServerView + JENKINS_API_ADDITION;
-        logger.info("Get projects from " + lookUpTarget);
+        logger.debug("Get projects from " + lookUpTarget);
         TreeSet<String> result = new TreeSet<String>();
         InputStream jsonStream = RestUtil.getJsonStream(lookUpTarget);
         if (jsonStream != null) {
