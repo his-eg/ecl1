@@ -166,47 +166,41 @@ public class ConsoleLogger {
     private void log(LogLevel logLevel, String message, Throwable t, boolean insertIntoErrorLogView) {
     	LogLevel visibleLogLevel = LogLevel.valueOf(getVisibleLogLevel());
 		if (logLevel.ordinal() >= visibleLogLevel.ordinal()) {
-			// https://www.eclipse.org/forums/index.php/t/172855/ :
-			// Setting colors must be run synchronized to avoid an illegal thread access exception.
-			Display.getDefault().syncExec(new Runnable() {
-				public void run() {
-					// prepare full message
-	            	String logLevelStr = logLevel.toString() + ": ";
-	            	if (logLevelStr.length()==6) logLevelStr += " ";
-	                String fullMessage = logLevelStr + message + "\n";
-	                // add stack trace if available
-	                if (t != null) {
-	                    for (StackTraceElement elem : t.getStackTrace()) {
-	                    	fullMessage += "   " + elem + "\n";
-	                    }
-	                }
-	                // create stream, eventually set color
-					MessageConsoleStream newMessageStream = console.newMessageStream();
-		            if (logLevel == LogLevel.ERROR) {
-		            	Color red = new Color(null, 255, 0, 0);
-		            	newMessageStream.setColor(red); 
-		            }
-		            // stream
-		            try {
-		                newMessageStream.write(fullMessage);
-		                newMessageStream.flush();
-		            } catch (IOException e) {
-		            	System.err.println("IOException while writing message to console: " + e.getMessage());
-		                e.printStackTrace();
-		                System.err.println("The message was: " + message);
-		            } finally {
-		                try {
-		                    newMessageStream.close();
-		                } catch (IOException e) {
-			            	System.err.println("IOException at closing MessageConsoleStream: " + e.getMessage());
-			                e.printStackTrace();
-		                }
-		            }
-				}
-			});
+			// prepare full message
+        	String logLevelStr = logLevel.toString() + ": ";
+        	if (logLevelStr.length()==6) logLevelStr += " ";
+            String fullMessage = logLevelStr + message + "\n";
+            // add stack trace if available
+            if (t != null) {
+                for (StackTraceElement elem : t.getStackTrace()) {
+                	fullMessage += "   " + elem + "\n";
+                }
+            }
+			MessageConsoleStream newMessageStream = console.newMessageStream();
+			// XXX: It would be nice to print error messages in red text color. But setting colors must be
+			// run synchronized to avoid an "Illegal thread access" SWTException in the std::out console;
+			// and Display.syncExec() in combination with Eclipse workers leads to a deadlock on some systems.
+			// See https://www.eclipse.org/forums/index.php/t/172855/
+			// and https://bugs.eclipse.org/bugs/show_bug.cgi?id=283490
+			// So we better forget the coloring...
+            try {
+                newMessageStream.write(fullMessage);
+                newMessageStream.flush();
+            } catch (IOException e) {
+            	System.err.println("IOException while writing message to console: " + e.getMessage());
+                e.printStackTrace();
+                System.err.println("The message was: " + message);
+            } finally {
+                try {
+                    newMessageStream.close();
+                } catch (IOException e) {
+	            	System.err.println("IOException at closing MessageConsoleStream: " + e.getMessage());
+	                e.printStackTrace();
+                }
+            }
         }
 		
-        // Also log in "Error Log" view?
+        // Log in "Error Log" view as well?
 		if (insertIntoErrorLogView) {
 			if (errorLogLogger != null) {
 	        	IStatus status = new Status(logLevel.toIStatus(), pluginId, message, t);

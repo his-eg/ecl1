@@ -48,12 +48,22 @@ public class P2Util {
 		try {
 			checkForUpdates(agent, monitor);
 		} finally {
-			bundleContext.ungetService(reference);
+			// TODO: In rare cases, the following ungetService() statement throws an IllegalStateException.
+			// From https://www.cct.lsu.edu/~rguidry/ecl31docs/api/org/osgi/framework/BundleContext.html:
+			// "The BundleContext object is only valid during the execution of its context bundle; 
+			// that is, during the period from when the context bundle is in the STARTING, STOPPING, 
+			// and ACTIVE bundle states. If the BundleContext object is used subsequently, an 
+			// IllegalStateException must be thrown."
+			try {
+				bundleContext.ungetService(reference);
+			} catch (IllegalStateException e) {
+				logger.error2("bundleContext.ungetService() failed: " + e.getMessage(), e); 
+			}
 		}
 	}
 
 	static IStatus checkForUpdates(IProvisioningAgent agent, IProgressMonitor monitor) throws OperationCanceledException {
-		
+		ProvisioningSession session = new ProvisioningSession(agent);
 		// Here we restrict the possible updates to ecl1
 		IQuery<IInstallableUnit> query = QueryUtil.createLatestQuery(QueryUtil.createIUQuery("h1modulesfeature.feature.group"));
 		logger.debug("Update Query Expression: " + query.getExpression());
@@ -63,7 +73,6 @@ public class P2Util {
 		Set<IInstallableUnit> unitsForUpdate = result.toUnmodifiableSet();
 		logger.debug("Installable Units for update: " + unitsForUpdate);
 		
-		ProvisioningSession session = new ProvisioningSession(agent);
 		UpdateOperation operation = new UpdateOperation(session);
 		if(!unitsForUpdate.isEmpty()) {
 			logger.info("Creating UpdateOperation for: " + unitsForUpdate);
