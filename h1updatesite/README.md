@@ -3,6 +3,9 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 0.8.1.2018-06-13##
+* Fixed deadlock while logging occurring on some systems
+
 ##Version 0.8.0.2018-06-04##
 * Prepared ExtensionImporter for transition from git to gitlab
 * Improved ChangeSetExporter input validation
