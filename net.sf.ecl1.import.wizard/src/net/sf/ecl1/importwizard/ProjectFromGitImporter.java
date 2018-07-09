@@ -107,17 +107,17 @@ public class ProjectFromGitImporter {
     		return baseRepositoryPath + extensionToImport;
     	}
 
-		// git lab style, e.g. ssh://git@gitlab.his.de/h1/cs/cs.sys/cs.sys.build.utilities
+		// git lab style, e.g. ssh://git@gitlab.his.de/h1/cs/sys/cs.sys.build.utilities
 		int c1Pos = extensionToImport.indexOf('.');
 		if (c1Pos < 0) {
-	    	logger.error2("Extension " + extensionToImport + ": Illegal extension name! An extension name must have at least 3 dot-separated segments!");
+	    	logger.error2("Extension " + extensionToImport + ": Illegal extension name! An extension name must have at least 2 dot-separated segments!");
 	    	return null;
 		}
 		String segment1 = extensionToImport.substring(0, c1Pos);
 		String segment2;
 		int c2Pos = extensionToImport.indexOf('.', c1Pos+1);
 		if (c2Pos < 0) {
-			// rt.rtt has only 2 segments...
+			// Some extensions like pm.hrm or rt.rtt have only 2 segments...
 			segment2 = extensionToImport.substring(c1Pos+1);
 		} else {
 			segment2 = extensionToImport.substring(c1Pos+1, c2Pos);
@@ -125,7 +125,7 @@ public class ProjectFromGitImporter {
 		// Create new URL according to https://hiszilla.his.de/hiszilla/show_bug.cgi?id=194146
 		// The old HIS git default is overwritten by the new gitlab; other values (e.g. from universities) are left untouched.
 		String basePath = PreferenceInitializer.GIT_BASE_REPOSITORY_PATH.equals(baseRepositoryPath) ? PreferenceInitializer.GITLAB_BASE_REPOSITORY_PATH : baseRepositoryPath;
-		return basePath + "h1/" + segment1 + "/" + segment1 + "." + segment2 + "/" + extensionToImport;
+		return basePath + "h1/" + segment1 + "/" + segment2 + "/" + extensionToImport;
     }
     
     private void enableAutoBuild() throws CoreException {
