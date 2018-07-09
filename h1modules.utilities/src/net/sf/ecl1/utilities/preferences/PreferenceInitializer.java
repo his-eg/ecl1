@@ -45,16 +45,25 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URLS, "http://devtools.his.de/ecl1/templates,http://ecl1.sourceforge.net/templates");
 		store.setDefault(ExtensionToolsPreferenceConstants.LOG_LEVEL_PREFERENCE, "INFO");
 		
-		// read ecl1 configuration: note that the build server URL may not be the default preference!
+		// Read ecl1 configuration: Note that the build server URL may not be the default preference!
+		// Furthermore we may get errors like UnknownHostException when the build server is not available
+		// (no VPN, universities have no access etc.) In that case we will use the new gitlab URL style.
+		// This should be ok for all after the migration to gitlab went through.
         String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE);
 		String configFile = buildServer + "userContent/ecl1.properties";
-        String configStr = new RemoteProjectSearchSupport().getRemoteFileContent(configFile);
+		String configStr = null;
+		try {
+			configStr = new RemoteProjectSearchSupport().getRemoteFileContent(configFile);
+		} catch (Exception e) {
+        	logger.error2("Unable to read ecl1 configuration. Do you have access to " + buildServer + " ? The original message was " + e.getMessage(), e);
+		}
         try {
         	Map<String, String> configProps = PropertyUtil.stringToProperties(configStr);
             String urlStyle = configProps!=null ? configProps.get("urlStyle") : null;
             IS_LEGACY_GIT_URL_STYLE = urlStyle!=null && urlStyle.equals("legacy");
         } catch (ParseException e) {
         	logger.error2("Error parsing extension import configuration: " + e.getMessage(), e);
+        	IS_LEGACY_GIT_URL_STYLE = false;
 		}
 
         // set default git server url in dependency of the configuration
