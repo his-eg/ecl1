@@ -43,8 +43,10 @@ public class ChangeSetExporterWizardPage extends WizardPage {
 
     private Collection<ChangeSet> changes = ChangeSetExportWizardPlugin.getDefault().getChangeSets();
 
+    // a map from change set titles to change sets
     private Map<String, ChangeSet> itemToChangeMap = Maps.newHashMap();
 
+    // the selected change set table element
     private TableItem selectedChangeTableItem;
 
     private StringFieldEditor hotfixTitle;
@@ -222,11 +224,20 @@ public class ChangeSetExporterWizardPage extends WizardPage {
     }
 
     private void checkSetHotfixFileNames() {
-    	// validation is always on when reading files from Change Set
+    	// Validation is always on when reading files from Change Set...
     	
-    	this.hotfixFileNames = new ArrayList<>();
+    	// Get the change set corresponding to the selected table item:
+        // * itemToChangeMap is a map from titles to change sets
+        // * The change set title is given by selectedChangeTableItem.getText() or getText(0), the comment by getText(1)
         Assert.assertNotNull(selectedChangeTableItem); // verified by ChangeSetExportWizard.finish()
-        ChangeSet selectedChangeSet = itemToChangeMap.get(selectedChangeTableItem.getText(1));
+        logger.debug("selectedChangeTableItem = " + selectedChangeTableItem);
+        String changeSetTitle = selectedChangeTableItem.getText();
+        logger.debug("changeSetTitle = " + changeSetTitle);
+        logger.debug("itemToChangeMap = " + itemToChangeMap);
+        ChangeSet selectedChangeSet = itemToChangeMap.get(changeSetTitle);
+        
+        // Check all files
+    	this.hotfixFileNames = new ArrayList<>();
         java.util.List<String> ignored = Lists.newLinkedList();
         if (selectedChangeSet != null) {
             java.util.List<IResource> resources = Arrays.asList(selectedChangeSet.getResources());
@@ -235,7 +246,7 @@ public class ChangeSetExporterWizardPage extends WizardPage {
 	                for (IResource changedResource : resources) {
 	                    IPath qisserver = new Path("qisserver/");
 	                    IPath changedResourceProjectRelativePath = changedResource.getProjectRelativePath();
-	                    // only resources from within qisserver are considered
+	                    // only resources inside qisserver are considered
 	                    IPath path = changedResourceProjectRelativePath.makeRelativeTo(qisserver);
 	                    String name = path.toString();
 	                    if (qisserver.isPrefixOf(changedResourceProjectRelativePath)) {
