@@ -3,6 +3,9 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 0.8.3.2018-11-19##
+* Fixed false error message "The selected ChangeSet contains no files!" when change set title and comment were different
+
 ##Version 0.8.2.2018-07-09##
 * Adapted modification in gitlab URL scheme.
 * Catch and log exception when build server is not accessible.
