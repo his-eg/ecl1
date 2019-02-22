@@ -20,12 +20,11 @@ import org.eclipse.swt.widgets.TableItem;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 /**
+ * The ecl1 classpath container edit page.
  * @author keunecke
- *
  */
 public class ExtensionClasspathContainerPage extends WizardPage implements IClasspathContainerPage {
 
