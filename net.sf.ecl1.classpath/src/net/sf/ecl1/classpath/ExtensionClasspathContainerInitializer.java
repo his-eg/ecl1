@@ -27,7 +27,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
@@ -83,7 +82,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
     	HashSet<String> extensionsForClasspathContainerSet = getExtensionsForClasspathContainerAsSet(containerPath);
         Collection<IClasspathEntry> classpathContainerEntryList = Collections2.filter(createClasspathContainerEntries(project, extensionsForClasspathContainerSet), Predicates.notNull());
         if (!classpathContainerEntryList.isEmpty()) {
-            IClasspathEntry[] classpathContainerEntryArray = Lists.newArrayList(classpathContainerEntryList).toArray(new IClasspathEntry[classpathContainerEntryList.size()]);
+            IClasspathEntry[] classpathContainerEntryArray = classpathContainerEntryList.toArray(new IClasspathEntry[classpathContainerEntryList.size()]);
             ExtensionClassPathContainer extensionClassPathContainer = new ExtensionClassPathContainer(containerPath, classpathContainerEntryArray);
             IClasspathContainer[] iClasspathContainers = new IClasspathContainer[] { extensionClassPathContainer };
             IJavaProject[] iJavaProjects = new IJavaProject[] { project };
