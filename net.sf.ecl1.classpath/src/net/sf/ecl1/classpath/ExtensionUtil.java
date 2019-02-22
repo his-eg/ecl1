@@ -1,15 +1,22 @@
 package net.sf.ecl1.classpath;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IJavaProject;
 
 import com.google.common.collect.Lists;
 
@@ -18,31 +25,43 @@ import net.sf.ecl1.utilities.hisinone.HisConstants;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
 /**
- * Utilities for extension handling
+ * Utilities for extension handling.
  * @author keunecke
- *
  */
 public class ExtensionUtil {
 
     private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
+	// singleton
+    private static final ExtensionUtil INSTANCE = new ExtensionUtil();
+
     private IProject webappsProject;
 
-    public ExtensionUtil() {
+    private ExtensionUtil() {
+    	// singleton
+    }
+    
+    /**
+     * @return the single ExtensionUtil instance
+     */
+    public static ExtensionUtil getInstance() {
+    	return INSTANCE;
+    }
+    
+    /**
+     * Find the webapps project in the workspace if there is one.
+     */
+    public void findWebappsProject() {
         webappsProject = WebappsUtil.findWebappsProject();
     }
     
-    public boolean doesExtensionJarExist(String extension) {
-        return doesExtensionExistAsJar(extension);
-    }
-
     /**
      * checks if an extension jar in webapps project exists
      *
      * @param extension
      * @return
      */
-    private boolean doesExtensionExistAsJar(String extension) {
+    public boolean doesExtensionJarExist(String extension) {
         if (webappsProject != null) {
             IPath extensionJarPath = new Path(HisConstants.EXTENSIONS_FOLDER).append(extension).addFileExtension("jar");
             return webappsProject.exists(extensionJarPath);
@@ -93,5 +112,46 @@ public class ExtensionUtil {
             }
         }
         return result;
+    }
+
+    /**
+     * Scan the java project for jar files in the extensions folder
+     *
+     * @param javaProject
+     * @param extensions
+     */
+    public void scanForExtensionJars(IJavaProject javaProject, Map<String, String> extensions) {
+        //scan workspace for extension jars
+        IFolder extensionsFolder = javaProject.getProject().getFolder(HisConstants.EXTENSIONS_FOLDER);
+        if (extensionsFolder.exists()) {
+            //if there is an extensions folder, scan it
+            IPath rawLocation = extensionsFolder.getRawLocation();
+            List<File> extensionJars = Arrays.asList(rawLocation.toFile().listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name != null && name.endsWith("jar");
+                }
+            }));
+            for (File extensionJar : extensionJars) {
+                extensions.put(extensionJar.getName().replace(".jar", ""), extensionJar.getName());
+            }
+        }
+    }
+
+    /**
+     * Scans for extension projects in workspace
+     *
+     * @param javaProject
+     * @param extensions
+     */
+    public void scanForExtensionProjects(Map<String, String> extensions) {
+        //scan workspace for extension projects
+        IWorkspaceRoot ws = ResourcesPlugin.getWorkspace().getRoot();
+        List<IProject> projects = Arrays.asList(ws.getProjects(0));
+        for (IProject project : projects) {
+            if (isExtensionProject(project)) {
+                extensions.put(project.getName(), project.getName());
+            }
+        }
     }
 }

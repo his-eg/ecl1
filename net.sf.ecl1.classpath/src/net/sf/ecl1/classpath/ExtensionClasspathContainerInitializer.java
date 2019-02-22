@@ -1,16 +1,12 @@
 package net.sf.ecl1.classpath;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -39,7 +35,9 @@ import net.sf.ecl1.utilities.hisinone.HisConstants;
 public class ExtensionClasspathContainerInitializer extends ClasspathContainerInitializer {
 
     private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
-
+    
+    private static final ExtensionUtil EXTENSION_UTIL = ExtensionUtil.getInstance();
+    
     @Override
     public void initialize(IPath containerPath, IJavaProject javaProject) throws CoreException {
         try {
@@ -79,6 +77,10 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
      * @throws JavaModelException
      */
     private void updateClasspathContainer(final IPath containerPath, final IJavaProject project) throws JavaModelException {
+    	// search for webapps each time we want to update the classpath container
+    	EXTENSION_UTIL.findWebappsProject();
+    	
+    	// now search extensions etc.
     	HashSet<String> extensionsForClasspathContainerSet = getExtensionsForClasspathContainerAsSet(containerPath);
         Collection<IClasspathEntry> classpathContainerEntryList = Collections2.filter(createClasspathContainerEntries(project, extensionsForClasspathContainerSet), Predicates.notNull());
         if (!classpathContainerEntryList.isEmpty()) {
@@ -104,17 +106,16 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
             String extensionsForClasspathContainerStr = containerPath.segment(1);
             if (extensionsForClasspathContainerStr != null) {
                 List<String> extensionsForClasspathContainerList = Splitter.on(",").splitToList(extensionsForClasspathContainerStr);
-                ExtensionUtil extensionUtil = new ExtensionUtil(); // avoids searching webapps for each checked project
                 for (String extension : extensionsForClasspathContainerList) {
-                    boolean projectExists = extensionUtil.doesExtensionProjectExist(extension);
-                    boolean jarExists = extensionUtil.doesExtensionJarExist(extension);
+                    boolean projectExists = EXTENSION_UTIL.doesExtensionProjectExist(extension);
+                    boolean jarExists = EXTENSION_UTIL.doesExtensionJarExist(extension);
                     if (projectExists || jarExists) {
                         extensionsForClasspathContainer.add(extension);
                     }
                 }
             }
         }
-        logger.debug("Extensions to add to the ecl1 classpath container: " + extensionsForClasspathContainer);
+        logger.info("Extensions to add to the ecl1 classpath container: " + extensionsForClasspathContainer);
         return extensionsForClasspathContainer;
     }
 
@@ -123,8 +124,8 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
         
     	// Find all extensions in the project
         Map<String, String> extensions = new HashMap<String, String>();
-        scanForExtensionJars(javaProject, extensions);
-        scanForExtensionProjects(extensions);
+        EXTENSION_UTIL.scanForExtensionJars(javaProject, extensions);
+        EXTENSION_UTIL.scanForExtensionProjects(extensions);
 
         for (Map.Entry<String, String> extension : extensions.entrySet()) {
             String extensionName = extension.getKey();
@@ -159,47 +160,4 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
         }
         return result;
     }
-
-    /**
-     * Scans for extension projects in workspace
-     *
-     * @param javaProject
-     * @param extensions
-     */
-    private void scanForExtensionProjects(Map<String, String> extensions) {
-        //scan workspace for extension projects
-        IWorkspaceRoot ws = ResourcesPlugin.getWorkspace().getRoot();
-        List<IProject> projects = Arrays.asList(ws.getProjects(0));
-        ExtensionUtil extensionUtil = new ExtensionUtil(); // avoids searching webapps for each checked project
-        for (IProject project : projects) {
-            if (extensionUtil.isExtensionProject(project)) {
-                extensions.put(project.getName(), project.getName());
-            }
-        }
-    }
-
-    /**
-     * Scan the java project for jar files in the extensions folder
-     *
-     * @param javaProject
-     * @param extensions
-     */
-    private void scanForExtensionJars(IJavaProject javaProject, Map<String, String> extensions) {
-        //scan workspace for extension jars
-        IFolder extensionsFolder = javaProject.getProject().getFolder(HisConstants.EXTENSIONS_FOLDER);
-        if (extensionsFolder.exists()) {
-            //if there is an extensions folder, scan it
-            IPath rawLocation = extensionsFolder.getRawLocation();
-            List<File> extensionJars = Arrays.asList(rawLocation.toFile().listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File dir, String name) {
-                    return name != null && name.endsWith("jar");
-                }
-            }));
-            for (File extensionJar : extensionJars) {
-                extensions.put(extensionJar.getName().replace(".jar", ""), extensionJar.getName());
-            }
-        }
-    }
-
 }

@@ -35,6 +35,8 @@ public class ExtensionClasspathContainerPage extends WizardPage implements IClas
 
     private static final String ECL1_CLASSPATH_CONTAINER = "ecl1 Classpath Container";
 
+    private static final ExtensionUtil EXTENSION_UTIL = ExtensionUtil.getInstance();
+
     private IPath selection;
 
     private Table extensionsTable;
@@ -71,7 +73,10 @@ public class ExtensionClasspathContainerPage extends WizardPage implements IClas
             c.setText(header);
         }
 
-        Collection<String> extensions = findExtensionJarsEligibleForClassPathAddition();
+        // before searching extensions, we search for webapps dynamically just in case it has been created after startup
+    	EXTENSION_UTIL.findWebappsProject();
+    	// search all extensions eligible to be added to the classpath container
+        Collection<String> extensions = EXTENSION_UTIL.findExtensionJars();
         for (String extensionName : extensions) {
             TableItem tableItem = new TableItem(extensionsTable, SWT.NONE);
             tableItem.setText(1, extensionName);
@@ -83,10 +88,6 @@ public class ExtensionClasspathContainerPage extends WizardPage implements IClas
 
         updateExtensionsTextfieldFromPath();
         setControl(composite);
-    }
-
-    private Collection<String> findExtensionJarsEligibleForClassPathAddition() {
-        return new ExtensionUtil().findExtensionJars();
     }
 
     @Override
