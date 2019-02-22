@@ -1,6 +1,3 @@
-/**
- *
- */
 package net.sf.ecl1.classpath;
 
 import java.io.File;
@@ -36,15 +33,13 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
 
 /**
- * Classpath Initializer for HISinOne-Extension projects
+ * Initializes the ecl1 classpath container with HISinOne-Extension projects
  *
  * @author keunecke
  */
 public class ExtensionClasspathContainerInitializer extends ClasspathContainerInitializer {
 
     private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
-
-    private final Collection<String> extensionsForClassPath = new HashSet<>();
 
     @Override
     public void initialize(IPath containerPath, IJavaProject javaProject) throws CoreException {
@@ -85,11 +80,11 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
      * @throws JavaModelException
      */
     private void updateClasspathContainer(final IPath containerPath, final IJavaProject project) throws JavaModelException {
-        initializeExtensionsToAddToClasspath(containerPath);
-        Collection<IClasspathEntry> entryList = Collections2.filter(Arrays.asList(createEntries(project)), Predicates.notNull());
-        if (!entryList.isEmpty()) {
-            IClasspathEntry[] array = Lists.newArrayList(entryList).toArray(new IClasspathEntry[entryList.size()]);
-            ExtensionClassPathContainer extensionClassPathContainer = new ExtensionClassPathContainer(containerPath, array);
+    	HashSet<String> extensionsForClasspathContainerSet = getExtensionsForClasspathContainerAsSet(containerPath);
+        Collection<IClasspathEntry> classpathContainerEntryList = Collections2.filter(createClasspathContainerEntries(project, extensionsForClasspathContainerSet), Predicates.notNull());
+        if (!classpathContainerEntryList.isEmpty()) {
+            IClasspathEntry[] classpathContainerEntryArray = Lists.newArrayList(classpathContainerEntryList).toArray(new IClasspathEntry[classpathContainerEntryList.size()]);
+            ExtensionClassPathContainer extensionClassPathContainer = new ExtensionClassPathContainer(containerPath, classpathContainerEntryArray);
             IClasspathContainer[] iClasspathContainers = new IClasspathContainer[] { extensionClassPathContainer };
             IJavaProject[] iJavaProjects = new IJavaProject[] { project };
             JavaCore.setClasspathContainer(containerPath, iJavaProjects, iClasspathContainers, new NullProgressMonitor());
@@ -99,45 +94,46 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
     }
 
     /**
-     * Initialize Extension needed to be added to Classpath
+     * Determine the extensions that need to be added to the ecl1 classpath container.
      *
      * @param containerPath
+     * @return set of extension that need to be added to the classpath container
      */
-    private void initializeExtensionsToAddToClasspath(IPath containerPath) {
-        this.extensionsForClassPath.clear();
+    private HashSet<String> getExtensionsForClasspathContainerAsSet(IPath containerPath) {
+    	HashSet<String> extensionsForClasspathContainer = new HashSet<>();
         if (containerPath != null && containerPath.segmentCount() == 2) {
-            String commaSeparatedExtensionsToIgnore = containerPath.segment(1);
-            if (commaSeparatedExtensionsToIgnore != null) {
-                List<String> extensionsToIgnore = Splitter.on(",").splitToList(commaSeparatedExtensionsToIgnore);
+            String extensionsForClasspathContainerStr = containerPath.segment(1);
+            if (extensionsForClasspathContainerStr != null) {
+                List<String> extensionsForClasspathContainerList = Splitter.on(",").splitToList(extensionsForClasspathContainerStr);
                 ExtensionUtil extensionUtil = new ExtensionUtil(); // avoids searching webapps for each checked project
-                for (String extension : extensionsToIgnore) {
+                for (String extension : extensionsForClasspathContainerList) {
                     boolean projectExists = extensionUtil.doesExtensionProjectExist(extension);
                     boolean jarExists = extensionUtil.doesExtensionJarExist(extension);
                     if (projectExists || jarExists) {
-                        extensionsForClassPath.add(extension);
+                        extensionsForClasspathContainer.add(extension);
                     }
                 }
             }
         }
-        logger.debug("Extensions for export: " + extensionsForClassPath);
+        logger.debug("Extensions to add to the ecl1 classpath container: " + extensionsForClasspathContainer);
+        return extensionsForClasspathContainer;
     }
 
-    private IClasspathEntry[] createEntries(IJavaProject javaProject) {
+    private ArrayList<IClasspathEntry> createClasspathContainerEntries(IJavaProject javaProject, HashSet<String> extensionsForClasspathContainer) {
+        ArrayList<IClasspathEntry> result = new ArrayList<>();
+        
+    	// Find all extensions in the project
         Map<String, String> extensions = new HashMap<String, String>();
-
         scanForExtensionJars(javaProject, extensions);
         scanForExtensionProjects(extensions);
 
-        ArrayList<IClasspathEntry> result = new ArrayList<>();
-
-        //uniquely register extensions either as jar or as project
         for (Map.Entry<String, String> extension : extensions.entrySet()) {
-
             String extensionName = extension.getKey();
             String extensionPath = extension.getValue();
 
-            boolean extensionNeedsToBeExported = extensionNeedsToBeAddedToClasspath(extensionName);
-            if (extensionNeedsToBeExported) {
+            if (extensionsForClasspathContainer.contains(extensionName)) {
+            	// We want the extension to be added to the classpath container.
+                // Uniquely register extensions either as jar or as project.
                 IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
                 IPath workspace = root.getRawLocation();
                 if (extensionPath.endsWith(".jar")) {
@@ -147,12 +143,12 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
                     IPath sourceAttachmentRootPath = null;
                     IClasspathEntry libraryEntry = JavaCore.newLibraryEntry(path, sourceAttachmentPath, sourceAttachmentRootPath, true);
                     result.add(libraryEntry);
-                    logger.debug("Creating new container library entry for: " + path.toString() + "\n * exported: " + extensionNeedsToBeExported
+                    logger.debug("Creating new container entry for library: " + path.toString()
                     		+ "\n * sourceAttachmentPath: " + sourceAttachmentPath + "\n * sourceAttachmentRootPath: " + sourceAttachmentRootPath);
                 } else {
                     IProject project = root.getProject(extensionPath);
                     if (project.exists()) {
-                    	logger.debug("Creating new container entry for project: " + project.getName() + " exported: " + extensionNeedsToBeExported);
+                    	logger.debug("Creating new container entry for project: " + project.getName());
                         IPath location = project.getLocation();
                         IClasspathEntry newProjectEntry = JavaCore.newProjectEntry(location.makeRelativeTo(workspace).makeAbsolute(), true);
                         result.add(newProjectEntry);
@@ -162,18 +158,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
                 }
             }
         }
-        return result.toArray(new IClasspathEntry[result.size()]);
-    }
-
-    /**
-     * Determine if extension should be added to classpath
-     *
-     * @param extensionName
-     * @return true iff extensionName is contained in container path
-     */
-    private boolean extensionNeedsToBeAddedToClasspath(String extensionName) {
-        boolean extensionIsListed = extensionsForClassPath.contains(extensionName);
-        return extensionIsListed;
+        return result;
     }
 
     /**
