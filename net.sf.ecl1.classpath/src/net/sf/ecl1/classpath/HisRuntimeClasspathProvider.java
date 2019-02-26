@@ -75,7 +75,7 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
 
 			// add Java extensions to runtime classpath
             IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-			Map<String, String> extensions = ExtensionUtil.getInstance().findAllExtensions(javaProject);
+			Map<String, String> extensions = ExtensionUtil.getInstance().findAllExtensions();
 			if (extensions!=null && extensions.size()>0) {
 				for (Map.Entry<String, String> extensionEntry : extensions.entrySet()) {
 					String simpleExtensionPath = extensionEntry.getValue();

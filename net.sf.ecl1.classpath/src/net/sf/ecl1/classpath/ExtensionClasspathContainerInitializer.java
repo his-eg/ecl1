@@ -121,9 +121,10 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
     private ArrayList<IClasspathEntry> createClasspathContainerEntries(IJavaProject javaProject, HashSet<String> extensionsForClasspathContainer) {
         ArrayList<IClasspathEntry> result = new ArrayList<>();
         
-    	// Find all extensions; extension projects override extension jars
-        Map<String, String> extensions = EXTENSION_UTIL.findAllExtensions(javaProject);
+        IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+        IPath workspace = root.getRawLocation();
 
+        Map<String, String> extensions = EXTENSION_UTIL.findAllExtensions();
         for (Map.Entry<String, String> extension : extensions.entrySet()) {
             String extensionName = extension.getKey();
             String simpleExtensionPath = extension.getValue();
@@ -131,8 +132,6 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
             if (extensionsForClasspathContainer.contains(extensionName)) {
             	// We want the extension to be added to the classpath container.
                 // Uniquely register extensions either as jar or as project.
-                IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-                IPath workspace = root.getRawLocation();
                 if (simpleExtensionPath.endsWith(".jar")) {
                     IPath fullExtensionPath = javaProject.getPath().append(HisConstants.EXTENSIONS_FOLDER).append(simpleExtensionPath);
                     // create a lib entry
