@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -95,6 +96,7 @@ public class ExtensionUtil {
      * Find all Extension Jars in webapps project
      * @return empty Collection if no webapps found, otherwise Collection of Strings with extension names
      */
+    // TODO use findAllExtensions() instead
     public Collection<String> findExtensionJars() {
         Collection<String> result = Lists.newArrayList();
         if (webappsProject != null) {
@@ -114,6 +116,20 @@ public class ExtensionUtil {
         return result;
     }
 
+    /**
+     * Find all extensions lying as jars in the extension folder of the given java project or as own projects in the workspace.
+     * Extension projects override extension jars.
+     * @param javaProject
+     * @return map from extension names to extension project/jar names
+     */
+    public Map<String, String> findAllExtensions(IJavaProject javaProject) {
+        Map<String, String> extensions = new HashMap<String, String>();
+        scanForExtensionJars(javaProject, extensions);
+        scanForExtensionProjects(extensions);
+        // TODO evaluate deactivated-extensions.txt and override extension jars with extension projects only if the project is not deactivated
+        return extensions;
+    }
+    
     /**
      * Scan the java project for jar files in the extensions folder
      *
