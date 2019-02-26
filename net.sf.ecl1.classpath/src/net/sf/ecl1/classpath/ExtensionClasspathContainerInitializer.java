@@ -2,7 +2,6 @@ package net.sf.ecl1.classpath;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -122,38 +121,36 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
     private ArrayList<IClasspathEntry> createClasspathContainerEntries(IJavaProject javaProject, HashSet<String> extensionsForClasspathContainer) {
         ArrayList<IClasspathEntry> result = new ArrayList<>();
         
-    	// Find all extensions; extension projects override extension jars // TODO evaluate deactivated-extensions.txt
-        Map<String, String> extensions = new HashMap<String, String>();
-        EXTENSION_UTIL.scanForExtensionJars(javaProject, extensions);
-        EXTENSION_UTIL.scanForExtensionProjects(extensions);
+    	// Find all extensions; extension projects override extension jars
+        Map<String, String> extensions = EXTENSION_UTIL.findAllExtensions(javaProject);
 
         for (Map.Entry<String, String> extension : extensions.entrySet()) {
             String extensionName = extension.getKey();
-            String extensionPath = extension.getValue();
+            String simpleExtensionPath = extension.getValue();
 
             if (extensionsForClasspathContainer.contains(extensionName)) {
             	// We want the extension to be added to the classpath container.
                 // Uniquely register extensions either as jar or as project.
                 IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
                 IPath workspace = root.getRawLocation();
-                if (extensionPath.endsWith(".jar")) {
-                    IPath path = javaProject.getPath().append(HisConstants.EXTENSIONS_FOLDER).append(extensionPath);
-                    //create a lib entry
-                    IPath sourceAttachmentPath = workspace.append(path);
+                if (simpleExtensionPath.endsWith(".jar")) {
+                    IPath fullExtensionPath = javaProject.getPath().append(HisConstants.EXTENSIONS_FOLDER).append(simpleExtensionPath);
+                    // create a lib entry
+                    IPath sourceAttachmentPath = workspace.append(fullExtensionPath);
                     IPath sourceAttachmentRootPath = null;
-                    IClasspathEntry libraryEntry = JavaCore.newLibraryEntry(path, sourceAttachmentPath, sourceAttachmentRootPath, true);
+                    IClasspathEntry libraryEntry = JavaCore.newLibraryEntry(fullExtensionPath, sourceAttachmentPath, sourceAttachmentRootPath, true);
                     result.add(libraryEntry);
-                    logger.debug("Creating new container entry for library: " + path.toString()
+                    logger.debug("Creating new container entry for library: " + fullExtensionPath.toString()
                     		+ "\n * sourceAttachmentPath: " + sourceAttachmentPath + "\n * sourceAttachmentRootPath: " + sourceAttachmentRootPath);
                 } else {
-                    IProject project = root.getProject(extensionPath);
-                    if (project.exists()) {
-                    	logger.debug("Creating new container entry for project: " + project.getName());
-                        IPath location = project.getLocation();
-                        IClasspathEntry newProjectEntry = JavaCore.newProjectEntry(location.makeRelativeTo(workspace).makeAbsolute(), true);
+                    IProject extensionProject = root.getProject(simpleExtensionPath);
+                    if (extensionProject.exists()) {
+                    	IPath fullExtensionPath = extensionProject.getFullPath();
+                    	logger.debug("Creating new container entry for project: " + fullExtensionPath);
+                        IClasspathEntry newProjectEntry = JavaCore.newProjectEntry(fullExtensionPath, true);
                         result.add(newProjectEntry);
                     } else {
-                    	logger.warn("Extension does not exist as project: " + extensionPath);
+                    	logger.warn("Extension does not exist as project: " + simpleExtensionPath);
                     }
                 }
             }
