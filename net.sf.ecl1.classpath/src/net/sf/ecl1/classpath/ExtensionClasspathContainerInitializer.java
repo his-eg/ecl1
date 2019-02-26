@@ -122,7 +122,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
     private ArrayList<IClasspathEntry> createClasspathContainerEntries(IJavaProject javaProject, HashSet<String> extensionsForClasspathContainer) {
         ArrayList<IClasspathEntry> result = new ArrayList<>();
         
-    	// Find all extensions in the project; extension projects override extension jars // TODO evaluate deactivated-extensions.txt
+    	// Find all extensions; extension projects override extension jars // TODO evaluate deactivated-extensions.txt
         Map<String, String> extensions = new HashMap<String, String>();
         EXTENSION_UTIL.scanForExtensionJars(javaProject, extensions);
         EXTENSION_UTIL.scanForExtensionProjects(extensions);
