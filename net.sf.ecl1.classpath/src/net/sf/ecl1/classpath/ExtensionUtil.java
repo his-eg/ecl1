@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -89,8 +90,8 @@ public class ExtensionUtil {
      * @param javaProject
      * @return map from extension names to extension project/jar names
      */
-    public Map<String, String> findAllExtensions() {
-        Map<String, String> extensions = new HashMap<String, String>();
+    public TreeMap<String, String> findAllExtensions() {
+    	TreeMap<String, String> extensions = new TreeMap<String, String>(); // TreeMap required to sort extensions by name
         scanForExtensionJars(extensions);
         scanForExtensionProjects(extensions);
         // TODO evaluate deactivated-extensions.txt and override extension jars with extension projects only if the project is not deactivated
@@ -103,7 +104,7 @@ public class ExtensionUtil {
      * @param javaProject
      * @param extensions the map from extension names to extension project/jar names, will be updated by this method
      */
-    public void scanForExtensionJars(Map<String, String> extensions) {
+    public void scanForExtensionJars(TreeMap<String, String> extensions) {
         // scan folder webapps/qisserver/WEB-INF/extensions/ for extension jars
         if (webappsProject != null) {
             IFolder extensionsFolder = webappsProject.getFolder(HisConstants.EXTENSIONS_FOLDER);
@@ -129,7 +130,7 @@ public class ExtensionUtil {
      * @param javaProject
      * @param extensions
      */
-    public void scanForExtensionProjects(Map<String, String> extensions) {
+    public void scanForExtensionProjects(TreeMap<String, String> extensions) {
         //scan workspace for extension projects
         IWorkspaceRoot ws = ResourcesPlugin.getWorkspace().getRoot();
         List<IProject> projects = Arrays.asList(ws.getProjects(0));
