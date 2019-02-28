@@ -3,9 +3,7 @@ package net.sf.ecl1.classpath;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
