@@ -26,6 +26,7 @@ import org.eclipse.jdt.launching.IRuntimeClasspathProvider;
 
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
+import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
 /**
  * A custom runtime classpath provider. Currently only used for JUnit launch configurations.
@@ -50,29 +51,17 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
 		}
 		
 		try {
-			// initialize runtime classpath with the output folder
-			IPath outputFolder = javaProject.getOutputLocation();
-			logger.debug("output folder = " + outputFolder);
 			ArrayList<IRuntimeClasspathEntry> runtimeClasspath = new ArrayList<>();
-			IRuntimeClasspathEntry outputFolderRuntimeClasspathEntry = createRuntimeClasspathEntry(outputFolder);
-			runtimeClasspath.add(outputFolderRuntimeClasspathEntry);
-			
-			// get compile classpath from Java project and convert it into a runtime classpath
-			IClasspathEntry[] compileClasspath = javaProject.getRawClasspath();
-			for (IClasspathEntry compileClasspathEntry : compileClasspath) {
-				// Compile classpath entries with content kind IPackageFragmentRoot.K_SOURCE must not be added to the runtime classpath
-				int contentKind = compileClasspathEntry.getContentKind(); // K_SOURCE=1, K_BINARY=2
-				//int entryKind = compileClasspathEntry.getEntryKind(); // CPE_LIBRARY=1, CPE_PROJECT=2, CPE_SOURCE=3, CPE_VARIABLE=4, CPE_CONTAINER=5
-				//logger.debug("contentKind=" + contentKind + ", entryKind=" + entryKind);
-				if (contentKind == IPackageFragmentRoot.K_BINARY) {
-					IRuntimeClasspathEntry runtimeClasspathEntry = new RuntimeClasspathEntry(compileClasspathEntry);
-					runtimeClasspath.add(runtimeClasspathEntry);
-					logger.debug("Add compile classpath entry " + compileClasspathEntry + " to runtime classpath");
-				} else {
-					logger.debug("Skip compile classpath entry " + compileClasspathEntry);
+			// add the project containing the JUnit test
+			addJavaProjectToRuntimeClasspath(javaProject, runtimeClasspath);
+			// if the project containing the JUnit test is an extension project then we must add the webapps project, too
+			if (!WebappsUtil.isWebapps(javaProject.getProject())) {
+				IProject webappsProject = WebappsUtil.findWebappsProject(); // TODO retrieve from ExtensionUtil
+				if (webappsProject != null) {
+					addJavaProjectToRuntimeClasspath(JavaCore.create(webappsProject), runtimeClasspath);
 				}
 			}
-
+			
 			// add Java extensions to runtime classpath
             IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 			Map<String, String> extensions = ExtensionUtil.getInstance().findAllExtensions();
@@ -81,17 +70,20 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
 					String simpleExtensionPath = extensionEntry.getValue();
 					IPath fullExtensionPath;
 	                if (simpleExtensionPath.endsWith(".jar")) {
+						// TODO exclude non-Java jars
 	                    fullExtensionPath = javaProject.getPath().append(HisConstants.EXTENSIONS_FOLDER).append(simpleExtensionPath);
 						logger.debug("Add extension jar " + fullExtensionPath + " to runtime classpath");
+						IRuntimeClasspathEntry extensionRuntimeClasspathEntry = createRuntimeClasspathEntry(fullExtensionPath);
+						//logger.debug("extensionRuntimeClasspathEntry = " + extensionRuntimeClasspathEntry);
+						runtimeClasspath.add(extensionRuntimeClasspathEntry);
 	                } else {
+	                	// if an extension is added as an extension project, it's dependencies must be added, too
+						// TODO exclude non-Java projects
 	                    IProject extensionProject = root.getProject(simpleExtensionPath);
 	                    fullExtensionPath = extensionProject.getFullPath();
-						logger.debug("Add extension project " + fullExtensionPath + " to runtime classpath");
+						logger.debug("Add extension project " + fullExtensionPath + " to runtime classpath...");
+						addJavaProjectToRuntimeClasspath(JavaCore.create(extensionProject), runtimeClasspath);
 	                }
-					// TODO exclude non-Java projects / jars
-					IRuntimeClasspathEntry extensionRuntimeClasspathEntry = createRuntimeClasspathEntry(fullExtensionPath);
-					//logger.debug("extensionRuntimeClasspathEntry = " + extensionRuntimeClasspathEntry);
-					runtimeClasspath.add(extensionRuntimeClasspathEntry);
 				}
 			}
 			return runtimeClasspath.toArray(new IRuntimeClasspathEntry[runtimeClasspath.size()]);
@@ -99,6 +91,31 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
 			logger.error("Caught exception while computing the unresolved classpath for launch configuration " + launchConfig + ": " + e, e);
 			return new IRuntimeClasspathEntry[] {};
 		}
+	}
+	
+	private void addJavaProjectToRuntimeClasspath(IJavaProject javaProject, ArrayList<IRuntimeClasspathEntry> runtimeClasspath) throws CoreException {
+		// initialize runtime classpath with the output folder
+		IPath outputFolder = javaProject.getOutputLocation();
+		logger.debug("Add output folder " + outputFolder + " to runtime classpath");
+		IRuntimeClasspathEntry outputFolderRuntimeClasspathEntry = createRuntimeClasspathEntry(outputFolder);
+		runtimeClasspath.add(outputFolderRuntimeClasspathEntry);
+
+		// get compile classpath from Java project and convert it into a runtime classpath
+		IClasspathEntry[] compileClasspath = javaProject.getRawClasspath();
+		for (IClasspathEntry compileClasspathEntry : compileClasspath) {
+			// Compile classpath entries with content kind IPackageFragmentRoot.K_SOURCE must not be added to the runtime classpath
+			int contentKind = compileClasspathEntry.getContentKind(); // K_SOURCE=1, K_BINARY=2
+			//int entryKind = compileClasspathEntry.getEntryKind(); // CPE_LIBRARY=1, CPE_PROJECT=2, CPE_SOURCE=3, CPE_VARIABLE=4, CPE_CONTAINER=5
+			//logger.debug("contentKind=" + contentKind + ", entryKind=" + entryKind);
+			if (contentKind == IPackageFragmentRoot.K_BINARY) {
+				IRuntimeClasspathEntry runtimeClasspathEntry = new RuntimeClasspathEntry(compileClasspathEntry);
+				runtimeClasspath.add(runtimeClasspathEntry);
+				logger.debug("Add compile classpath entry " + compileClasspathEntry + " to runtime classpath");
+			} else {
+				logger.debug("Skip compile classpath entry " + compileClasspathEntry);
+			}
+		}
+
 	}
 	
 	/**
