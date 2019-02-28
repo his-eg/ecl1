@@ -8,8 +8,7 @@ import org.eclipse.jdt.core.IClasspathEntry;
  *
  * @author markus
  */
-class ExtensionClassPathContainer implements
-IClasspathContainer {
+class ExtensionClassPathContainer implements IClasspathContainer {
 
     private final IClasspathEntry[] entries;
 
