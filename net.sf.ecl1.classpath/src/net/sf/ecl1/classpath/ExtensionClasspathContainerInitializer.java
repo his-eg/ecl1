@@ -24,6 +24,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
 
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.hisinone.ExtensionUtil;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
 
 /**

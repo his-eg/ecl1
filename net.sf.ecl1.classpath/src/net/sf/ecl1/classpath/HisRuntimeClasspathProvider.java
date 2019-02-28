@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -14,6 +12,8 @@ import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.IRuntimeClasspathProvider;
 
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.general.ProjectUtil;
+import net.sf.ecl1.utilities.general.RuntimeClasspathUtil;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
 /**
@@ -24,8 +24,6 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
     private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
     public static final String CLASSPATH_PROVIDER_EXTENSION_ID = "net.sf.ecl1.HisRuntimeClasspathProvider";
-
-    private RuntimeClasspathUtil runtimeClasspathUtil = new RuntimeClasspathUtil();
     
 	/**
 	 * Compute the unresolved runtime classpath for the given launch configuration.
@@ -33,25 +31,26 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
 	 * @param launchConfig
 	 * @return array of runtime classpath entries
 	 */
+    @Override
 	public IRuntimeClasspathEntry[] computeUnresolvedClasspath(ILaunchConfiguration launchConfig) {
 		logger.info("Compute unresolved classpath for launch configuration " + launchConfig + "...");
-		IJavaProject javaProject = getJavaProjectForLaunchConfiguration(launchConfig);
+		IJavaProject javaProject = ProjectUtil.getJavaProjectForLaunchConfiguration(launchConfig);
 		if (javaProject == null) {
 			return new IRuntimeClasspathEntry[] {};
 		}
 		
 		ArrayList<IRuntimeClasspathEntry> runtimeClasspath = new ArrayList<>();
 		// add the project containing the JUnit test
-		runtimeClasspathUtil.addJavaProjectToRuntimeClasspath(javaProject, runtimeClasspath);
+		RuntimeClasspathUtil.addJavaProjectToRuntimeClasspath(javaProject, runtimeClasspath);
 		// if the project containing the JUnit test is an extension project then we must add the webapps project, too
 		if (!WebappsUtil.isWebapps(javaProject.getProject())) {
 			IProject webappsProject = WebappsUtil.findWebappsProject(); // TODO retrieve from ExtensionUtil
 			if (webappsProject != null) {
-				runtimeClasspathUtil.addJavaProjectToRuntimeClasspath(JavaCore.create(webappsProject), runtimeClasspath);
+				RuntimeClasspathUtil.addJavaProjectToRuntimeClasspath(JavaCore.create(webappsProject), runtimeClasspath);
 			}
 		}
 		// add Java extensions to runtime classpath
-		runtimeClasspathUtil.addAllExtensionsToRuntimeClasspath(javaProject, runtimeClasspath);
+		RuntimeClasspathUtil.addAllExtensionsToRuntimeClasspath(javaProject, runtimeClasspath);
 		
 		return runtimeClasspath.toArray(new IRuntimeClasspathEntry[runtimeClasspath.size()]);
 	}
@@ -62,6 +61,7 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
 	 * @param launchConfig
 	 * @return array of runtime classpath entries
 	 */
+    @Override
 	public IRuntimeClasspathEntry[] resolveClasspath(IRuntimeClasspathEntry[] classpathEntries, ILaunchConfiguration launchConfig) {
 		logger.info("Resolve runtime classpath for launch configuration " + launchConfig + "...");
 		logger.debug("Unresolved classpath entries: " + Arrays.toString(classpathEntries));
@@ -69,22 +69,22 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
 			return new IRuntimeClasspathEntry[] {};
 		}
 		
-		IJavaProject javaProject = getJavaProjectForLaunchConfiguration(launchConfig);
+		IJavaProject javaProject = ProjectUtil.getJavaProjectForLaunchConfiguration(launchConfig);
 
 		ArrayList<IRuntimeClasspathEntry> resolvedEntries = new ArrayList<>();
 		for (IRuntimeClasspathEntry unresolvedEntry : classpathEntries) {
 			int entryKind = unresolvedEntry.getClasspathEntry().getEntryKind();
 			//logger.debug("unresolvedEntry = " + unresolvedEntry + ", entryKind=" + entryKind);
 			switch (entryKind) {
-			case IClasspathEntry.CPE_PROJECT:
+			case IClasspathEntry.CPE_PROJECT: // XXX Needs a different handling?
 			case IClasspathEntry.CPE_LIBRARY:
 				resolvedEntries.add(unresolvedEntry);
 				break;
 			case IClasspathEntry.CPE_VARIABLE:
-				resolvedEntries.add(runtimeClasspathUtil.resolveClasspathVariable(unresolvedEntry));
+				resolvedEntries.add(RuntimeClasspathUtil.resolveClasspathVariable(unresolvedEntry));
 				break;
 			case IClasspathEntry.CPE_CONTAINER:
-				resolvedEntries.addAll(runtimeClasspathUtil.resolveClasspathContainer(unresolvedEntry, javaProject));
+				resolvedEntries.addAll(RuntimeClasspathUtil.resolveClasspathContainer(unresolvedEntry, javaProject));
 			default:
 				// src entries should already have been skipped in computeUnresolvedClasspath()
 				logger.warn("Launch configuration " + launchConfig + ": Unexpected classpath entry kind " + entryKind + " found while resolving the classpath. This entry will be ignored...");
@@ -93,29 +93,5 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
 		logger.info("Resolved runtime classpath with " + resolvedEntries.size() + " elements.");
 		logger.debug("Resolved classpath entries: " + resolvedEntries);
 		return resolvedEntries.toArray(new IRuntimeClasspathEntry[resolvedEntries.size()]);
-	}
-
-	private IJavaProject getJavaProjectForLaunchConfiguration(ILaunchConfiguration launchConfig) {
-		try {
-			IResource[] mappedResources = launchConfig.getMappedResources();
-			if (mappedResources==null || mappedResources.length==0) {
-				logger.error("The launch configuration " + launchConfig + " has no mapped resources -> cannot find the project");
-				return null;
-			} else {
-				logger.debug("mappedResources = " + Arrays.toString(mappedResources));
-			}
-			// XXX make sure there is exactly one mapped resource?
-			IResource mappedResource = mappedResources[0];
-			logger.debug("mappedResources[0] = " + mappedResource);
-			IProject project = mappedResource.getProject();
-			logger.debug("project = " + project);
-			IJavaProject javaProject = JavaCore.create(project);
-			logger.info("The launch configuration " + launchConfig + " belongs to java project " + javaProject.getElementName());
-			return javaProject;
-		} catch (CoreException e) {
-			logger.error("Looking for the Java project of launch configuration " + launchConfig + " caused exception " + e, e);
-			return null;
-		}
-
 	}
 }

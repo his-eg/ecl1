@@ -1,4 +1,4 @@
-package net.sf.ecl1.classpath;
+package net.sf.ecl1.utilities.general;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -20,7 +20,8 @@ import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.launching.RuntimeClasspathEntry;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import h1modules.utilities.utils.Activator;
+import net.sf.ecl1.utilities.hisinone.ExtensionUtil;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
 
 /**
@@ -30,7 +31,7 @@ import net.sf.ecl1.utilities.hisinone.HisConstants;
 public class RuntimeClasspathUtil {
     private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
-	public void addAllExtensionsToRuntimeClasspath(IJavaProject javaProject, ArrayList<IRuntimeClasspathEntry> runtimeClasspath) {
+	public static void addAllExtensionsToRuntimeClasspath(IJavaProject javaProject, ArrayList<IRuntimeClasspathEntry> runtimeClasspath) {
         IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		Map<String, String> extensions = ExtensionUtil.getInstance().findAllExtensions();
 		if (extensions!=null && extensions.size()>0) {
@@ -45,16 +46,19 @@ public class RuntimeClasspathUtil {
 					runtimeClasspath.add(extensionRuntimeClasspathEntry);
                 } else {
                 	// if an extension is added as an extension project, it's dependencies must be added, too
-					// TODO exclude non-Java projects
                     IProject extensionProject = root.getProject(simpleExtensionPath);
-					logger.debug("Add extension project " + extensionProject.getFullPath() + " to runtime classpath...");
-					addJavaProjectToRuntimeClasspath(JavaCore.create(extensionProject), runtimeClasspath);
+                    if (ProjectUtil.isJavaProject(extensionProject)) {
+                    	logger.debug("Add Java extension project " + extensionProject.getFullPath() + " to runtime classpath...");
+                    	addJavaProjectToRuntimeClasspath(JavaCore.create(extensionProject), runtimeClasspath);
+                    } else {
+                    	logger.debug("Skip non-Java extension project " + extensionProject.getFullPath());
+                    }
                 }
 			}
 		}
 	}
 	
-	public void addJavaProjectToRuntimeClasspath(IJavaProject javaProject, ArrayList<IRuntimeClasspathEntry> runtimeClasspath) {
+	public static void addJavaProjectToRuntimeClasspath(IJavaProject javaProject, ArrayList<IRuntimeClasspathEntry> runtimeClasspath) {
 		try {
 			// initialize runtime classpath with the output folder
 			IPath outputFolder = javaProject.getOutputLocation();
@@ -82,17 +86,17 @@ public class RuntimeClasspathUtil {
 		}
 	}
 	
-	public IRuntimeClasspathEntry createRuntimeClasspathEntry(IPath path) {
+	public static IRuntimeClasspathEntry createRuntimeClasspathEntry(IPath path) {
 		ClasspathEntry classpathEntry = new ClasspathEntry(IPackageFragmentRoot.K_BINARY, IClasspathEntry.CPE_LIBRARY, path, new IPath[] {}, new IPath[] {}, null, null, null, false, new IAccessRule[] {}, false, new IClasspathAttribute[] {});
 		return new RuntimeClasspathEntry(classpathEntry);
 	}
 	
-	public IRuntimeClasspathEntry resolveClasspathVariable(IRuntimeClasspathEntry unresolvedEntry) {
+	public static IRuntimeClasspathEntry resolveClasspathVariable(IRuntimeClasspathEntry unresolvedEntry) {
 		IClasspathEntry resolvedEntry = JavaCore.getResolvedClasspathEntry(unresolvedEntry.getClasspathEntry());
 		return new RuntimeClasspathEntry(resolvedEntry);
 	}
 	
-	public ArrayList<IRuntimeClasspathEntry> resolveClasspathContainer(IRuntimeClasspathEntry unresolvedEntry, IJavaProject javaProject) {
+	public static ArrayList<IRuntimeClasspathEntry> resolveClasspathContainer(IRuntimeClasspathEntry unresolvedEntry, IJavaProject javaProject) {
 		ArrayList<IRuntimeClasspathEntry> result = new ArrayList<>();
 		IClasspathContainer resolvedContainer = null;
 		try {

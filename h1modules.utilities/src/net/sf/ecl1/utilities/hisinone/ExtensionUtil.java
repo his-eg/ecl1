@@ -1,4 +1,4 @@
-package net.sf.ecl1.classpath;
+package net.sf.ecl1.utilities.hisinone;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -13,9 +13,6 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-
-import net.sf.ecl1.utilities.hisinone.HisConstants;
-import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
 /**
  * Utilities for extension handling.

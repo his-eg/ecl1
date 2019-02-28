@@ -22,6 +22,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 
+import net.sf.ecl1.utilities.hisinone.ExtensionUtil;
+
 /**
  * The ecl1 classpath container edit page.
  * @author keunecke
