@@ -25,9 +25,15 @@ public class RestUtil {
 
     private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
-    public static InputStream getJsonStream(final String defaultTarget) {
+    /**
+     * Create a JSON input stream for the given target URL.
+     * @param target the URL resource we want to read
+     * @param targetShouldExist if true then we expect that the target exists
+     * @return input stream, or null if the target does not exist or another error occurred
+     */
+    public static InputStream getJsonStream(final String target, final boolean targetShouldExist) {
         try {
-            HttpGet get = new HttpGet(defaultTarget);
+            HttpGet get = new HttpGet(target);
             ResponseHandler<InputStream> responseHandler = new ResponseHandler<InputStream>() {
                 @Override
                 public InputStream handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
@@ -36,13 +42,17 @@ public class RestUtil {
                         HttpEntity entity = response.getEntity();
                         return entity != null ? new ByteArrayInputStream(EntityUtils.toString(entity).getBytes()) : null;
                     }
-                    throw new ClientProtocolException("Unexpected response status '" + status + "' expected status <= 200 and < 300 for URL " + defaultTarget);
+                    throw new ClientProtocolException("Unexpected response status '" + status + "' expected status <= 200 and < 300 for URL " + target);
                 }
             };
             HttpClient c = new DefaultHttpClient();
             return c.execute(get, responseHandler);
         } catch (IOException e) {
-    		logger.error2(e.getMessage(), e);
+    		if (targetShouldExist) {
+    			logger.error2(e.getMessage(), e);
+    		} else {
+    			logger.debug("Http lookup target " + target + " does not exist.");
+    		}
         }
         return null;
     }

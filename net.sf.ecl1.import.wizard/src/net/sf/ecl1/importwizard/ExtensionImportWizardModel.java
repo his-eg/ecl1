@@ -169,11 +169,11 @@ public class ExtensionImportWizardModel {
 		// register empty list to signal that initialization has taken place now:
 		dependencyExtensions = new ArrayList<String>();
 		extensions2dependencyExtensions.put(extension, dependencyExtensions);
-		// read extension ".classpath" file
-    	String classpathContent = remoteProjectSearchSupport.getRemoteFileContent(extension, ".classpath");
+		// try to read extension ".classpath" file
+    	String classpathContent = remoteProjectSearchSupport.getRemoteFileContent(extension, ".classpath", false);
     	if (classpathContent == null) {
-    		// there is no ".classpath"-file in the extension project?
-    		return dependencyExtensions; // return empty list
+    		// the extension is no Java project -> return empty list
+    		return dependencyExtensions;
     	}
     	
     	// create XML document

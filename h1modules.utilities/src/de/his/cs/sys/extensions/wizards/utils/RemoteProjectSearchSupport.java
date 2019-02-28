@@ -62,7 +62,7 @@ public class RemoteProjectSearchSupport {
         String lookUpTarget = buildServer + JENKINS_VIEW_INFIX + buildServerView + JENKINS_API_ADDITION;
         logger.debug("Get projects from " + lookUpTarget);
         TreeSet<String> result = new TreeSet<String>();
-        InputStream jsonStream = RestUtil.getJsonStream(lookUpTarget);
+        InputStream jsonStream = RestUtil.getJsonStream(lookUpTarget, true);
         if (jsonStream != null) {
             BuildJobView view = JsonUtil.fromJson(BuildJobView.class, jsonStream);
             result.addAll(view.getBuildJobNames());
@@ -74,24 +74,26 @@ public class RemoteProjectSearchSupport {
      * Returns the content of an extension project file from Jenkins as a String, or null if the file does not exist.
      * @param extension The name of the extension project from which to get the file
      * @param fileName the name of the file, relative to the extension project base folder
+     * @param targetShouldExist if true then we expect that the target exists
      * @return String or null if the file does not exist
      */
-    public String getRemoteFileContent(String extension, String fileName) {
+    public String getRemoteFileContent(String extension, String fileName, boolean targetShouldExist) {
         IPreferenceStore store = Activator.getPreferences();
         String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE); // z.B. "http://build.his.de/build/"
         String buildServerView = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE); // branch
         String lookUpTarget = buildServer + JENKINS_JOB_INFIX + extension + "_" + buildServerView + JENKINS_WORKSPACE_INFIX + fileName + JENKINS_VIEW_ADDITION;
-        return getRemoteFileContent(lookUpTarget);
+        return getRemoteFileContent(lookUpTarget, targetShouldExist);
     }
     
     /**
      * Read the content of an arbitrary file from Jenkins.
      * @param lookUpTarget the REST-URL of the file to read
+     * @param targetShouldExist if true then we expect that the target exists
      * @return file content as String
      */
-    public String getRemoteFileContent(String lookUpTarget) {
+    public String getRemoteFileContent(String lookUpTarget, boolean targetShouldExist) {
         logger.debug("Get file " + lookUpTarget);
-    	InputStream inStream = RestUtil.getJsonStream(lookUpTarget);
+    	InputStream inStream = RestUtil.getJsonStream(lookUpTarget, targetShouldExist);
     	if (inStream == null) {
     		// wrong URL, file doesn't exist? 
     		return null;

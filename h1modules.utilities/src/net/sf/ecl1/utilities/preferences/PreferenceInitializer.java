@@ -53,7 +53,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		String configFile = buildServer + "userContent/ecl1.properties";
 		String configStr = null;
 		try {
-			configStr = new RemoteProjectSearchSupport().getRemoteFileContent(configFile);
+			configStr = new RemoteProjectSearchSupport().getRemoteFileContent(configFile, true);
 		} catch (Exception e) {
         	logger.error2("Unable to read ecl1 configuration. Do you have access to " + buildServer + " ? The original message was " + e.getMessage(), e);
 		}
