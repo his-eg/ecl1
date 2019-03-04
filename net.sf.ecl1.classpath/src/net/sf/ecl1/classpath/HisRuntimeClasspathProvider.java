@@ -42,15 +42,18 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
 		ArrayList<IRuntimeClasspathEntry> runtimeClasspath = new ArrayList<>();
 		// add the project containing the JUnit test
 		RuntimeClasspathUtil.addJavaProjectToRuntimeClasspath(javaProject, runtimeClasspath);
-		// if the project containing the JUnit test is an extension project then we must add the webapps project, too
-		if (!WebappsUtil.isWebapps(javaProject.getProject())) {
-			IProject webappsProject = WebappsUtil.findWebappsProject(); // TODO retrieve from ExtensionUtil
-			if (webappsProject != null) {
-				RuntimeClasspathUtil.addJavaProjectToRuntimeClasspath(JavaCore.create(webappsProject), runtimeClasspath);
+		IProject webappsProject = WebappsUtil.findWebappsProject(); // TODO retrieve from ExtensionUtil
+		if (webappsProject != null) {
+			// if the project containing the JUnit test is an extension project then we must add the webapps project, too
+			IJavaProject webappsJavaProject = JavaCore.create(webappsProject);
+			if (!WebappsUtil.isWebapps(javaProject.getProject())) {
+				RuntimeClasspathUtil.addJavaProjectToRuntimeClasspath(webappsJavaProject, runtimeClasspath);
 			}
+			// add Java extensions to runtime classpath
+			RuntimeClasspathUtil.addAllExtensionsToRuntimeClasspath(webappsJavaProject, runtimeClasspath);
+		} else {
+			logger.debug("Can not add exntensions because no webapps project has been found.");
 		}
-		// add Java extensions to runtime classpath
-		RuntimeClasspathUtil.addAllExtensionsToRuntimeClasspath(javaProject, runtimeClasspath);
 		
 		return runtimeClasspath.toArray(new IRuntimeClasspathEntry[runtimeClasspath.size()]);
 	}
