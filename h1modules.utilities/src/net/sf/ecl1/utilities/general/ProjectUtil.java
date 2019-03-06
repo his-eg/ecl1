@@ -30,16 +30,13 @@ public class ProjectUtil {
 			if (mappedResources==null || mappedResources.length==0) {
 				logger.error("The launch configuration " + launchConfig + " has no mapped resources -> cannot find the project");
 				return null;
-			} else {
-				logger.debug("mappedResources = " + Arrays.toString(mappedResources));
 			}
+			logger.debug("mappedResources = " + Arrays.toString(mappedResources));
 			// XXX make sure there is exactly one mapped resource?
-			IResource mappedResource = mappedResources[0];
-			logger.debug("mappedResources[0] = " + mappedResource);
-			IProject project = mappedResource.getProject();
+			IProject project = mappedResources[0].getProject();
 			logger.debug("project = " + project);
 			IJavaProject javaProject = JavaCore.create(project);
-			logger.info("The launch configuration " + launchConfig + " belongs to java project " + javaProject.getElementName());
+			logger.info("The launch configuration " + launchConfig + " belongs to the java project " + javaProject.getElementName());
 			return javaProject;
 		} catch (CoreException e) {
 			logger.error("Looking for the Java project of launch configuration " + launchConfig + " caused exception " + e, e);

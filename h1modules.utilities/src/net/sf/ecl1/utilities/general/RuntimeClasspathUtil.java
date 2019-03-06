@@ -1,6 +1,7 @@
 package net.sf.ecl1.utilities.general;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -31,7 +32,7 @@ import net.sf.ecl1.utilities.hisinone.HisConstants;
 public class RuntimeClasspathUtil {
     private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
-	public static void addAllExtensionsToRuntimeClasspath(IJavaProject javaProject, ArrayList<IRuntimeClasspathEntry> runtimeClasspath) {
+	public static void addAllExtensionsToRuntimeClasspath(IJavaProject javaProject, LinkedHashSet<IRuntimeClasspathEntry> runtimeClasspath) {
         IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		Map<String, String> extensions = ExtensionUtil.getInstance().findAllExtensions();
 		if (extensions!=null && extensions.size()>0) {
@@ -58,16 +59,24 @@ public class RuntimeClasspathUtil {
 		}
 	}
 	
-	public static void addJavaProjectToRuntimeClasspath(IJavaProject javaProject, ArrayList<IRuntimeClasspathEntry> runtimeClasspath) {
+	public static void addJavaProjectToRuntimeClasspath(IJavaProject javaProject, LinkedHashSet<IRuntimeClasspathEntry> runtimeClasspath) {
 		try {
-			// initialize runtime classpath with the output folder
+			IClasspathEntry[] compileClasspath = javaProject.getRawClasspath();
+			// If available then instrumented classes must be added first
+			for (IClasspathEntry compileClasspathEntry : compileClasspath) {
+				if (compileClasspathEntry.getPath().lastSegment().equals("classes.instr")) {
+					logger.debug("Add compile classpath entry " + compileClasspathEntry + " to runtime classpath");
+					IRuntimeClasspathEntry runtimeClasspathEntry = new RuntimeClasspathEntry(compileClasspathEntry);
+					runtimeClasspath.add(runtimeClasspathEntry);
+				}
+			}
+			// Next add the output folder to the runtime classpath so that patched classes override the unpatched library classes
 			IPath outputFolder = javaProject.getOutputLocation();
 			logger.debug("Add output folder " + outputFolder + " to runtime classpath");
 			IRuntimeClasspathEntry outputFolderRuntimeClasspathEntry = createRuntimeClasspathEntry(outputFolder);
 			runtimeClasspath.add(outputFolderRuntimeClasspathEntry);
 	
-			// get compile classpath from Java project and convert it into a runtime classpath
-			IClasspathEntry[] compileClasspath = javaProject.getRawClasspath();
+			// Add all other entries to the runtime classpath (typically libraries)
 			for (IClasspathEntry compileClasspathEntry : compileClasspath) {
 				// Compile classpath entries with content kind IPackageFragmentRoot.K_SOURCE must not be added to the runtime classpath
 				int contentKind = compileClasspathEntry.getContentKind(); // K_SOURCE=1, K_BINARY=2
@@ -75,10 +84,14 @@ public class RuntimeClasspathUtil {
 				//logger.debug("contentKind=" + contentKind + ", entryKind=" + entryKind);
 				if (contentKind == IPackageFragmentRoot.K_BINARY) {
 					IRuntimeClasspathEntry runtimeClasspathEntry = new RuntimeClasspathEntry(compileClasspathEntry);
-					runtimeClasspath.add(runtimeClasspathEntry);
-					logger.debug("Add compile classpath entry " + compileClasspathEntry + " to runtime classpath");
+					if (!runtimeClasspath.contains(runtimeClasspathEntry)) {
+						logger.debug("Add compile classpath entry " + compileClasspathEntry + " to runtime classpath");
+						runtimeClasspath.add(runtimeClasspathEntry);
+					} else {
+						logger.debug("Ignore duplicate compile classpath entry " + compileClasspathEntry);
+					}
 				} else {
-					logger.debug("Skip compile classpath entry " + compileClasspathEntry);
+					logger.debug("Ignore compile classpath entry of source kind " + compileClasspathEntry);
 				}
 			}
 		} catch (CoreException e) {

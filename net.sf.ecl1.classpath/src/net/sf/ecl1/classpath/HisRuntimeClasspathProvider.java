@@ -2,6 +2,7 @@ package net.sf.ecl1.classpath;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -34,25 +35,27 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
     @Override
 	public IRuntimeClasspathEntry[] computeUnresolvedClasspath(ILaunchConfiguration launchConfig) {
 		logger.info("Compute unresolved classpath for launch configuration " + launchConfig + "...");
-		IJavaProject javaProject = ProjectUtil.getJavaProjectForLaunchConfiguration(launchConfig);
-		if (javaProject == null) {
-			return new IRuntimeClasspathEntry[] {};
+		
+		// Using a LinkedHashSet avoids double entries while keeping the elements in the order in which they were inserted
+		LinkedHashSet<IRuntimeClasspathEntry> runtimeClasspath = new LinkedHashSet<>();
+		IProject webappsProject = WebappsUtil.findWebappsProject(); // TODO retrieve from ExtensionUtil
+		IJavaProject webappsJavaProject = webappsProject!=null ? JavaCore.create(webappsProject) : null;
+		if (webappsJavaProject != null) {
+			// Add webapps entries first in such order that WEB-INF/classes.instr overrides WEB-INF/classes and patched classes override libs
+			RuntimeClasspathUtil.addJavaProjectToRuntimeClasspath(webappsJavaProject, runtimeClasspath);
 		}
 		
-		ArrayList<IRuntimeClasspathEntry> runtimeClasspath = new ArrayList<>();
-		// add the project containing the JUnit test
-		RuntimeClasspathUtil.addJavaProjectToRuntimeClasspath(javaProject, runtimeClasspath);
-		IProject webappsProject = WebappsUtil.findWebappsProject(); // TODO retrieve from ExtensionUtil
-		if (webappsProject != null) {
-			// if the project containing the JUnit test is an extension project then we must add the webapps project, too
-			IJavaProject webappsJavaProject = JavaCore.create(webappsProject);
-			if (!WebappsUtil.isWebapps(javaProject.getProject())) {
-				RuntimeClasspathUtil.addJavaProjectToRuntimeClasspath(webappsJavaProject, runtimeClasspath);
-			}
-			// add Java extensions to runtime classpath
+		IJavaProject javaProject = ProjectUtil.getJavaProjectForLaunchConfiguration(launchConfig);
+		if (javaProject != null && !WebappsUtil.isWebapps(javaProject.getProject())) {
+			// Add the project that contains the class started by the given launch configuration
+			RuntimeClasspathUtil.addJavaProjectToRuntimeClasspath(webappsJavaProject, runtimeClasspath);
+		}
+		
+		if (webappsJavaProject != null) {
+			// add Java extensions from webapps to the runtime classpath
 			RuntimeClasspathUtil.addAllExtensionsToRuntimeClasspath(webappsJavaProject, runtimeClasspath);
 		} else {
-			logger.debug("Can not add exntensions because no webapps project has been found.");
+			logger.debug("Can not add extensions because no webapps project has been found.");
 		}
 		
 		return runtimeClasspath.toArray(new IRuntimeClasspathEntry[runtimeClasspath.size()]);
