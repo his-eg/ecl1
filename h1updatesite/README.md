@@ -3,6 +3,9 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 0.8.5.2019-03-06##
+* Fixed order of runtime classpath entries.
+
 ##Version 0.8.4.2019-03-04##
 * Now ecl1 constructs the runtime classpath for JUnit launch configurations. This fixes JUnit tests that need HisInOne extensions under Java 11.
 
