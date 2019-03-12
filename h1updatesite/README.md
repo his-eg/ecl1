@@ -3,6 +3,9 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 0.8.6.2019-03-12##
+* Fixed another bug in the runtime classpath.
+
 ##Version 0.8.5.2019-03-06##
 * Fixed order of runtime classpath entries.
 
