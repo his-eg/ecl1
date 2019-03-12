@@ -48,7 +48,7 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
 		IJavaProject javaProject = ProjectUtil.getJavaProjectForLaunchConfiguration(launchConfig);
 		if (javaProject != null && !WebappsUtil.isWebapps(javaProject.getProject())) {
 			// Add the project that contains the class started by the given launch configuration
-			RuntimeClasspathUtil.addJavaProjectToRuntimeClasspath(webappsJavaProject, runtimeClasspath);
+			RuntimeClasspathUtil.addJavaProjectToRuntimeClasspath(javaProject, runtimeClasspath);
 		}
 		
 		if (webappsJavaProject != null) {
