@@ -32,6 +32,8 @@ import net.sf.ecl1.utilities.hisinone.HisConstants;
 public class RuntimeClasspathUtil {
     private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
+    private static final String JRE_CONTAINER_PREFIX = "org.eclipse.jdt.launching.JRE_CONTAINER";
+
 	public static void addAllExtensionsToRuntimeClasspath(IJavaProject javaProject, LinkedHashSet<IRuntimeClasspathEntry> runtimeClasspath) {
         IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		Map<String, String> extensions = ExtensionUtil.getInstance().findAllExtensions();
@@ -66,7 +68,7 @@ public class RuntimeClasspathUtil {
 			for (IClasspathEntry compileClasspathEntry : compileClasspath) {
 				if (compileClasspathEntry.getPath().lastSegment().equals("classes.instr")) {
 					logger.debug("Add compile classpath entry " + compileClasspathEntry + " to runtime classpath");
-					IRuntimeClasspathEntry runtimeClasspathEntry = new RuntimeClasspathEntry(compileClasspathEntry);
+					IRuntimeClasspathEntry runtimeClasspathEntry = compileToRuntimeClasspathEntry(compileClasspathEntry);
 					runtimeClasspath.add(runtimeClasspathEntry);
 				}
 			}
@@ -80,10 +82,10 @@ public class RuntimeClasspathUtil {
 			for (IClasspathEntry compileClasspathEntry : compileClasspath) {
 				// Compile classpath entries with content kind IPackageFragmentRoot.K_SOURCE must not be added to the runtime classpath
 				int contentKind = compileClasspathEntry.getContentKind(); // K_SOURCE=1, K_BINARY=2
-				//int entryKind = compileClasspathEntry.getEntryKind(); // CPE_LIBRARY=1, CPE_PROJECT=2, CPE_SOURCE=3, CPE_VARIABLE=4, CPE_CONTAINER=5
+				int entryKind = compileClasspathEntry.getEntryKind(); // CPE_LIBRARY=1, CPE_PROJECT=2, CPE_SOURCE=3, CPE_VARIABLE=4, CPE_CONTAINER=5
 				//logger.debug("contentKind=" + contentKind + ", entryKind=" + entryKind);
 				if (contentKind == IPackageFragmentRoot.K_BINARY) {
-					IRuntimeClasspathEntry runtimeClasspathEntry = new RuntimeClasspathEntry(compileClasspathEntry);
+					IRuntimeClasspathEntry runtimeClasspathEntry = compileToRuntimeClasspathEntry(compileClasspathEntry);
 					if (!runtimeClasspath.contains(runtimeClasspathEntry)) {
 						logger.debug("Add compile classpath entry " + compileClasspathEntry + " to runtime classpath");
 						runtimeClasspath.add(runtimeClasspathEntry);
@@ -91,7 +93,20 @@ public class RuntimeClasspathUtil {
 						logger.debug("Ignore duplicate compile classpath entry " + compileClasspathEntry);
 					}
 				} else {
-					logger.debug("Ignore compile classpath entry of source kind " + compileClasspathEntry);
+					logger.debug("Check source kind compileClasspathEntry " + compileClasspathEntry);
+					logger.debug("entryKind = " + entryKind);
+					if (entryKind == IClasspathEntry.CPE_CONTAINER) {
+						IPath containerPath = compileClasspathEntry.getPath();
+						if (containerPath.toString().startsWith(JRE_CONTAINER_PREFIX)) {
+							logger.info("Skip JRE container...");
+						} else {
+							ArrayList<IRuntimeClasspathEntry> resolvedContainer = resolveClasspathContainer(compileClasspathEntry.getPath(), javaProject);
+							logger.debug("Resolved classpathContainer = " + resolvedContainer);
+							runtimeClasspath.addAll(resolvedContainer);
+						}
+					} else {
+						logger.debug("Ignore compile classpath entry of source kind " + compileClasspathEntry);
+					}
 				}
 			}
 		} catch (CoreException e) {
@@ -100,30 +115,38 @@ public class RuntimeClasspathUtil {
 	}
 	
 	public static IRuntimeClasspathEntry createRuntimeClasspathEntry(IPath path) {
-		ClasspathEntry classpathEntry = new ClasspathEntry(IPackageFragmentRoot.K_BINARY, IClasspathEntry.CPE_LIBRARY, path, new IPath[] {}, new IPath[] {}, null, null, null, false, new IAccessRule[] {}, false, new IClasspathAttribute[] {});
-		return new RuntimeClasspathEntry(classpathEntry);
+		IClasspathEntry classpathEntry = new ClasspathEntry(IPackageFragmentRoot.K_BINARY, IClasspathEntry.CPE_LIBRARY, path, new IPath[] {}, new IPath[] {}, null, null, null, false, new IAccessRule[] {}, false, new IClasspathAttribute[] {});
+		return compileToRuntimeClasspathEntry(classpathEntry);
 	}
 	
 	public static IRuntimeClasspathEntry resolveClasspathVariable(IRuntimeClasspathEntry unresolvedEntry) {
 		IClasspathEntry resolvedEntry = JavaCore.getResolvedClasspathEntry(unresolvedEntry.getClasspathEntry());
-		return new RuntimeClasspathEntry(resolvedEntry);
+		return compileToRuntimeClasspathEntry(resolvedEntry);
 	}
 	
-	public static ArrayList<IRuntimeClasspathEntry> resolveClasspathContainer(IRuntimeClasspathEntry unresolvedEntry, IJavaProject javaProject) {
+	public static ArrayList<IRuntimeClasspathEntry> resolveClasspathContainer(IPath containerPath, IJavaProject javaProject) {
 		ArrayList<IRuntimeClasspathEntry> result = new ArrayList<>();
 		IClasspathContainer resolvedContainer = null;
 		try {
-			resolvedContainer = JavaCore.getClasspathContainer(unresolvedEntry.getPath(), javaProject);
+			resolvedContainer = JavaCore.getClasspathContainer(containerPath, javaProject);
+			logger.debug("resolvedContainer = " + resolvedContainer);
 		} catch (JavaModelException e) {
-			logger.error("Resolving the classpath container " + unresolvedEntry + " failed with exception " + e, e);
+			logger.error("Resolving the classpath container " + containerPath + " failed with exception " + e, e);
 		}
 		IClasspathEntry[] containerEntries = resolvedContainer!=null ? resolvedContainer.getClasspathEntries() : null;
 		if (containerEntries==null || containerEntries.length==0) {
+			logger.debug("resolvedContainer has no content");
 			return result;
 		}
 		for (IClasspathEntry containerEntry : containerEntries) {
-			result.add(new RuntimeClasspathEntry(containerEntry));
+			logger.debug("resolvedContainer contains element " + containerEntry);
+			result.add(compileToRuntimeClasspathEntry(containerEntry));
 		}
 		return result;
+	}
+	
+	public static IRuntimeClasspathEntry compileToRuntimeClasspathEntry(IClasspathEntry compileClasspathEntry) {
+		// XXX filter out classpath entries of source kind?
+		return new RuntimeClasspathEntry(compileClasspathEntry);
 	}
 }

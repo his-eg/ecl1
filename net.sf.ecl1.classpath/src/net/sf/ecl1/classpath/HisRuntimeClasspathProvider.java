@@ -90,7 +90,7 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
 				resolvedEntries.add(RuntimeClasspathUtil.resolveClasspathVariable(unresolvedEntry));
 				break;
 			case IClasspathEntry.CPE_CONTAINER:
-				resolvedEntries.addAll(RuntimeClasspathUtil.resolveClasspathContainer(unresolvedEntry, javaProject));
+				resolvedEntries.addAll(RuntimeClasspathUtil.resolveClasspathContainer(unresolvedEntry.getPath(), javaProject));
 			default:
 				// src entries should already have been skipped in computeUnresolvedClasspath()
 				logger.warn("Launch configuration " + launchConfig + ": Unexpected classpath entry kind " + entryKind + " found while resolving the classpath. This entry will be ignored...");
