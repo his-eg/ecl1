@@ -1,12 +1,10 @@
 package net.sf.ecl1.classpath;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.debug.core.ILaunchConfiguration;
-import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
@@ -77,24 +75,9 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
 		
 		IJavaProject javaProject = ProjectUtil.getJavaProjectForLaunchConfiguration(launchConfig);
 
-		ArrayList<IRuntimeClasspathEntry> resolvedEntries = new ArrayList<>();
+		LinkedHashSet<IRuntimeClasspathEntry> resolvedEntries = new LinkedHashSet<>();
 		for (IRuntimeClasspathEntry unresolvedEntry : classpathEntries) {
-			int entryKind = unresolvedEntry.getClasspathEntry().getEntryKind();
-			//logger.debug("unresolvedEntry = " + unresolvedEntry + ", entryKind=" + entryKind);
-			switch (entryKind) {
-			case IClasspathEntry.CPE_PROJECT: // XXX Needs a different handling?
-			case IClasspathEntry.CPE_LIBRARY:
-				resolvedEntries.add(unresolvedEntry);
-				break;
-			case IClasspathEntry.CPE_VARIABLE:
-				resolvedEntries.add(RuntimeClasspathUtil.resolveClasspathVariable(unresolvedEntry));
-				break;
-			case IClasspathEntry.CPE_CONTAINER:
-				resolvedEntries.addAll(RuntimeClasspathUtil.resolveClasspathContainer(unresolvedEntry.getPath(), javaProject));
-			default:
-				// src entries should already have been skipped in computeUnresolvedClasspath()
-				logger.warn("Launch configuration " + launchConfig + ": Unexpected classpath entry kind " + entryKind + " found while resolving the classpath. This entry will be ignored...");
-			}
+			RuntimeClasspathUtil.addCompileClasspathEntryToRuntimeClasspath(unresolvedEntry.getClasspathEntry(), javaProject, resolvedEntries);
 		}
 		logger.info("Resolved runtime classpath with " + resolvedEntries.size() + " elements.");
 		logger.debug("Resolved classpath entries: " + resolvedEntries);

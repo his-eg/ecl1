@@ -1,6 +1,5 @@
 package net.sf.ecl1.utilities.general;
 
-import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
@@ -34,6 +33,11 @@ public class RuntimeClasspathUtil {
 
     private static final String JRE_CONTAINER_PREFIX = "org.eclipse.jdt.launching.JRE_CONTAINER";
 
+    /**
+     * If available, add all extension projects to the runtime classpath.
+     * @param javaProject The project containing the extensions
+     * @param runtimeClasspath the runtime classpath to update
+     */
 	public static void addAllExtensionsToRuntimeClasspath(IJavaProject javaProject, LinkedHashSet<IRuntimeClasspathEntry> runtimeClasspath) {
         IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 		Map<String, String> extensions = ExtensionUtil.getInstance().findAllExtensions();
@@ -44,7 +48,7 @@ public class RuntimeClasspathUtil {
 					// TODO exclude non-Java jars
                 	IPath fullExtensionPath = javaProject.getPath().append(HisConstants.EXTENSIONS_FOLDER).append(simpleExtensionPath);
 					logger.debug("Add extension jar " + fullExtensionPath + " to runtime classpath");
-					IRuntimeClasspathEntry extensionRuntimeClasspathEntry = createRuntimeClasspathEntry(fullExtensionPath);
+					IRuntimeClasspathEntry extensionRuntimeClasspathEntry = createLibraryRuntimeClasspathEntry(fullExtensionPath);
 					//logger.debug("extensionRuntimeClasspathEntry = " + extensionRuntimeClasspathEntry);
 					runtimeClasspath.add(extensionRuntimeClasspathEntry);
                 } else {
@@ -61,6 +65,12 @@ public class RuntimeClasspathUtil {
 		}
 	}
 	
+	/**
+	 * Add a Java project including all its dependencies to the runtime classpath.
+	 * 
+	 * @param javaProject The java project to add
+	 * @param runtimeClasspath the runtime classpath to update
+	 */
 	public static void addJavaProjectToRuntimeClasspath(IJavaProject javaProject, LinkedHashSet<IRuntimeClasspathEntry> runtimeClasspath) {
 		try {
 			IClasspathEntry[] compileClasspath = javaProject.getRawClasspath();
@@ -68,85 +78,109 @@ public class RuntimeClasspathUtil {
 			for (IClasspathEntry compileClasspathEntry : compileClasspath) {
 				if (compileClasspathEntry.getPath().lastSegment().equals("classes.instr")) {
 					logger.debug("Add compile classpath entry " + compileClasspathEntry + " to runtime classpath");
-					IRuntimeClasspathEntry runtimeClasspathEntry = compileToRuntimeClasspathEntry(compileClasspathEntry);
+					IRuntimeClasspathEntry runtimeClasspathEntry = createRuntimeClasspathEntry(compileClasspathEntry);
 					runtimeClasspath.add(runtimeClasspathEntry);
 				}
 			}
 			// Next add the output folder to the runtime classpath so that patched classes override the unpatched library classes
 			IPath outputFolder = javaProject.getOutputLocation();
 			logger.debug("Add output folder " + outputFolder + " to runtime classpath");
-			IRuntimeClasspathEntry outputFolderRuntimeClasspathEntry = createRuntimeClasspathEntry(outputFolder);
+			IRuntimeClasspathEntry outputFolderRuntimeClasspathEntry = createLibraryRuntimeClasspathEntry(outputFolder);
 			runtimeClasspath.add(outputFolderRuntimeClasspathEntry);
 	
 			// Add all other entries to the runtime classpath (typically libraries)
 			for (IClasspathEntry compileClasspathEntry : compileClasspath) {
-				// Compile classpath entries with content kind IPackageFragmentRoot.K_SOURCE must not be added to the runtime classpath
-				int contentKind = compileClasspathEntry.getContentKind(); // K_SOURCE=1, K_BINARY=2
-				int entryKind = compileClasspathEntry.getEntryKind(); // CPE_LIBRARY=1, CPE_PROJECT=2, CPE_SOURCE=3, CPE_VARIABLE=4, CPE_CONTAINER=5
-				//logger.debug("contentKind=" + contentKind + ", entryKind=" + entryKind);
-				if (contentKind == IPackageFragmentRoot.K_BINARY) {
-					IRuntimeClasspathEntry runtimeClasspathEntry = compileToRuntimeClasspathEntry(compileClasspathEntry);
-					if (!runtimeClasspath.contains(runtimeClasspathEntry)) {
-						logger.debug("Add compile classpath entry " + compileClasspathEntry + " to runtime classpath");
-						runtimeClasspath.add(runtimeClasspathEntry);
-					} else {
-						logger.debug("Ignore duplicate compile classpath entry " + compileClasspathEntry);
-					}
-				} else {
-					logger.debug("Check source kind compileClasspathEntry " + compileClasspathEntry);
-					logger.debug("entryKind = " + entryKind);
-					if (entryKind == IClasspathEntry.CPE_CONTAINER) {
-						IPath containerPath = compileClasspathEntry.getPath();
-						if (containerPath.toString().startsWith(JRE_CONTAINER_PREFIX)) {
-							logger.info("Skip JRE container...");
-						} else {
-							ArrayList<IRuntimeClasspathEntry> resolvedContainer = resolveClasspathContainer(compileClasspathEntry.getPath(), javaProject);
-							logger.debug("Resolved classpathContainer = " + resolvedContainer);
-							runtimeClasspath.addAll(resolvedContainer);
-						}
-					} else {
-						logger.debug("Ignore compile classpath entry of source kind " + compileClasspathEntry);
-					}
-				}
+				addCompileClasspathEntryToRuntimeClasspath(compileClasspathEntry, javaProject, runtimeClasspath);
 			}
 		} catch (CoreException e) {
 			logger.error("Adding project " + javaProject + " to the runtime classpath caused an exception: " + e, e);
 		}
 	}
 	
-	public static IRuntimeClasspathEntry createRuntimeClasspathEntry(IPath path) {
+	/**
+	 * Add an arbitrary compile classpath entry to the runtime classpath.
+	 * This method is the core of the runtime classpath construction procedure.
+	 * 
+	 * @param compileClasspathEntry The compile classpath entry to add to the runtime classpath
+	 * @param javaProject The java project containing the compile classpath entry
+	 * @param runtimeClasspath  the runtime classpath to update
+	 */
+	public static void addCompileClasspathEntryToRuntimeClasspath(IClasspathEntry compileClasspathEntry, IJavaProject javaProject, LinkedHashSet<IRuntimeClasspathEntry> runtimeClasspath) {
+		switch (compileClasspathEntry.getEntryKind()) {
+		// CPE_LIBRARY=1, CPE_PROJECT=2, CPE_SOURCE=3, CPE_VARIABLE=4, CPE_CONTAINER=5
+		case IClasspathEntry.CPE_LIBRARY:
+			IRuntimeClasspathEntry runtimeClasspathEntry = createRuntimeClasspathEntry(compileClasspathEntry);
+			if (!runtimeClasspath.contains(runtimeClasspathEntry)) {
+				logger.debug("Add compile classpath entry of library kind " + compileClasspathEntry + " to runtime classpath");
+				runtimeClasspath.add(runtimeClasspathEntry);
+			} else {
+				logger.debug("Ignore duplicate compile classpath entry " + compileClasspathEntry);
+			}
+			return;
+		case IClasspathEntry.CPE_PROJECT:
+			IPath path = compileClasspathEntry.getPath();
+	        String projectName = path.lastSegment();
+	        logger.debug("Add compile classpath entry of project kind to runtime classpath: path = " + path + ", projectName = " + projectName);
+			IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+	        IJavaProject javaProject2 = JavaCore.create(project);
+	        addJavaProjectToRuntimeClasspath(javaProject2, runtimeClasspath);
+	        return;
+		case IClasspathEntry.CPE_SOURCE:
+	        logger.debug("Skip compile classpath entry of source kind: " + compileClasspathEntry);
+			return; // skip source entries
+		case IClasspathEntry.CPE_VARIABLE:
+			IClasspathEntry resolvedVariable = JavaCore.getResolvedClasspathEntry(compileClasspathEntry);
+			logger.debug("Resolved compile classpath variable " + compileClasspathEntry + " to " + resolvedVariable);
+			addCompileClasspathEntryToRuntimeClasspath(resolvedVariable, javaProject, runtimeClasspath);
+			return;
+		case IClasspathEntry.CPE_CONTAINER:
+			IPath containerPath = compileClasspathEntry.getPath();
+			if (containerPath.toString().startsWith(JRE_CONTAINER_PREFIX)) {
+				logger.info("Skip JRE container...");
+			} else {
+				logger.debug("Add compile classpath container " + compileClasspathEntry);
+				addClasspathContainerToRuntimeClasspath(compileClasspathEntry.getPath(), javaProject, runtimeClasspath);
+			}
+			return;
+		}
+	}
+	
+	public static IRuntimeClasspathEntry createLibraryRuntimeClasspathEntry(IPath path) {
 		IClasspathEntry classpathEntry = new ClasspathEntry(IPackageFragmentRoot.K_BINARY, IClasspathEntry.CPE_LIBRARY, path, new IPath[] {}, new IPath[] {}, null, null, null, false, new IAccessRule[] {}, false, new IClasspathAttribute[] {});
-		return compileToRuntimeClasspathEntry(classpathEntry);
+		return createRuntimeClasspathEntry(classpathEntry);
 	}
 	
 	public static IRuntimeClasspathEntry resolveClasspathVariable(IRuntimeClasspathEntry unresolvedEntry) {
 		IClasspathEntry resolvedEntry = JavaCore.getResolvedClasspathEntry(unresolvedEntry.getClasspathEntry());
-		return compileToRuntimeClasspathEntry(resolvedEntry);
+		return createRuntimeClasspathEntry(resolvedEntry);
 	}
 	
-	public static ArrayList<IRuntimeClasspathEntry> resolveClasspathContainer(IPath containerPath, IJavaProject javaProject) {
-		ArrayList<IRuntimeClasspathEntry> result = new ArrayList<>();
+	/**
+	 * Add a classpath container and all its contents to the runtime classpath.
+	 * @param containerPath the path to the container
+	 * @param javaProject The javaProject that has the container in its compile classpath
+	 * @param runtimeClasspath the runtime classpath to update
+	 */
+	public static void addClasspathContainerToRuntimeClasspath(IPath containerPath, IJavaProject javaProject, LinkedHashSet<IRuntimeClasspathEntry> runtimeClasspath) {
 		IClasspathContainer resolvedContainer = null;
 		try {
 			resolvedContainer = JavaCore.getClasspathContainer(containerPath, javaProject);
-			logger.debug("resolvedContainer = " + resolvedContainer);
+			logger.debug("Resolved classpath container " + resolvedContainer.getDescription());
 		} catch (JavaModelException e) {
 			logger.error("Resolving the classpath container " + containerPath + " failed with exception " + e, e);
 		}
 		IClasspathEntry[] containerEntries = resolvedContainer!=null ? resolvedContainer.getClasspathEntries() : null;
 		if (containerEntries==null || containerEntries.length==0) {
-			logger.debug("resolvedContainer has no content");
-			return result;
+			logger.debug("Resolved classpath container has no content");
+			return;
 		}
 		for (IClasspathEntry containerEntry : containerEntries) {
-			logger.debug("resolvedContainer contains element " + containerEntry);
-			result.add(compileToRuntimeClasspathEntry(containerEntry));
+			addCompileClasspathEntryToRuntimeClasspath(containerEntry, javaProject, runtimeClasspath);
 		}
-		return result;
+		return;
 	}
 	
-	public static IRuntimeClasspathEntry compileToRuntimeClasspathEntry(IClasspathEntry compileClasspathEntry) {
-		// XXX filter out classpath entries of source kind?
+	public static IRuntimeClasspathEntry createRuntimeClasspathEntry(IClasspathEntry compileClasspathEntry) {
 		return new RuntimeClasspathEntry(compileClasspathEntry);
 	}
 }
