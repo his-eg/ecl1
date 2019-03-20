@@ -143,7 +143,7 @@ public class RuntimeClasspathUtil {
 		case IClasspathEntry.CPE_CONTAINER:
 			IPath containerPath = compileClasspathEntry.getPath();
 			if (containerPath.toString().startsWith(JRE_CONTAINER_PREFIX)) {
-				logger.info("Skip JRE container...");
+				logger.debug("Skip JRE container...");
 			} else {
 				logger.debug("Add compile classpath container " + compileClasspathEntry);
 				addClasspathContainerToRuntimeClasspath(compileClasspathEntry.getPath(), javaProject, runtimeClasspath);
