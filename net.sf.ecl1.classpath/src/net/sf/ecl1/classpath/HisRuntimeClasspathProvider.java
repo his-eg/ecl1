@@ -3,10 +3,8 @@ package net.sf.ecl1.classpath;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.IRuntimeClasspathProvider;
 
@@ -34,26 +32,15 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
 	public IRuntimeClasspathEntry[] computeUnresolvedClasspath(ILaunchConfiguration launchConfig) {
 		logger.info("Compute unresolved classpath for launch configuration " + launchConfig + "...");
 		
-		// Using a LinkedHashSet avoids double entries while keeping the elements in the order in which they were inserted
 		LinkedHashSet<IRuntimeClasspathEntry> runtimeClasspath = new LinkedHashSet<>();
-		IProject webappsProject = WebappsUtil.findWebappsProject(); // TODO retrieve from ExtensionUtil
-		IJavaProject webappsJavaProject = webappsProject!=null ? JavaCore.create(webappsProject) : null;
-		if (webappsJavaProject != null) {
-			// Add webapps entries first in such order that WEB-INF/classes.instr overrides WEB-INF/classes and patched classes override libs
-			RuntimeClasspathUtil.addJavaProjectToRuntimeClasspath(webappsJavaProject, runtimeClasspath);
-		}
 		
+		// Add the Java project the JUnit test class belongs to, and all its classpath dependencies.
+		// If the JUnit test is part of a HisInOne extension, webapps will be a dependency.
 		IJavaProject javaProject = ProjectUtil.getJavaProjectForLaunchConfiguration(launchConfig);
-		if (javaProject != null && !WebappsUtil.isWebapps(javaProject.getProject())) {
-			// Add the project that contains the class started by the given launch configuration
-			RuntimeClasspathUtil.addJavaProjectToRuntimeClasspath(javaProject, runtimeClasspath);
-		}
-		
-		if (webappsJavaProject != null) {
-			// add Java extensions from webapps to the runtime classpath
-			RuntimeClasspathUtil.addAllExtensionsToRuntimeClasspath(webappsJavaProject, runtimeClasspath);
-		} else {
-			logger.debug("Can not add extensions because no webapps project has been found.");
+		RuntimeClasspathUtil.addJavaProjectToRuntimeClasspath(javaProject, runtimeClasspath);
+		if (WebappsUtil.isWebapps(javaProject.getProject())) {
+			// Add all Java extensions from webapps to the runtime classpath
+			RuntimeClasspathUtil.addAllExtensionsToRuntimeClasspath(javaProject, runtimeClasspath);
 		}
 		
 		return runtimeClasspath.toArray(new IRuntimeClasspathEntry[runtimeClasspath.size()]);
