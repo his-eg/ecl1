@@ -3,14 +3,18 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 0.8.8.2019-03-20##
+* Add webapps project to the runtime classpath for JUnit tests only if it is a dependency of the project containing the JUnit test.
+* Do not add projects twice to the runtime classpath for JUnit tests.
+
 ##Version 0.8.7.2019-03-18##
-* Full recurrent iteration through projects, classpath containers and classpath variables; fixes JUnit 5 tests.
+* Runtime classpath for JUnit tests: Full recurrent iteration through projects, classpath containers and classpath variables.
 
 ##Version 0.8.6.2019-03-12##
-* Fixed another bug in the runtime classpath.
+* Fixed another bug in the runtime classpath for JUnit tests.
 
 ##Version 0.8.5.2019-03-06##
-* Fixed order of runtime classpath entries.
+* Fixed order of runtime classpath entries for JUnit tests.
 
 ##Version 0.8.4.2019-03-04##
 * Now ecl1 constructs the runtime classpath for JUnit launch configurations. This fixes JUnit tests that need HisInOne extensions under Java 11.
