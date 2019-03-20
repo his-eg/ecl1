@@ -73,8 +73,16 @@ public class RuntimeClasspathUtil {
 	 */
 	public static void addJavaProjectToRuntimeClasspath(IJavaProject javaProject, LinkedHashSet<IRuntimeClasspathEntry> runtimeClasspath) {
 		try {
-			IClasspathEntry[] compileClasspath = javaProject.getRawClasspath();
+			// Has the project already been added? We check this using the output folder
+			IPath outputFolder = javaProject.getOutputLocation();
+			IRuntimeClasspathEntry outputFolderRuntimeClasspathEntry = createLibraryRuntimeClasspathEntry(outputFolder);
+			if (runtimeClasspath.contains(outputFolderRuntimeClasspathEntry)) {
+				logger.debug("Skip project " + javaProject.getElementName() + " which has been added to the runtime classpath before");
+				return;
+			}
+			
 			// If available then instrumented classes must be added first
+			IClasspathEntry[] compileClasspath = javaProject.getRawClasspath();
 			for (IClasspathEntry compileClasspathEntry : compileClasspath) {
 				if (compileClasspathEntry.getPath().lastSegment().equals("classes.instr")) {
 					logger.debug("Add compile classpath entry " + compileClasspathEntry + " to runtime classpath");
@@ -82,10 +90,9 @@ public class RuntimeClasspathUtil {
 					runtimeClasspath.add(runtimeClasspathEntry);
 				}
 			}
+			
 			// Next add the output folder to the runtime classpath so that patched classes override the unpatched library classes
-			IPath outputFolder = javaProject.getOutputLocation();
 			logger.debug("Add output folder " + outputFolder + " to runtime classpath");
-			IRuntimeClasspathEntry outputFolderRuntimeClasspathEntry = createLibraryRuntimeClasspathEntry(outputFolder);
 			runtimeClasspath.add(outputFolderRuntimeClasspathEntry);
 	
 			// Add all other entries to the runtime classpath (typically libraries)
@@ -93,7 +100,7 @@ public class RuntimeClasspathUtil {
 				addCompileClasspathEntryToRuntimeClasspath(compileClasspathEntry, javaProject, runtimeClasspath);
 			}
 		} catch (CoreException e) {
-			logger.error("Adding project " + javaProject + " to the runtime classpath caused an exception: " + e, e);
+			logger.error("Adding project " + javaProject.getElementName() + " to the runtime classpath caused an exception: " + e, e);
 		}
 	}
 	
