@@ -82,13 +82,13 @@ public class RuntimeClasspathUtil {
 			}
 			
 			// If available then instrumented classes must be added first
-			IClasspathEntry[] compileClasspath = javaProject.getRawClasspath();
-			for (IClasspathEntry compileClasspathEntry : compileClasspath) {
-				if (compileClasspathEntry.getPath().lastSegment().equals("classes.instr")) {
-					logger.debug("Add compile classpath entry " + compileClasspathEntry + " to runtime classpath");
-					IRuntimeClasspathEntry runtimeClasspathEntry = createRuntimeClasspathEntry(compileClasspathEntry);
-					runtimeClasspath.add(runtimeClasspathEntry);
-				}
+			IPath classesInstrFolder = outputFolder.removeLastSegments(1).append("classes.instr");
+			if (javaProject.getProject().exists(classesInstrFolder.removeFirstSegments(1))) {
+				logger.debug("Add instrumented classes folder " + classesInstrFolder + " to runtime classpath");
+				IRuntimeClasspathEntry runtimeClasspathEntry = createLibraryRuntimeClasspathEntry(classesInstrFolder);
+				runtimeClasspath.add(runtimeClasspathEntry);
+			} else {
+				logger.debug("Project " + javaProject.getElementName() + " does not contain instrumented classes folder.");
 			}
 			
 			// Next add the output folder to the runtime classpath so that patched classes override the unpatched library classes
@@ -96,8 +96,13 @@ public class RuntimeClasspathUtil {
 			runtimeClasspath.add(outputFolderRuntimeClasspathEntry);
 	
 			// Add all other entries to the runtime classpath (typically libraries)
+			IClasspathEntry[] compileClasspath = javaProject.getRawClasspath();
 			for (IClasspathEntry compileClasspathEntry : compileClasspath) {
-				addCompileClasspathEntryToRuntimeClasspath(compileClasspathEntry, javaProject, runtimeClasspath);
+				if (compileClasspathEntry.getPath().equals(classesInstrFolder)) {
+					logger.debug("Skip compile classpath entry " + compileClasspathEntry + " which has been added to the runtime classpath before");
+				} else {
+					addCompileClasspathEntryToRuntimeClasspath(compileClasspathEntry, javaProject, runtimeClasspath);
+				}
 			}
 		} catch (CoreException e) {
 			logger.error("Adding project " + javaProject.getElementName() + " to the runtime classpath caused an exception: " + e, e);
