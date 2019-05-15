@@ -74,7 +74,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     public boolean performFinish() {
     	// variables to be used in the Job class implementation must be final
         Collection<String> extensionsToImport = new HashSet<String>(model.getSelectedExtensions()); // copy
-        extensionsToImport.addAll(model.getTotalRequiredExtensions());
+        extensionsToImport.addAll(model.getDependenciesOfSelectedExtensions());
         boolean openProjectsAfterImport = page2.openProjectsAfterImport();
         boolean deleteFolders = page2.deleteFolders();
 

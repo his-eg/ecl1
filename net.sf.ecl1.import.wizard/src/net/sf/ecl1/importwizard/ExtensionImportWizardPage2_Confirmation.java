@@ -1,5 +1,6 @@
 package net.sf.ecl1.importwizard;
 
+import java.util.Collection;
 import java.util.Set;
 
 import org.eclipse.jface.wizard.IWizardPage;
@@ -108,28 +109,21 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
     
     void onEnterPage() {
     	//logger.log("create data for page 2");
-        
-        userSelectedTable.removeAll(); // avoid entries being added several times if the back-button is used
-    	Set<String> userSelectedExtensions = model.getSelectedExtensions();
-        for (String userSelectedExtension : userSelectedExtensions) {
-        	TableItem tableItem = new TableItem(userSelectedTable, SWT.NONE);
-        	tableItem.setText(0, userSelectedExtension); // first column has index 0
-        }
-        userSelectedTableColumn.pack();
-        
-        // Find extension dependencies recursively
-        model.findTotalRequiredExtensions();
-
-        dependentTable.removeAll();
-        for (String dependentExtension : model.getTotalRequiredExtensions()) {
-        	TableItem tableItem = new TableItem(dependentTable, SWT.NONE);
-        	tableItem.setText(0, dependentExtension); // first column has index 0
-        }
-        dependentTableColumn.pack();
-        
+        setExtensionsTable(userSelectedTable, userSelectedTableColumn, model.getSelectedExtensions());
+        model.findDependenciesOfSelectedExtensions();
+        setExtensionsTable(dependentTable, dependentTableColumn, model.getDependenciesOfSelectedExtensions());
         setPageComplete(true);
     }
 
+    private void setExtensionsTable(Table table, TableColumn column, Collection<String> extensions) {
+    	table.removeAll();
+        for (String extension : extensions) {
+        	TableItem tableItem = new TableItem(table, SWT.NONE);
+        	tableItem.setText(0, extension); // first column has index 0
+        }
+        column.pack();
+    }
+    
     @Override
     public IWizardPage getPreviousPage() {
 		return ((ExtensionImportWizard) this.getWizard()).page1;
