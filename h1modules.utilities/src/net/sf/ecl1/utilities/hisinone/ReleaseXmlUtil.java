@@ -37,7 +37,7 @@ import net.sf.ecl1.utilities.general.FileUtil;
  */
 public class ReleaseXmlUtil {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ReleaseXmlUtil.class.getSimpleName());
 
 	private static final String RELEASE_XML_FOLDER = "qisserver/WEB-INF/conf/service/patches/hisinone";
 	

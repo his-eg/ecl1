@@ -15,7 +15,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 public class WebappsUtil {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, WebappsUtil.class.getSimpleName());
 
     /**
      * Find the webapps project in the workspace.

@@ -22,7 +22,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  */
 public class ToggleExtensionNatureAction implements IObjectActionDelegate {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(ExtensionPointBuilderPlugin.getDefault().getLog(), ExtensionPointBuilderPlugin.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(ExtensionPointBuilderPlugin.getDefault().getLog(), ExtensionPointBuilderPlugin.PLUGIN_ID, ToggleExtensionNatureAction.class.getSimpleName());
 
 	private ISelection selection;
 
@@ -104,5 +104,4 @@ public class ToggleExtensionNatureAction implements IObjectActionDelegate {
 			logger.error2(e.getMessage(), e);
 		}
 	}
-
 }

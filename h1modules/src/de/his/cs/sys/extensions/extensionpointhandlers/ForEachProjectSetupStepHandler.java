@@ -1,12 +1,3 @@
-/*
- * Copyright (c) 2012 HIS eG All Rights Reserved.
- *
- * $Id$
- *
- * $Log$
- *
- * Created on 26.06.2012 by keunecke
- */
 package de.his.cs.sys.extensions.extensionpointhandlers;
 
 import static de.his.cs.sys.extensions.steps.DeclaredExtensionPointIds.CS_SYS_EXTENSIONS_PROJECT_SETUP_STEPS;
@@ -22,12 +13,12 @@ import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /**
+ * @company HIS eG
  * @author keunecke
- * @version $Revision$ 
  */
 public class ForEachProjectSetupStepHandler {
 
-	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ForEachProjectSetupStepHandler.class.getSimpleName());
 
 	private final IProject project;
 	private final InitialProjectConfigurationChoices initialChoice;
@@ -60,5 +51,4 @@ public class ForEachProjectSetupStepHandler {
 		ProjectSetupStep step = (ProjectSetupStep) object;
 		step.performStep(this.project, this.initialChoice);
 	}
-	
 }

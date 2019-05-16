@@ -21,7 +21,7 @@ import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
  */
 public class TemplateFetcher {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, TemplateFetcher.class.getSimpleName());
 
 	private final List<String> templateRootUrls;
 

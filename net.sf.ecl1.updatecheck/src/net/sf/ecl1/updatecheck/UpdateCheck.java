@@ -9,7 +9,7 @@ import org.eclipse.ui.IStartup;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 public class UpdateCheck implements IStartup {
-    private static final ConsoleLogger logger = new ConsoleLogger(UpdateCheckActivator.getDefault().getLog(), UpdateCheckActivator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(UpdateCheckActivator.getDefault().getLog(), UpdateCheckActivator.PLUGIN_ID, UpdateCheck.class.getSimpleName());
 
 	@Override
 	public void earlyStartup() {

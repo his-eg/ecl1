@@ -31,7 +31,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  */
 public class ProjectSupport {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ProjectSupport.class.getSimpleName());
 
     private static final String[] PATHS = { "src/java", "src/test", "src/generated", "resource", ".settings" };
     

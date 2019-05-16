@@ -29,7 +29,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  */
 public class GitBatchPullHandler extends AbstractHandler {
 
-	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, GitBatchPullHandler.class.getSimpleName());
 	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {

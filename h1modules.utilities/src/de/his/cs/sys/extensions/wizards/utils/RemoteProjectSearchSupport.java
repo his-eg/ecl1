@@ -22,7 +22,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class RemoteProjectSearchSupport {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, RemoteProjectSearchSupport.class.getSimpleName());
 
     private class BuildJob {
         private String name;
@@ -108,6 +108,5 @@ public class RemoteProjectSearchSupport {
     	}
     	logger.debug("File content = "  + fileContent);
     	return fileContent;
-
     }
 }

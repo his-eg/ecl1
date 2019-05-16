@@ -18,7 +18,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  * @author TNeumann
  */
 public class HisRuntimeClasspathProviderManager implements IStartup, ILaunchConfigurationListener {
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, HisRuntimeClasspathProviderManager.class.getSimpleName());
     
 	@Override
 	public void earlyStartup() {

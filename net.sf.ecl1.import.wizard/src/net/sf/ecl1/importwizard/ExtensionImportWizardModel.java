@@ -34,7 +34,7 @@ import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
  */
 public class ExtensionImportWizardModel {
     
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ExtensionImportWizardModel.class.getSimpleName());
 
 	private static final String JENKINS_WEBAPPS_NAME = "/webapps";
 

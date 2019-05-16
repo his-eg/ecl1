@@ -22,7 +22,7 @@ import org.eclipse.jdt.core.JavaModelException;
 
 class ExtensionPointVisitor implements IResourceVisitor {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(ExtensionPointBuilderPlugin.getDefault().getLog(), ExtensionPointBuilderPlugin.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(ExtensionPointBuilderPlugin.getDefault().getLog(), ExtensionPointBuilderPlugin.PLUGIN_ID, ExtensionPointVisitor.class.getSimpleName());
 
     private static final String JAVA_FILE_EXTENSION = "java";
 

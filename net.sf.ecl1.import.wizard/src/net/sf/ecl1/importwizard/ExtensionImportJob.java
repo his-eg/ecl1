@@ -32,7 +32,7 @@ import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
  */
 public class ExtensionImportJob extends Job {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ExtensionImportJob.class.getSimpleName());
     
     private static final String ERROR_MESSAGE_EXISTING_FOLDER = "Your workspace contains folders named like extensions you want to import: %s\n\nThese folders must be deleted before the import, but first you might want to check if they contain files you want to keep. Then delete the folders manually or set the 'Delete folders?' option on the confirmation page of this wizard.";
     private static final String ERROR_MESSAGE_DELETE_FAILED = "Some extensions could not be imported, because deleting existing folders before the import failed: %s";

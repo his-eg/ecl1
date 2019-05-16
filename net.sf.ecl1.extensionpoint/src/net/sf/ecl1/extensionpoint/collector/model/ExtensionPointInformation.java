@@ -18,7 +18,7 @@ import com.google.common.base.Objects;
  */
 public class ExtensionPointInformation {
 	
-    private static final ConsoleLogger logger = new ConsoleLogger(ExtensionPointBuilderPlugin.getDefault().getLog(), ExtensionPointBuilderPlugin.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(ExtensionPointBuilderPlugin.getDefault().getLog(), ExtensionPointBuilderPlugin.PLUGIN_ID, ExtensionPointInformation.class.getSimpleName());
 
 	private final String id;
 	

@@ -26,15 +26,12 @@ import org.osgi.framework.ServiceReference;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /**
- * Provisioning platform util
- * 
- * taken from: 
+ * Provisioning platform util.
  * 
  * @author keunecke
- *
  */
 public class P2Util {
-    private static final ConsoleLogger logger = new ConsoleLogger(UpdateCheckActivator.getDefault().getLog(), UpdateCheckActivator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(UpdateCheckActivator.getDefault().getLog(), UpdateCheckActivator.PLUGIN_ID, P2Util.class.getSimpleName());
 
 	static void doCheckForUpdates(IProgressMonitor monitor) {
 		BundleContext bundleContext = UpdateCheckActivator.getDefault().getBundle().getBundleContext();

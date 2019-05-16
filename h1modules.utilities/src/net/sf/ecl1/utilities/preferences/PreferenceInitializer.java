@@ -18,7 +18,7 @@ import de.his.cs.sys.extensions.wizards.utils.RemoteProjectSearchSupport;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, PreferenceInitializer.class.getSimpleName());
 
 	public static boolean IS_LEGACY_GIT_URL_STYLE;
 

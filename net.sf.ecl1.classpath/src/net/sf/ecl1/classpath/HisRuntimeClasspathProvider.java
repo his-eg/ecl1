@@ -18,7 +18,7 @@ import net.sf.ecl1.utilities.hisinone.WebappsUtil;
  * @author TNeumann
  */
 public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, HisRuntimeClasspathProvider.class.getSimpleName());
 
     public static final String CLASSPATH_PROVIDER_EXTENSION_ID = "net.sf.ecl1.HisRuntimeClasspathProvider";
     

@@ -37,7 +37,7 @@ import org.junit.Assert;
 
 public class ChangeSetExporterWizardPage extends WizardPage {
 
-	private static final ConsoleLogger logger = new ConsoleLogger(ChangeSetExportWizardPlugin.getDefault().getLog(), ChangeSetExportWizardPlugin.PLUGIN_ID);
+	private static final ConsoleLogger logger = new ConsoleLogger(ChangeSetExportWizardPlugin.getDefault().getLog(), ChangeSetExportWizardPlugin.PLUGIN_ID, ChangeSetExporterWizardPage.class.getSimpleName());
 
     private Table changeSetTable;
 

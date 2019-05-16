@@ -17,7 +17,7 @@ import h1modules.utilities.utils.Activator;
  * @author TNeumann
  */
 public class ProjectUtil {
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ProjectUtil.class.getSimpleName());
 
 	public static boolean isJavaProject(IProject project) {
 		IFile classpathFile = project.getProject().getFile(".classpath");

@@ -17,7 +17,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  */
 public class ResourceSetupStep implements ProjectSetupStep {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ResourceSetupStep.class.getSimpleName());
 
     @Override
     public void performStep(IProject project, InitialProjectConfigurationChoices choices) {

@@ -32,7 +32,7 @@ import com.google.common.collect.Lists;
  */
 public class ExtensionPointBuilder extends IncrementalProjectBuilder {
 	
-    private static final ConsoleLogger logger = new ConsoleLogger(ExtensionPointBuilderPlugin.getDefault().getLog(), ExtensionPointBuilderPlugin.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(ExtensionPointBuilderPlugin.getDefault().getLog(), ExtensionPointBuilderPlugin.PLUGIN_ID, ExtensionPointBuilder.class.getSimpleName());
 
     private static final String EXTENSION_EXTENDED_POINTS_PROPERTY = "extension.extended-points";
 
@@ -115,5 +115,4 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
     		logger.error2(e.getMessage(), e);
 		}
 	}
-
 }

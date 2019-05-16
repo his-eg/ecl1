@@ -24,7 +24,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
  */
 public class ProjectFromGitImporter {
 	
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ProjectFromGitImporter.class.getSimpleName());
 	
     // base path of the source repo configured in preferences, e.g. "ssh://git@git.his.de/"
     private final String baseRepositoryPath;

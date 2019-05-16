@@ -32,7 +32,7 @@ import com.google.common.collect.Maps;
  */
 public class TemplateManager {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, TemplateManager.class.getSimpleName());
 
     private static final Map<String, String> nameReplacements = Maps.newHashMap();
     static {

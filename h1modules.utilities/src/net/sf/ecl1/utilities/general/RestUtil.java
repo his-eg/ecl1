@@ -23,7 +23,7 @@ import h1modules.utilities.utils.Activator;
  */
 public class RestUtil {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, RestUtil.class.getSimpleName());
 
     /**
      * Create a JSON input stream for the given target URL.
@@ -56,5 +56,4 @@ public class RestUtil {
         }
         return null;
     }
-
 }

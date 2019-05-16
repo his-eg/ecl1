@@ -35,7 +35,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  */
 public class NewEnrollCheckerWizard extends Wizard implements INewWizard {
 
-	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, NewEnrollCheckerWizard.class.getSimpleName());
 	
 	private IStructuredSelection selection;
 	private NewEnrollCheckerWizardPage newFileWizardPage;
@@ -69,7 +69,7 @@ public class NewEnrollCheckerWizard extends Wizard implements INewWizard {
 		this.selection = selection;
 	}
 
-	class NewEnrollCheckerWizardPage extends WizardNewFileCreationPage {
+	public class NewEnrollCheckerWizardPage extends WizardNewFileCreationPage {
 		private final IProject project;
 
 		public NewEnrollCheckerWizardPage(IStructuredSelection selection) {

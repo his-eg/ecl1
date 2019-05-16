@@ -21,7 +21,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  */
 public class GitInitSetupStep implements ProjectSetupStep {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, GitInitSetupStep.class.getSimpleName());
 
     @Override
     public void performStep(IProject project, InitialProjectConfigurationChoices choices) {

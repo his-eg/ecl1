@@ -22,7 +22,7 @@ import net.sf.ecl1.utilities.hisinone.HisConstants;
  */
 public class ResourceSupport {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ResourceSupport.class.getSimpleName());
 
     private static final String DEPENDENCIES_VARIABLE_NAME = "[dependencies]";
 

@@ -29,7 +29,7 @@ import net.sf.ecl1.utilities.hisinone.HisConstants;
  * @author TNeumann
  */
 public class RuntimeClasspathUtil {
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, RuntimeClasspathUtil.class.getSimpleName());
 
     private static final String JRE_CONTAINER_PREFIX = "org.eclipse.jdt.launching.JRE_CONTAINER";
 

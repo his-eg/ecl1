@@ -20,23 +20,6 @@ import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
  */
 public class ConsoleLogger {
 
-    public enum LogLevel {
-    	DEBUG {
-    		int toIStatus() { return IStatus.OK; }
-    	},
-    	INFO {
-    		int toIStatus() { return IStatus.INFO; }
-    	},
-    	WARN {
-    		int toIStatus() { return IStatus.WARNING; }
-    	},
-    	ERROR {
-    		int toIStatus() { return IStatus.ERROR; }
-    	};
-    	
-    	abstract int toIStatus();
-    }
-
     /**
      * The name of the console this project should always acquire
      */
@@ -61,17 +44,19 @@ public class ConsoleLogger {
 
     private String pluginId = null;
     private ILog errorLogLogger = null;
-
+    private String className;
+    
     /**
      * Create a new ConsoleLogger.
      * 
-     * @param plugin the Eclipse plugin that wants to log
+     * @param errorLogLogger logs to Eclipse's ErrorLog view
+     * @param pluginId the identifier of the plugin that wants to log
+     * @param className the simple name of the class that wants to log
      */
-    public ConsoleLogger(ILog errorLogLogger, String pluginId) {
-    	if (errorLogLogger != null) {
-    		this.errorLogLogger = errorLogLogger;
-    		this.pluginId = pluginId;
-    	}
+    public ConsoleLogger(ILog errorLogLogger, String pluginId, String className) {
+    	this.errorLogLogger = errorLogLogger;
+    	this.pluginId = pluginId;
+    	this.className = className;
     }
 
     /**
@@ -158,10 +143,10 @@ public class ConsoleLogger {
     	LogLevel visibleLogLevel = LogLevel.valueOf(getVisibleLogLevel());
 		if (logLevel.ordinal() >= visibleLogLevel.ordinal()) {
 			// prepare full message
-        	String logLevelStr = logLevel.toString() + ": ";
-        	if (logLevelStr.length()==6) logLevelStr += " ";
-            String fullMessage = logLevelStr + message + "\n";
-            // add stack trace if available
+        	String logLevelStr = logLevel.toString() + " ";
+        	if (logLevelStr.length()==5) logLevelStr += " ";
+            String fullMessage = logLevelStr + "[" + className + "] " + message + "\n";
+            // add stack trace if given
             if (t != null) {
                 for (StackTraceElement elem : t.getStackTrace()) {
                 	fullMessage += "   " + elem + "\n";
