@@ -1,11 +1,10 @@
 package net.sf.ecl1.importwizard;
 
-import h1modules.utilities.utils.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.preferences.PreferenceInitializer;
+import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 import java.io.File;
-import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -25,7 +24,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
  */
 public class ProjectFromGitImporter {
 	
-	private static final ConsoleLogger logger = new ConsoleLogger();
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 	
     // base path of the source repo configured in preferences, e.g. "ssh://git@git.his.de/"
     private final String baseRepositoryPath;
@@ -65,7 +64,7 @@ public class ProjectFromGitImporter {
             IPath workspacePath = workspace.getRoot().getLocation();
             IPath extensionPath = workspacePath.append(extensionToImport);
             File extensionFolder = extensionPath.toFile();
-            String branch = Activator.getHISinOneBranch();
+            String branch = PreferenceWrapper.getBuildServerView();
 
             try {
                 try {

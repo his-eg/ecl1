@@ -1,38 +1,41 @@
 package h1modules.resource.setup;
 
-import org.osgi.framework.BundleActivator;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
- * Activator for this plugin
- * 
- * @author keunecke
+ * The activator class controls the plug-in life cycle
  */
-// TODO Should implement AbstractUIPlugin to permit access to ILog ?
-public class Activator implements BundleActivator {
+public class Activator extends AbstractUIPlugin {
 
-	public static final String PLUGIN_ID = "net.sf.ecl1.resource.setup";
+	// The plug-in ID
+	public static final String PLUGIN_ID = "net.sf.ecl1.resource.setup"; //$NON-NLS-1$
+
+	// The shared instance
+	private static Activator plugin;
 	
-	private static BundleContext context;
-
-	static BundleContext getContext() {
-		return context;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#start(org.osgi.framework.BundleContext)
+	/**
+	 * The constructor
 	 */
-	public void start(BundleContext bundleContext) throws Exception {
-		Activator.context = bundleContext;
+	public Activator() {
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.osgi.framework.BundleActivator#stop(org.osgi.framework.BundleContext)
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
+		plugin = this;
+	}
+
+	public void stop(BundleContext context) throws Exception {
+		plugin = null;
+		super.stop(context);
+	}
+
+	/**
+	 * Returns the shared instance of the plugin activator
+	 *
+	 * @return the shared instance
 	 */
-	public void stop(BundleContext bundleContext) throws Exception {
-		Activator.context = null;
+	public static Activator getDefault() {
+		return plugin;
 	}
-
 }

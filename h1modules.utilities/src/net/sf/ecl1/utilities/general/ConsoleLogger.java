@@ -5,16 +5,13 @@ import java.io.IOException;
 import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 
-import h1modules.utilities.utils.Activator;
-import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
+import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 /**
  * Helper class for logging messages to a console.
@@ -64,12 +61,6 @@ public class ConsoleLogger {
 
     private String pluginId = null;
     private ILog errorLogLogger = null;
-    
-    /**
-     * Create a new ConsoleLogger. This constructor is for cases where we can not get an ILog (wizards !?)
-     */
-    public ConsoleLogger() {
-    }
 
     /**
      * Create a new ConsoleLogger.
@@ -212,7 +203,7 @@ public class ConsoleLogger {
     }
     
     private String getVisibleLogLevel() {
-    	String visibleLogLevel = Activator.getDefault().getPreferenceStore().getString(ExtensionToolsPreferenceConstants.LOG_LEVEL_PREFERENCE);
+    	String visibleLogLevel = PreferenceWrapper.getLogLevel();
     	if (visibleLogLevel == null || visibleLogLevel.isEmpty()) {
     		// preference store not initialized yet
     		return "DEBUG";

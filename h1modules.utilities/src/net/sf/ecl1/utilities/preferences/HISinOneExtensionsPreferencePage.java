@@ -27,7 +27,7 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
 
     public HISinOneExtensionsPreferencePage() {
         super(GRID);
-        setPreferenceStore(Activator.getDefault().getPreferenceStore());
+        setPreferenceStore(Activator.getPreferences());
         setDescription("Preferences for HISinOne-Extension-Tools");
     }
 
@@ -39,10 +39,10 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
      */
     @Override
     public void createFieldEditors() {
-        gitServer = new StringFieldEditor(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE, "GIT Server:", getFieldEditorParent());
-        buildServer = new StringFieldEditor(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE, "Build Server:", getFieldEditorParent());
-        buildServerView = new StringFieldEditor(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, "Search view on Build Server (Branches):", getFieldEditorParent());
-        templateRootUrls = new StringFieldEditor(ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URLS, "URLs for new project templates (comma-separated):", getFieldEditorParent());
+        gitServer = new StringFieldEditor(PreferenceWrapper.GIT_SERVER_PREFERENCE_KEY, "GIT Server:", getFieldEditorParent());
+        buildServer = new StringFieldEditor(PreferenceWrapper.BUILD_SERVER_PREFERENCE_KEY, "Build Server:", getFieldEditorParent());
+        buildServerView = new StringFieldEditor(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, "Search view on Build Server (Branches):", getFieldEditorParent());
+        templateRootUrls = new StringFieldEditor(PreferenceWrapper.TEMPLATE_ROOT_URLS_PREFERENCE_KEY, "URLs for new project templates (comma-separated):", getFieldEditorParent());
         addField(gitServer);
         addField(buildServer);
         addField(buildServerView);
@@ -53,7 +53,7 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
 		logLevels[1][0] = logLevels[1][1] = "INFO";
 		logLevels[2][0] = logLevels[2][1] = "WARN";
 		logLevels[3][0] = logLevels[3][1] = "ERROR";
-		addField(new ComboFieldEditor(ExtensionToolsPreferenceConstants.LOG_LEVEL_PREFERENCE, "Log-Level", logLevels, getFieldEditorParent()));
+		addField(new ComboFieldEditor(PreferenceWrapper.LOG_LEVEL_PREFERENCE_KEY, "Log-Level", logLevels, getFieldEditorParent()));
     }
 
     /* (non-Javadoc)

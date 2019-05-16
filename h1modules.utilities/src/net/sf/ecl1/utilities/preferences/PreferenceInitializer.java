@@ -32,8 +32,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
      */
     @Override
     public void initializeDefaultPreferences() {
-        IPreferenceStore store = Activator.getDefault().getPreferenceStore();
-        store.setDefault(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE, "http://build.his.de/build/");
+        IPreferenceStore store = Activator.getPreferences();
+        store.setDefault(PreferenceWrapper.BUILD_SERVER_PREFERENCE_KEY, "http://build.his.de/build/");
         
         // initialize HISinOne version preference setting from webapps/CVS/Tag
         String branch = CvsTagUtil.getCvsTagVersionLongString();
@@ -41,15 +41,15 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         	// there is no webapps project yet, use HEAD as default
         	branch = CvsTagUtil.HEAD_VERSION;
         }
-        store.setDefault(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE, branch);
-        store.setDefault(ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URLS, "http://devtools.his.de/ecl1/templates,http://ecl1.sourceforge.net/templates");
-		store.setDefault(ExtensionToolsPreferenceConstants.LOG_LEVEL_PREFERENCE, "INFO");
+        store.setDefault(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, branch);
+        store.setDefault(PreferenceWrapper.TEMPLATE_ROOT_URLS_PREFERENCE_KEY, "http://devtools.his.de/ecl1/templates,http://ecl1.sourceforge.net/templates");
+		store.setDefault(PreferenceWrapper.LOG_LEVEL_PREFERENCE_KEY, "INFO");
 		
 		// Read ecl1 configuration: Note that the build server URL may not be the default preference!
 		// Furthermore we may get errors like UnknownHostException when the build server is not available
 		// (no VPN, universities have no access etc.) In that case we will use the new gitlab URL style.
 		// This should be ok for all after the migration to gitlab went through.
-        String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE);
+        String buildServer = store.getString(PreferenceWrapper.BUILD_SERVER_PREFERENCE_KEY);
 		String configFile = buildServer + "userContent/ecl1.properties";
 		String configStr = null;
 		try {
@@ -68,6 +68,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
         // set default git server url in dependency of the configuration
         String defaultGitUrl = IS_LEGACY_GIT_URL_STYLE ? GIT_BASE_REPOSITORY_PATH : GITLAB_BASE_REPOSITORY_PATH;
-        store.setDefault(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE, defaultGitUrl);
+        store.setDefault(PreferenceWrapper.GIT_SERVER_PREFERENCE_KEY, defaultGitUrl);
     }
 }

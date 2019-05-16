@@ -1,12 +1,3 @@
-/*
- * Copyright (c) 2012 HIS eG All Rights Reserved.
- *
- * $Id$
- *
- * $Log$
- *
- * Created on 26.06.2012 by keunecke
- */
 package h1modules.resource.setup.step;
 
 import java.io.UnsupportedEncodingException;
@@ -17,15 +8,16 @@ import org.eclipse.core.runtime.CoreException;
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
 import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
 import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
+import h1modules.resource.setup.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /**
  * @author keunecke
- * @version $Revision$ 
+ * @company HIS eG
  */
 public class ResourceSetupStep implements ProjectSetupStep {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(); // TODO We can't get an ILog here
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
     @Override
     public void performStep(IProject project, InitialProjectConfigurationChoices choices) {
@@ -37,5 +29,4 @@ public class ResourceSetupStep implements ProjectSetupStep {
         }
         logger.debug("Finished resource setup");
     }
-
 }

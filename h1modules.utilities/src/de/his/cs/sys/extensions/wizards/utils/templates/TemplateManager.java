@@ -1,25 +1,14 @@
-/*
- * Copyright (c) 2012 HIS eG All Rights Reserved.
- *
- * $Id$
- *
- * $Log$
- *
- * Created on 21.06.2012 by keunecke
- */
 package de.his.cs.sys.extensions.wizards.utils.templates;
-
-import static net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URLS;
 
 import h1modules.utilities.utils.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +27,8 @@ import com.google.common.collect.Maps;
  *
  * Templates will be retrieved from http://ecl1.sourceforge.net/templates
  *
+ * @company HIS eG
  * @author keunecke
- * @version $Revision$
  */
 public class TemplateManager {
 
@@ -65,8 +54,7 @@ public class TemplateManager {
      * @param variables
      */
     public TemplateManager(String templatePath, Map<String, String> variables) {
-        String templateRootUrlPreferenceValue = Activator.getPreferences().getString(TEMPLATE_ROOT_URLS);
-        templateRootUrls = Arrays.asList(templateRootUrlPreferenceValue.split(","));
+        templateRootUrls = PreferenceWrapper.getTemplateRootUrls();
         this.templatePath = templatePath;
         this.variables = variables;
     }

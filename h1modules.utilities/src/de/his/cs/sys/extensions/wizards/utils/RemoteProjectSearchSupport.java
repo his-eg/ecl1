@@ -10,10 +10,9 @@ import java.util.TreeSet;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.JsonUtil;
 import net.sf.ecl1.utilities.general.RestUtil;
-import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
+import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 import org.apache.commons.io.IOUtils;
-import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
  * Read remote projects from a jenkins view.
@@ -56,9 +55,8 @@ public class RemoteProjectSearchSupport {
     public static final String JENKINS_VIEW_ADDITION = "/*view*/";
     
     public Collection<String> getProjects() {
-        IPreferenceStore store = Activator.getPreferences();
-        String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE); // z.B. "http://build.his.de/build/"
-        String buildServerView = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE); // branch
+        String buildServer = PreferenceWrapper.getBuildServer(); // z.B. "http://build.his.de/build/"
+        String buildServerView = PreferenceWrapper.getBuildServerView(); // branch
         String lookUpTarget = buildServer + JENKINS_VIEW_INFIX + buildServerView + JENKINS_API_ADDITION;
         logger.debug("Get projects from " + lookUpTarget);
         TreeSet<String> result = new TreeSet<String>();
@@ -78,9 +76,8 @@ public class RemoteProjectSearchSupport {
      * @return String or null if the file does not exist
      */
     public String getRemoteFileContent(String extension, String fileName, boolean targetShouldExist) {
-        IPreferenceStore store = Activator.getPreferences();
-        String buildServer = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_PREFERENCE); // z.B. "http://build.his.de/build/"
-        String buildServerView = store.getString(ExtensionToolsPreferenceConstants.BUILD_SERVER_VIEW_PREFERENCE); // branch
+        String buildServer = PreferenceWrapper.getBuildServer(); // z.B. "http://build.his.de/build/"
+        String buildServerView = PreferenceWrapper.getBuildServerView(); // branch
         String lookUpTarget = buildServer + JENKINS_JOB_INFIX + extension + "_" + buildServerView + JENKINS_WORKSPACE_INFIX + fileName + JENKINS_VIEW_ADDITION;
         return getRemoteFileContent(lookUpTarget, targetShouldExist);
     }

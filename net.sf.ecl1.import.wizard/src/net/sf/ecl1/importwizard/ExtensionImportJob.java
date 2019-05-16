@@ -4,9 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.text.ParseException;
 
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IWorkspace;
@@ -19,16 +17,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.preference.IPreferenceStore;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-import de.his.cs.sys.extensions.wizards.utils.RemoteProjectSearchSupport;
-import h1modules.utilities.utils.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
-import net.sf.ecl1.utilities.general.PropertyUtil;
-import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
+import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 /**
  * The job that actually performs deleting of existing folders in the workspace and the extension import.
@@ -38,7 +32,7 @@ import net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants;
  */
 public class ExtensionImportJob extends Job {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(); // TODO can't get an ILog here?
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
     
     private static final String ERROR_MESSAGE_EXISTING_FOLDER = "Your workspace contains folders named like extensions you want to import: %s\n\nThese folders must be deleted before the import, but first you might want to check if they contain files you want to keep. Then delete the folders manually or set the 'Delete folders?' option on the confirmation page of this wizard.";
     private static final String ERROR_MESSAGE_DELETE_FAILED = "Some extensions could not be imported, because deleting existing folders before the import failed: %s";
@@ -104,9 +98,10 @@ public class ExtensionImportJob extends Job {
             }
         }
 
-        // second part of the job: import extension projects from git repository.
-        // extensions with folders in the workspace that could not be deleted can not be imported.
-        String reposerver = Activator.getDefault().getPreferenceStore().getString(ExtensionToolsPreferenceConstants.GIT_SERVER_PREFERENCE);
+        // Second part of the job: import extension projects from git repository.
+        // Extensions with folders in the workspace that could not be deleted can not be imported.
+        String reposerver = PreferenceWrapper.getGitServer();
+        logger.debug("reposerver = " + reposerver);
         ProjectFromGitImporter importer = new ProjectFromGitImporter(reposerver, openProjectsAfterImport);
         for (String extension : extensionsToImport) {
         	if (extensionsWithDeleteErrors.contains(extension)) {

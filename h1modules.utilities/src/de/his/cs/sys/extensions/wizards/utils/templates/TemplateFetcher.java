@@ -1,12 +1,9 @@
 package de.his.cs.sys.extensions.wizards.utils.templates;
 
-import static net.sf.ecl1.utilities.preferences.ExtensionToolsPreferenceConstants.TEMPLATE_ROOT_URLS;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -15,6 +12,7 @@ import com.google.common.collect.Sets;
 
 import h1modules.utilities.utils.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 /**
  * A utility to fetch templates from the URLs specified in preferences.
@@ -31,8 +29,7 @@ public class TemplateFetcher {
      * Create a Fetcher that is able to try to read from several sources
      */
     public TemplateFetcher() {
-        String templateRootUrlPreferenceValue = Activator.getPreferences().getString(TEMPLATE_ROOT_URLS);
-        templateRootUrls = Arrays.asList(templateRootUrlPreferenceValue.split(","));
+        templateRootUrls = PreferenceWrapper.getTemplateRootUrls();
     }
 
     /**

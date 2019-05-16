@@ -11,6 +11,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
 import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
+import h1modules.resource.setup.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /**
@@ -20,7 +21,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  */
 public class GitInitSetupStep implements ProjectSetupStep {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(); // TODO We can't get an ILog here
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
     @Override
     public void performStep(IProject project, InitialProjectConfigurationChoices choices) {

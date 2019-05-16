@@ -25,8 +25,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import de.his.cs.sys.extensions.wizards.utils.RemoteProjectSearchSupport;
-import h1modules.utilities.utils.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 /**
  * The data model of the Extension Import Wizard.
@@ -34,7 +34,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  */
 public class ExtensionImportWizardModel {
     
-    private static final ConsoleLogger logger = new ConsoleLogger();
+    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID);
 
 	private static final String JENKINS_WEBAPPS_NAME = "/webapps";
 
@@ -60,7 +60,7 @@ public class ExtensionImportWizardModel {
     private Collection<String> allRequiredDependencies = null;
 
     public ExtensionImportWizardModel() {
-    	branch = Activator.getHISinOneBranch();
+    	branch = PreferenceWrapper.getBuildServerView();
     	remoteProjectSearchSupport = new RemoteProjectSearchSupport();
     	initRemoteExtensions();
         initExtensionsInWorkspace();
