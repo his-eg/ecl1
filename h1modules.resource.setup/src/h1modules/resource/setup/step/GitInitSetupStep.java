@@ -10,9 +10,9 @@ import org.eclipse.jgit.api.InitCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
-import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
 import h1modules.resource.setup.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.general.InitialProjectConfigurationChoices;
 
 /**
  * Initialize a git repository in the project root

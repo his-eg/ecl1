@@ -9,8 +9,8 @@ import org.eclipse.core.runtime.Platform;
 
 import de.his.cs.sys.extensions.Activator;
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
-import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.general.InitialProjectConfigurationChoices;
 
 /**
  * @company HIS eG

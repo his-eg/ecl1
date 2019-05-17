@@ -20,7 +20,7 @@ import org.eclipse.jdt.internal.core.ClasspathEntry;
 import org.eclipse.jdt.internal.launching.RuntimeClasspathEntry;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 
-import h1modules.utilities.utils.Activator;
+import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.hisinone.ExtensionUtil;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
 

@@ -7,7 +7,7 @@
  *
  * Created on 21.06.2012 by keunecke
  */
-package de.his.cs.sys.extensions.wizards.utils;
+package net.sf.ecl1.utilities.general;
 
 import java.util.ArrayList;
 import java.util.List;

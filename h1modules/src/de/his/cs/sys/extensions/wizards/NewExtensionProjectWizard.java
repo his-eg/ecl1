@@ -11,8 +11,8 @@ import org.eclipse.ui.IWorkbench;
 
 import de.his.cs.sys.extensions.extensionpointhandlers.ForEachProjectSetupStepHandler;
 import de.his.cs.sys.extensions.wizards.pages.NewExtensionWizardPage;
-import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
-import de.his.cs.sys.extensions.wizards.utils.ProjectSupport;
+import net.sf.ecl1.utilities.general.InitialProjectConfigurationChoices;
+import net.sf.ecl1.utilities.general.ProjectSupport;
 
 /**
  * Wizard für das Anlegen eines neuen Modulprojekts

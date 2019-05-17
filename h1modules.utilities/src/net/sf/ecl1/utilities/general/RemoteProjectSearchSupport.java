@@ -1,15 +1,11 @@
-package de.his.cs.sys.extensions.wizards.utils;
-
-import h1modules.utilities.utils.Activator;
+package net.sf.ecl1.utilities.general;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.TreeSet;
 
-import net.sf.ecl1.utilities.general.ConsoleLogger;
-import net.sf.ecl1.utilities.general.JsonUtil;
-import net.sf.ecl1.utilities.general.RestUtil;
+import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 import org.apache.commons.io.IOUtils;

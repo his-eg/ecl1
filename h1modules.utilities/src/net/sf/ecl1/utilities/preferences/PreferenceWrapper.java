@@ -3,7 +3,7 @@ package net.sf.ecl1.utilities.preferences;
 import java.util.Arrays;
 import java.util.List;
 
-import h1modules.utilities.utils.Activator;
+import net.sf.ecl1.utilities.Activator;
 
 /**
  * Encapsulate access to Eclipse preferences.

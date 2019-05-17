@@ -1,4 +1,4 @@
-package de.his.cs.sys.extensions.wizards.utils;
+package net.sf.ecl1.utilities.general;
 
 import org.eclipse.jdt.core.JavaCore;
 

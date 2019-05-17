@@ -10,7 +10,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 
-import h1modules.utilities.utils.Activator;
+import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 public class WebappsUtil {

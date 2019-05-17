@@ -6,10 +6,10 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
-import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
-import de.his.cs.sys.extensions.wizards.utils.ResourceSupport;
 import h1modules.resource.setup.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.general.InitialProjectConfigurationChoices;
+import net.sf.ecl1.utilities.general.ResourceSupport;
 
 /**
  * @author keunecke

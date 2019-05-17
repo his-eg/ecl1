@@ -13,8 +13,8 @@ import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 
 import de.his.cs.sys.extensions.wizards.pages.packages.HISinOneStrategy;
 import de.his.cs.sys.extensions.wizards.pages.packages.PackageStructureStrategy;
-import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices;
-import de.his.cs.sys.extensions.wizards.utils.WorkspaceSupport;
+import net.sf.ecl1.utilities.general.InitialProjectConfigurationChoices;
+import net.sf.ecl1.utilities.general.WorkspaceSupport;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
 
 /**

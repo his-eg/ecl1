@@ -1,8 +1,9 @@
 package net.sf.ecl1.utilities.preferences;
 
-import h1modules.utilities.utils.Activator;
+import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.PropertyUtil;
+import net.sf.ecl1.utilities.general.RemoteProjectSearchSupport;
 import net.sf.ecl1.utilities.hisinone.CvsTagUtil;
 
 import java.text.ParseException;
@@ -10,8 +11,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
-
-import de.his.cs.sys.extensions.wizards.utils.RemoteProjectSearchSupport;
 
 /**
  * Class used to initialize default preference values.

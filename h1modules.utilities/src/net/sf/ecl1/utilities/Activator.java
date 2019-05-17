@@ -1,4 +1,4 @@
-package h1modules.utilities.utils;
+package net.sf.ecl1.utilities;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;

@@ -10,7 +10,7 @@ import java.util.List;
 
 import com.google.common.collect.Sets;
 
-import h1modules.utilities.utils.Activator;
+import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 

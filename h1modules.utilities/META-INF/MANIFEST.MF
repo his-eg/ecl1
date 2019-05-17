@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Utilities for H1 extension tools
 Bundle-SymbolicName: net.sf.ecl1.utilities;singleton:=true
 Bundle-Version: 0.5.8.2019-04-01
-Bundle-Activator: h1modules.utilities.utils.Activator
+Bundle-Activator: net.sf.ecl1.utilities.Activator
 Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  org.eclipse.core.resources;visibility:=reexport,
  org.eclipse.jdt;visibility:=reexport,
@@ -19,12 +19,15 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  org.eclipse.jdt.core
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Export-Package: de.his.cs.sys.extensions.wizards.utils;uses:="org.eclipse.core.resources",
- net.sf.ecl1.utilities.templates,
- h1modules.utilities.utils,
- net.sf.ecl1.utilities.general,
- net.sf.ecl1.utilities.hisinone,
- net.sf.ecl1.utilities.preferences
+Export-Package: net.sf.ecl1.utilities.general;
+  uses:="org.eclipse.core.runtime,
+   org.eclipse.jdt.core,
+   org.eclipse.core.resources,
+   org.eclipse.jdt.launching,
+   org.eclipse.debug.core",
+ net.sf.ecl1.utilities.hisinone;uses:="org.eclipse.core.resources",
+ net.sf.ecl1.utilities.preferences;uses:="org.eclipse.ui,org.eclipse.jface.preference,org.eclipse.core.runtime.preferences",
+ net.sf.ecl1.utilities.templates
 Import-Package: org.apache.commons.io,
  org.eclipse.jdt.core,
  org.eclipse.team.ui

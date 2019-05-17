@@ -1,21 +1,12 @@
-/*
- * Copyright (c) 2012 HIS eG All Rights Reserved.
- *
- * $Id$
- *
- * $Log$
- *
- * Created on 02.07.2012 by keunecke
- */
-package de.his.cs.sys.extensions.wizards.utils;
+package net.sf.ecl1.utilities.general;
 
 import java.util.Collection;
 
 /**
  * Container for the initial values for a new extension project entered by a user
  *
+ * @company HIS eG
  * @author keunecke
- * @version $Revision$
  */
 public class InitialProjectConfigurationChoices {
 
@@ -32,8 +23,7 @@ public class InitialProjectConfigurationChoices {
      * @param name, must not be null
      * @param version, must not be null
      */
-    public InitialProjectConfigurationChoices(Collection<String> projectsToReference, String name,
-                                              String version) {
+    public InitialProjectConfigurationChoices(Collection<String> projectsToReference, String name, String version) {
         this.projectsToReference = projectsToReference;
         this.name = name;
         this.version = version;
@@ -63,5 +53,4 @@ public class InitialProjectConfigurationChoices {
     public String getVersion() {
         return version;
     }
-
 }

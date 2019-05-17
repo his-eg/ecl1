@@ -1,4 +1,4 @@
-package de.his.cs.sys.extensions.wizards.utils;
+package net.sf.ecl1.utilities.general;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -21,8 +21,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
-import h1modules.utilities.utils.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.Activator;
 
 /**
  * manages project creation
