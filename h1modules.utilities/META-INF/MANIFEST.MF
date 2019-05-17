@@ -20,7 +20,7 @@ Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: de.his.cs.sys.extensions.wizards.utils;uses:="org.eclipse.core.resources",
- de.his.cs.sys.extensions.wizards.utils.templates,
+ net.sf.ecl1.utilities.templates,
  h1modules.utilities.utils,
  net.sf.ecl1.utilities.general,
  net.sf.ecl1.utilities.hisinone,

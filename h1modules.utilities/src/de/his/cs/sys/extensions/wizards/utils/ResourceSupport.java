@@ -9,11 +9,11 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
-import de.his.cs.sys.extensions.wizards.utils.templates.TemplateFetcher;
-import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
 import h1modules.utilities.utils.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
+import net.sf.ecl1.utilities.templates.TemplateFetcher;
+import net.sf.ecl1.utilities.templates.TemplateManager;
 
 /**
  * Simple Resource access support.

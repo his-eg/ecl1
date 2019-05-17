@@ -1,4 +1,4 @@
-package de.his.cs.sys.extensions.wizards.utils.templates;
+package net.sf.ecl1.utilities.templates;
 
 import h1modules.utilities.utils.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;

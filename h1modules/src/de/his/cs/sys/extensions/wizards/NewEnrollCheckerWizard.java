@@ -24,9 +24,9 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
-import de.his.cs.sys.extensions.wizards.utils.templates.TemplateManager;
 import de.his.cs.sys.extensions.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.templates.TemplateManager;
 
 /**
  * creates a new EnrollChecker
