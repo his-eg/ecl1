@@ -65,7 +65,7 @@ public class ExtensionImportJob extends Job {
             if (deleteFolders==false) {
             	// scrubbing folders is necessary but not permitted by the user
             	String message = String.format(ERROR_MESSAGE_EXISTING_FOLDER, existingFoldersStr);
-                return new Status(IStatus.ERROR, PluginConstants.PLUGIN_ID, message);
+                return new Status(IStatus.ERROR, Activator.PLUGIN_ID, message);
             }
 
             // scrubbing folders is necessary and authorized
@@ -131,7 +131,7 @@ public class ExtensionImportJob extends Job {
         	// some extensions could not be imported because existing folders could not be deleted
         	String extensionsWithDeleteErrorsStr = Joiner.on(", ").join(extensionsWithDeleteErrors);
         	String message = String.format(ERROR_MESSAGE_DELETE_FAILED, extensionsWithDeleteErrorsStr);
-            return new Status(IStatus.ERROR, PluginConstants.PLUGIN_ID, message);
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID, message);
         }
     	return Status.OK_STATUS;
     }
