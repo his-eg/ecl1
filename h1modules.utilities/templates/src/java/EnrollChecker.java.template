@@ -77,10 +77,9 @@ public class [name] extends UcheckerBase implements UnitcheckerInvoker {
             if (!forbiddenElements.isEmpty()) {
                aggregationNode.addMessage(message, type, (Object[]) params);
             }
-            aggregationNode.setForbidden(true);
+            aggregationNode.setForbidden(true, true);
             return false;
         }
-
 
         return true;
     }
