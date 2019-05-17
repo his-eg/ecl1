@@ -1,12 +1,3 @@
-/*
- * Copyright (c) 2012 HIS eG All Rights Reserved.
- *
- * $Id$
- *
- * $Log$
- *
- * Created on 21.06.2012 by keunecke
- */
 package de.his.cs.sys.extensions.wizards.pages;
 
 import java.util.ArrayList;
@@ -29,8 +20,8 @@ import net.sf.ecl1.utilities.hisinone.HisConstants;
 /**
  * Extended New Project Wizard Page asking for additional information on extensions
  * 
+ * @company HIS eG
  * @author keunecke
- * @version $Revision$ 
  */
 public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 
@@ -111,5 +102,4 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 	public InitialProjectConfigurationChoices getInitialConfiguration() {
 		return new InitialProjectConfigurationChoices(getProjectsToReference(), getProjectName(), getInitialVersion());
 	}
-
 }

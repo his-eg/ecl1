@@ -1,20 +1,11 @@
-/*
- * Copyright (c) 2012 HIS eG All Rights Reserved.
- *
- * $Id$
- *
- * $Log$
- *
- * Created on 14.07.2012 by keunecke
- */
 package de.his.cs.sys.extensions.wizards.pages.packages;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
 /**
+ * @company HIS eG
  * @author keunecke
- * @version $Revision$ 
  */
 public class HISinOneStrategy implements PackageStructureStrategy {
 	
@@ -33,5 +24,4 @@ public class HISinOneStrategy implements PackageStructureStrategy {
 		}
 		return result;
 	}
-
 }

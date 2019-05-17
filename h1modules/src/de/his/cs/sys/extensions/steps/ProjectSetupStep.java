@@ -1,12 +1,3 @@
-/*
- * Copyright (c) 2012 HIS eG All Rights Reserved.
- *
- * $Id$
- *
- * $Log$
- *
- * Created on 26.06.2012 by keunecke
- */
 package de.his.cs.sys.extensions.steps;
 
 import org.eclipse.core.resources.IProject;
@@ -16,8 +7,8 @@ import de.his.cs.sys.extensions.wizards.utils.InitialProjectConfigurationChoices
 /**
  * Step for the setup of an extension project
  * 
+ * @company HIS eG
  * @author keunecke
- * @version $Revision$ 
  */
 public interface ProjectSetupStep {
 	
@@ -28,5 +19,4 @@ public interface ProjectSetupStep {
 	 * @param choices
 	 */
 	public void performStep(IProject project, InitialProjectConfigurationChoices choices);
-
 }
