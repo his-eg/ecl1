@@ -1,6 +1,3 @@
-/**
- *
- */
 package net.sf.ecl1.changeset.exporter;
 
 import static org.hamcrest.core.Is.is;
@@ -8,6 +5,7 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -26,8 +24,9 @@ public class HotfixInformationTest {
 
     @Before
     public void setUp() {
-        hotfixInformation = new HotfixInformation("test", "describtion", "12345,54321");
-        hotfixInformation.addFile("WEB-INF/conf/importdata/gx-hisinone.xml");
+    	ArrayList<String> fileNames = new ArrayList<>();
+    	fileNames.add("WEB-INF/conf/importdata/gx-hisinone.xml");
+        hotfixInformation = new HotfixInformation("test", "description", "12345,54321", false, fileNames);
     }
 
     /**
@@ -45,5 +44,4 @@ public class HotfixInformationTest {
         List<String> lines = IOUtils.readLines(is);
         return Joiner.on("\n").join(lines);
     }
-
 }

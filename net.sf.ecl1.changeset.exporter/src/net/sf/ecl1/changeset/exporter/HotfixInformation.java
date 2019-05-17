@@ -24,7 +24,7 @@ public class HotfixInformation {
 
     private String hiszilla;
 
-    private String describtion;
+    private String description;
 
     private String title;
 
@@ -35,14 +35,14 @@ public class HotfixInformation {
     /**
      * Create a new HotfixInformation with all data given.
      * @param title
-     * @param describtion
+     * @param description
      * @param hiszilla
      * @param dbUpdate
      * @param fileNames
      */
-    public HotfixInformation(String title, String describtion, String hiszilla, boolean dbUpdate, ArrayList<String> fileNames) {
+    public HotfixInformation(String title, String description, String hiszilla, boolean dbUpdate, ArrayList<String> fileNames) {
         this.title = title;
-        this.describtion = describtion;
+        this.description = description;
         this.hiszilla = hiszilla;
         this.dbUpdate = dbUpdate ? "true" : "false";
         this.fileNames = fileNames;
@@ -59,7 +59,7 @@ public class HotfixInformation {
             sb.append(String.format(INDENT + FILE_ELEMENT + NEW_LINE, fileName));
         }
         sb.append(INDENT + DESC_START + NEW_LINE);
-        sb.append(describtion + NEW_LINE);
+        sb.append(description + NEW_LINE);
         sb.append(INDENT + DESC_END + NEW_LINE);
         sb.append(PATCH_END);
         return sb.toString();
