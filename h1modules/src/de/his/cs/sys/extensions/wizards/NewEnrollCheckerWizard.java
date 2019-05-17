@@ -82,14 +82,15 @@ public class NewEnrollCheckerWizard extends Wizard implements INewWizard {
 
 		@Override
 		protected InputStream getInitialContents() {
-
-			// guess package and name
+			// Guess package and name
 			String name = this.getFileName().replace(".java", "");
 			String packageName = this.getContainerFullPath().toPortableString();
 			int pos = packageName.indexOf("/src/java/");
+			// The package name is guessed by taking the part of the full path following "/src/java/" and replace slashes by dots in it.
+			// TODO this works only if a package inside "/src/java/" has been chosen as the location of the new class...
 			packageName = packageName.substring(pos + 10).replace('/', '.');
 			writeSpringEntry(packageName, name);
-			// write file with replaced variables
+			// Write file with replaced variables
 			Map<String, String> variables = new HashMap<String, String>();
 			variables.put("[name]", name);
 			variables.put("[package]", packageName);
