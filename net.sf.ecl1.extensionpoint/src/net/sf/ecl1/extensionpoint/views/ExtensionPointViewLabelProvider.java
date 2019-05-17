@@ -14,7 +14,6 @@ class ExtensionPointViewLabelProvider extends LabelProvider implements ITableLab
 		return getImage(obj);
 	}
 	public Image getImage(Object obj) {
-		return PlatformUI.getWorkbench().
-				getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
+		return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
 	}
 }

@@ -1,14 +1,21 @@
 package net.sf.ecl1.utilities.general;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 
 import h1modules.utilities.utils.Activator;
 
@@ -43,4 +50,31 @@ public class ProjectUtil {
 			return null;
 		}
 	}
+	
+    /**
+     * Get all classes declared in the given java project.
+     * @param javaProject
+     * @return collection of IType
+     * @throws JavaModelException
+     */
+    public static Collection<IType> getClasses(IJavaProject project) throws JavaModelException {
+        Collection<IType> result = new ArrayList<IType>();
+        IPackageFragment[] fragmentRoots = project.getPackageFragments();
+        for (IPackageFragment iPackageFragment : fragmentRoots) {
+            if (IPackageFragmentRoot.K_SOURCE == iPackageFragment.getKind()) {
+                scanPackage(iPackageFragment, result);
+            }
+        }
+        return result;
+    }
+
+    private static void scanPackage(IPackageFragment iPackageFragment, Collection<IType> result) throws JavaModelException {
+        ICompilationUnit[] units = iPackageFragment.getCompilationUnits();
+        for (ICompilationUnit unit : units) {
+            IType[] types = unit.getAllTypes();
+            for (IType type : types) {
+                result.add(type);
+            }
+        }
+    }
 }
