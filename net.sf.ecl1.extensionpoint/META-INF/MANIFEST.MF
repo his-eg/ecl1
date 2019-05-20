@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Extension Point Collector
 Bundle-SymbolicName: net.sf.ecl1.extensionpoint; singleton:=true
-Bundle-Version: 0.2.0.2018-06-04
+Bundle-Version: 0.3.0.2019-05-20
 Bundle-Activator: net.sf.ecl1.extensionpoint.ExtensionPointBuilderPlugin
 Bundle-Vendor: HIS eG
 Require-Bundle: org.eclipse.ui,

@@ -3,6 +3,11 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 0.9.0.2019-05-20##
+* Fixed infinite loop at extension import when there are cyclic dependencies between extensions.
+* Fixed exceptions in new enroll checker wizard when no or a wrong project has been selected.
+* Added Activator classes to all plugins, which allowed to improve logs.
+
 ##Version 0.8.9.2019-04-01##
 * Add classes.instr folder to the runtime classpath of JUnit tests even if it is not in the compile classpath.
 
