@@ -1,162 +1,186 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="angularextension" default="jar">
-	<description>
-		Build Script for HISinOne Extension based on Angular 2
-	</description>
+  <description>
+    Build Script for HISinOne Extension based on Angular
+  </description>
 
-	<!-- Umgebungsvariablen sollen in den Builds verfügbar sein -->
-	<property environment="env"/>
+  <!-- Umgebungsvariablen sollen in den Builds verfügbar sein -->
+  <property environment="env"/>
 
-	<!-- Lokal koennen per Propertiesdatei Werte Ueberschrieben werden -->
-	<property file="${user.name}.ant.properties" />
+  <!-- If REQUIRED-VERSION was not set during ant invokation, set it based on gitlabTargetBranch -->
+  <condition property="REQUIRED-VERSION" value="HEAD" else="${env.gitlabTargetBranch}">
+    <equals arg1="${env.gitlabTargetBranch}" arg2="master" />
+  </condition>
 
-	<!--
-	Parameter, die modulspezifisch sind, werden in der modul.ant.properties gepflegt:
-	- Modulname: extension.name
-	-->
-	<property file="extension.ant.properties" />
+  <!-- Lokal koennen per Propertiesdatei Werte Ueberschrieben werden -->
+  <property file="${user.name}.ant.properties" />
 
-
-	<!-- Windows fails to execute "ng" unless it is invoked as "ng.cmd" -->
-	<condition property="executable.suffix" value=".cmd">
-		<os family="windows" />
-	</condition>
-	<property name="executable.suffix" value="" />
-
-	<!-- find cs.sys.angularbase extension -->
-	<available file="../cs.sys.angularbase" property="cs.sys.angularbase" value="../cs.sys.angularbase" />
-	<available file="../../cs.sys.angularbase_${REQUIRED-VERSION}/workspace" property="cs.sys.angularbase" value="../../cs.sys.angularbase_${REQUIRED-VERSION}/workspace" />
-	<fail message="Extension cs.sys.angularbase is required as project for angular builds but it was not found." unless="cs.sys.angularbase" />
+  <!--
+  Parameter, die modulspezifisch sind, werden in der modul.ant.properties gepflegt:
+  - Modulname: extension.name
+  -->
+  <property file="extension.ant.properties" />
 
 
-	<!-- targets (names are compatible with java.xml) -->
+  <!-- Windows fails to execute "ng" unless it is invoked as "ng.cmd" -->
+  <condition property="executable.suffix" value=".cmd">
+    <os family="windows" />
+  </condition>
+  <property name="executable.suffix" value="" />
+
+  <!-- find cs.sys.angularbase extension -->
+  <available file="../cs.sys.angularbase" property="cs.sys.angularbase" value="../cs.sys.angularbase" />
+  <available file="../../cs.sys.angularbase_${REQUIRED-VERSION}/workspace" property="cs.sys.angularbase" value="../../cs.sys.angularbase_${REQUIRED-VERSION}/workspace" />
+  <fail message="Extension cs.sys.angularbase is required as project for angular builds but it was not found." unless="cs.sys.angularbase" />
 
 
-	<target name="clean">
-		<delete includeemptydirs="true" failonerror="false" >
-			<fileset dir="build" />
-			<fileset dir="dist" />
-		</delete>
-	</target>
+  <!-- targets (names are compatible with java.xml) -->
 
-	
 
-	<!-- init node_modules, if it does not exist -->
-	<target name="init">
-		<available file="node_modules" property="node_modules" />
-		<antcall target="internal-init" />
-	</target>
-
-	<target name="internal-init" unless="node_modules">
-		<condition property="windows" value="windows">
-			<os family="windows" />
-		</condition>
-		<antcall target="internal-init-windows" />
-		<antcall target="internal-init-notwindows" />
-	</target>
-
-	<target name="internal-init-windows" if="windows">
-		<exec executable="cmd.exe">
-			<arg value="/c" />
-			<arg value="mklink" />
-			<arg value="/j" />
-			<arg value="node_modules" />
-			<arg value="..\cs.sys.angularbase\node_modules" />
-		</exec>
-	</target>
-	
-	<target name="internal-init-notwindows" unless="windows">
-		<exec executable="/bin/ln">
-			<arg value="-s" />
-			<arg value="${cs.sys.angularbase}/node_modules" />
-			<arg value="node_modules" />
-		</exec>
-	</target>
+  <target name="clean">
+    <delete includeemptydirs="true" failonerror="false" >
+      <fileset dir="build" />
+      <fileset dir="dist" />
+    </delete>
+  </target>
 
 
 
+  <!-- init node_modules, if it does not exist -->
+  <target name="init">
+    <available file="node_modules" property="node_modules" />
+    <antcall target="internal-init" />
 
-	<target name="build" depends="init">
-		<exec executable="node_modules/.bin/ng${executable.suffix}" failonerror="true">
-			<arg value="build" />
-			<arg value="--preserve-symlinks" />
-			<arg value="--prod" />
-			<arg value="--aot" />
-			<arg value="--progress" />
-			<arg value="false" />
-		</exec>
-	</target>
+    <!-- rewrite path in angular.json on Jenkins -->
+    <replace file="angular.json" token="&quot;../cs.sys.angularbase" value="&quot;${cs.sys.angularbase}"/>
+  </target>
 
-	<target name="jar" depends="build">
-	    <condition property="extension.revision" value="${env.BUILD_TAG}-${env.GIT_COMMIT}" else="unknown">
-           	<isset property="env.BUILD_TAG"/>
-	    </condition>
+  <target name="internal-init" unless="node_modules">
+    <condition property="windows" value="windows">
+      <os family="windows" />
+    </condition>
+    <antcall target="internal-init-windows" />
+    <antcall target="internal-init-notwindows" />
+  </target>
 
-	    <exec executable="git" outputproperty="git.revision" failifexecutionfails="false" errorproperty="">
-	        <arg value="describe"/>
-	        <arg value="--tags"/>
-	        <arg value="--always"/>
-	        <arg value="HEAD"/>
-	    </exec>
-	    <condition property="repository.version" value="${env.GIT_COMMIT}" else="unknown">
-	        <and>
-	            <isset property="git.revision"/>
-	            <length string="${git.revision}" trim="yes" length="0" when="greater"/>
-	        </and>
-	    </condition>
+  <target name="internal-init-windows" if="windows">
+    <exec executable="cmd.exe">
+      <arg value="/c" />
+      <arg value="mklink" />
+      <arg value="/j" />
+      <arg value="node_modules" />
+      <arg value="..\cs.sys.angularbase\node_modules" />
+    </exec>
+  </target>
 
-
-		<jar destfile="dist/${extension.name}.jar">
-			<zipfileset prefix="META-INF/resources/web/${extension.name}" dir="dist" includes="*" excludes="*.jar" />
-			<zipfileset dir="." includes="**" excludes="dist/**,node_modules/**" />
-			<manifest>
-				<attribute name="Extension-Name" value="${extension.name}"/>
-				<attribute name="Extension-Version" value="${extension.version}"/>
-				<attribute name="Extension-Revision" value="${extension.revision}"/>
-				<attribute name="Extension-Git-Commit" value="${repository.version}" />
-			</manifest>
-		</jar>
-	</target>
+  <target name="internal-init-notwindows" unless="windows">
+    <exec executable="/bin/ln">
+      <arg value="-s" />
+      <arg value="${cs.sys.angularbase}/node_modules" />
+      <arg value="node_modules" />
+    </exec>
+  </target>
 
 
-	<target name="serve" depends="init">
-		<exec executable="node_modules/.bin/ng${executable.suffix}">
-			<arg value="serve"/>
-			<arg value="--preserve-symlinks" />
-			<arg value="--port"/>
-			<arg value="${extension.port}"/>
-			<arg value="--live-reload-client"/>
-			<arg value="localhost:${extension.port}"/>
-		</exec>
-	</target>
+  <target name="lint" depends="init">
+    <exec executable="node_modules/.bin/ng${executable.suffix}" failonerror="true">
+      <arg value="lint" />
+    </exec>
+  </target>
+
+  <target name="build" depends="init,lint">
+    <exec executable="node_modules/.bin/ng${executable.suffix}" failonerror="true">
+      <env key="NODE_OPTIONS" value="--max-old-space-size=8192" />
+      <arg value="build" />
+      <arg value="--prod" />
+      <arg value="--aot" />
+      <arg value="--progress" />
+      <arg value="false" />
+    </exec>
+  </target>
+
+  <available file=".git" type="dir" property="git.present" />
+  <target name="git-revision" description="Store git revision in ${repository.version}" if="git.present">
+    <exec executable="git" outputproperty="git.revision" failifexecutionfails="false" errorproperty="">
+      <arg value="rev-parse" />
+      <arg value="HEAD" />
+    </exec>
+    <condition property="repository.version" value="${git.revision}">
+      <and>
+        <isset property="git.revision" />
+        <length string="${git.revision}" trim="yes" length="0" when="greater" />
+      </and>
+    </condition>
+  </target>
+
+  <target name="jenkins-data" depends="git-revision">
+    <property name="git.version">${env.GIT_COMMIT}</property>
+    <condition property="extension.revision" value="${env.BUILD_TAG}-${env.GIT_COMMIT}" else="unknown">
+      <isset property="env.BUILD_TAG" />
+    </condition>
+  </target>
+
+  <target name="jar" depends="build, jenkins-data">
+    <property name="jar.excludes" value="dist/**,node_modules/**" />
+    <jar destfile="dist/${extension.name}.jar" zip64mode="as-needed">
+      <zipfileset prefix="META-INF/resources/web/${extension.name}" dir="dist" includes="*" excludes="*.jar" />
+      <zipfileset dir="." includes="**" excludes="${jar.excludes}" />
+      <manifest>
+        <attribute name="Extension-Name" value="${extension.name}"/>
+        <attribute name="Extension-Version" value="${extension.version}"/>
+        <attribute name="Extension-Revision" value="${extension.revision}"/>
+        <attribute name="Extension-Git-Commit" value="${repository.version}" />
+        <attribute name="Extension-Only-Resources" value="${extension.onlyresources}" />
+      </manifest>
+    </jar>
+  </target>
 
 
-	<target name="test" depends="init">
-		<parallel>
-			<daemons>
-				<exec executable="/usr/bin/Xvfb" failonerror="false" osfamily="unix">
-					<arg value=":10" />
-					<arg value="-screen" />
-					<arg value="0" />
-					<arg value="1920x1200x24" />
-				</exec>
-			</daemons>
-			<exec executable="node_modules/.bin/ng${executable.suffix}" errorproperty="prevent-screen-clear">
-				<arg value="test"/>
-				<arg value="--preserve-symlinks" />
-				<arg value="--watch=false" />
-				<arg value="--with-coverage" />
-				<arg value="--sourcemap=false" />
-				<arg value="--progress"/>
-				<arg value="false"/>
-				<env key="DISPLAY" value=":10" />
-			</exec>
-		</parallel>
-	</target>
+  <target name="serve" depends="init">
+    <exec executable="node_modules/.bin/ng${executable.suffix}">
+      <env key="NODE_OPTIONS" value="--max-old-space-size=8192" />
+      <arg value="serve"/>
+      <arg value="--port"/>
+      <arg value="${extension.port}"/>
+    </exec>
+  </target>
+
+  <target name="serveprod" depends="init">
+    <exec executable="node_modules/.bin/ng${executable.suffix}">
+      <env key="NODE_OPTIONS" value="--max-old-space-size=8192" />
+      <arg value="serve"/>
+      <arg value="--prod"/>
+      <arg value="--aot"/>
+      <arg value="--port"/>
+      <arg value="${extension.port}"/>
+    </exec>
+  </target>
 
 
-	<!-- compatibility -->
-	<target name="cobertura-report" depends="cobertura-test" />
-	<target name="cobertura-test" depends="test" />
+  <target name="test" depends="init">
+    <parallel>
+      <daemons>
+        <exec executable="/usr/bin/Xvfb" failonerror="false" osfamily="unix">
+          <arg value=":10" />
+          <arg value="-screen" />
+          <arg value="0" />
+          <arg value="1920x1200x24" />
+        </exec>
+      </daemons>
+      <exec executable="node_modules/.bin/ng${executable.suffix}" errorproperty="prevent-screen-clear">
+        <arg value="test"/>
+        <arg value="--preserve-symlinks" />
+        <arg value="--watch=false" />
+        <arg value="--progress"/>
+        <arg value="false"/>
+        <env key="DISPLAY" value=":10" />
+      </exec>
+    </parallel>
+  </target>
+
+  <!-- compatibility -->
+  <target name="coverage-report" depends="coverage-test" />
+  <target name="coverage-test" depends="test" />
+  <target name="import-testresults" depends="coverage-test" />
 
 </project>

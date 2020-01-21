@@ -5,51 +5,52 @@
     <property name="macker.report.xml" value="${macker.results}/report.xml" />
     <property name="macker.report.html" value="${macker.results}/report.html" />
     <property name="macker.verbose" value="false" />
-    <property name="macker.failonerror" value="false"/>
+  <property name="macker.failonerror" value="false"/>
+
     <property name="rules-path" location="${webapps}/.settings/macker/"></property>
 
     <path id="macker.classpath">
-        <fileset dir="${qisserver-webinf}/internal/macker" includes="**/*.jar" />
+        <fileset dir="${webapps}/qisserver/WEB-INF/internal/macker" includes="**/*.jar" />
         <path refid="compile-classpath" />
     </path>
 
     <taskdef name="macker" classname="de.andrena.tools.macker.ant.MackerAntTask" classpathref="macker.classpath" />
     <taskdef name="macker-report" classname="de.andrena.tools.macker.ant.MackerReportAntTask" classpathref="macker.classpath" />
 
-	<target name="macker-clean">
-		<delete failonerror="false">
-			<fileset dir="${macker.results}" />
-		</delete>
-	</target>
+  <target name="macker-clean">
+    <delete failonerror="false">
+      <fileset dir="${macker.results}" />
+    </delete>
+  </target>
 
     <target name="macker-init">
         <mkdir dir="${macker.results}" />
     </target>
 
-	<target name="macker-check" depends="macker-init">
-		<macker printthreshold="info" angerthreshold="error" failonerror="${macker.failonerror}" fork="false" xmlReportFile="${macker.report.xml}" angerProperty="macker.angry" maxMessages="3">
+  <target name="macker-check" depends="macker-init">
+    <macker printthreshold="info" angerthreshold="error" failonerror="${macker.failonerror}" fork="false" xmlReportFile="${macker.report.xml}" angerProperty="macker.angry" maxMessages="3">
             <rules dir="${rules-path}" includes="*.xml" />
-            <classes dir="${classes-target}">
+            <classes dir="${build}/classes">
                 <include name="de/his/**/*.class" />
                 <exclude name="**/package-info.class" />
             </classes>
             <var name="basepkg" value="de.his" />
             <classpath refid="macker.classpath" />
         </macker>
-	</target>
+  </target>
 
     <target name="macker-report" depends="macker-check">
         <macker-report xmlReportfile="${macker.report.xml}" outputFile="${macker.report.html}" />
     </target>
 
-	<condition property="building-branch-head" value="true" else="false">
-		<equals arg1="${REQUIRED-VERSION}" arg2="HEAD"/>
-	</condition>
+  <condition property="building-branch-head" value="true" else="false">
+    <equals arg1="${REQUIRED-VERSION}" arg2="HEAD"/>
+  </condition>
 
-	<target name="macker-check-ci-build" if="${building-branch-head}">
-		<antcall target="macker-check">
-			<param name="macker.failonerror" value="true" />
-		</antcall>
-	</target>
+  <target name="macker-check-ci-build" if="${building-branch-head}">
+    <antcall target="macker-check">
+      <param name="macker.failonerror" value="true" />
+    </antcall>
+  </target>
 
 </project>

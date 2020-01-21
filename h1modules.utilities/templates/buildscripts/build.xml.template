@@ -1,11 +1,20 @@
 <project name="build-script-dispatcher">
-	<description>
+  <description>
             Build Script for HISinOne Extension
     </description>
 
-	<available file=".angular-cli.json" property="extension.type" value="angular" />
-	<property name="extension.type">java</property>
+    <condition property="antVersionMessage"
+      value=""
+      else="You are using the ant installation from ${ant.library.dir}. Please set variable ANT_HOME to the ant installation in directory WEB-INF/internal/ant.">
+      <contains string="${ant.library.dir}" substring="WEB-INF" />
+    </condition>
 
-	<import file="${extension.type}.xml" />
-	
+    <echo message="${antVersionMessage}"/>
+
+  <available file="angular.json" property="extension.type" value="angular" />
+  <property name="extension.type">java</property>
+
+  <import file="${extension.type}.xml" />
+
+  <target name="ciall" depends="clean,coverage-report,import-testresults,jar" />
 </project>
