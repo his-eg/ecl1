@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.exportWizards">
+         <category
+            id="de.his.cs.sys.extensions"
+            name="HISinOne">
+         </category>
+         <wizard
+               id="net.sf.ecl1.commit.exporter"
+               name="Commit Exporter" category="de.his.cs.sys.extensions"
+               icon="icons/export.png"
+               class="net.sf.ecl1.commit.exporter.CommitExporterWizard">
+         </wizard>
+   </extension>
+
+</plugin>
