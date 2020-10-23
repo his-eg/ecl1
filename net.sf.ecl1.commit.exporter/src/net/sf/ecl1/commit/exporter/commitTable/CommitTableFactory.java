@@ -1,12 +1,14 @@
 package net.sf.ecl1.commit.exporter.commitTable;
 
 import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableColumn;
 
@@ -20,7 +22,7 @@ public class CommitTableFactory {
      * @param parentComposite
      * @return
      */
-    static public TableViewer createCommitTable(Composite parentComposite) {
+    static public CheckboxTableViewer createCommitTable(Composite parentComposite) {
         /* ----------------------
          * Create the table that displays everything
          * ----------------------
@@ -31,8 +33,11 @@ public class CommitTableFactory {
         Composite tableComposite = new Composite(parentComposite, SWT.NONE);
         TableColumnLayout tableColumnLayout = new TableColumnLayout();
         tableComposite.setLayout(tableColumnLayout);
+        GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1);
+        tableComposite.setLayoutData(layoutData);
 
-        TableViewer tableViewer = new TableViewer(tableComposite, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
+        CheckboxTableViewer tableViewer = CheckboxTableViewer.newCheckList(tableComposite,
+                                                                           SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER | SWT.CHECK | SWT.BORDER);
         //TableViewer tableViewer = new TableViewer(shell);
         //TableViewer tableViewer = new TableViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
         tableViewer.getTable().setHeaderVisible(true);
@@ -52,24 +57,36 @@ public class CommitTableFactory {
 
     private static void createColumns(TableViewer tableViewer, TableColumnLayout tableColumnLayout) {
 
-        String[] headers = { "Checked?", "Short ID", "Message", "Author", "Date" };
-        int[] columnWeights = { 1, 1, 4, 2, 2 };
+        String[] headers = { "ID", "Message", "Author", "Date" };
+        int[] columnWeights = { 1, 4, 2, 2 };
 
+
+        //        //First column
+        //        TableViewerColumn col = createTableViewerColumn(tableViewer, headers[0], tableColumnLayout, columnWeights[0]);
+        //        col.setLabelProvider(new ColumnLabelProvider() {
+        //            @Override
+        //            public String getText(Object element) {
+        //                SelectableRevCommit c = (SelectableRevCommit) element;
+        //                if (c.isSelected()) {
+        //                    return Character.toString((char) 0x2611);
+        //                } else {
+        //                    return Character.toString((char) 0x2610);
+        //                }
+        //            }
+        //        });
+        //        col.setEditingSupport(new SelectedEditingSupport(tableViewer));
 
         //First column
         TableViewerColumn col = createTableViewerColumn(tableViewer, headers[0], tableColumnLayout, columnWeights[0]);
         col.setLabelProvider(new ColumnLabelProvider() {
+
             @Override
             public String getText(Object element) {
-                SelectableRevCommit c = (SelectableRevCommit) element;
-                if (c.isSelected()) {
-                    return Character.toString((char) 0x2611);
-                } else {
-                    return Character.toString((char) 0x2610);
-                }
+                RevCommit c = (RevCommit) element;
+                //                return c.getId().abbreviate(7).name();
+                return c.getId().name();
             }
         });
-        col.setEditingSupport(new SelectedEditingSupport(tableViewer));
 
         //Second column
         col = createTableViewerColumn(tableViewer, headers[1], tableColumnLayout, columnWeights[1]);
@@ -77,8 +94,8 @@ public class CommitTableFactory {
 
             @Override
             public String getText(Object element) {
-                RevCommit c = ((SelectableRevCommit) element).getCommit();
-                return c.getId().abbreviate(7).name();
+                RevCommit c = (RevCommit) element;
+                return c.getShortMessage();
             }
         });
 
@@ -88,8 +105,8 @@ public class CommitTableFactory {
 
             @Override
             public String getText(Object element) {
-                RevCommit c = ((SelectableRevCommit) element).getCommit();
-                return c.getShortMessage();
+                RevCommit c = (RevCommit) element;
+                return c.getAuthorIdent().getEmailAddress();
             }
         });
 
@@ -99,19 +116,7 @@ public class CommitTableFactory {
 
             @Override
             public String getText(Object element) {
-                RevCommit c = ((SelectableRevCommit) element).getCommit();
-                return c.getAuthorIdent().getEmailAddress();
-            }
-        });
-
-        //Fifth column
-        col = createTableViewerColumn(tableViewer, headers[4], tableColumnLayout, columnWeights[4]);
-        col.setLabelProvider(new ColumnLabelProvider() {
-
-            @Override
-            public String getText(Object element) {
-                RevCommit c = ((SelectableRevCommit) element).getCommit();
-                //Implement me!
+                RevCommit c = (RevCommit) element;
                 return c.getAuthorIdent().getWhen().toString();
             }
         });

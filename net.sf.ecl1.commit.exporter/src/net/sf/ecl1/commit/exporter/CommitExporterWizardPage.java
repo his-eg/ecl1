@@ -1,8 +1,10 @@
 package net.sf.ecl1.commit.exporter;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
@@ -10,19 +12,25 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
-import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.ArrayContentProvider;
+import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.team.internal.core.subscribers.ChangeSet;
@@ -32,16 +40,20 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 import net.sf.ecl1.commit.exporter.commitTable.CommitTableFactory;
+import net.sf.ecl1.commit.exporter.commitTable.GitUtil;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.hisinone.ReleaseXmlUtil;
+import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
 public class CommitExporterWizardPage extends WizardPage {
 
 	private static final ConsoleLogger logger = new ConsoleLogger(CommitExportWizardPlugin.getDefault().getLog(), CommitExportWizardPlugin.PLUGIN_ID, CommitExporterWizardPage.class.getSimpleName());
 
-    private TableViewer commitTable;
+    private CheckboxTableViewer commitTable;
 
     private Table changeSetTable;
+
+    private Git git;
 
     private Collection<ChangeSet> changes = CommitExportWizardPlugin.getDefault().getChangeSets();
 
@@ -83,6 +95,12 @@ public class CommitExporterWizardPage extends WizardPage {
 
     @Override
     public void createControl(Composite parent) {
+        String webappsPath = WebappsUtil.findWebappsProject().getLocation().toString();
+        logger.info("Starting search for git-repo at this location: " + webappsPath);
+        git = GitUtil.searchGitRepo(webappsPath);
+        logger.info("Found git-repo at: " + git.getRepository().getDirectory().toString());
+
+
         Composite pageComposite = new Composite(parent, SWT.NONE);
         GridLayout gridLayout = new GridLayout(2, true);
         pageComposite.setLayout(gridLayout);
@@ -104,30 +122,36 @@ public class CommitExporterWizardPage extends WizardPage {
         Label dbUpdateLabel = new Label(pageComposite, SWT.LEFT);
         dbUpdateLabel.setText("Database update required?");
         dbUpdateRequired = new BooleanFieldEditor("dbUpdate", "", pageComposite);
-        dbUpdateRequired.fillIntoGrid(pageComposite, 1);
+        //dbUpdateRequired.fillIntoGrid(pageComposite, 1);
         dbUpdateRequired.setPropertyChangeListener(propertyChangeListener);
 
         Label inlcudeStagedChangesLabel = new Label(pageComposite, SWT.LEFT);
         inlcudeStagedChangesLabel.setText("Include Staged Changes in Hotfix?");
         Button includeStageChanges = new Button(pageComposite, SWT.CHECK);
         includeStageChanges.setSelection(true);
-        
-        Composite processSelectButtonsComp = new Composite(parent, SWT.NONE);
-        processSelectButtonsComp.setLayout(new RowLayout());
-
-        checkAllSelected = new Button(processSelectButtonsComp, SWT.PUSH);
-        checkAllSelected.setText("Check all selected rows");
-        uncheckAllSelected = new Button(processSelectButtonsComp, SWT.PUSH);
-        uncheckAllSelected.setText("Uncheck all selected rows");
-
-        
-        
 
         Label tableLabel = new Label(pageComposite, SWT.LEFT);
         tableLabel.setText("Commits");
         
         commitTable = CommitTableFactory.createCommitTable(pageComposite);
-        
+        /* ----------------------
+         * Set the content provider for the table
+         * ----------------------
+         */
+        //We choose an ArrayContentProvider, because our data is not mutable
+        commitTable.setContentProvider(new ArrayContentProvider());
+        //TODO: Must later be replaced a something that does not collect all commits, but only when called (lazy)
+        List<RevCommit> allCommits = new ArrayList<>();
+
+        try {
+            for (RevCommit r : git.log().all().call()) {
+                allCommits.add(r);
+            }
+        } catch (GitAPIException | IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        commitTable.setInput(allCommits);
 
 
         //                changeSetTable = new Table(pageComposite, SWT.FULL_SELECTION | SWT.V_SCROLL | SWT.SINGLE | SWT.FILL);
@@ -205,6 +229,50 @@ public class CommitExporterWizardPage extends WizardPage {
         //for (IFile releaseXml : releaseXmlFiles) {
         //    releaseFilesList.add(releaseXml.getName());
         //}
+
+        new Label(pageComposite, SWT.NONE); //Needed to correctly align the following elements in the layout
+        Composite processSelectButtonsComp = new Composite(pageComposite, SWT.LEFT);
+        RowLayout rl_processSelectButtonsComp = new RowLayout();
+        rl_processSelectButtonsComp.marginLeft = 0;
+        processSelectButtonsComp.setLayout(rl_processSelectButtonsComp);
+        checkAllSelected = new Button(processSelectButtonsComp, SWT.PUSH);
+        checkAllSelected.setText("Check all selected rows");
+        checkAllSelected.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                IStructuredSelection selectedRows = commitTable.getStructuredSelection();
+                for (Object o : selectedRows.toList()) {
+                    commitTable.setChecked(o, true);
+                }
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+
+        uncheckAllSelected = new Button(processSelectButtonsComp, SWT.PUSH);
+        uncheckAllSelected.setText("Uncheck all selected rows");
+        uncheckAllSelected.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                IStructuredSelection selectedRows = commitTable.getStructuredSelection();
+                for (Object o : selectedRows.toList()) {
+                    commitTable.setChecked(o, false);
+                }
+
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+        });
 
         this.hotfixSnippetTextEditor = new StringFieldEditor("snippet", "Hotfix Snippet", pageComposite);
 

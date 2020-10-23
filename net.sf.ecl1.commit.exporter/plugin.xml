@@ -3,16 +3,17 @@
 <plugin>
    <extension
          point="org.eclipse.ui.exportWizards">
-         <category
+      <category
             id="de.his.cs.sys.extensions"
             name="HISinOne">
-         </category>
-         <wizard
-               id="net.sf.ecl1.commit.exporter"
-               name="Commit Exporter" category="de.his.cs.sys.extensions"
-               icon="icons/export.png"
-               class="net.sf.ecl1.commit.exporter.CommitExporterWizard">
-         </wizard>
+      </category>
+      <wizard
+            category="de.his.cs.sys.extensions"
+            class="net.sf.ecl1.commit.exporter.CommitExporterWizard"
+            icon="icons/export.png"
+            id="net.sf.ecl1.commit.exporter"
+            name="Commit Exporter">
+      </wizard>
    </extension>
 
 </plugin>

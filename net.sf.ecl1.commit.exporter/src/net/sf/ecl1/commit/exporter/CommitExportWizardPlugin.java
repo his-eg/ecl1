@@ -61,6 +61,19 @@ public class CommitExportWizardPlugin extends AbstractUIPlugin {
 
     
     
+
+    //    /**
+    //     * 
+    //     * If a git-repo is available in this workspace, this method returns its. 
+    //     * 
+    //     * @return
+    //     * @throws IOException
+    //     */
+    //    public Git getGit() {
+    //        return GitUtil.getGit();
+    //    }
+
+
     /**
      * Retrieve all present change sets
      *
