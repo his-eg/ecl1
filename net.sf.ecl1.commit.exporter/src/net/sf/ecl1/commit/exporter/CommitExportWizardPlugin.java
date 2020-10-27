@@ -1,16 +1,7 @@
 package net.sf.ecl1.commit.exporter;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import org.eclipse.team.internal.ccvs.ui.CVSUIPlugin;
-import org.eclipse.team.internal.core.subscribers.ActiveChangeSetManager;
-import org.eclipse.team.internal.core.subscribers.ChangeSet;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-
-import com.google.common.collect.Sets;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -59,32 +50,5 @@ public class CommitExportWizardPlugin extends AbstractUIPlugin {
         return plugin;
     }
 
-    
-    
-
-    //    /**
-    //     * 
-    //     * If a git-repo is available in this workspace, this method returns its. 
-    //     * 
-    //     * @return
-    //     * @throws IOException
-    //     */
-    //    public Git getGit() {
-    //        return GitUtil.getGit();
-    //    }
-
-
-    /**
-     * Retrieve all present change sets
-     *
-     * @return all user defined change sets
-     */
-    public Collection<ChangeSet> getChangeSets() {
-        Collection<ChangeSet> changeSets = Sets.newHashSet();
-        ActiveChangeSetManager manager = CVSUIPlugin.getPlugin().getChangeSetManager();
-        List<ChangeSet> changeSetsFromManager = Arrays.asList(manager.getSets());
-        changeSets.addAll(changeSetsFromManager);
-        return changeSets;
-    }
 
 }

@@ -5,9 +5,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
-import net.sf.ecl1.utilities.general.ConsoleLogger;
-import net.sf.ecl1.utilities.hisinone.ReleaseXmlUtil;
-
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -29,11 +26,13 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.team.internal.core.subscribers.ChangeSet;
+import org.junit.Assert;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import org.junit.Assert;
+import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.hisinone.ReleaseXmlUtil;
 
 public class ChangeSetExporterWizardPage extends WizardPage {
 

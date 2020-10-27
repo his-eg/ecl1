@@ -23,4 +23,4 @@ Import-Package: com.google.common.base;version="15.0.0",
  org.eclipse.team.internal.core,
  org.eclipse.team.internal.core.subscribers,
  org.eclipse.team.ui,
- org.slf4j;version="1.7.30"
+ org.slf4j

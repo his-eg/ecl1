@@ -1,6 +1,6 @@
 package net.sf.ecl1.commit.exporter;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Information about a hotfix
@@ -30,7 +30,7 @@ public class HotfixInformation {
 
     private String dbUpdate;
     
-    private ArrayList<String> fileNames = new ArrayList<>();
+    private List<String> fileNames;
 
     /**
      * Create a new HotfixInformation with all data given.
@@ -40,7 +40,7 @@ public class HotfixInformation {
      * @param dbUpdate
      * @param fileNames
      */
-    public HotfixInformation(String title, String description, String hiszilla, boolean dbUpdate, ArrayList<String> fileNames) {
+    public HotfixInformation(String title, String description, String hiszilla, boolean dbUpdate, List<String> fileNames) {
         this.title = title;
         this.description = description;
         this.hiszilla = hiszilla;
@@ -59,7 +59,7 @@ public class HotfixInformation {
             sb.append(String.format(INDENT + FILE_ELEMENT + NEW_LINE, fileName));
         }
         sb.append(INDENT + DESC_START + NEW_LINE);
-        sb.append(description + NEW_LINE);
+        sb.append(INDENT + INDENT + description + NEW_LINE);
         sb.append(INDENT + DESC_END + NEW_LINE);
         sb.append(PATCH_END);
         return sb.toString();

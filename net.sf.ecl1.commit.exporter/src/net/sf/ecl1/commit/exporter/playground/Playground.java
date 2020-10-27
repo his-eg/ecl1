@@ -25,8 +25,8 @@ import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -38,6 +38,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import net.sf.ecl1.commit.exporter.commitTable.CommitTableFactory;
 import net.sf.ecl1.commit.exporter.commitTable.GitUtil;
+import net.sf.ecl1.commit.exporter.commitTable.StagedChanges;
 
 
 
@@ -67,11 +68,13 @@ public class Playground {
     private static final Logger logger = Logger.getGlobal();
 
 
-    public static void main(String[] args) throws NoHeadException, GitAPIException, IOException {
+    public static void main(String[] args) {
 
 
-
+        //        Git git = GitUtil.searchGitRepo("C:\\HIS-Workspace\\Repositories\\webapps\\");
+        //        Git git = GitUtil.searchGitRepo("C:\\HIS-Workspace\\Tomcat\\tomcat-head\\webapps\\");
         Git git = GitUtil.searchGitRepo("C:\\HIS-Workspace\\Repositories\\ecl1\\");
+        logger.info("Using the GIT-Repo at: " + git.getRepository().getDirectory().toString());
 
         /* ----------------------
          * Greate a display and a shell
@@ -105,14 +108,14 @@ public class Playground {
         //        Display.getDefault().addListener(SWT.KeyDown, listener);
 
 
-        /* ----------------------
-         * Staged changes checkbox
-         * ----------------------
-         */
-        Label inlcudeStagedChangesLabel = new Label(shell, SWT.LEFT);
-        inlcudeStagedChangesLabel.setText("Include Staged Changes in Hotfix?");
-        Button includeStageChanges = new Button(shell, SWT.CHECK);
-        includeStageChanges.setSelection(true);
+        //        /* ----------------------
+        //         * Staged changes checkbox
+        //         * ----------------------
+        //         */
+        //        Label inlcudeStagedChangesLabel = new Label(shell, SWT.LEFT);
+        //        inlcudeStagedChangesLabel.setText("Include Staged Changes in Hotfix?");
+        //        Button includeStageChanges = new Button(shell, SWT.CHECK);
+        //        includeStageChanges.setSelection(true);
 
 
 
@@ -130,23 +133,13 @@ public class Playground {
         //We choose an ArrayContentProvider, because our data is not mutable
         tableViewer.setContentProvider(new ArrayContentProvider());
 
-        //        GridData gridData = new GridData();
-        //        gridData.grabExcessHorizontalSpace = true;
-        //        gridData.horizontalAlignment = GridData.FILL;
-        //        tableViewer.getTable().setLayoutData(gridData);
-
-        //TODO: Must later be replaced a something that does not collect all commits, but only when called (lazy)
-        //        List<SelectableRevCommit> allCommits = new ArrayList<>();
-        //        for (RevCommit r : GitUtil.getGit().log().all().call()) {
-        //            allCommits.add(new SelectableRevCommit(r));
-        //        }
-        //        tableViewer.setInput(allCommits);
-        List<RevCommit> allCommits = new ArrayList<>();
-        for (RevCommit r : git.log().all().call()) {
-            allCommits.add(r);
-        }
-        logger.info("Using the GIT-Repo at: " + git.getRepository().getDirectory().toString());
+        List<Object> allCommits = new ArrayList<>();
+        StagedChanges stagedChanges = new StagedChanges();
+        allCommits.add(stagedChanges);
+        allCommits.addAll(GitUtil.getAllCommits(git));
         tableViewer.setInput(allCommits);
+        tableViewer.setChecked(stagedChanges, true);
+
 
         
 
@@ -166,8 +159,7 @@ public class Playground {
         Button checkAllSelected = new Button(processSelectButtonsComp, SWT.PUSH);
         checkAllSelected.setText("Check all selected rows");
         checkAllSelected.setToolTipText("CTRL + S");
-        checkAllSelected.addSelectionListener(new SelectionListener() {
-
+        checkAllSelected.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 IStructuredSelection selectedRows = tableViewer.getStructuredSelection();
@@ -175,19 +167,13 @@ public class Playground {
                     tableViewer.setChecked(o, true);
                 }
             }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-                // TODO Auto-generated method stub
-
-            }
         });
 
 
         Button uncheckAllSelected = new Button(processSelectButtonsComp, SWT.PUSH);
         uncheckAllSelected.setText("Uncheck all selected rows");
         uncheckAllSelected.setToolTipText("CTRL+D");
-        uncheckAllSelected.addSelectionListener(new SelectionListener() {
+        uncheckAllSelected.addSelectionListener(new SelectionAdapter() {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -198,11 +184,6 @@ public class Playground {
 
             }
 
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-                // TODO Auto-generated method stub
-
-            }
         });
 
 
@@ -216,51 +197,19 @@ public class Playground {
         exportButton.setText("Export all selected commits to console");
 
 
-        exportButton.addSelectionListener(new SelectionListener() {
+        exportButton.addSelectionListener(new SelectionAdapter() {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                try {
-                    /* ----------------------
-                     * Handle Staged Changes
-                     * ----------------------
-                     */
-                    if (includeStageChanges.getSelection()) {
-                        List<String> stagedChanges = GitUtil.getStagedChanges(git);
-                        System.out.println("--------");
-                        for (String s : stagedChanges) {
-                            System.out.println(s);
-                        }
-                        System.out.println("--------");
-                    }
+                List<String> touchedFiles = GitUtil.getAddedOrModifiedFiles(tableViewer.getCheckedElements(), git);
 
-
-
-
-                    /* ----------------------
-                     * Handle Commits
-                     * ----------------------
-                     */
-                    Object[] checkedElements = tableViewer.getCheckedElements();
-                    List<RevCommit> checkedCommits = new ArrayList<RevCommit>();
-                    for (Object o : checkedElements) {
-                        checkedCommits.add((RevCommit) o);
-                    }
-
-                    printChangedFiles(checkedCommits, GitUtil.getGit().getRepository());
-                } catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                for (String s : touchedFiles) {
+                    System.out.println(s);
                 }
 
             }
 
 
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-                // TODO Auto-generated method stub
-            }
         });
         
 
@@ -277,7 +226,6 @@ public class Playground {
         display.dispose();
 
     }
-
 
 
 

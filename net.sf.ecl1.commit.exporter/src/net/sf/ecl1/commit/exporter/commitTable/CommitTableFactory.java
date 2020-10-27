@@ -16,7 +16,7 @@ public class CommitTableFactory {
 
     /**
      * 
-     * Creates a TableViewer on the given shell with a suitable layout for displaying git commits. 
+     * Creates a TableViewer on the given shell with a nice-looking layout for displaying git commits. 
      * 
      * 
      * @param parentComposite
@@ -61,30 +61,20 @@ public class CommitTableFactory {
         int[] columnWeights = { 1, 4, 2, 2 };
 
 
-        //        //First column
-        //        TableViewerColumn col = createTableViewerColumn(tableViewer, headers[0], tableColumnLayout, columnWeights[0]);
-        //        col.setLabelProvider(new ColumnLabelProvider() {
-        //            @Override
-        //            public String getText(Object element) {
-        //                SelectableRevCommit c = (SelectableRevCommit) element;
-        //                if (c.isSelected()) {
-        //                    return Character.toString((char) 0x2611);
-        //                } else {
-        //                    return Character.toString((char) 0x2610);
-        //                }
-        //            }
-        //        });
-        //        col.setEditingSupport(new SelectedEditingSupport(tableViewer));
-
         //First column
         TableViewerColumn col = createTableViewerColumn(tableViewer, headers[0], tableColumnLayout, columnWeights[0]);
         col.setLabelProvider(new ColumnLabelProvider() {
 
             @Override
             public String getText(Object element) {
-                RevCommit c = (RevCommit) element;
-                //                return c.getId().abbreviate(7).name();
-                return c.getId().name();
+
+                if (element instanceof RevCommit) {
+                    RevCommit c = (RevCommit) element;
+                    return c.getId().name();
+                }
+                //Must be StagedChanges then...
+                StagedChanges c = (StagedChanges) element;
+                return c.getID();
             }
         });
 
@@ -94,7 +84,12 @@ public class CommitTableFactory {
 
             @Override
             public String getText(Object element) {
-                RevCommit c = (RevCommit) element;
+                if (element instanceof RevCommit) {
+                    RevCommit c = (RevCommit) element;
+                    return c.getShortMessage();
+                }
+                //Must be StagedChanges then...
+                StagedChanges c = (StagedChanges) element;
                 return c.getShortMessage();
             }
         });
@@ -105,8 +100,13 @@ public class CommitTableFactory {
 
             @Override
             public String getText(Object element) {
-                RevCommit c = (RevCommit) element;
-                return c.getAuthorIdent().getEmailAddress();
+                if (element instanceof RevCommit) {
+                    RevCommit c = (RevCommit) element;
+                    return c.getAuthorIdent().getEmailAddress();
+                }
+                //Must be StagedChanges then...
+                StagedChanges c = (StagedChanges) element;
+                return c.getEmailAddress();
             }
         });
 
@@ -116,8 +116,13 @@ public class CommitTableFactory {
 
             @Override
             public String getText(Object element) {
-                RevCommit c = (RevCommit) element;
-                return c.getAuthorIdent().getWhen().toString();
+                if (element instanceof RevCommit) {
+                    RevCommit c = (RevCommit) element;
+                    return c.getAuthorIdent().getWhen().toString();
+                }
+                //Must be StagedChanges then...
+                StagedChanges c = (StagedChanges) element;
+                return c.getWhen();
             }
         });
 

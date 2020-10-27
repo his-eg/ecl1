@@ -19,7 +19,7 @@ public class CommitExporterWizard extends Wizard implements IExportWizard {
     @Override
     public boolean performFinish() {
     	page.setValidationRequired();
-        page.checkSetHotfixInformation();
+        page.createHotfix();
         return (page.getErrorMessage() == null);
     }
 }
