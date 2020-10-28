@@ -3,6 +3,7 @@ package net.sf.ecl1.commit.exporter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -66,7 +67,12 @@ public class CommitExporterWizardPage extends WizardPage {
 
     @Override
     public void createControl(Composite parent) {
-        String webappsPath = WebappsUtil.findWebappsProject().getLocation().toString();
+        IProject webappsProject = WebappsUtil.findWebappsProject();
+        if (webappsProject == null) {
+            logger.info("No webapps project found! Aborting!");
+            throw new RuntimeException("No webapps project found! Aborting!");
+        }
+        String webappsPath = webappsProject.getLocation().toString();
         logger.info("Starting search for git-repo at this location: " + webappsPath);
         git = GitUtil.searchGitRepo(webappsPath);
         logger.info("Found git-repo at: " + git.getRepository().getDirectory().toString());
