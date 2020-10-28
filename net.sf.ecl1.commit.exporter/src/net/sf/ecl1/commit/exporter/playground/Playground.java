@@ -36,9 +36,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import net.sf.ecl1.commit.exporter.commitTable.CommitTableFactory;
-import net.sf.ecl1.commit.exporter.commitTable.GitUtil;
-import net.sf.ecl1.commit.exporter.commitTable.StagedChanges;
+import net.sf.ecl1.commit.exporter.git.CommitTableFactory;
+import net.sf.ecl1.commit.exporter.git.GitUtil;
+import net.sf.ecl1.commit.exporter.git.StagedChanges;
 
 
 

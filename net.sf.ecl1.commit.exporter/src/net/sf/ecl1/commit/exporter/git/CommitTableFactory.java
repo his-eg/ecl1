@@ -1,4 +1,4 @@
-package net.sf.ecl1.commit.exporter.commitTable;
+package net.sf.ecl1.commit.exporter.git;
 
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -38,8 +38,6 @@ public class CommitTableFactory {
 
         CheckboxTableViewer tableViewer = CheckboxTableViewer.newCheckList(tableComposite,
                                                                            SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER | SWT.CHECK | SWT.BORDER);
-        //TableViewer tableViewer = new TableViewer(shell);
-        //TableViewer tableViewer = new TableViewer(shell, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
         tableViewer.getTable().setHeaderVisible(true);
         tableViewer.getTable().setLinesVisible(true);
 

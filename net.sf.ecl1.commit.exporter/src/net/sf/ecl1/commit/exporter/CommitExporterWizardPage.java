@@ -23,9 +23,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
-import net.sf.ecl1.commit.exporter.commitTable.CommitTableFactory;
-import net.sf.ecl1.commit.exporter.commitTable.GitUtil;
-import net.sf.ecl1.commit.exporter.commitTable.StagedChanges;
+import net.sf.ecl1.commit.exporter.git.CommitTableFactory;
+import net.sf.ecl1.commit.exporter.git.GitUtil;
+import net.sf.ecl1.commit.exporter.git.StagedChanges;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.hisinone.ReleaseXmlUtil;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
@@ -119,7 +119,8 @@ public class CommitExporterWizardPage extends WizardPage {
         rl_processSelectButtonsComp.marginLeft = 0;
         processSelectButtonsComp.setLayout(rl_processSelectButtonsComp);
         checkAllSelected = new Button(processSelectButtonsComp, SWT.PUSH);
-        checkAllSelected.setText("Check all selected rows");
+        checkAllSelected.setText("&Check all selected rows");
+        checkAllSelected.setToolTipText("ALT + C");
         checkAllSelected.addSelectionListener(new SelectionAdapter() {
 
             @Override
@@ -132,7 +133,8 @@ public class CommitExporterWizardPage extends WizardPage {
         });
 
         uncheckAllSelected = new Button(processSelectButtonsComp, SWT.PUSH);
-        uncheckAllSelected.setText("Uncheck all selected rows");
+        uncheckAllSelected.setText("&Uncheck all selected rows");
+        uncheckAllSelected.setToolTipText("ALT + U");
         uncheckAllSelected.addSelectionListener(new SelectionAdapter() {
 
             @Override
@@ -155,24 +157,19 @@ public class CommitExporterWizardPage extends WizardPage {
     void createHotfix() {
         if (validUserInput()) {
 
-            //            logger.info("Start: getTouchedFiles: " + System.currentTimeMillis());
             hotfixFileNames = GitUtil.getAddedOrModifiedFiles(commitTable.getCheckedElements(), git);
-            //            logger.info("Stop: getTouchedFiles: " + System.currentTimeMillis());
 
             if (validate && hotfixFileNames.isEmpty()) {
                 setLogError("The selected commits contain no files or all modified files are outside of qisserver!");
                 return;
             }
 
-            //            logger.info("Start: createHotFix: " + System.currentTimeMillis());
-            // looks good -> create hotfix snippet
             String title = hotfixTitle.getStringValue();
             String description = hotfixDescription.getStringValue();
             String hiszilla = hiszillaTickets.getStringValue();
             boolean isDbUpdateRequired = dbUpdateRequired.getBooleanValue();
             String hotfixSnippet = new HotfixInformation(title, description, hiszilla, isDbUpdateRequired, hotfixFileNames).toXml();
-            //            logger.debug("Created hotfix snippet:\n" + hotfixSnippet);
-            //            logger.info("Stop: createHotFix: " + System.currentTimeMillis());
+            logger.debug("Created hotfix snippet:\n" + hotfixSnippet);
 
             // add content to clipboard
             final Display display = getControl().getDisplay();

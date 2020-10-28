@@ -1,4 +1,4 @@
-package net.sf.ecl1.commit.exporter.commitTable;
+package net.sf.ecl1.commit.exporter.git;
 
 public class StagedChanges {
 

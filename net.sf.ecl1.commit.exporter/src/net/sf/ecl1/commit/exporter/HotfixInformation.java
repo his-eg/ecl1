@@ -54,14 +54,14 @@ public class HotfixInformation {
      */
     public String toXml() {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format(PATCH_START + NEW_LINE, title, hiszilla, dbUpdate));
+        sb.append(String.format(INDENT + PATCH_START + NEW_LINE, title, hiszilla, dbUpdate));
         for (String fileName : fileNames) {
-            sb.append(String.format(INDENT + FILE_ELEMENT + NEW_LINE, fileName));
+            sb.append(String.format(INDENT + INDENT + FILE_ELEMENT + NEW_LINE, fileName));
         }
-        sb.append(INDENT + DESC_START + NEW_LINE);
-        sb.append(INDENT + INDENT + description + NEW_LINE);
-        sb.append(INDENT + DESC_END + NEW_LINE);
-        sb.append(PATCH_END);
+        sb.append(INDENT + INDENT + DESC_START + NEW_LINE);
+        sb.append(INDENT + INDENT + INDENT + description + NEW_LINE);
+        sb.append(INDENT + INDENT + DESC_END + NEW_LINE);
+        sb.append(INDENT + PATCH_END);
         return sb.toString();
     }
 }

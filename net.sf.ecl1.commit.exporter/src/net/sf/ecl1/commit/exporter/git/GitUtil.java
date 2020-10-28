@@ -1,4 +1,4 @@
-package net.sf.ecl1.commit.exporter.commitTable;
+package net.sf.ecl1.commit.exporter.git;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -109,9 +109,6 @@ public class GitUtil {
      * @return
      */
     public static Set<String> getAddedOrModifiedFilesByStagedChanges(Git git, Set<String> files) {
-        if (files.isEmpty()) {
-            files = new TreeSet<String>();
-        }
 
         List<DiffEntry> stagedChanges = null;
         try {
@@ -120,7 +117,7 @@ public class GitUtil {
             e.printStackTrace();
         }
         if (stagedChanges == null) {
-            return new TreeSet<String>();
+            return files;
         }
         
         for (DiffEntry e : stagedChanges) {
@@ -131,16 +128,6 @@ public class GitUtil {
                 files.add(e.getNewPath());
             }
         }
-        //        
-        //        Status status = null;
-        //        try {
-        //            status = git.status().call();
-        //        } catch (NoWorkTreeException | GitAPIException e1) {
-        //            e1.printStackTrace();
-        //        }
-        //        files.addAll(status.getAdded());
-        //        files.addAll(status.getChanged());
-        //        files.removeAll(status.getRemoved());
         return files;
     }
 
@@ -227,7 +214,7 @@ public class GitUtil {
 
                     List<DiffEntry> entries = null;
 
-                    //Get all DiffEntry between the current commit and this parent
+                    //Get all DiffEntries between the current commit and this parent
                     try {
                         currentTreeIter.reset(reader, currentTreeId);
                         parentTreeIter.reset(reader, parentTreeId);
@@ -270,7 +257,15 @@ public class GitUtil {
      * @return
      */
     public static List<String> getAddedOrModifiedFiles(Object[] checkedElements, Git git) {
-        Set<String> addedOrModifiedFiles = new TreeSet<>();
+        /*
+         * Sorting with the Collator is necessary, because otherwise the strings would be
+         * sorted by their unicode value. This would result in unexpected behavior, since every CAPITAL letter
+         * has a lower unicode value than every lower-case letter. This means
+         * that a file named e.java is sorted after W.java, which is something a human would not expect
+         * (or at least I don't expect it). By using the Collator, the strings are sorted as
+         * most humans would expect them to be (this means that basically the case is ignored).
+         */
+        Set<String> addedOrModifiedFiles = new TreeSet<>(Collator.getInstance());
 
         if (checkedElements.length == 0) {
             return new ArrayList<String>();
@@ -305,25 +300,14 @@ public class GitUtil {
         }
 
         
-        /*
-         * Convert the TreeSet into a List to make sorting easier...
-         * Sorting with the Collator is necessary, because otherwise the strings would be
-         * sorted by their unicode value. This would result in unexpected behavior, since every CAPITAL letter
-         * has a lower unicode value than every lower-case letter. This means
-         * that a file named e.java is sorted after W.java, which is something a human would not expect
-         * (or at least I don't expect it). By using the Collator, the strings are sorted as
-         * most humans would expect them to be (this means that basically the case is ignored).
-         */
-        List<String> returnList = new ArrayList<String>();
-        returnList.addAll(addedOrModifiedFiles);
-        Collections.sort(returnList, Collator.getInstance());
+
         
         /*
          * Every file that does not start with qisserver is removed from the list. 
          * Strip qisserver/ from the start of every remaining file.
          */
         String qisserver = "qisserver/";
-        returnList = returnList.stream().filter(s -> s.startsWith(qisserver)).map(s -> s.substring(qisserver.length())).collect(Collectors.toList());
+        List<String> returnList = addedOrModifiedFiles.stream().filter(s -> s.startsWith(qisserver)).map(s -> s.substring(qisserver.length())).collect(Collectors.toList());
         
         return returnList;
 
