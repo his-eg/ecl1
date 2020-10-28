@@ -160,7 +160,7 @@ public class CommitExporterWizardPage extends WizardPage {
             //            logger.info("Stop: getTouchedFiles: " + System.currentTimeMillis());
 
             if (validate && hotfixFileNames.isEmpty()) {
-                setLogError("The selected elements contain no files!");
+                setLogError("The selected commits contain no files or all modified files are outside of qisserver!");
                 return;
             }
 

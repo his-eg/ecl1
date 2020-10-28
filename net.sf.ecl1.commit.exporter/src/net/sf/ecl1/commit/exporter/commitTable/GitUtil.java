@@ -9,13 +9,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
-import org.eclipse.jgit.errors.NoWorkTreeException;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -109,20 +108,39 @@ public class GitUtil {
      * @param files
      * @return
      */
-    public static Set<String> getTouchedFilesByStagedChanges(Git git, Set<String> files) {
+    public static Set<String> getAddedOrModifiedFilesByStagedChanges(Git git, Set<String> files) {
         if (files.isEmpty()) {
             files = new TreeSet<String>();
         }
 
-        Status status = null;
+        List<DiffEntry> stagedChanges = null;
         try {
-            status = git.status().call();
-        } catch (NoWorkTreeException | GitAPIException e1) {
-            e1.printStackTrace();
+            stagedChanges = git.diff().setCached(true).call();
+        } catch (GitAPIException e) {
+            e.printStackTrace();
         }
-        files.addAll(status.getAdded());
-        files.addAll(status.getChanged());
-        files.removeAll(status.getRemoved());
+        if (stagedChanges == null) {
+            return new TreeSet<String>();
+        }
+        
+        for (DiffEntry e : stagedChanges) {
+            //Note: Deleted files have dev/null as their new path.
+            if (e.getNewPath() == DiffEntry.DEV_NULL) {
+                files.remove(e.getOldPath());
+            } else {
+                files.add(e.getNewPath());
+            }
+        }
+        //        
+        //        Status status = null;
+        //        try {
+        //            status = git.status().call();
+        //        } catch (NoWorkTreeException | GitAPIException e1) {
+        //            e1.printStackTrace();
+        //        }
+        //        files.addAll(status.getAdded());
+        //        files.addAll(status.getChanged());
+        //        files.removeAll(status.getRemoved());
         return files;
     }
 
@@ -133,7 +151,7 @@ public class GitUtil {
 
     /**
      * Returns a list of files that have been modified/added by the given commits. 
-     * Since a commit is just a description of state of the repository, a commit always needs another commit to create a diff. 
+     * Since a commit is just a description of a state of the repository, a commit always needs another commit to create a diff. 
      * This method always makes a diff against the parent(s) of the commits. 
      * 
      * Goes through the commits in chronological order. 
@@ -144,7 +162,7 @@ public class GitUtil {
      * @param repo
      * @return
      */
-    public static Set<String> getAddedOrChangedFilesByCommits(List<RevCommit> commits, Repository repo) {
+    public static Set<String> getAddedOrModifiedFilesByCommits(List<RevCommit> commits, Repository repo) {
 
         //Note: A TreeSet is used here to automatically sort the filenames alphabetically. 
         Set<String> addedOrChangedFiles = new TreeSet<>();
@@ -197,7 +215,10 @@ public class GitUtil {
 
             } else {
                 /*
-                 * 'Normal' case, if a commit has at least one parent. Create the diffs against all parents of this commit. 
+                 * 'Normal' case, if a commit has at least one parent. Create the diffs against all parents of this commit.
+                 * Idea from here: 
+                 * https://github.com/centic9/jgit-cookbook/blob/master/src/main/java/org/dstadler/jgit/porcelain/ShowBranchDiff.java
+                 * 
                  */
                 RevCommit[] parents = r.getParents();
                 for (int i = 0; i < parents.length; i++) {
@@ -218,7 +239,8 @@ public class GitUtil {
 
                     for (DiffEntry entry : entries) {
 
-                        if (entry.getNewPath() == DiffEntry.DEV_NULL) {//Deleted files have dev/null as their new entry!
+                        //Note: Deleted files have dev/null as their new path.
+                        if (entry.getNewPath() == DiffEntry.DEV_NULL) {
                             addedOrChangedFiles.remove(entry.getOldPath());
                         } else {
                             addedOrChangedFiles.add(entry.getNewPath());
@@ -272,14 +294,14 @@ public class GitUtil {
         for (; i < checkedElements.length; i++) {
             checkedCommits.add((RevCommit) checkedElements[i]);
         }
-        addedOrModifiedFiles.addAll(GitUtil.getAddedOrChangedFilesByCommits(checkedCommits, git.getRepository()));
+        addedOrModifiedFiles.addAll(GitUtil.getAddedOrModifiedFilesByCommits(checkedCommits, git.getRepository()));
 
 
         /*
          * Handle StagedChanges.
          */
         if (stagedChanges) {
-            addedOrModifiedFiles = GitUtil.getTouchedFilesByStagedChanges(git, addedOrModifiedFiles);
+            addedOrModifiedFiles = GitUtil.getAddedOrModifiedFilesByStagedChanges(git, addedOrModifiedFiles);
         }
 
         
@@ -288,12 +310,21 @@ public class GitUtil {
          * Sorting with the Collator is necessary, because otherwise the strings would be
          * sorted by their unicode value. This would result in unexpected behavior, since every CAPITAL letter
          * has a lower unicode value than every lower-case letter. This means
-         * that a file nameed e.java is sorted after W.java... By using the Collator, the strings are sorted as
+         * that a file named e.java is sorted after W.java, which is something a human would not expect
+         * (or at least I don't expect it). By using the Collator, the strings are sorted as
          * most humans would expect them to be (this means that basically the case is ignored).
          */
         List<String> returnList = new ArrayList<String>();
         returnList.addAll(addedOrModifiedFiles);
         Collections.sort(returnList, Collator.getInstance());
+        
+        /*
+         * Every file that does not start with qisserver is removed from the list. 
+         * Strip qisserver/ from the start of every remaining file.
+         */
+        String qisserver = "qisserver/";
+        returnList = returnList.stream().filter(s -> s.startsWith(qisserver)).map(s -> s.substring(qisserver.length())).collect(Collectors.toList());
+        
         return returnList;
 
     }

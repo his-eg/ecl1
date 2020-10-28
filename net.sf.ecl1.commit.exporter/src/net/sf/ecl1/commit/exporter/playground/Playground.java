@@ -76,6 +76,8 @@ public class Playground {
         Git git = GitUtil.searchGitRepo("C:\\HIS-Workspace\\Repositories\\ecl1\\");
         logger.info("Using the GIT-Repo at: " + git.getRepository().getDirectory().toString());
 
+
+
         /* ----------------------
          * Greate a display and a shell
          * ----------------------
