@@ -9,6 +9,8 @@ import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.swt.SWT;
@@ -64,19 +66,10 @@ public class CommitExporterWizardPage extends WizardPage {
         this.setTitle("Describe the hotfix and select commits");
         propertyChangeListener = new SimplePropertyChangeListener(this);
     }
-
+    
     @Override
     public void createControl(Composite parent) {
-        IProject webappsProject = WebappsUtil.findWebappsProject();
-        if (webappsProject == null) {
-            logger.info("No webapps project found! Aborting!");
-            throw new RuntimeException("No webapps project found! Aborting!");
-        }
-        String webappsPath = webappsProject.getLocation().toString();
-        logger.info("Starting search for git-repo at this location: " + webappsPath);
-        git = GitUtil.searchGitRepo(webappsPath);
-        logger.info("Found git-repo at: " + git.getRepository().getDirectory().toString());
-
+    	locateGit();
 
         Composite pageComposite = new Composite(parent, SWT.NONE);
         GridLayout gridLayout = new GridLayout(2, true);
@@ -111,13 +104,15 @@ public class CommitExporterWizardPage extends WizardPage {
          * Set the content provider for the table
          * ----------------------
          */
-        commitTable.setContentProvider(new ArrayContentProvider());
-        List<Object> allCommits = new ArrayList<>();
-        StagedChanges stagedChanges = new StagedChanges();
-        allCommits.add(stagedChanges);
-        allCommits.addAll(GitUtil.getLast500Commits(git));
-        commitTable.setInput(allCommits);
-        commitTable.setChecked(stagedChanges, true);
+        if(git != null ) {
+	        commitTable.setContentProvider(new ArrayContentProvider());
+	        List<Object> allCommits = new ArrayList<>();
+	        StagedChanges stagedChanges = new StagedChanges();
+	        allCommits.add(stagedChanges);
+	        allCommits.addAll(GitUtil.getLast500Commits(git));
+	        commitTable.setInput(allCommits);
+	        commitTable.setChecked(stagedChanges, true);
+        }
 
         new Label(pageComposite, SWT.NONE); //Needed to correctly align the following elements in the layout
         Composite processSelectButtonsComp = new Composite(pageComposite, SWT.LEFT);
@@ -158,7 +153,21 @@ public class CommitExporterWizardPage extends WizardPage {
         setControl(pageComposite);
     }
 
-
+    private void locateGit() {
+    	IProject webappsProject = WebappsUtil.findWebappsProject();
+        if (webappsProject == null) {
+            setErrorMessage("Could not find webapps project in workspace! Commit Exporter will not work! Please add (exactly) one webapps project to your workspace.");
+        } else {
+            String webappsPath = webappsProject.getLocation().toString();
+            logger.info("Starting search for git-repo at this location: " + webappsPath);
+            git = GitUtil.searchGitRepo(webappsPath);
+            if(git == null ) {
+            	setErrorMessage("Found a webapps project, but no git repository. Commit Exporter will not work! Please make sure this version of webapps has a git repository.");
+            } else {
+                logger.info("Found git-repo at: " + git.getRepository().getDirectory().toString());
+            }
+        }
+    }
 
     void createHotfix() {
         if (validUserInput()) {
@@ -213,6 +222,15 @@ public class CommitExporterWizardPage extends WizardPage {
         return hiszilla != null && !hiszilla.isEmpty();
     }
 
+    
+    private boolean hasGit() {
+    	if(git == null) {
+    		return false;
+    	} else {
+    		return true;
+    	}
+    }
+    
     /**
      * Turn on validation when the finish button was clicked.
      */
@@ -225,7 +243,7 @@ public class CommitExporterWizardPage extends WizardPage {
      */
     private void checkSetValidationRequired() {
         if (!validate) {
-            validate = hasTitle() && hasDescription() && hasHiszilla() && hasAtLeastOneCommitChecked();
+            validate = hasGit() && hasTitle() && hasDescription() && hasHiszilla() && hasAtLeastOneCommitChecked();
         }
     }
 
@@ -235,8 +253,13 @@ public class CommitExporterWizardPage extends WizardPage {
     private boolean validUserInput() {
 
         checkSetValidationRequired();
+        
 
-
+        if(!hasGit()) {
+            if (validate) setLogError("No Git repository found!");
+            return false;
+        }
+        
         if (!hasTitle()) {
             if (validate) setLogError("No hotfix title provided!");
             return false;
@@ -253,7 +276,10 @@ public class CommitExporterWizardPage extends WizardPage {
             if (validate) setLogError("No commit selected!");
             return false;
         }
-
+        
+        
+        setMessage(null);
+        setErrorMessage(null);
         return true;
     }
 

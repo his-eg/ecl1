@@ -36,14 +36,16 @@ public class GitUtil {
      */
     public static Git searchGitRepo(String absolutePath) {
         File startPoint = new File(absolutePath);
-        //System.out.println("Starting searching for git-repo at this location: " + startPoint.toString());
         FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
         repoBuilder.findGitDir(startPoint);
         repoBuilder.setMustExist(true);
+        if(repoBuilder.getGitDir() == null) {
+        	//Could not find gitdir...
+        	return null;
+        }
         Repository repo = null;
         try {
             repo = repoBuilder.build();
-            //System.out.println("Found Git-Repo at: " + repo.getDirectory().toString());
         } catch (IOException e) {
             e.printStackTrace();
         }

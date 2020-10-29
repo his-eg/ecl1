@@ -24,9 +24,7 @@ public class SimplePropertyChangeListener implements IPropertyChangeListener, IC
     }
 
     private void handleEvent(EventObject event) {
-        // clear previous messages
-        page.setMessage(null);
-        page.setErrorMessage(null);
+        //clear previous messages
         page.createHotfix();
     }
 }
