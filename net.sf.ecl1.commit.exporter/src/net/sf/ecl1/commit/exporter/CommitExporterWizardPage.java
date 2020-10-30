@@ -27,9 +27,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import net.sf.ecl1.commit.exporter.git.CommitTableFactory;
-import net.sf.ecl1.commit.exporter.git.GitUtil;
+import net.sf.ecl1.commit.exporter.git.DiffUtil;
 import net.sf.ecl1.commit.exporter.git.StagedChanges;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.hisinone.GitUtil;
 import net.sf.ecl1.utilities.hisinone.ReleaseXmlUtil;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
@@ -109,7 +110,7 @@ public class CommitExporterWizardPage extends WizardPage {
 	        List<Object> allCommits = new ArrayList<>();
 	        StagedChanges stagedChanges = new StagedChanges();
 	        allCommits.add(stagedChanges);
-	        allCommits.addAll(GitUtil.getLast500Commits(git));
+	        allCommits.addAll(GitUtil.getLastCommits(git,500));
 	        commitTable.setInput(allCommits);
 	        commitTable.setChecked(stagedChanges, true);
         }
@@ -127,9 +128,11 @@ public class CommitExporterWizardPage extends WizardPage {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 IStructuredSelection selectedRows = commitTable.getStructuredSelection();
-                for (Object o : selectedRows.toList()) {
+                for (Object o : selectedRows.toList()) {               	
                     commitTable.setChecked(o, true);
                 }
+                //Necessary, because commitTable.setChecked does not fire the check state listener... 
+                propertyChangeListener.handleEvent(e); 
             }
         });
 
@@ -144,7 +147,8 @@ public class CommitExporterWizardPage extends WizardPage {
                 for (Object o : selectedRows.toList()) {
                     commitTable.setChecked(o, false);
                 }
-
+                //Necessary, because commitTable.setChecked does not fire the check state listener... 
+                propertyChangeListener.handleEvent(e); 
             }
         });
 
@@ -172,7 +176,7 @@ public class CommitExporterWizardPage extends WizardPage {
     void createHotfix() {
         if (validUserInput()) {
 
-            hotfixFileNames = GitUtil.getAddedOrModifiedFiles(commitTable.getCheckedElements(), git);
+            hotfixFileNames = DiffUtil.getAddedOrModifiedFiles(commitTable.getCheckedElements(), git);
 
             if (validate && hotfixFileNames.isEmpty()) {
                 setLogError("The selected commits contain no files or all modified files are outside of qisserver!");

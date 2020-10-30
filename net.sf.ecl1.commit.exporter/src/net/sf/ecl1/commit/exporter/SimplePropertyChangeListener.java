@@ -23,7 +23,7 @@ public class SimplePropertyChangeListener implements IPropertyChangeListener, IC
 
     }
 
-    private void handleEvent(EventObject event) {
+    public void handleEvent(EventObject event) {
         //clear previous messages
         page.createHotfix();
     }

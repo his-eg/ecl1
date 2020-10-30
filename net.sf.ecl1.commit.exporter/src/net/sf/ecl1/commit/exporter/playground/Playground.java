@@ -37,8 +37,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import net.sf.ecl1.commit.exporter.git.CommitTableFactory;
-import net.sf.ecl1.commit.exporter.git.GitUtil;
+import net.sf.ecl1.commit.exporter.git.DiffUtil;
 import net.sf.ecl1.commit.exporter.git.StagedChanges;
+import net.sf.ecl1.utilities.hisinone.GitUtil;
 
 
 
@@ -203,7 +204,7 @@ public class Playground {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                List<String> touchedFiles = GitUtil.getAddedOrModifiedFiles(tableViewer.getCheckedElements(), git);
+                List<String> touchedFiles = DiffUtil.getAddedOrModifiedFiles(tableViewer.getCheckedElements(), git);
 
                 for (String s : touchedFiles) {
                     System.out.println(s);

@@ -15,9 +15,24 @@ import org.eclipse.swt.widgets.TableColumn;
 public class CommitTableFactory {
 
     /**
+     * <p>Creates a TableViewer on the given shell with a nice-looking layout for displaying git commits. </p>
      * 
-     * Creates a TableViewer on the given shell with a nice-looking layout for displaying git commits. 
+     * <p>The returned table can handle {@link org.eclipse.jgit.revwalk.RevCommit RevCommits}
+     * and {@link net.sf.ecl1.commit.exporter.git.StagedChanges StagedChanges} as inputs. </p>
      * 
+     * <p>A note about the implementation: The runtime-performance of the returned CheckboxTableViewer can be optimized. 
+     * How? 
+     * When the input of the table is later set the StagedChanges are always set in the first row and the commits are set after the StagedChanges. 
+     * In the {@link net.sf.ecl1.commit.exporter.git.CommitTableFactory#createColumns createColumns} this information is not used. Instead, 
+     * for every cell an instanceof-check is performed. This could be avoided by simply assuming that the first row is StagedChanges and all 
+     * subsequent rows are commits. Therefore, we could avoid a lot of instanceof-checks in {@link net.sf.ecl1.commit.exporter.git.CommitTableFactory#createColumns createColumns}.
+     *  A possible solution would be to direclty set the input as {@link org.eclipse.swt.widgets.TableItem TableItems}
+     *  instead of creating columns. See the source for the Change Set Exporter in ecl1 how  a table must be constructed by utilizing TableItems. </p>
+     *
+     * <p>Why was the runtime-performance not optimized?
+     * The runtime-performance is already so fast, that any changes could be filed under "premature optimization". 
+     * So in conclusion: The author of this factory is aware that the performance can be optimized, but has chosen not to optimize, 
+     * because it is already fast enough. </p>
      * 
      * @param parentComposite
      * @return
@@ -53,6 +68,12 @@ public class CommitTableFactory {
 
     }
 
+    /**
+     * Creates the definitions of the columns. 
+     * 
+     * @param tableViewer
+     * @param tableColumnLayout
+     */
     private static void createColumns(TableViewer tableViewer, TableColumnLayout tableColumnLayout) {
 
         String[] headers = { "ID", "Message", "Author", "Date" };
