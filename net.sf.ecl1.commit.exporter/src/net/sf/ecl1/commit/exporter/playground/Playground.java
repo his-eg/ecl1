@@ -38,8 +38,8 @@ import org.eclipse.swt.widgets.Shell;
 
 import net.sf.ecl1.commit.exporter.git.CommitTableFactory;
 import net.sf.ecl1.commit.exporter.git.DiffUtil;
+import net.sf.ecl1.commit.exporter.git.GitUtil;
 import net.sf.ecl1.commit.exporter.git.StagedChanges;
-import net.sf.ecl1.utilities.hisinone.GitUtil;
 
 
 

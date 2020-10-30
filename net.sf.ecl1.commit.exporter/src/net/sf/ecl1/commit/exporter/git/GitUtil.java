@@ -1,4 +1,4 @@
-package net.sf.ecl1.utilities.hisinone;
+package net.sf.ecl1.commit.exporter.git;
 
 import java.io.File;
 import java.io.IOException;

@@ -28,9 +28,9 @@ import org.eclipse.swt.widgets.Label;
 
 import net.sf.ecl1.commit.exporter.git.CommitTableFactory;
 import net.sf.ecl1.commit.exporter.git.DiffUtil;
+import net.sf.ecl1.commit.exporter.git.GitUtil;
 import net.sf.ecl1.commit.exporter.git.StagedChanges;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
-import net.sf.ecl1.utilities.hisinone.GitUtil;
 import net.sf.ecl1.utilities.hisinone.ReleaseXmlUtil;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
