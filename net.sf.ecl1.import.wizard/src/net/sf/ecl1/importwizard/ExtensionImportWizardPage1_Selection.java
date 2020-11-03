@@ -31,6 +31,8 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 	private static final String PAGE_NAME = "page1";
 	private static final String PAGE_DESCRIPTION = "Extension Import - Selection";
 
+	private static final String AUTOCOMMIT_EXTENSION_JAR = "AUTOCOMMIT_EXTENSION_JAR";
+	
 	// top-level container for this page
 	private Composite container;
 
@@ -102,7 +104,7 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 
         Set<String> extensionsInWorkspace = model.getExtensionsInWorkspace();
         for (String remoteExtensionName : model.getRemoteExtensions()) {
-            if (!extensionsInWorkspace.contains(remoteExtensionName) && !remoteExtensionName.contains(HisConstants.WEBAPPS)) {
+            if (!extensionsInWorkspace.contains(remoteExtensionName) && !remoteExtensionName.contains(HisConstants.WEBAPPS) && !remoteExtensionName.contains(AUTOCOMMIT_EXTENSION_JAR)) {
                 TableItem tableItem = new TableItem(projectTable, SWT.NONE);
                 tableItem.setChecked(false);
                 tableItem.setText(1, remoteExtensionName);
