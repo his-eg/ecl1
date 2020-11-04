@@ -1,7 +1,6 @@
 package net.sf.ecl1.updatecheck;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -33,6 +32,8 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
 public class P2Util {
     private static final ConsoleLogger logger = new ConsoleLogger(UpdateCheckActivator.getDefault().getLog(), UpdateCheckActivator.PLUGIN_ID, P2Util.class.getSimpleName());
 
+    private static final String ECL1_UPDATE_ID = "h1modulesfeature.feature.group";
+    
 	static void doCheckForUpdates(IProgressMonitor monitor) {
 		BundleContext bundleContext = UpdateCheckActivator.getDefault().getBundle().getBundleContext();
 		ServiceReference<?> reference = bundleContext.getServiceReference(IProvisioningAgent.SERVICE_NAME);
@@ -59,10 +60,10 @@ public class P2Util {
 		}
 	}
 
-	static IStatus checkForUpdates(IProvisioningAgent agent, IProgressMonitor monitor) throws OperationCanceledException {
+	private static IStatus checkForUpdates(IProvisioningAgent agent, IProgressMonitor monitor) throws OperationCanceledException {
 		ProvisioningSession session = new ProvisioningSession(agent);
 		// Here we restrict the possible updates to ecl1
-		IQuery<IInstallableUnit> query = QueryUtil.createLatestQuery(QueryUtil.createIUQuery("h1modulesfeature.feature.group"));
+		IQuery<IInstallableUnit> query = QueryUtil.createLatestQuery(QueryUtil.createIUQuery(ECL1_UPDATE_ID));
 		logger.debug("Update Query Expression: " + query.getExpression());
 		IProfileRegistry registry = (IProfileRegistry) agent.getService(IProfileRegistry.SERVICE_NAME);
 		final IProfile profile = registry.getProfile(IProfileRegistry.SELF);
@@ -70,82 +71,76 @@ public class P2Util {
 		Set<IInstallableUnit> unitsForUpdate = result.toUnmodifiableSet();
 		logger.debug("Installable Units for update: " + unitsForUpdate);
 		
-		UpdateOperation operation = new UpdateOperation(session);
+		UpdateOperation operation;
 		if(!unitsForUpdate.isEmpty()) {
 			logger.info("Creating UpdateOperation for: " + unitsForUpdate);
 			operation = new UpdateOperation(session, unitsForUpdate);
+		} else {
+			// XXX can this case happen at all ?
+			logger.debug("Creating UpdateOperation for everything");
+			operation = new UpdateOperation(session);
 		}
 		
 		// Check if updates for ecl1 are available
 		SubMonitor sub = SubMonitor.convert(monitor, "Checking for application updates...", 200);
-		IStatus status = operation.resolveModal(sub.newChild(100));
+		IStatus status = operation.resolveModal(sub.newChild(100)); // sets possible updates
 		logger.info("Status after update check: " + status.getMessage());
-		// TODO Currently all available software sites are searched for ecl1 updates (see #171739).
-		// It would be much faster to identify the repository first and then do repository.query(...)
+		Update[] possibleUpdates = operation.getPossibleUpdates();
+		logger.debug("Possible updates = " + Arrays.toString(possibleUpdates));
 
 		// React on the update check result
-		if (status.getCode() == UpdateOperation.STATUS_NOTHING_TO_UPDATE) {
-			return status;
-		}
-		if (status.getSeverity() == IStatus.CANCEL)
-			throw new OperationCanceledException();
-
+		if (status.getCode() == UpdateOperation.STATUS_NOTHING_TO_UPDATE) return status;
+		if (status.getSeverity() == IStatus.CANCEL) throw new OperationCanceledException();
+		
 		if (status.getSeverity() != IStatus.ERROR) {
 			// More complex status handling might include showing the user what
 			// updates are available if there are multiples, differentiating
 			// patches vs. updates, etc. In this example, we simply update as
 			// suggested by the operation.
 			
-			// Do the update
-			status = restrictUpdateToEcl1(operation, monitor, sub);
-			logger.info("Status after update: " + status.getMessage());
-			
-			if (status.getSeverity() == IStatus.CANCEL) {
-				Throwable t = status.getException();
-				if (t != null) {
-					logger.error2(status.getMessage() + ": " + t.getMessage(), t);
+			Update ecl1Update = findEcl1Update(possibleUpdates); // XXX only required if the update operation is not restricted to ecl1 ?
+			if(ecl1Update != null) {
+				operation.setSelectedUpdates(new Update[]{ecl1Update});
+				ProvisioningJob job = operation.getProvisioningJob(monitor);
+				if (job == null) {
+					status = new Status(IStatus.ERROR, UpdateCheckActivator.PLUGIN_ID,
+							"ProvisioningJob could not be created - does this application support p2 software installation?");
 				} else {
-					logger.error2(status.getMessage());
+					// Do the update
+					status = job.runModal(sub.newChild(100));
+					if (status.getSeverity() == IStatus.CANCEL) { // the update has been cancelled by the user
+						Throwable t = status.getException();
+						if (t != null) {
+							logger.error2(status.getMessage() + ": " + t.getMessage(), t);
+						} else {
+							logger.error2(status.getMessage());
+						}
+						throw new OperationCanceledException();
+					}
 				}
-				throw new OperationCanceledException();
+			} else {
+				status = new Status(Status.INFO, UpdateCheckActivator.PLUGIN_ID, "No update for ecl1 found.");
 			}
+			logger.info("Status after update: " + status.getMessage());
 		}
 		return status;
 	}
 
-	// TODO The implementation of this method seems to be incomplete.
-	//	    Is the ecl1 check not necessary anymore because above the query is restricted to h1modules ?
-	// TODO uncomment code?
-	private static IStatus restrictUpdateToEcl1(UpdateOperation operation, IProgressMonitor monitor, SubMonitor sub) {
-		ProvisioningJob job = operation.getProvisioningJob(monitor);
-		List<Update> chosenUpdates = Arrays.asList(operation.getPossibleUpdates());
-		Update ecl1 = null;
-		for (Update update : chosenUpdates) {
-			logger.info("Possible Update from " + update.toUpdate.getId() + " " + update.toUpdate.getVersion() + " to " + update.replacement.getVersion());
-			if(isEcl1(update)) {
-				logger.info("Identified ecl1-Update: " + update.toUpdate.getId());
-				ecl1 = update;
+	private static Update findEcl1Update(Update[] possibleUpdates) {
+		if (possibleUpdates != null && possibleUpdates.length>0) {
+			for (Update update : possibleUpdates) {
+				String updateId = update.toUpdate.getId();
+				if(updateId != null && updateId.equals(ECL1_UPDATE_ID)) {
+					logger.info("Found ecl1 update " + update);
+					return update;
+				} else {
+					logger.debug("Discarded non-ecl1 update " + update);
+				}
 			}
+			logger.info("None of the available updates is an ecl1 update...");
+		} else {
+			logger.info("There are no updates available");
 		}
-		
-//		if(ecl1 != null) {
-//		operation.setSelectedUpdates(new Update[]{ecl1});
-		if (job == null) {
-			return new Status(IStatus.ERROR, UpdateCheckActivator.PLUGIN_ID,
-					"ProvisioningJob could not be created - does this application support p2 software installation?");
-		}
-		return job.runModal(sub.newChild(100));
-//		}
-//		return new Status(Status.INFO, UpdateCheckActivator.PLUGIN_ID, "No update for ecl1 found.");
-	}
-
-	private static boolean isEcl1(Update update) {
-		String updateId = update.toUpdate.getId();
-		logger.debug("updateId = " + updateId);
-		if(updateId != null) {
-			// TODO recognize ecl1
-			return true;
-		}
-		return false;
+		return null;
 	}
 }
