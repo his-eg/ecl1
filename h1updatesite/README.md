@@ -3,6 +3,11 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 0.10.0.2020-11-05##
+* Added commit exporter for webapps in git repository
+* Do not offer AUTOCOMMIT_EXTENSION_JAR for extension import
+* Refactored ecl1 update check
+
 ##Version 0.9.0.2019-05-20##
 * Fixed infinite loop at extension import when there are cyclic dependencies between extensions.
 * Fixed exceptions in new enroll checker wizard when no or a wrong project has been selected.
