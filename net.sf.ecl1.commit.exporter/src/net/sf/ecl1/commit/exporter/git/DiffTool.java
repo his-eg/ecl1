@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -23,35 +24,60 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 
 /**
  * 
- * Util class for creating diffs from commits (and possibly from StagedChanges)
+ * This class computes the addedOrModified-list and the removed-list from the user checked commits. 
  * 
  * @author sohrt
  */
-public class DiffUtil {
+public class DiffTool {
+
+    /**
+     * All files that have been added or modified by the user checked commits. 
+     */
+	private Set<String> addedOrModifiedFiles = new TreeSet<>();
+	
+	/** Deletes files by user checked commits. */
+	private Set<String> deletedFiles = new TreeSet<>();
+	
+	private boolean diffComputed = false;
+	
+	
+	public Set<String> getAddedOrModifiedFiles() {
+		if(diffComputed) {
+			return addedOrModifiedFiles;
+		} else {
+			return new TreeSet<String>();
+		}
+	}
+
+	public Set<String> getDeletedFiles() {
+		if(diffComputed) {
+			return deletedFiles;
+		} else {
+			return new TreeSet<String>();
+		}
+	}
 
 	/**
-	 * This method expects within the given Object[]-array either RevCommits or StagedChanges. 
+	 * This method returns all files that have been added or modified by the given RevCommits/StagedChanges.
 	 * 
-	 * This method returns all files that have been added or modified by the given RevCommits/StagedChanges.  
+     * his method expects within the given Object[]-array either RevCommits or StagedChanges. 
 	 * 
-	 * @param checkedElements
-	 * @param git
-	 * @return
+	 * @param checkedElements must by either RevCommits or StagedChanges
+	 * @param git The git-repo the RevCommits or StagedChanges belong to
 	 */
-	public static List<String> getAddedOrModifiedFiles(Object[] checkedElements, Git git) {
-	    /*
-	     * Sorting with the Collator is necessary, because otherwise the strings would be
-	     * sorted by their unicode value. This would result in unexpected behavior, since every CAPITAL letter
-	     * has a lower unicode value than every lower-case letter. This means
-	     * that a file named e.java is sorted after W.java, which is something a human would not expect
-	     * (or at least I don't expect it). By using the Collator, the strings are sorted as
-	     * most humans would expect them to be (this means that basically the case is ignored).
+	public void computeDiff(Object[] checkedElements, Git git) {
+		/*
+		 * Delete previous diff
+		 * 
 	     */
-	    Set<String> addedOrModifiedFiles = new TreeSet<>(Collator.getInstance());
+	    addedOrModifiedFiles = new TreeSet<>();
+	    deletedFiles = new TreeSet<String>();
 	
 	    if (checkedElements.length == 0) {
-	        return new ArrayList<String>();
+	        return;
 	    }
+	    
+
 	
 	    /*
 	     * Check if StagedChanges have been checked by the user
@@ -71,48 +97,53 @@ public class DiffUtil {
 	    for (; i < checkedElements.length; i++) {
 	        checkedCommits.add((RevCommit) checkedElements[i]);
 	    }
-	    addedOrModifiedFiles.addAll(DiffUtil.getAddedOrModifiedFilesByCommits(checkedCommits, git.getRepository()));
+	    computeCommits(checkedCommits, git.getRepository());
 	
 	
 	    /*
 	     * Handle StagedChanges.
 	     */
 	    if (stagedChanges) {
-	        addedOrModifiedFiles = DiffUtil.getAddedOrModifiedFilesByStagedChanges(git, addedOrModifiedFiles);
+	        computeStagedChanges(git);
 	    }
 	
 	    
 	
 	    
 	    /*
-	     * Every file that does not start with qisserver is removed from the list. 
-	     * Strip qisserver/ from the start of every remaining file.
+	     * This does two things: 
+	     * 1. Every file that does not start with qisserver is removed from the list. 
+	     * 2. Strip qisserver/ from the start of every remaining file.
 	     */
 	    String qisserver = "qisserver/";
-	    List<String> returnList = addedOrModifiedFiles.stream().filter(s -> s.startsWith(qisserver)).map(s -> s.substring(qisserver.length())).collect(Collectors.toList());
+	    addedOrModifiedFiles = addedOrModifiedFiles.stream().filter(s -> s.startsWith(qisserver))
+	    		.map(s -> s.substring(qisserver.length()))
+	    		.collect(Collectors.toCollection(TreeSet::new));
 	    
-	    return returnList;
+	    deletedFiles = deletedFiles.stream().filter(s -> s.startsWith(qisserver))
+	    		.map(s -> s.substring(qisserver.length()))
+	    		.collect(Collectors.toCollection(TreeSet::new));
+	    
+		this.diffComputed = true;
 	
 	}
 
 	/**
-	 * Returns a list of files that have been modified/added by the given commits. 
+	 * Computes all files that have been modified/added by the given commits and
+	 * all files that haven been deleted. 
+	 * 
 	 * Since a commit is just a description of a state of the repository, a commit always needs another commit to create a diff. 
 	 * This method always makes a diff against the parent(s) of the commits. 
 	 * 
 	 * Goes through the commits in chronological order. 
 	 * 
-	 * If a file is deleted by a later commit, the file is deleted from the resulting file set. 
+	 * If a file is deleted by a later commit, the file is deleted from the resulting file set. The deletion is
+	 * also saved in this object. 
 	 * 
 	 * @param commits This method expects that the commits are given in reverse chronological order (latest file first)
 	 * @param repo
-	 * @return
 	 */
-	public static Set<String> getAddedOrModifiedFilesByCommits(List<RevCommit> commits, Repository repo) {
-	
-	    //Note: A TreeSet is used here to automatically sort the filenames alphabetically. 
-	    Set<String> addedOrChangedFiles = new TreeSet<>();
-	
+	private void computeCommits(List<RevCommit> commits, Repository repo) {
 	    //Sort commits in chronological order (oldest first)
 	    Collections.reverse(commits);
 	
@@ -151,7 +182,7 @@ public class DiffUtil {
 	                    if (treeWalk.isSubtree()) {
 	                        treeWalk.enterSubtree();
 	                    } else {
-	                        addedOrChangedFiles.add(treeWalk.getPathString());
+	                        this.addedOrModifiedFiles.add(treeWalk.getPathString());
 	                    }
 	                }
 	            } catch (IOException e) {
@@ -187,9 +218,22 @@ public class DiffUtil {
 	
 	                    //Note: Deleted files have dev/null as their new path.
 	                    if (entry.getNewPath() == DiffEntry.DEV_NULL) {
-	                        addedOrChangedFiles.remove(entry.getOldPath());
+	                    	/*
+	                    	 * This if-clause prevents removedEntries to show up in the final result, 
+	                    	 * if they only existed within the git range that the user has checked.
+	                    	 * 
+	                    	 * An example: 
+	                    	 * If I created a file in a hotfix-commit but then realized I don't need
+	                    	 * this file in the next hotfix-commit anymore, the file is excluded from the resultSet. 
+	                    	 * The file only shortly existed during the hotfix-creation-phase, but was not part of the 
+	                    	 * hotfix that was eventually delivered to the customers. 
+	                    	 * 
+	                    	 */
+	                    	if(this.addedOrModifiedFiles.remove(entry.getOldPath()) == false) {
+	                    		this.deletedFiles.add(entry.getOldPath());
+	                    	}
 	                    } else {
-	                        addedOrChangedFiles.add(entry.getNewPath());
+	                    	this.addedOrModifiedFiles.add(entry.getNewPath());
 	                    }
 	
 	                }
@@ -200,22 +244,16 @@ public class DiffUtil {
 	
 	    }
 	    df.close();
-	    return addedOrChangedFiles;
 	}
 
 	/**
-	 * Modifies the given set of files by taking into account changes from the StagedChanges. 
-	 * Returns the modified set after completing the modifications. 
+	 * Computes all files that have been modified/added by StagedChanges and
+	 * all files that haven been deleted. 
 	 * 
-	 * Here's what happens: 
-	 * Every file that was added or modified in the StagedChanges is added to the set. 
-	 * Every file that was removed in the StagedChanges is removed from the set. 
 	 * 
 	 * @param git
-	 * @param files
-	 * @return
 	 */
-	public static Set<String> getAddedOrModifiedFilesByStagedChanges(Git git, Set<String> files) {
+	private void computeStagedChanges(Git git) {
 	
 	    List<DiffEntry> stagedChanges = null;
 	    try {
@@ -224,18 +262,20 @@ public class DiffUtil {
 	        e.printStackTrace();
 	    }
 	    if (stagedChanges == null) {
-	        return files;
+	        return;
 	    }
 	    
 	    for (DiffEntry e : stagedChanges) {
 	        //Note: Deleted files have dev/null as their new path.
 	        if (e.getNewPath() == DiffEntry.DEV_NULL) {
-	            files.remove(e.getOldPath());
+	        	if(addedOrModifiedFiles.remove(e.getOldPath()) == false) {
+	        		this.deletedFiles.add(e.getOldPath());
+	        	}
 	        } else {
-	            files.add(e.getNewPath());
+	            addedOrModifiedFiles.add(e.getNewPath());
 	        }
 	    }
-	    return files;
+
 	}
 
 }

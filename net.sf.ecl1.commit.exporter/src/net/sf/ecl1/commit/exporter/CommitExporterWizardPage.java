@@ -1,7 +1,10 @@
 package net.sf.ecl1.commit.exporter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.preference.BooleanFieldEditor;
@@ -27,7 +30,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import net.sf.ecl1.commit.exporter.git.CommitTableFactory;
-import net.sf.ecl1.commit.exporter.git.DiffUtil;
+import net.sf.ecl1.commit.exporter.git.DiffTool;
 import net.sf.ecl1.commit.exporter.git.GitUtil;
 import net.sf.ecl1.commit.exporter.git.StagedChanges;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
@@ -41,6 +44,8 @@ public class CommitExporterWizardPage extends WizardPage {
     private CheckboxTableViewer commitTable;
 
     private Git git;
+    
+    private DiffTool diffStorage = new DiffTool();
 
     private StringFieldEditor hotfixTitle;
 
@@ -56,7 +61,9 @@ public class CommitExporterWizardPage extends WizardPage {
 
     private StringFieldEditor hotfixSnippetTextEditor;
 
-    private List<String> hotfixFileNames = new ArrayList<>();
+    private Set<String> addedOrModifiedFiles = new TreeSet<String>();
+    
+    private Set<String> deletedFiles = new TreeSet<String>();
 
     private SimplePropertyChangeListener propertyChangeListener;
     
@@ -110,7 +117,7 @@ public class CommitExporterWizardPage extends WizardPage {
 	        List<Object> allCommits = new ArrayList<>();
 	        StagedChanges stagedChanges = new StagedChanges();
 	        allCommits.add(stagedChanges);
-	        allCommits.addAll(GitUtil.getLastCommits(git,500));
+	        allCommits.addAll(GitUtil.getLastCommits(git,100));
 	        commitTable.setInput(allCommits);
 	        commitTable.setChecked(stagedChanges, true);
         }
@@ -176,9 +183,11 @@ public class CommitExporterWizardPage extends WizardPage {
     void createHotfix() {
         if (validUserInput()) {
 
-            hotfixFileNames = DiffUtil.getAddedOrModifiedFiles(commitTable.getCheckedElements(), git);
+            diffStorage.computeDiff(commitTable.getCheckedElements(), git);
+        	addedOrModifiedFiles = diffStorage.getAddedOrModifiedFiles();
+        	deletedFiles = diffStorage.getDeletedFiles();
 
-            if (validate && hotfixFileNames.isEmpty()) {
+            if (validate && addedOrModifiedFiles.isEmpty()) {
                 setLogError("The selected commits contain no files or all modified files are outside of qisserver!");
                 return;
             }
@@ -187,7 +196,7 @@ public class CommitExporterWizardPage extends WizardPage {
             String description = hotfixDescription.getStringValue();
             String hiszilla = hiszillaTickets.getStringValue();
             boolean isDbUpdateRequired = dbUpdateRequired.getBooleanValue();
-            String hotfixSnippet = new HotfixInformation(title, description, hiszilla, isDbUpdateRequired, hotfixFileNames).toXml();
+            String hotfixSnippet = new HotfixInformation(title, description, hiszilla, isDbUpdateRequired, addedOrModifiedFiles, deletedFiles).toXml();
             logger.debug("Created hotfix snippet:\n" + hotfixSnippet);
 
             // add content to clipboard

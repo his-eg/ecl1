@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import net.sf.ecl1.commit.exporter.git.CommitTableFactory;
-import net.sf.ecl1.commit.exporter.git.DiffUtil;
+import net.sf.ecl1.commit.exporter.git.DiffTool;
 import net.sf.ecl1.commit.exporter.git.GitUtil;
 import net.sf.ecl1.commit.exporter.git.StagedChanges;
 
@@ -204,9 +204,11 @@ public class Playground {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                List<String> touchedFiles = DiffUtil.getAddedOrModifiedFiles(tableViewer.getCheckedElements(), git);
+            	DiffTool diffTool = new DiffTool();
+            	diffTool.computeDiff(tableViewer.getCheckedElements(), git);
+            	Set<String> addedOrModifiedFiles = diffTool.getAddedOrModifiedFiles();
 
-                for (String s : touchedFiles) {
+                for (String s : addedOrModifiedFiles) {
                     System.out.println(s);
                 }
 
