@@ -1,0 +1,10 @@
+#!/bin/sh
+#The Line endings must be LF. Otherwise sh won't interpret this script (this holds true both for Linux _and_ Windows). Please take care when editing this script on a Windows machine, that you don't accidentally change the line endings to CRLF...
+
+test "" = "$(grep -E '#[[:digit:]]{6}' "$1")" && {
+   echo "Every commit message must include a Hiszilla ticket No." >&2 
+   echo "Expected format: #123456" >&2 
+   exit 1
+}
+
+exit 0

@@ -1,0 +1,13 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Update Git Hooks
+Bundle-SymbolicName: net.sf.ecl1.git.updatehooks;singleton:=true
+Bundle-Version: 0.3.0.2020-11-05
+Bundle-Activator: net.sf.ecl1.git.updatehooks.UpdateHooksActivator
+Bundle-Vendor: HIS eG
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ net.sf.ecl1.utilities,
+ org.eclipse.jgit
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-ActivationPolicy: lazy
