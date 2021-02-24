@@ -35,6 +35,8 @@ import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 public class AutoLfsPrune implements IStartup {
     
 	private static final ConsoleLogger logger = new ConsoleLogger(AutoLfsPruneActivator.getDefault().getLog(), AutoLfsPruneActivator.PLUGIN_ID, AutoLfsPrune.class.getSimpleName());
+	
+	private static int RUN_DELAY = 86400000; //86400000ms = 1day
     
 	public static ExecutionResult runCommandInRepo(String command, Repository repo) throws IOException, InterruptedException {
 		FS fs = repo.getFS();
@@ -96,14 +98,14 @@ public class AutoLfsPrune implements IStartup {
 
 						if (er.getStdout().length() != 0) {
 							// If "git stash list" has output --> stashes present in this repo --> We cannot prune
-							logger.error2("Found stashes in the repository. Cannot run \"git lfs prune\" when stashes are present! Aborting..."
-											+ "\n You can run \"git stash clear\" to manually delete your stashes. ");
+							logger.info("Found stashes in project: " + name + "Cannot run \"git lfs prune\" when stashes are present! Aborting..."
+											+ "\nYou can run \"git stash clear\" to manually delete your stashes. ");
 							monitor.worked(1);
 							continue;
 						}
 						
 					} catch (IOException | InterruptedException e) {
-						logger.error2("Failed to run \"git stash list\" command in the following project: "+ name);
+						logger.error2("Failed to run \"git stash list\" command in project: "+ name);
 						logger.error2("Error message: " + e.getMessage(),e);
 						monitor.worked(1);	
 						continue;
@@ -137,6 +139,8 @@ public class AutoLfsPrune implements IStartup {
 				}
 				
 				monitor.done();
+				//Rerung "git lfs prune" once every day
+				this.schedule(RUN_DELAY);
 				return Status.OK_STATUS;
 			}
 		};
