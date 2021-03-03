@@ -81,7 +81,7 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
         StringBuilder propStringBuilder = new StringBuilder();
         for (Object prop : tree.keySet()) {
             // build properties string
-            propStringBuilder.append(prop.toString().replace(":", "\\:").replace("=", "\\=") + "=" + tree.get(prop).toString().replace(":", "\\:").replace("=", "\\=") + "\n");
+            propStringBuilder.append(prop.toString().replace(":", "\\:").replace("=", "\\=") + "=" + tree.get(prop).toString().replace(":", "\\:").replace("=", "\\=") + System.lineSeparator());
         }
         InputStream source = new ByteArrayInputStream(propStringBuilder.toString().getBytes());
         return source;
@@ -96,8 +96,14 @@ public class ExtensionPointBuilder extends IncrementalProjectBuilder {
     }
 
     private boolean haveContributionsChanged(Iterable<String> newContributors, Iterable<String> oldContributors) {
-        List<String> newList = Lists.newArrayList(newContributors);
+    	List<String> newList = Lists.newArrayList(newContributors);
         List<String> oldList = Lists.newArrayList(oldContributors);
+    	
+        //If both lists are empty, the contributions have not changed and we can abort early
+        if(newList.isEmpty() && oldList.isEmpty()) {
+        	return false;
+        }
+        
         return !oldList.equals(newList);
     }
 
