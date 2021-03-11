@@ -2,21 +2,10 @@ package net.sf.ecl1.git.auto.lfs.prune;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -26,11 +15,8 @@ import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.FS.ExecutionResult;
-import org.eclipse.jgit.util.FS_Win32;
 import org.eclipse.ui.IStartup;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
-import net.sf.ecl1.utilities.hisinone.ExtensionUtil;
-import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
 public class AutoLfsPrune implements IStartup {
     
@@ -98,7 +84,7 @@ public class AutoLfsPrune implements IStartup {
 
 						if (er.getStdout().length() != 0) {
 							// If "git stash list" has output --> stashes present in this repo --> We cannot prune
-							logger.info("Found stashes in project: " + name + "Cannot run \"git lfs prune\" when stashes are present! Aborting..."
+							logger.info("Found stashes in project: " + name + ". Cannot run \"git lfs prune\" when stashes are present! Aborting..."
 											+ "\nYou can run \"git stash clear\" to manually delete your stashes. ");
 							monitor.worked(1);
 							continue;
