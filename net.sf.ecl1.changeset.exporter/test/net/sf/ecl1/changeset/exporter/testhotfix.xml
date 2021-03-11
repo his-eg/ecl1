@@ -1,6 +1,0 @@
-<patch name="test" hiszilla="12345,54321" dbUpdate="false">
-    <file name="WEB-INF/conf/importdata/gx-hisinone.xml" />
-    <desc>
-description
-    </desc>
-</patch>
