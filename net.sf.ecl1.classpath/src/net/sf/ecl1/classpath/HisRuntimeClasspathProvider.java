@@ -5,12 +5,14 @@ import java.util.LinkedHashSet;
 
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.IRuntimeClasspathProvider;
 
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.ProjectUtil;
 import net.sf.ecl1.utilities.general.RuntimeClasspathUtil;
+import net.sf.ecl1.utilities.hisinone.ExtensionUtil;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
 /**
@@ -41,6 +43,18 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
 		if (WebappsUtil.isWebapps(javaProject.getProject())) {
 			// Add all Java extensions from webapps to the runtime classpath
 			RuntimeClasspathUtil.addAllExtensionsToRuntimeClasspath(javaProject, runtimeClasspath);
+		}
+		
+		/* 
+		 * Fixes #253541 
+		 * When starting a HIS-unit-test with Java <=8 , the HIS-unit-test was able to add the extension-projects (either as jars or
+		 * as a workspace-project-folder) to the classpath itself. Because the old Java-VM-classloader was deprecated in Java 9, 
+		 * the HIS-unit-test is no longer capable of adding the extensions-projects itself, and therefore ecl1 must do it instead. 
+		 */
+		if(ExtensionUtil.getInstance().isExtensionProject(javaProject.getProject())) {
+			logger.info("Enriching classpath of the following extension project: " + javaProject.getElementName());
+			//First parameter must be webapps as a IJavaproject and NOT the extension project itself
+			RuntimeClasspathUtil.addAllExtensionsToRuntimeClasspath(JavaCore.create(WebappsUtil.findWebappsProject()), runtimeClasspath);
 		}
 		
 		return runtimeClasspath.toArray(new IRuntimeClasspathEntry[runtimeClasspath.size()]);
