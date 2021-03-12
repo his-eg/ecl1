@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: GIT Commit Exporter
 Bundle-SymbolicName: net.sf.ecl1.commit.exporter;singleton:=true
-Bundle-Version: 0.1.0.2020-11-05
+Bundle-Version: 0.1.1.2021-03-12
 Bundle-Activator: net.sf.ecl1.commit.exporter.CommitExportWizardPlugin
 Bundle-Vendor: HIS eG
 Require-Bundle: org.eclipse.ui,

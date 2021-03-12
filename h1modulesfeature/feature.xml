@@ -2,7 +2,7 @@
 <feature
       id="h1modulesfeature"
       label="ecl1 - HISinOne Extension Tools"
-      version="0.10.0.2020-11-05"
+      version="1.0.0.2021-03-12"
       provider-name="HIS eG">
 
    <description url="http://ecl1.sf.net">
@@ -171,13 +171,6 @@ To apply the Apache License to your work, attach the following boilerplate notic
          unpack="false"/>
 
    <plugin
-         id="net.sf.ecl1.changeset.exporter"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="net.sf.ecl1.updatecheck"
          download-size="0"
          install-size="0"
@@ -193,6 +186,20 @@ To apply the Apache License to your work, attach the following boilerplate notic
 
    <plugin
          id="net.sf.ecl1.commit.exporter"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.sf.ecl1.git.auto-lfs-prune"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="net.sf.ecl1.git.updatehooks"
          download-size="0"
          install-size="0"
          version="0.0.0"
