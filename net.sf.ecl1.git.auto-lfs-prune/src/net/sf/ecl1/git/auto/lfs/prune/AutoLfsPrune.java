@@ -41,6 +41,33 @@ public class AutoLfsPrune implements IStartup {
 		Job job = new Job("ecl1GitLfsPrune") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
+				
+				/*
+				 * Test if git is installed on the command line
+				 */
+				try {
+					Process myProcess = Runtime.getRuntime().exec("which git");
+					
+					//Closing the streams to release resources. See: https://stackoverflow.com/questions/3774432/starting-a-process-in-java
+					myProcess.getInputStream().close();
+					myProcess.getErrorStream().close();
+					
+					int exitCode = myProcess.waitFor();
+					
+					if(exitCode != 0) {
+						logger.info("Command \"git\" is not available in your console. Therefore \"git lfs prune\" will not work. Aborting...");
+						logger.info("This can be fixed by installing git in your console.");
+						return Status.OK_STATUS;
+					}
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+				
 				List<IProject> projects = Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects());
 				logger.info("Found projects in Workspace: " + projects);
 				monitor.beginTask("Batch Git Lfs prune", projects.size());
