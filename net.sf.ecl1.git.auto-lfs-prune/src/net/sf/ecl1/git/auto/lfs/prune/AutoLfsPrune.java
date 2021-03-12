@@ -42,32 +42,6 @@ public class AutoLfsPrune implements IStartup {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				
-				/*
-				 * Test if git is installed on the command line
-				 */
-				try {
-					Process myProcess = Runtime.getRuntime().exec("which git");
-					
-					//Closing the streams to release resources. See: https://stackoverflow.com/questions/3774432/starting-a-process-in-java
-					myProcess.getInputStream().close();
-					myProcess.getErrorStream().close();
-					
-					int exitCode = myProcess.waitFor();
-					
-					if(exitCode != 0) {
-						logger.info("Command \"git\" is not available in your console. Therefore \"git lfs prune\" will not work. Aborting...");
-						logger.info("This can be fixed by installing git in your console.");
-						return Status.OK_STATUS;
-					}
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				
-				
 				List<IProject> projects = Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects());
 				logger.info("Found projects in Workspace: " + projects);
 				monitor.beginTask("Batch Git Lfs prune", projects.size());
@@ -103,10 +77,10 @@ public class AutoLfsPrune implements IStartup {
 						ExecutionResult er = runCommandInRepo("git stash list", repo);
 						
 						if (er.getRc() != 0) {
-							logger.error2("Command: \"git stash list\" returned an error code! Aborting prune attempt.");
-							logger.error2("Output of the error stream: " + new String(er.getStderr().toByteArray()));
-							monitor.worked(1);
-							continue;
+							logger.info("Command: \"git stash list\" returned an error code! Aborting pruning in ALL projects in the workspace.");
+							logger.info("Most likely cause for the error code: \"git\" command is not available on your console.");
+							logger.info("This can be fixed by installing git in your console.");
+							return Status.OK_STATUS;
 						}
 
 						if (er.getStdout().length() != 0) {
