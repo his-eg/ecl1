@@ -39,7 +39,7 @@ public class ExtensionUtil {
     /**
      * Find the webapps project in the workspace if there is one.
      */
-    public void findWebappsProject() {
+    public void updateWebappsProjectReference() {
         webappsProject = WebappsUtil.findWebappsProject();
     }
     

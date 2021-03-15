@@ -29,7 +29,6 @@ public class AutoLfsPrune implements IStartup {
 	public static ExecutionResult runCommandInRepo(String command, Repository repo) throws IOException, InterruptedException {
 		FS fs = repo.getFS();
 		
-		// The fs.runInShell makes sure that the command is run by sh.exe and _not_ by cmd.exe
 		ProcessBuilder pb = fs.runInShell(command, new String[0]);
 		pb.directory(repo.getWorkTree());
 		pb.environment().put(Constants.GIT_DIR_KEY, repo.getDirectory().getAbsolutePath());

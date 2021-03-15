@@ -76,7 +76,7 @@ public class ExtensionClasspathContainerPage extends WizardPage implements IClas
         }
 
         // before searching extensions, we search for webapps dynamically just in case it has been created after startup
-    	EXTENSION_UTIL.findWebappsProject();
+    	EXTENSION_UTIL.updateWebappsProjectReference();
     	// search all extensions eligible to be added to the classpath container
         Collection<String> extensionNames = EXTENSION_UTIL.findAllExtensions().keySet();
         for (String extensionName : extensionNames) {

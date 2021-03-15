@@ -78,7 +78,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
      */
     private void updateClasspathContainer(final IPath containerPath, final IJavaProject project) throws JavaModelException {
     	// search for webapps each time we want to update the classpath container
-    	EXTENSION_UTIL.findWebappsProject();
+    	EXTENSION_UTIL.updateWebappsProjectReference();
     	
     	// now search extensions etc.
     	HashSet<String> extensionsForClasspathContainerSet = getExtensionsForClasspathContainerAsSet(containerPath);
