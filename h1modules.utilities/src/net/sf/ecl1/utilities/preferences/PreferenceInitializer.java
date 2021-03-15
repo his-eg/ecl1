@@ -2,15 +2,19 @@ package net.sf.ecl1.utilities.preferences;
 
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.general.GitUtil;
 import net.sf.ecl1.utilities.general.PropertyUtil;
 import net.sf.ecl1.utilities.general.RemoteProjectSearchSupport;
-import net.sf.ecl1.utilities.hisinone.CvsTagUtil;
+import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jgit.api.Git;
 
 /**
  * Class used to initialize default preference values.
@@ -23,8 +27,28 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
 	public static final String GIT_BASE_REPOSITORY_PATH = "ssh://git@git.his.de/";
 	public static final String GITLAB_BASE_REPOSITORY_PATH = "ssh://git@gitlab.his.de/";
+	
+	public static final String UNKNOWN_BRANCH = "Unknown_branch";
 
-    /*
+    
+	private String getCheckedOutBranchOfWebapps() {
+        IProject webappsProject = WebappsUtil.findWebappsProject();
+        if(webappsProject != null) {
+        	String webappsPath = webappsProject.getLocation().toString();
+            Git git = GitUtil.searchGitRepo(webappsPath);
+            try {
+				String branch = git.getRepository().getFullBranch();
+				//Remove "refs/heads/" from branch name
+				branch = branch.substring(branch.lastIndexOf("/")+1);
+				return branch;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+        }
+        return UNKNOWN_BRANCH;
+	}
+	
+	/*
      * (non-Javadoc)
      *
      * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
@@ -34,13 +58,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         IPreferenceStore store = Activator.getPreferences();
         store.setDefault(PreferenceWrapper.BUILD_SERVER_PREFERENCE_KEY, "http://build.his.de/build/");
         
-        // initialize HISinOne version preference setting from webapps/CVS/Tag
-        String branch = CvsTagUtil.getCvsTagVersionLongString();
-        if (branch==null || branch.equals(CvsTagUtil.UNKNOWN_VERSION)) {
-        	// there is no webapps project yet, use HEAD as default
-        	branch = CvsTagUtil.HEAD_VERSION;
-        }
-        store.setDefault(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, branch);
+        
+        
+        
+//        // initialize HISinOne version preference setting from webapps/CVS/Tag
+//        String branch = CvsTagUtil.getCvsTagVersionLongString();
+//        if (branch==null || branch.equals(CvsTagUtil.UNKNOWN_VERSION)) {
+//        	// there is no webapps project yet, use HEAD as default
+//        	branch = CvsTagUtil.HEAD_VERSION;
+//        }
+        store.setDefault(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, getCheckedOutBranchOfWebapps());
         store.setDefault(PreferenceWrapper.TEMPLATE_ROOT_URLS_PREFERENCE_KEY, "http://devtools.his.de/ecl1/templates,http://ecl1.sourceforge.net/templates");
 		store.setDefault(PreferenceWrapper.LOG_LEVEL_PREFERENCE_KEY, "INFO");
 		

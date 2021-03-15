@@ -1,15 +1,18 @@
-package net.sf.ecl1.commit.exporter.git;
+package net.sf.ecl1.utilities.general;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+
+import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
 public class GitUtil {
 
