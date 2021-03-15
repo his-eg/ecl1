@@ -100,11 +100,6 @@ public class ProjectFromGitImporter {
     
     private String getFullRepositoryPath(String extensionToImport) {
     	logger.debug("Extension " + extensionToImport + ": baseRepositoryPath = " + baseRepositoryPath);
-        
-    	if (PreferenceInitializer.IS_LEGACY_GIT_URL_STYLE) {
-    		// traditional git URL, e.g. ssh://git@git.his.de/cs.sys.build.utilities
-    		return baseRepositoryPath + extensionToImport;
-    	}
 
 		// git lab style, e.g. ssh://git@gitlab.his.de/h1/cs/sys/cs.sys.build.utilities
 		int c1Pos = extensionToImport.indexOf('.');
@@ -122,9 +117,7 @@ public class ProjectFromGitImporter {
 			segment2 = extensionToImport.substring(c1Pos+1, c2Pos);
 		}
 		// Create new URL according to https://hiszilla.his.de/hiszilla/show_bug.cgi?id=194146
-		// The old HIS git default is overwritten by the new gitlab; other values (e.g. from universities) are left untouched.
-		String basePath = PreferenceInitializer.GIT_BASE_REPOSITORY_PATH.equals(baseRepositoryPath) ? PreferenceInitializer.GITLAB_BASE_REPOSITORY_PATH : baseRepositoryPath;
-		return basePath + "h1/" + segment1 + "/" + segment2 + "/" + extensionToImport;
+		return baseRepositoryPath + "h1/" + segment1 + "/" + segment2 + "/" + extensionToImport;
     }
     
     private void enableAutoBuild() throws CoreException {
