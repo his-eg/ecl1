@@ -119,6 +119,12 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
         return extensionsForClasspathContainer;
     }
 
+    /**
+     * 
+     * @param javaProject MUST be webapps or else this will fail. 
+     * @param extensionsForClasspathContainer names of all the extensions that need to be added to the classpath container
+     * @return resolved classpath entries. Either a *.jar or a link to a checked out project within the workspace. 
+     */
     private ArrayList<IClasspathEntry> createClasspathContainerEntries(IJavaProject javaProject, HashSet<String> extensionsForClasspathContainer) {
         ArrayList<IClasspathEntry> result = new ArrayList<>();
         
