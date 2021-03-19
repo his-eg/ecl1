@@ -21,6 +21,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 	public static final String GITLAB_BASE_REPOSITORY_PATH = "ssh://git@gitlab.his.de/";
 	
 	public static final String UNKNOWN_BRANCH = "Unknown_branch";
+	public static final String MASTER = "master";
+	/** The local master branch is called HEAD on the remote jenkins server */
+	public static final String REMOTE_ALIAS_FOR_LOCAL_MASTER_BRANCH = "HEAD";
 
     
 	private String getCheckedOutBranchOfWebapps() {
@@ -32,6 +35,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				String branch = git.getRepository().getFullBranch();
 				//Remove "refs/heads/" from branch name
 				branch = branch.substring(branch.lastIndexOf("/")+1);
+				if(branch.equals(MASTER)) {
+					branch = REMOTE_ALIAS_FOR_LOCAL_MASTER_BRANCH;
+				}
 				return branch;
 			} catch (IOException e) {
 				e.printStackTrace();
