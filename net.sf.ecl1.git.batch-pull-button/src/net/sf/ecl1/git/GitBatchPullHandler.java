@@ -41,6 +41,11 @@ public class GitBatchPullHandler extends AbstractHandler {
 				logger.info("Found projects in Workspace: " + projects);
 				monitor.beginTask("Batch Git Pull", projects.size());
 				for (IProject p : projects) {
+					//Check, if user has requested a cancel
+					if(monitor.isCanceled()) {
+						return Status.CANCEL_STATUS;
+					}
+					
 					String name = p.getName();
 					monitor.subTask("Pulling " + name);
 					File projectLocationFile = p.getLocation().append(".git").toFile();

@@ -100,6 +100,10 @@ public class UpdateHooks implements IStartup {
 				
 
 				for(Entry<String,String> e : extensions.entrySet()) {
+					if(monitor.isCanceled()) {
+						return Status.CANCEL_STATUS;
+					}
+					
 					IProject extensionProject = root.getProject(e.getValue());
 					
 					try {
