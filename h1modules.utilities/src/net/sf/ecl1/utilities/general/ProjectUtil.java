@@ -26,9 +26,15 @@ import net.sf.ecl1.utilities.Activator;
 public class ProjectUtil {
     private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ProjectUtil.class.getSimpleName());
 
-	public static boolean isJavaProject(IProject project) {
-		IFile classpathFile = project.getProject().getFile(".classpath");
-		return classpathFile.exists();
+	
+    public static boolean isJavaProject(IProject project) {
+    	try {
+			return project.hasNature(JavaCore.NATURE_ID);
+		} catch (CoreException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		return false;
 	}
 
 	public static IJavaProject getJavaProjectForLaunchConfiguration(ILaunchConfiguration launchConfig) {
