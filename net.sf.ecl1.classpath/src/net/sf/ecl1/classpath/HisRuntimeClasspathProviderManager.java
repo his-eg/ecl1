@@ -63,7 +63,8 @@ public class HisRuntimeClasspathProviderManager implements IStartup, ILaunchConf
 			ILaunchConfigurationType launchConfigType = launchConfig.getType();
 			String launchConfigTypeName = launchConfigType!=null ? launchConfigType.getName() : null;
 			logger.debug("Launch config type name = " + launchConfigTypeName);
-			if (launchConfigType.getName().equals("JUnit")) {
+			//Addition of "Java Application" fixes #254407
+			if (launchConfigType.getName().equals("JUnit") || launchConfigType.getName().equals("Java Application")) {
 				// set new classpath provider for JUnit tests
 				ILaunchConfigurationWorkingCopy wc = launchConfig.getWorkingCopy();
 				wc.setAttribute(IJavaLaunchConfigurationConstants.ATTR_CLASSPATH_PROVIDER, HisRuntimeClasspathProvider.CLASSPATH_PROVIDER_EXTENSION_ID);
