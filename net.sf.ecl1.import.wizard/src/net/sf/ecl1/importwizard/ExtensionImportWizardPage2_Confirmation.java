@@ -1,7 +1,6 @@
 package net.sf.ecl1.importwizard;
 
 import java.util.Collection;
-import java.util.Set;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;

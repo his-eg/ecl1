@@ -1,6 +1,5 @@
 package net.sf.ecl1.commit.exporter;
 
-import java.util.List;
 import java.util.Set;
 
 /**

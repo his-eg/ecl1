@@ -5,7 +5,6 @@ import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,7 +27,7 @@ public class HotfixInformationTest {
 
     @Before
     public void setUp() {
-    	Set<String> fileNames = new HashSet();
+    	Set<String> fileNames = new HashSet<>();
     	fileNames.add("WEB-INF/conf/importdata/gx-hisinone.xml");
         hotfixInformation = new HotfixInformation("test", "description", "12345,54321", false, fileNames,null);
     }

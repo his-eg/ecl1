@@ -5,7 +5,6 @@ import net.sf.ecl1.utilities.general.NetUtil;
 
 import java.util.Collection;
 
-import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;

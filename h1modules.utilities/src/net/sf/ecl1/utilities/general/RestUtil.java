@@ -7,10 +7,10 @@ import java.io.InputStream;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import net.sf.ecl1.utilities.Activator;
@@ -32,7 +32,7 @@ public class RestUtil {
      * @return input stream, or null if the target does not exist or another error occurred
      */
     public static InputStream getJsonStream(final String target, final boolean targetShouldExist) {
-        try {
+    	try (CloseableHttpClient c = HttpClientBuilder.create().build()) {
             HttpGet get = new HttpGet(target);
             ResponseHandler<InputStream> responseHandler = new ResponseHandler<InputStream>() {
                 @Override
@@ -45,7 +45,6 @@ public class RestUtil {
                     throw new ClientProtocolException("Unexpected response status '" + status + "' expected status <= 200 and < 300 for URL " + target);
                 }
             };
-            HttpClient c = new DefaultHttpClient();
             return c.execute(get, responseHandler);
         } catch (IOException e) {
     		if (targetShouldExist) {

@@ -16,7 +16,8 @@ import org.eclipse.jgit.api.Git;
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, PreferenceInitializer.class.getSimpleName());
+    @SuppressWarnings("unused")
+	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, PreferenceInitializer.class.getSimpleName());
 
 	public static final String GITLAB_BASE_REPOSITORY_PATH = "ssh://git@gitlab.his.de/";
 	
