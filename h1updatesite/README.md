@@ -3,6 +3,10 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.0.1.2021-03-25##
+* Fixed standalone applications like EntityEnhancer and DtoGenerator running on extensions.
+* Fixed resource leak in gitlab http access.
+
 ##Version 1.0.0.2021-03-12##
 * Fixed runtime classpath for Junit-Tests with Java 11.
 * Run 'git lfs prune' at Eclipse startup to remove old LFS files from local storage. (needs external git client)
