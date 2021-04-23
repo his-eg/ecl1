@@ -150,7 +150,7 @@ public class AutoLfsPrune implements IStartup {
 		 * At least one user is leaving eclipse open for a very long time (multiple days). This user
 		 * wants eclipse to run "git lfs prune" once a day automatically. 
 		 * 
-		 * This thread will never terminated. Isn't there a better way to schedule an indefinitely repeating job?
+		 * This thread will never terminate. Isn't there a better way to schedule an indefinitely repeating job?
 		 * The officially recommended way of implementing a repeating background task is described here: 
 		 * https://wiki.eclipse.org/FAQ_How_do_I_create_a_repeating_background_task%3F
 		 * Using this approach would also keep the thread alive indefinitely. Therefore there is no 

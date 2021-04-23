@@ -3,6 +3,8 @@ package net.sf.ecl1.git;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -28,7 +30,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  * @author keunecke
  */
 public class GitBatchPullHandler extends AbstractHandler {
-
+		
 	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, GitBatchPullHandler.class.getSimpleName());
 	
 	@Override
@@ -38,6 +40,8 @@ public class GitBatchPullHandler extends AbstractHandler {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				List<IProject> projects = Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects());
+				//Fixes #250882
+				Collections.sort(projects, projectComparator);
 				logger.info("Found projects in Workspace: " + projects);
 				monitor.beginTask("Batch Git Pull", projects.size());
 				for (IProject p : projects) {
@@ -83,4 +87,69 @@ public class GitBatchPullHandler extends AbstractHandler {
 		job.schedule();
 		return null;
 	}
+
+	
+	/**
+	 * 
+	 * Sorts the projects according to the following order: 
+	 *  
+	 * 1. *.api
+     * 2. webapps
+     * 3. cs.* ohne *.dbschema.*, ohne *.frontend
+     * 4. cm.*, fs.*, rm.* jeweils ohne *.frontend
+     * 5. *.frontend
+     * 6. *.dbschema.*
+     * 7. rest
+	 * 
+	 * Sorting the projects in this order speeds up the build-process. 
+	 * 
+	 */
+	Comparator<IProject> projectComparator = new Comparator<IProject>() {
+		
+		private int getPriority(IProject p) {
+			final String api = ".api";
+			final String webapps = "webapps";
+			final String cs = "cs.";
+			final String frontend = ".frontend";
+			final String cm = "cm.";
+			final String fs = "fs.";
+			final String rm = "rm.";
+			final String dbschema = ".dbschema.";
+			
+			String pName = p.getName();
+			if(pName.endsWith(api)) {
+				return 0;
+			}
+			
+			if(pName.matches(webapps)) {
+				return 1;
+			}
+			
+			if(pName.startsWith(cs) && !(pName.contains(dbschema) || pName.endsWith(frontend))) {
+				return 2;
+			}
+			
+			if( (pName.startsWith(cm) || pName.startsWith(fs) || pName.startsWith(rm)) && !pName.endsWith(frontend)) {
+				return 3;
+			}
+			
+			if(pName.endsWith(frontend)) {
+				return 4;
+			}  
+			
+			if(pName.contains(dbschema)) {
+				return 5;
+			}
+			
+			return 6;
+		}
+		
+		
+		@Override
+		public int compare(IProject p1, IProject p2) {
+			return getPriority(p1) - getPriority(p2);
+		}		
+		
+	};
+	
 }
