@@ -5,6 +5,7 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.GitUtil;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
+import java.io.File;
 import java.io.IOException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
@@ -31,8 +32,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         IProject webappsProject = WebappsUtil.findWebappsProject();
         if(webappsProject != null) {
         	String webappsPath = webappsProject.getLocation().toString();
-            Git git = GitUtil.searchGitRepo(webappsPath);
             try {
+            	Git git = Git.open(new File(webappsPath));
 				String branch = git.getRepository().getFullBranch();
 				//Remove "refs/heads/" from branch name
 				branch = branch.substring(branch.lastIndexOf("/")+1);
@@ -41,7 +42,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 				}
 				return branch;
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.info("Could not open git repository. Therefore I could not determine the branch of the repository.\n "
+						+ "Exception was: " + e.getMessage());
+		        return UNKNOWN_BRANCH;
 			}
         }
         return UNKNOWN_BRANCH;

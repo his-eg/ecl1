@@ -19,11 +19,11 @@ import org.eclipse.jgit.util.FS.ExecutionResult;
 import org.eclipse.ui.IStartup;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
-public class AutoLfsPrune implements IStartup {
+public class AutoLfsPrune implements IStartup, Runnable {
     
 	private static final ConsoleLogger logger = new ConsoleLogger(AutoLfsPruneActivator.getDefault().getLog(), AutoLfsPruneActivator.PLUGIN_ID, AutoLfsPrune.class.getSimpleName());
 	
-//	private static int RUN_DELAY = 60000; // =1min
+//	private static int RUN_DELAY = 60000; // = 1min
 	private static int RUN_DELAY = 86400000; //86400000ms = 1day
     
 	public static ExecutionResult runCommandInRepo(String command, Repository repo) throws IOException, InterruptedException {
@@ -39,6 +39,17 @@ public class AutoLfsPrune implements IStartup {
     
     @Override
 	public void earlyStartup() {
+    	/*
+    	 * We start a separate thread for this plugin, because we want to schedule 
+    	 * running "auto lfs prune" once every day. Scheduling is achieved by putting the "auto lfs prune" thread
+    	 * to sleep for a day. By creating a separate thread, we won't put the thread to sleep 
+    	 * that is responsible for executing all other early startup-plugins. 
+    	 */
+    	new Thread(this,"Auto lfs prune thread").start();
+	}
+
+	@Override
+	public void run() {
 		Job job = new Job("ecl1GitLfsPrune") {			
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
@@ -60,6 +71,12 @@ public class AutoLfsPrune implements IStartup {
 					monitor.subTask("Pruning " + name);
 					File projectLocationFile = p.getLocation().append(".git").toFile();
 					logger.info(name + " with location " + projectLocationFile.getAbsolutePath());
+					
+					if(projectLocationFile.isFile()) {
+						logger.info(name + " is managed by git, but you are currently in a linked work tree. Auto lfs pruning will not work in a linked work tree. Skipping...");
+						monitor.worked(1);
+						continue;
+					}
 					
 					/*
 					 * Try to open git-repo of this eclipse-project
@@ -172,7 +189,6 @@ public class AutoLfsPrune implements IStartup {
 			}
 			job.schedule();
 		}
-			
-
+		
 	}
 }

@@ -54,6 +54,12 @@ public class GitBatchPullHandler extends AbstractHandler {
 					monitor.subTask("Pulling " + name);
 					File projectLocationFile = p.getLocation().append(".git").toFile();
 					logger.info(name + " with location " + projectLocationFile.getAbsolutePath());
+					
+					if(projectLocationFile.isFile()) {
+						logger.info(name + " is managed by git, but you are currently in a linked work tree. Git Batch Pull will not work in a linked work tree. Skipping...");
+						monitor.worked(1);
+						continue;
+					}
 
 					try {
 						Git git = Git.open(projectLocationFile);

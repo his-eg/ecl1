@@ -1,5 +1,8 @@
 package net.sf.ecl1.commit.exporter;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +16,7 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
@@ -166,14 +170,18 @@ public class CommitExporterWizardPage extends WizardPage {
         if (webappsProject == null) {
             setErrorMessage("Could not find webapps project in workspace! Commit Exporter will not work! Please add (exactly) one webapps project to your workspace.");
         } else {
-            String webappsPath = webappsProject.getLocation().toString();
-            logger.info("Starting search for git-repo at this location: " + webappsPath);
-            git = GitUtil.searchGitRepo(webappsPath);
-            if(git == null ) {
-            	setErrorMessage("Found a webapps project, but no git repository. Commit Exporter will not work! Please make sure this version of webapps has a git repository.");
-            } else {
-                logger.info("Found git-repo at: " + git.getRepository().getDirectory().toString());
+            String webappsPath = webappsProject.getLocation().toString() + File.separator + ".git";
+            File gitFolder = new File(webappsPath);
+            if (gitFolder.isFile()) {
+            	setErrorMessage("This project is managed by git, but you are currently in a linked work tree. Commit Exporter will not work in a linked work tree.");
+            	return;
             }
+            try {
+				git = Git.open(new File(webappsPath));
+                logger.info("Found git-repo at: " + git.getRepository().getDirectory().toString());
+			} catch (IOException e) {
+				setErrorMessage("Found a webapps project, but no git repository. Commit Exporter will not work! Please make sure this version of webapps has a git repository.");
+			}
         }
     }
 

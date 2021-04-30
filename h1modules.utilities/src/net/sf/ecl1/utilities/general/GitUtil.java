@@ -1,12 +1,14 @@
 package net.sf.ecl1.utilities.general;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
@@ -15,11 +17,19 @@ public class GitUtil {
 
     /**
      * Starts from the supplied path and scans up through the parentdirectory tree until a Git repository is found.
+     * <br><br>
+     * WARNING: 
+     * As discovered in ticket #256448 this method does not work, if it is
+     * executed in a directory that was created with the "git worktree" command. 
+     * Therefore this method should no longer be used. 
+     * <br><br>
+     * Use {@link org.eclipse.jgit.api.Git#open(File)} instead
      * 
      * @param absolutePath
      * @return
      */
-    public static Git searchGitRepo(String absolutePath) {
+    @Deprecated
+	public static Git searchGitRepo(String absolutePath) {
         File startPoint = new File(absolutePath);
         FileRepositoryBuilder repoBuilder = new FileRepositoryBuilder();
         repoBuilder.findGitDir(startPoint);
@@ -35,8 +45,9 @@ public class GitUtil {
             e.printStackTrace();
         }
         return new Git(repo);
-    }
-
+    }   
+    
+    	
 
     /**
      * Returns the last i commits of this repository. 

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.TreeSet;
 
 import net.sf.ecl1.utilities.Activator;
+import net.sf.ecl1.utilities.preferences.PreferenceInitializer;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 import org.apache.commons.io.IOUtils;
@@ -51,11 +52,15 @@ public class RemoteProjectSearchSupport {
     public static final String JENKINS_VIEW_ADDITION = "/*view*/";
     
     public Collection<String> getProjects() {
+        TreeSet<String> result = new TreeSet<String>();
         String buildServer = PreferenceWrapper.getBuildServer(); // z.B. "http://build.his.de/build/"
         String buildServerView = PreferenceWrapper.getBuildServerView(); // branch
+        if (buildServerView == PreferenceInitializer.UNKNOWN_BRANCH) {
+        	//Since we are locally on an unknown branch, we can abort here before contacting the remote
+        	return result;
+        }
         String lookUpTarget = buildServer + JENKINS_VIEW_INFIX + buildServerView + JENKINS_API_ADDITION;
         logger.debug("Get projects from " + lookUpTarget);
-        TreeSet<String> result = new TreeSet<String>();
         InputStream jsonStream = RestUtil.getJsonStream(lookUpTarget, true);
         if (jsonStream != null) {
             BuildJobView view = JsonUtil.fromJson(BuildJobView.class, jsonStream);
