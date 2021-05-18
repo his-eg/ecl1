@@ -3,6 +3,10 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.1.0.2021-05-18##
+* git-batch-pull button: Projects are now pulled in a specific order to speed up the build process.
+* ecl1 now handles linked work trees gracefully.
+
 ##Version 1.0.1.2021-03-25##
 * Fixed standalone applications like EntityEnhancer and DtoGenerator running on extensions.
 * Fixed resource leak in gitlab http access.
