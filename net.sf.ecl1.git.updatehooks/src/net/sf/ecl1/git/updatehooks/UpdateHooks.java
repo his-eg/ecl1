@@ -53,8 +53,8 @@ public class UpdateHooks implements IStartup {
 				if (fs.getClass() == FS_Win32.class) { 
 					logger.error2("Detected a Windows machine without sh.exe in its Path! \n"
 							+ "Git hooks will only work in Git Bash, but not in eclipse! \n"
-							+ "To enable processing of git hooks by eclipse, try running the following command in cmd.exe:\n"
-							+ "setx PATH \"PATH=%PATH%;C:\\Program Files\\Git\\usr\\bin\"");
+							+ "To enable processing of git hooks by eclipse, please refer to the following manual: "
+							+ "https://wiki.his.de/mediawiki/index.php/Einrichtung_einer_HISinOne-Arbeitsumgebung#Eclipse_dazu_bef.C3.A4higen_Git_hooks_ausf.C3.BChren_zu_k.C3.B6nnen");
 				}
 				
 				
