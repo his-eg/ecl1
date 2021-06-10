@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -68,9 +69,11 @@ public class UpdateHooks implements IStartup {
 						logger.info("Current project is managed by git, but you are currently in a linked work tree. Updating the git hooks will not work in a linked work tree. Skipping...");
 					} else {
 						try {
+							
 							Path hooksDirWebapps = Paths.get(webapps.getFolder(HOOKS_DIR_ECLIPSE_PROJECTS).getLocationURI());
-	
 							Files.copy(getCommitMsgHook(), hooksDirWebapps, StandardCopyOption.REPLACE_EXISTING);
+							Files.setPosixFilePermissions(hooksDirWebapps, PosixFilePermissions.fromString("rwxr-x--x"));
+							
 							logger.info("Successfully updated the git hooks of the webapps project.");
 						} catch (IOException e) {
 							logger.error2("Failed to update the git hooks of the webapps project. Exception: " + e.getMessage(), e);
@@ -101,8 +104,9 @@ public class UpdateHooks implements IStartup {
 					try {
 						
 						Path hooksDirExtension = Paths.get(extensionProject.getFolder(HOOKS_DIR_ECLIPSE_PROJECTS).getLocationURI());
-						
 						Files.copy(getCommitMsgHook(), hooksDirExtension, StandardCopyOption.REPLACE_EXISTING);
+						Files.setPosixFilePermissions(hooksDirExtension, PosixFilePermissions.fromString("rwxr-x--x"));
+						
 						logger.info("Successfully updated the git hooks of the following extensions project: " + extensionProject.getName());
 					} catch (IOException e1) {
 						logger.error2("Failed to update the git hooks of the folloing extensions project: " + extensionProject.getName() + 
