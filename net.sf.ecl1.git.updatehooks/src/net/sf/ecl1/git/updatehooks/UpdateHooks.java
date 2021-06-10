@@ -2,6 +2,7 @@ package net.sf.ecl1.git.updatehooks;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,6 +20,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jgit.util.FS;
+import org.eclipse.jgit.util.FS_POSIX;
 import org.eclipse.jgit.util.FS_Win32;
 import org.eclipse.ui.IStartup;
 
@@ -32,6 +34,8 @@ public class UpdateHooks implements IStartup {
     
     private static final String HOOKS_DIR_ECLIPSE_PROJECTS = ".git/hooks/commit-msg";
     private static final String HOOKS_DIR_ECL1 = "/githooks/commit-msg";
+    
+    private final FS fs = FS.detect();
     
     
 	@Override
@@ -50,7 +54,6 @@ public class UpdateHooks implements IStartup {
 				 * 
 				 * FS_Posix and FS_Win32_Cygwin are unproblematic. Only warn about FS_Win32.
 				 */
-				FS fs = FS.detect();
 				if (fs.getClass() == FS_Win32.class) { 
 					logger.error2("Detected a Windows machine without sh.exe in its Path! \n"
 							+ "Git hooks will only work in Git Bash, but not in eclipse! \n"
@@ -71,8 +74,12 @@ public class UpdateHooks implements IStartup {
 						try {
 							
 							Path hooksDirWebapps = Paths.get(webapps.getFolder(HOOKS_DIR_ECLIPSE_PROJECTS).getLocationURI());
-							Files.copy(getCommitMsgHook(), hooksDirWebapps, StandardCopyOption.REPLACE_EXISTING);
-							Files.setPosixFilePermissions(hooksDirWebapps, PosixFilePermissions.fromString("rwxr-x--x"));
+							copyHookToDestination(getCommitMsgHook(), hooksDirWebapps);
+//							Files.copy(getCommitMsgHook(), hooksDirWebapps, StandardCopyOption.REPLACE_EXISTING);
+//							Files.setPosixFilePermissions(hooksDirWebapps, PosixFilePermissions.fromString("rwxr-x--x"));
+							
+
+							
 							
 							logger.info("Successfully updated the git hooks of the webapps project.");
 						} catch (IOException e) {
@@ -104,8 +111,9 @@ public class UpdateHooks implements IStartup {
 					try {
 						
 						Path hooksDirExtension = Paths.get(extensionProject.getFolder(HOOKS_DIR_ECLIPSE_PROJECTS).getLocationURI());
-						Files.copy(getCommitMsgHook(), hooksDirExtension, StandardCopyOption.REPLACE_EXISTING);
-						Files.setPosixFilePermissions(hooksDirExtension, PosixFilePermissions.fromString("rwxr-x--x"));
+						copyHookToDestination(getCommitMsgHook(), hooksDirExtension);
+//						Files.copy(getCommitMsgHook(), hooksDirExtension, StandardCopyOption.REPLACE_EXISTING);
+//						Files.setPosixFilePermissions(hooksDirExtension, PosixFilePermissions.fromString("rwxr-x--x"));
 						
 						logger.info("Successfully updated the git hooks of the following extensions project: " + extensionProject.getName());
 					} catch (IOException e1) {
@@ -131,4 +139,20 @@ public class UpdateHooks implements IStartup {
     	return is;
     }
 	
+    private void copyHookToDestination(InputStream hook, Path destination) throws IOException {
+		Files.copy(hook, destination, StandardCopyOption.REPLACE_EXISTING);
+		/* 
+		 * On a posix-complaint system, we need to set the executable bits manually.
+		 * 
+		 * We don't need to do this on windows machines, since the executable bits 
+		 * are preserved when copying the hook from within the plugin-jar. As a matter of fact: 
+		 * the setPosixFilePermissions call will throw an exception on windows machines
+		 * (therefore the check for the file system).
+		 * 
+		 */
+		if (fs.getClass() == FS_POSIX.class ) {
+			Files.setPosixFilePermissions(destination, PosixFilePermissions.fromString("rwxr-x--x"));			
+		}
+    }
+    
 }
