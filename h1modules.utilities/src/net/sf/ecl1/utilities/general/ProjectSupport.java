@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -31,8 +32,10 @@ import net.sf.ecl1.utilities.Activator;
 public class ProjectSupport {
 
     private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ProjectSupport.class.getSimpleName());
-
-    private static final String[] PATHS = { "src/java", "src/test", "src/generated", "resource", ".settings" };
+    
+    private static final String[] SOURCE_FOLDERS = { "src/java", "src/test", "src/generated"};
+    
+    private static final String[] FOLDERS_TO_CREATE =  { "src/java", "src/test", "src/generated", "resource", ".settings" };
     
     private final Collection<String> packagesToCreate;
     
@@ -62,8 +65,8 @@ public class ProjectSupport {
 		
 		try {
             addNatures(project, projectName);
-            addToProjectStructure(project, PATHS);
-            setSourceFolders(project, PATHS);
+            addToProjectStructure(project, FOLDERS_TO_CREATE);
+            setSourceFolders(project, SOURCE_FOLDERS);
             addProjectDependencies(project, choices.getProjectsToReference());
     		setJreEnvironment(project);
         } catch (CoreException e) {
