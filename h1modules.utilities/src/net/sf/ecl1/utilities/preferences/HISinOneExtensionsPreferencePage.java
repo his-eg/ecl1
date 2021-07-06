@@ -1,6 +1,7 @@
 package net.sf.ecl1.utilities.preferences;
 
 import net.sf.ecl1.utilities.Activator;
+import net.sf.ecl1.utilities.general.GitUtil;
 import net.sf.ecl1.utilities.general.NetUtil;
 
 import java.util.Collection;
@@ -107,6 +108,8 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
      */
     @Override
     public void init(IWorkbench workbench) {
-        //nop
+    	//Everytime we are opening this preference page, we need to check if the branch of webapps has changed since
+    	//the last time we opened this preference page
+        getPreferenceStore().setValue(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, GitUtil.getCheckedOutBranchOfWebapps());
     }
 }
