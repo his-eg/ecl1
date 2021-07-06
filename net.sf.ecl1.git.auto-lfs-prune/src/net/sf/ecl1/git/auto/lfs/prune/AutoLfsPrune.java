@@ -223,7 +223,7 @@ public class AutoLfsPrune implements IStartup, Runnable {
 					
 					
 					
-					logger.info("Succesfully finished pruning: " + name);
+					logger.info("Successfully finished pruning: " + name);
 					monitor.worked(1);	
 				}
 				
