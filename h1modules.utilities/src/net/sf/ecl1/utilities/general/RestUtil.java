@@ -42,7 +42,9 @@ public class RestUtil {
                         HttpEntity entity = response.getEntity();
                         return entity != null ? new ByteArrayInputStream(EntityUtils.toString(entity).getBytes()) : null;
                     }
-                    throw new ClientProtocolException("Unexpected response status '" + status + "' expected status <= 200 and < 300 for URL " + target);
+                    logger.info("Unexpected response status '" + status + "' expected status <= 200 and < 300 for URL " + target + 
+                    		"\nThis error might have been caused by a local branch that is not known on the remote server.");
+                    return null;
                 }
             };
             return c.execute(get, responseHandler);
