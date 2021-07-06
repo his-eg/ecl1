@@ -57,7 +57,6 @@ public class ExtensionImportJob extends Job {
         // convert monitor to SubMonitor and set total number of work units
         final int totalWork = existingFolders.size() + extensionsToImport.size();
         SubMonitor subMonitor = SubMonitor.convert(monitor, totalWork);
-        subMonitor.worked(1); // fixes displayed progress percentage
 
         // first part of the job: delete projects from workspace (if requested)
     	ArrayList<String> extensionsWithDeleteErrors = new ArrayList<String>();
@@ -70,31 +69,29 @@ public class ExtensionImportJob extends Job {
 
             // scrubbing folders is necessary and authorized
             for (String extension : existingFolders) {
+				//Check, if user has requested a cancel
+				if(monitor.isCanceled()) {
+					return Status.CANCEL_STATUS;
+				}
+
+                // set the name of the current work
+                String taskName = "Delete extension folder from workspace: " + extension;
+                subMonitor.setTaskName(taskName);
+                logger.info(taskName);
+
+                // do one task
+                IWorkspace workspace = ResourcesPlugin.getWorkspace();
+                IWorkspaceRoot root = workspace.getRoot();
+                File workspaceFile = root.getLocation().toFile();
+                File extensionFolder = new File(workspaceFile, extension);
                 try {
-                    // sleep a second (allows users to cancel the job)
-                    TimeUnit.SECONDS.sleep(1);
-
-                    // set the name of the current work
-                    String taskName = "Delete extension folder from workspace: " + extension;
-                    subMonitor.setTaskName(taskName);
-                    logger.info(taskName);
-
-                    // do one task
-                    IWorkspace workspace = ResourcesPlugin.getWorkspace();
-                    IWorkspaceRoot root = workspace.getRoot();
-                    File workspaceFile = root.getLocation().toFile();
-                    File extensionFolder = new File(workspaceFile, extension);
-                    try {
-                        FileUtils.deleteDirectory(extensionFolder);
-                    } catch (IOException e) {
-                    	extensionsWithDeleteErrors.add(extension);
-                    	logger.error2("Extension folder " + extension + " could not be deleted from workspace", e);
-                    }
-                    // reduce total work by 1
-                    subMonitor.worked(1);
-                } catch (InterruptedException e) {
-                	return Status.CANCEL_STATUS;
+                    FileUtils.deleteDirectory(extensionFolder);
+                } catch (IOException e) {
+                	extensionsWithDeleteErrors.add(extension);
+                	logger.error2("Extension folder " + extension + " could not be deleted from workspace", e);
                 }
+                // reduce total work by 1
+                subMonitor.worked(1);
             }
         }
 
@@ -108,22 +105,28 @@ public class ExtensionImportJob extends Job {
         		// delete failed -> extension can not be imported
         		continue;
         	}
-            try {
-                // sleep a second
-                TimeUnit.SECONDS.sleep(1);
+
+				//Check, if user has requested a cancel
+				if(monitor.isCanceled()) {
+					return Status.CANCEL_STATUS;
+				}
 
                 // set the name of the current work
                 String taskName = "Import extension " + extension;
                 subMonitor.setTaskName(taskName);
                 logger.info(taskName);
-
-                // do one task
-                importer.importProject(extension);
+                
+                try {
+                	importer.importProject(extension);
+	            } catch (CoreException e) {
+	            	logger.error2("An exception occured while trying to import the following extension: " + extension + 
+	            			"\n This is the exception: ",e);
+	            	return Status.CANCEL_STATUS;
+	            }
+                
                 // reduce total work by 1
                 subMonitor.worked(1);
-            } catch (InterruptedException | CoreException e) {
-            	return Status.CANCEL_STATUS;
-            }
+
         }
 
         // result
