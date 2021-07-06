@@ -1,21 +1,25 @@
 package net.sf.ecl1.utilities.general;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
+import net.sf.ecl1.utilities.Activator;
+import net.sf.ecl1.utilities.hisinone.WebappsUtil;
+
 public class GitUtil {
 
-    /**
+	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, GitUtil.class.getSimpleName());
+	
+	/**
      * Starts from the supplied path and scans up through the parentdirectory tree until a Git repository is found.
      * <br><br>
      * WARNING: 
@@ -92,5 +96,32 @@ public class GitUtil {
         }
         return commits;
     }
+
+	public static final String UNKNOWN_BRANCH = "Unknown_branch";
+	public static final String MASTER = "master";
+	/** The local master branch is called HEAD on the remote jenkins server */
+	public static final String REMOTE_ALIAS_FOR_LOCAL_MASTER_BRANCH = "HEAD";
+
+	public static String getCheckedOutBranchOfWebapps() {
+	        IProject webappsProject = WebappsUtil.findWebappsProject();
+	        if(webappsProject != null) {
+	        	String webappsPath = webappsProject.getLocation().toString();
+	            try {
+	            	Git git = Git.open(new File(webappsPath));
+					String branch = git.getRepository().getFullBranch();
+					//Remove "refs/heads/" from branch name
+					branch = branch.substring(branch.lastIndexOf("/")+1);
+					if(branch.equals(MASTER)) {
+						branch = REMOTE_ALIAS_FOR_LOCAL_MASTER_BRANCH;
+					}
+					return branch;
+				} catch (IOException e) {
+					logger.info("Could not open git repository. Therefore I could not determine the branch of the repository.\n "
+							+ "Exception was: " + e.getMessage());
+			        return UNKNOWN_BRANCH;
+				}
+	        }
+	        return UNKNOWN_BRANCH;
+		}
 
 }

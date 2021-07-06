@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.TreeSet;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.preferences.PreferenceInitializer;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 import org.apache.commons.io.IOUtils;
@@ -55,7 +54,7 @@ public class RemoteProjectSearchSupport {
         TreeSet<String> result = new TreeSet<String>();
         String buildServer = PreferenceWrapper.getBuildServer(); // z.B. "http://build.his.de/build/"
         String buildServerView = PreferenceWrapper.getBuildServerView(); // branch
-        if (buildServerView == PreferenceInitializer.UNKNOWN_BRANCH) {
+        if (buildServerView == GitUtil.UNKNOWN_BRANCH) {
         	//Since we are locally on an unknown branch, we can abort here before contacting the remote
         	return result;
         }

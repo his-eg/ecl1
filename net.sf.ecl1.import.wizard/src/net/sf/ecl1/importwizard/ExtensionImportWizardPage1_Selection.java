@@ -17,8 +17,8 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import net.sf.ecl1.utilities.general.GitUtil;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
-import net.sf.ecl1.utilities.preferences.PreferenceInitializer;
 
 /**
  * Extension import configuration wizard page.
@@ -63,7 +63,7 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
         Label branchInfo = new Label(container, SWT.TOP);
         branchInfo.setText("Branch: " + model.getBranch());
         
-        if(model.getBranch() == PreferenceInitializer.UNKNOWN_BRANCH) {
+        if(model.getBranch() == GitUtil.UNKNOWN_BRANCH) {
         	setErrorMessage("Could not determine branch of git repository of webapps project. Either there is no repo or you are on a linked work tree.");
         }
 

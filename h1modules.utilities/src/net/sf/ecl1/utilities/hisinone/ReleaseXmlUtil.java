@@ -29,7 +29,7 @@ import com.google.common.collect.Sets;
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.FileUtil;
-import net.sf.ecl1.utilities.preferences.PreferenceInitializer;
+import net.sf.ecl1.utilities.general.GitUtil;
 
 /**
  * Utilities for management of release.xml files
@@ -102,12 +102,12 @@ public class ReleaseXmlUtil {
     	IFile releaseFile = getReleaseXmlFile("release.xml");
     	if (releaseFile==null) {
     		logger.error2("File 'release.xml' does not exist");
-    		return PreferenceInitializer.UNKNOWN_BRANCH;
+    		return GitUtil.UNKNOWN_BRANCH;
     	}
         String contents = FileUtil.readContent(releaseFile);
         if (contents==null) {
         	logger.error2("IOException occurred reading file 'release.xml'");
-    		return PreferenceInitializer.UNKNOWN_BRANCH;
+    		return GitUtil.UNKNOWN_BRANCH;
         }
 
     	// create XML document
@@ -128,11 +128,11 @@ public class ReleaseXmlUtil {
     		classpathContentStream.close();
     	} catch (IOException | SAXException | ParserConfigurationException e) {
     		logger.error2("Exception parsing 'release.xml' file: " + e);
-    		return PreferenceInitializer.UNKNOWN_BRANCH;
+    		return GitUtil.UNKNOWN_BRANCH;
     	}
     	if (doc==null) {
     		logger.error2("Could not create XML document from 'release.xml' file");
-    		return PreferenceInitializer.UNKNOWN_BRANCH;
+    		return GitUtil.UNKNOWN_BRANCH;
     	}
     	
     	// parse XML
@@ -141,7 +141,7 @@ public class ReleaseXmlUtil {
 		int patchEntriesCount;
 		if (patchEntries==null || (patchEntriesCount = patchEntries.getLength()) == 0) {
 			logger.error2("'release.xml' file does not contain <patch> elements");
-    		return PreferenceInitializer.UNKNOWN_BRANCH;
+    		return GitUtil.UNKNOWN_BRANCH;
 		}
 
     	int maxMinorVersion = Integer.MIN_VALUE;    	
@@ -183,7 +183,7 @@ public class ReleaseXmlUtil {
         if (distinctMajorVersions2Count.isEmpty()) {
         	// there was no valid <patch> element
         	logger.error2("'release.xml' does not contain valid <patch> elements");
-    		return PreferenceInitializer.UNKNOWN_BRANCH;
+    		return GitUtil.UNKNOWN_BRANCH;
         }
         
         // find the major version that occurred most often
