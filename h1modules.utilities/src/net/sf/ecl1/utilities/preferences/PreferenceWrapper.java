@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sf.ecl1.utilities.Activator;
+import net.sf.ecl1.utilities.general.GitUtil;
 
 /**
  * Encapsulate access to Eclipse preferences.
@@ -25,6 +26,9 @@ public class PreferenceWrapper {
 
     /** Messages with a log level greater or equal than this preference are logged, others not. */
     public static final String LOG_LEVEL_PREFERENCE_KEY = "net.sf.ecl1.logLevel";
+    
+    /** Stores if the current branch of webapps should be detected automatically */
+    public static final String DETECT_BRANCH_AUTOMATICALLY = "detectBranchAutomatically";
 
     
     /**
@@ -46,6 +50,9 @@ public class PreferenceWrapper {
      * like "HEAD" or "HISinOne_VERSION_07_RELEASE_01".
      */
     public static String getBuildServerView() {
+    	if(Activator.getPreferences().getBoolean(DETECT_BRANCH_AUTOMATICALLY)) {
+    		Activator.getPreferences().setValue(BUILD_SERVER_VIEW_PREFERENCE_KEY, GitUtil.getCheckedOutBranchOfWebapps());
+    	}
         return Activator.getPreferences().getString(BUILD_SERVER_VIEW_PREFERENCE_KEY);
     }
     
@@ -63,4 +70,8 @@ public class PreferenceWrapper {
     public static String getLogLevel() {
     	return Activator.getPreferences().getString(LOG_LEVEL_PREFERENCE_KEY);
     }
+
+	public static boolean isDetectBranchAutomatically() {
+		return Activator.getPreferences().getBoolean(DETECT_BRANCH_AUTOMATICALLY);
+	}
 }

@@ -27,5 +27,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(PreferenceWrapper.TEMPLATE_ROOT_URLS_PREFERENCE_KEY, "http://devtools.his.de/ecl1/templates,http://ecl1.sourceforge.net/templates");
 		store.setDefault(PreferenceWrapper.LOG_LEVEL_PREFERENCE_KEY, "INFO");
         store.setDefault(PreferenceWrapper.GIT_SERVER_PREFERENCE_KEY, GITLAB_BASE_REPOSITORY_PATH);
+        store.setDefault(PreferenceWrapper.DETECT_BRANCH_AUTOMATICALLY, true);
     }
 }

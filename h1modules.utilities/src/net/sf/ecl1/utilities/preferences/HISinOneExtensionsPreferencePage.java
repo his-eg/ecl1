@@ -6,9 +6,12 @@ import net.sf.ecl1.utilities.general.NetUtil;
 
 import java.util.Collection;
 
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.StringFieldEditor;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -24,11 +27,30 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
     private StringFieldEditor buildServer;    
     private StringFieldEditor buildServerView;
     private StringFieldEditor templateRootUrls;
+    private BooleanFieldEditor automaticBranchDetection;
 
     public HISinOneExtensionsPreferencePage() {
         super(GRID);
         setPreferenceStore(Activator.getPreferences());
         setDescription("Preferences for HISinOne-Extension-Tools");
+    }
+    
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+    	
+    	//Enable/disable manual setting of branch
+    	if(event.getSource().equals(automaticBranchDetection)) {
+    		boolean newValue = ((Boolean) event.getNewValue()).booleanValue();
+    		buildServerView.setEnabled(!newValue, getFieldEditorParent());
+    		
+    		//Update branch immediately if automatic detection is set to true by user
+    		if(newValue) {
+    			getPreferenceStore().setValue(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, GitUtil.getCheckedOutBranchOfWebapps());
+    			buildServerView.load();
+    		}
+    	}
+    	
+    	super.propertyChange(event);
     }
 
     /**
@@ -41,10 +63,13 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
     public void createFieldEditors() {
         gitServer = new StringFieldEditor(PreferenceWrapper.GIT_SERVER_PREFERENCE_KEY, "GIT Server:", getFieldEditorParent());
         buildServer = new StringFieldEditor(PreferenceWrapper.BUILD_SERVER_PREFERENCE_KEY, "Build Server:", getFieldEditorParent());
-        buildServerView = new StringFieldEditor(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, "Search view on Build Server (Branches):", getFieldEditorParent());
+        automaticBranchDetection = new BooleanFieldEditor(PreferenceWrapper.DETECT_BRANCH_AUTOMATICALLY, "Detect branch of webapps automatically? ", BooleanFieldEditor.SEPARATE_LABEL, getFieldEditorParent());
+        buildServerView = new StringFieldEditor(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, "Branch of webapps: ", getFieldEditorParent());
+        buildServerView.setEnabled(!getPreferenceStore().getBoolean(PreferenceWrapper.DETECT_BRANCH_AUTOMATICALLY), getFieldEditorParent());
         templateRootUrls = new StringFieldEditor(PreferenceWrapper.TEMPLATE_ROOT_URLS_PREFERENCE_KEY, "URLs for new project templates (comma-separated):", getFieldEditorParent());
         addField(gitServer);
         addField(buildServer);
+        addField(automaticBranchDetection);
         addField(buildServerView);
         addField(templateRootUrls);
         // Loglevel Combobox
@@ -108,8 +133,8 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
      */
     @Override
     public void init(IWorkbench workbench) {
-    	//Everytime we are opening this preference page, we need to check if the branch of webapps has changed since
-    	//the last time we opened this preference page
-        getPreferenceStore().setValue(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, GitUtil.getCheckedOutBranchOfWebapps());
+    	//This is needed to update the value for the branch in case the user has switched branches since the last time 
+    	//when this setting page was open
+    	getPreferenceStore().setValue(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY,PreferenceWrapper.getBuildServerView());
     }
 }
