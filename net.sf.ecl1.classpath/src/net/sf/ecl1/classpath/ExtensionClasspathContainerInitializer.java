@@ -29,7 +29,7 @@ import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-
+import org.eclipse.jdt.internal.ui.wizards.buildpaths.BuildPathSupport;
 import com.google.common.base.Predicates;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
@@ -48,6 +48,8 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ExtensionClasspathContainerInitializer.class.getSimpleName());
 
 	private static final ExtensionUtil EXTENSION_UTIL = ExtensionUtil.getInstance();
+	
+	boolean listenerRegistered = false;
 
 	@Override
 	public void initialize(IPath containerPath, IJavaProject javaProject) throws CoreException {
@@ -69,7 +71,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 	 * in case a project referenced in the ecl1 classpath container was added or deleted 
 	 */
 	private void registerListener(IPath containerPath, IJavaProject javaProject) {
-
+		
 		/**
 		 * This listener requests an update of the ecl1 classpath container, 
 		 * if a project was added or deleted from the workspace that 
@@ -137,7 +139,12 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 				 * Kind --> IResourceDelta.CHANGED
 				 * Flags --> IResourceDelta.OPEN
 				 * 
-				 * -----------------------------------
+				 * Sometimes, when importing, I also saw: 
+				 * Kind --> IResourceDelta.ADDED 
+				 * Flags --> IResourceDelta.OPEN   
+				 * 
+				 * 
+				 *-----------------------------------
 				 * Closing a project in the workspace:
 				 * -----------------------------------
 				 * Kind --> IResourceDelta.CHANGED
@@ -158,16 +165,16 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 				 * Kind --> IResourceDelta.REMOVED
 				 * Flags --> 0                    
 				 * 2.
-				 * Kind --> IResourceDelta.CHANGED 
+				 * Kind --> IResourceDelta.CHANGED | IResourceDelta.ADDED
 				 * Flags --> IResourceDelta.OPEN   
 				 * 
 				 */
 				
 				//Only check direct children (aka projects) of rootDelta 
-				for(IResourceDelta delta : rootDelta.getAffectedChildren( (IResourceDelta.REMOVED | IResourceDelta.CHANGED) )) {
+				for(IResourceDelta delta : rootDelta.getAffectedChildren( (IResourceDelta.REMOVED | IResourceDelta.CHANGED | IResourceDelta.ADDED) )) {
 					/*
 					 * If the project changes which contains the ecl1 classpath container, 
-					 * we can exit early (which is good for performance reasons). 
+					 * we can exit early.
 					 * 
 					 * Rational behind this: 
 					 * A project can only be one of two things: 
@@ -206,44 +213,23 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 				if(classpathContainerUpdateNecessary && canUpdateClasspathContainer(containerPath, javaProject)) {
 					logger.info("Updating the ecl1 classpath container");
 
-					Job updateClassPathContainerJob = new Job("Updating ecl1 classpath container") {
-
-						@Override
-						protected IStatus run(IProgressMonitor monitor) {
-							try {
-								updateClasspathContainer(containerPath, javaProject);
-
-								/*
-								 * Note: I specifically request a build here not because I want one, but because
-								 * eclipse _will_ start one on its own after updating the ecl1 classpath container. 
-								 * 
-								 * When eclipse starts the build on its own, no progress monitor is created. Thus, 
-								 * the user cannot cancel the job and eclipse becomes unusable until webapps has been built 
-								 * (which takes ~5 min. on my machine !). 
-								 * 
-								 * By giving the build-job a monitor, the user can cancel the build-process if he/she chooses to do so. 
-								 *
-								 */
-								ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.INCREMENTAL_BUILD, monitor);
-
-							} catch (CoreException e) {
-								logger.error2("An exception occured while trying to update the ecl1 classpath container of webapps "
-										+ "\nafter a project was changed in the workspace. This was the exception: ", e);
-								return Status.CANCEL_STATUS;
-							}
-							return Status.OK_STATUS;
-						}
-					};
-
-					updateClassPathContainerJob.schedule();
-
+					try {
+						updateClasspathContainer(containerPath, javaProject);
+					} catch (CoreException e) {
+						logger.error2("An exception occured while trying to update the ecl1 classpath container of webapps "
+								+ "\nafter a project was changed in the workspace. This was the exception: ", e);
+					}
+					
 				}
 
 			}
 		};
 
 		//Add listener to workspace. We only want to be informed after a workspace change is completed
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
+		if(listenerRegistered == false) {
+			ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
+			listenerRegistered = true;
+		}
 	}
 
 	/* (non-Javadoc)
