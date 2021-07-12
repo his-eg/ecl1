@@ -3,6 +3,12 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.2.0.2021-07-12##
+* Make git hooks work under Linux
+* Improved resource loading in extension projects
+* git auto prune now works as well when stashes are present
+* Extension importer usability and performance improvements
+
 ##Version 1.1.0.2021-05-18##
 * git-batch-pull button: Projects are now pulled in a specific order to speed up the build process.
 * ecl1 now handles linked work trees gracefully.
