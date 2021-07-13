@@ -53,7 +53,7 @@ public class ProjectFromGitImporter {
      */
     public void importProject(String extensionToImport) throws CoreException {
     	
-        disableAutoBuild();
+//        disableAutoBuild();
         
         // Compute full repository URL depending on configuration
         String fullRepositoryPath = getFullRepositoryPath(extensionToImport);
@@ -82,6 +82,7 @@ public class ProjectFromGitImporter {
 
                 extensionProject.create(description, null);
 
+                
                 if (openProjectOnCreation) {
                     extensionProject.open(null);
                 }
@@ -92,7 +93,7 @@ public class ProjectFromGitImporter {
                 if (extensionFolder.exists()) {
                     extensionFolder.delete();
                 }
-                enableAutoBuild();
+//                enableAutoBuild();
             }
     	}
     }

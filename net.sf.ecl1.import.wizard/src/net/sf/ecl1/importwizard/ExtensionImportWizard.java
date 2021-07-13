@@ -78,10 +78,11 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
         boolean openProjectsAfterImport = page2.openProjectsAfterImport();
         boolean deleteFolders = page2.deleteFolders();
 
-        ExtensionImportJob job = new ExtensionImportJob(extensionsToImport, openProjectsAfterImport, deleteFolders);
+        ExtensionImportJob importJob = new ExtensionImportJob(extensionsToImport, openProjectsAfterImport, deleteFolders); 
         // register job to be started immediately as another thread
-    	job.schedule();
-    	// TODO: since we do not know when the job finishes we can not evaluate it's return status here, only return true?
+        importJob.schedule();
+
         return true;
     }
+    
 }
