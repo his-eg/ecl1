@@ -33,7 +33,7 @@ public class ExtensionClasspathContainerPage extends WizardPage implements IClas
     /**
      * ClasspathContainer ID
      */
-    private static final String NET_SF_ECL1_ECL1_CONTAINER_ID = "net.sf.ecl1.ECL1_CONTAINER";
+    public static final String NET_SF_ECL1_ECL1_CONTAINER_ID = "net.sf.ecl1.ECL1_CONTAINER";
 
     private static final String ECL1_CLASSPATH_CONTAINER = "ecl1 Classpath Container";
 

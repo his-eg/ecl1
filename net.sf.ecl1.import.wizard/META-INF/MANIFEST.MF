@@ -8,8 +8,10 @@ Require-Bundle: org.eclipse.ui,
  net.sf.ecl1.utilities,
  org.eclipse.jgit,
  com.google.guava;bundle-version="15.0.0",
- org.apache.commons.io;bundle-version="2.2.0"
+ org.apache.commons.io;bundle-version="2.2.0",
+ org.eclipse.jdt.core;bundle-version="3.25.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .
 Bundle-Activator: net.sf.ecl1.importwizard.Activator
 Bundle-ActivationPolicy: lazy
+Export-Package: net.sf.ecl1.importwizard

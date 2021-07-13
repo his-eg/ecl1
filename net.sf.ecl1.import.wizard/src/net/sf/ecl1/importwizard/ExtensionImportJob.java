@@ -4,8 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -17,7 +15,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
@@ -40,6 +37,8 @@ public class ExtensionImportJob extends Job {
 	private Collection<String> extensionsToImport;
 	private boolean openProjectsAfterImport;
 	private boolean deleteFolders;
+	
+	public final static Object JOB_FAMILY = new Object();
 
 	public ExtensionImportJob(Collection<String> extensionsToImport, boolean openProjectsAfterImport, boolean deleteFolders) {
 		super("Extension Import");
@@ -47,9 +46,15 @@ public class ExtensionImportJob extends Job {
 		this.openProjectsAfterImport = openProjectsAfterImport;
 		this.deleteFolders = deleteFolders;
 	}
-
+		
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
+	public boolean belongsTo(Object family) {
+		return JOB_FAMILY.equals(family);
+	}
+    
+    @Override
+    protected IStatus run(IProgressMonitor monitor) { 	
+    	
     	// The folders in workspace that must be scrubbed before extension import
         Collection<String> existingFolders = checkForExistingFolders(extensionsToImport);
         String existingFoldersStr = Joiner.on(", ").join(existingFolders);
@@ -162,5 +167,6 @@ public class ExtensionImportJob extends Job {
             }
         }
         return result;
-    }
+    }  
+    
 }
