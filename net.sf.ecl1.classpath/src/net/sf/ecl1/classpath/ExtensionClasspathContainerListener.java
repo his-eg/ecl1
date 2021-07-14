@@ -9,14 +9,8 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-
-import net.sf.ecl1.importwizard.ExtensionImportJob;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
-import net.sf.ecl1.utilities.hisinone.EclipseUtil;
 
 
 /**

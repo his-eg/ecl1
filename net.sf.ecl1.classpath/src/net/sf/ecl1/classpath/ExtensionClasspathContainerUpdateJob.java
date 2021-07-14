@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
+
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /** Updates the ecl1 classpath container */
@@ -51,7 +52,8 @@ public class ExtensionClasspathContainerUpdateJob extends Job {
 			logger.error2("Updating of the ecl1 classpath container caused an exception. This was the exception: ", e);
 			return Status.CANCEL_STATUS;
 		}
-
+		
+		logger.info("Ecl1 classpath container successfully updated :)");
 		return Status.OK_STATUS;
 	}
 
