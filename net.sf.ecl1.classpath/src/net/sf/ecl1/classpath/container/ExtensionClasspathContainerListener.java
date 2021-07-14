@@ -1,4 +1,4 @@
-package net.sf.ecl1.classpath;
+package net.sf.ecl1.classpath.container;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,6 +10,8 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.core.runtime.jobs.Job;
+
+import net.sf.ecl1.classpath.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 

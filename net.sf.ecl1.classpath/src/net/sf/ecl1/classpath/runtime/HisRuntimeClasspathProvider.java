@@ -1,4 +1,4 @@
-package net.sf.ecl1.classpath;
+package net.sf.ecl1.classpath.runtime;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -8,6 +8,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.IRuntimeClasspathProvider;
 
+import net.sf.ecl1.classpath.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.ProjectUtil;
 import net.sf.ecl1.utilities.general.RuntimeClasspathUtil;

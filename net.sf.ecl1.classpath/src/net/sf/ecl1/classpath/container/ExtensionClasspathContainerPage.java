@@ -1,4 +1,4 @@
-package net.sf.ecl1.classpath;
+package net.sf.ecl1.classpath.container;
 
 import java.util.Collection;
 import java.util.List;
