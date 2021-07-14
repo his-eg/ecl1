@@ -3,6 +3,7 @@ package net.sf.ecl1.importwizard;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
@@ -79,7 +80,9 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
         boolean deleteFolders = page2.deleteFolders();
 
         ExtensionImportJob importJob = new ExtensionImportJob(extensionsToImport, openProjectsAfterImport, deleteFolders); 
-        // register job to be started immediately as another thread
+        
+        //Acquiring this rule prevents auto builds
+        importJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
         importJob.schedule();
 
         return true;

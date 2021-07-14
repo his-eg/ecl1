@@ -6,10 +6,17 @@ import java.util.Set;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+
+import net.sf.ecl1.importwizard.ExtensionImportJob;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.hisinone.EclipseUtil;
 
 
 /**
@@ -26,7 +33,6 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 	
 	/** Path to the ecl1 classpath container*/
 	IPath containerPath;
-	
 	/** Project that contains an ecl classpath container */
 	IJavaProject javaProject;
 	
@@ -65,13 +71,13 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 	
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {
-
+		
 		extensionsInClasspathContainer = ExtensionClasspathContainerInitializer.getExtensionsInClasspathContainer(containerPath);     
 
 		IResourceDelta rootDelta = event.getDelta();
 
-		//XXX: Uncomment to enable better debugging of this plugin
-		//Just for debugging purposes
+		//Just for debugging purposes.
+		//TODO: Comment me before releasing!
 //		System.out.println("Full path of root Delta: " + rootDelta.getFullPath());
 //		System.out.println("Printing all children of delta:");
 //		for(IResourceDelta child : rootDelta.getAffectedChildren()) {
@@ -183,28 +189,32 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 		
 		
 		if(classpathContainerUpdateNecessary) {
-			
-			/*
-			 * Every time the listener is triggered, the job is delayed further. 
-			 * 
-			 * This is done to wait for the workspace to "calm down" and it becomes static 
-			 * (no more projects are deleted/added/changed and thus the listener is not triggered anymore). 
-			 * 
-			 * Only when the workspace has "calmed down", we want to update the ecl1 classpath container
-			 */
-			updateJob.delayStart(DELAY);
-			
-			//Maybe a job is already scheduled? If so --> Don't schedule a new one
-			Job[] oldJobs = Job.getJobManager().find(ExtensionClasspathContainerUpdateJob.FAMILY);
-			//Only schedule this job once!
-			if(oldJobs.length == 0) {
-				updateJob.schedule();
-			}
-			
-			
+			scheduleUpdateJob();
 		}
-
-
+		
+	}
+	
+	
+	private void scheduleUpdateJob() {
+		//Only schedule this job once
+		Job[] alreadyScheduledJobs = Job.getJobManager().find(ExtensionClasspathContainerUpdateJob.FAMILY);
+		if(alreadyScheduledJobs.length == 0) {
+			//Setting this rule prevents auto builds
+			updateJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
+			updateJob.schedule(DELAY);
+		}
+		
+		/*
+		 * Every time the listener is triggered, the job is delayed further. 
+		 * 
+		 * This is done to wait for the workspace to "calm down" and it becomes static 
+		 * (no more projects are deleted/added/changed and thus the listener is not triggered anymore). 
+		 * 
+		 * We do this to avoid updating the ecl1 classpath container multiple times (after every little change) and 
+		 * instead only update it (hopefully) once by grouping all relevant events together.  
+		 * 
+		 */
+		updateJob.wakeUp(DELAY);
 	}
 
 }
