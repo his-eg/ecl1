@@ -52,9 +52,10 @@ public class ExtensionImportJob extends Job {
 		return JOB_FAMILY.equals(family);
 	}
     
+    
     @Override
     protected IStatus run(IProgressMonitor monitor) { 	
-    	
+    	    	
     	// The folders in workspace that must be scrubbed before extension import
         Collection<String> existingFolders = checkForExistingFolders(extensionsToImport);
         String existingFoldersStr = Joiner.on(", ").join(existingFolders);
@@ -141,6 +142,7 @@ public class ExtensionImportJob extends Job {
         	String message = String.format(ERROR_MESSAGE_DELETE_FAILED, extensionsWithDeleteErrorsStr);
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID, message);
         }
+        
     	return Status.OK_STATUS;
     }
 
