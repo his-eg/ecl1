@@ -46,7 +46,9 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 	public void initialize(IPath containerPath, IJavaProject javaProject) throws CoreException {
 		try {
 			if (containerPath != null) {
-				logger.debug("Supplied path: " + containerPath.toOSString());
+				logger.debug("The following project contains an ecl1 classpath container: " + javaProject.toString() +
+						"\nThis is the content of this container: " + containerPath.toOSString() + 
+						"\nThe ecl1 plugin will now attempt to initialize the container.");
 			}
 			registerListener(containerPath,javaProject);
 			updateClasspathContainer(containerPath, javaProject);

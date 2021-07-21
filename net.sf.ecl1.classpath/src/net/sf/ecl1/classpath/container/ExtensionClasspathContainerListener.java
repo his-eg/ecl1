@@ -66,9 +66,7 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 	}
 	
 	@Override
-	public void resourceChanged(IResourceChangeEvent event) {
-		
-		extensionsInClasspathContainer = ExtensionClasspathContainerInitializer.getExtensionsInClasspathContainer(containerPath);     
+	public void resourceChanged(IResourceChangeEvent event) {  
 
 		IResourceDelta rootDelta = event.getDelta();
 
@@ -161,6 +159,9 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 			if(javaProject.getElementName().equals(delta.getResource().getName())) {
 				continue;
 			}									
+			
+			//TODO: Maybe don't parse the ecl1-container every time?
+			extensionsInClasspathContainer = ExtensionClasspathContainerInitializer.getExtensionsInClasspathContainer(containerPath);
 			
 			/*
 			 * Note: We first check for flags for performance reasons and only after this we check if the 
