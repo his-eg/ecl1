@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 
 import net.sf.ecl1.classpath.Activator;
+import net.sf.ecl1.utilities.general.BuildJob;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /** Updates the ecl1 classpath container */
@@ -47,14 +48,14 @@ public class ExtensionClasspathContainerUpdateJob extends Job {
 			
 			//Update ecl1 classpath container
 			ExtensionClasspathContainerInitializer.updateClasspathContainer(containerPath, javaProject);
-			//Updating the index is necessary or else an exception occurs when trying to build the workspace
-			JavaCore.rebuildIndex(monitor);
 		} catch (CoreException e) {
 			logger.error2("Updating of the ecl1 classpath container caused an exception. This was the exception: ", e);
 			return Status.CANCEL_STATUS;
 		}
 		
 		logger.info("Ecl1 classpath container successfully updated :)");
+		//Rebuild the workspace manually, because eclipse does not realize that a build is necessary by itself
+		new BuildJob().schedule();
 		return Status.OK_STATUS;
 	}
 
