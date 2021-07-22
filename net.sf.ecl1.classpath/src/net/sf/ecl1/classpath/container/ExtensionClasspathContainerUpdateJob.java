@@ -7,8 +7,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
-
 import net.sf.ecl1.classpath.Activator;
 import net.sf.ecl1.utilities.general.BuildJob;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
@@ -42,6 +40,36 @@ public class ExtensionClasspathContainerUpdateJob extends Job {
 	protected IStatus run(IProgressMonitor monitor) {
 		logger.info("Updating the ecl1 classpath container");
 		try {
+			
+			/*
+			 * The following code prevents the occurrence of Java Model Exceptions. 
+			 * 
+			 * It is currently not active, since it uses classes from eclipse that
+			 * do not belong to the public api and can be changed without notice. 
+			 * 
+			 * More details about this design decision in the ticket: 
+			 * https://hiszilla.his.de/hiszilla/show_bug.cgi?id=261078
+			 */
+//			int indexJobsCount = JavaModelManager.getIndexManager().awaitingJobsCount();
+// 
+//			while (indexJobsCount > 0) {
+//				long sleepTime = 5000;
+//				logger.info("The indexer is still working!"
+//						+ "\nCannot update the ecl1 classpath container while indexing without likely causing a Java Model Exception"
+//						+ "\nWill wait for " + sleepTime + "ms for the indexer to finish "
+//						+ "\n" + indexJobsCount + " files must still be indexed.");
+//				try {
+//					Thread.sleep(sleepTime);
+//				} catch (InterruptedException e) {
+//					logger.error2("Updating of the ecl1 classpath container caused an exception. This was the exception: ", e);
+//					return Status.CANCEL_STATUS;
+//				}
+//				indexJobsCount = JavaModelManager.getIndexManager().awaitingJobsCount();
+//			}
+			
+			
+			
+			
 			//Update ecl1 classpath container
 //			ClasspathContainerInitializer initializer = JavaCore.getClasspathContainerInitializer(ExtensionClasspathContainerPage.NET_SF_ECL1_ECL1_CONTAINER_ID);
 //			initializer.initialize(containerPath, javaProject);
