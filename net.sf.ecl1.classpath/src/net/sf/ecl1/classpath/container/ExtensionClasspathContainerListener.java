@@ -204,7 +204,10 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 				Set<IJavaProject> temp = collectProjectsWhereThisExtensionIsPresent(extensionName, javaProjectsWithClasspathContainer);
 				if(!temp.isEmpty()) {
 					String outputString = "The following extension project: " + extensionName + " was removed.\n";
-					outputString += "The project is a member of the ecl1 classpath container of the following projects: [" + Arrays.toString(temp.toArray()) + "]\n";
+					outputString += "The project is a member of the ecl1 classpath container of the following projects: \n";
+					for(IJavaProject p : temp) {
+						outputString += p.getElementName() + "\n";
+					}
 					outputString += "The ecl1 classpath container of these projects will be updated.";
 					logger.info(outputString);
 					projectsThatNeedToBeUpdated.addAll(temp);
@@ -216,7 +219,10 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 				Set<IJavaProject> temp = collectProjectsWhereThisExtensionIsPresent(extensionName, javaProjectsWithClasspathContainer);
 				if(!temp.isEmpty()) {
 					String outputString = "The following extension project: " + extensionName + " was either opened or closed!\n";
-					outputString += "The project is a member of the ecl1 classpath container of the following projects: [" + Arrays.toString(temp.toArray()) + "]\n";
+					outputString += "The project is a member of the ecl1 classpath container of the following projects: \n";
+					for(IJavaProject p : temp) {
+						outputString += p.getElementName() + "\n";
+					}
 					outputString += "The ecl1 classpath container of these projects will be updated.";
 					logger.info(outputString);
 					projectsThatNeedToBeUpdated.addAll(temp);
