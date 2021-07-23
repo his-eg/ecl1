@@ -28,6 +28,7 @@ import net.sf.ecl1.classpath.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.hisinone.ExtensionUtil;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
+import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
 /**
  * Initializes the ecl1 classpath container with HISinOne-Extension projects
@@ -98,7 +99,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 		// now search extensions etc.
 		Set<String> extensionsForClasspathContainerSet = getExtensionsInClasspathContainer(containerPath);
 
-		Collection<IClasspathEntry> classpathContainerEntryList = Collections2.filter(createClasspathContainerEntries(project, extensionsForClasspathContainerSet), Predicates.notNull());
+		Collection<IClasspathEntry> classpathContainerEntryList = Collections2.filter(createClasspathContainerEntries(extensionsForClasspathContainerSet), Predicates.notNull());
 		if (!classpathContainerEntryList.isEmpty()) {
 			IClasspathEntry[] classpathContainerEntryArray = classpathContainerEntryList.toArray(new IClasspathEntry[classpathContainerEntryList.size()]);
 			ExtensionClassPathContainer extensionClassPathContainer = new ExtensionClassPathContainer(containerPath, classpathContainerEntryArray);
@@ -163,12 +164,17 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 
 
 	/**
-	 * 
-	 * @param javaProject MUST be webapps or else this will fail. 
 	 * @param extensionsForClasspathContainer names of all the extensions that need to be added to the classpath container
 	 * @return resolved classpath entries. Either a *.jar or a link to a checked out project within the workspace. 
 	 */
-	private static ArrayList<IClasspathEntry> createClasspathContainerEntries(IJavaProject javaProject, Set<String> extensionsForClasspathContainer) {
+	private static ArrayList<IClasspathEntry> createClasspathContainerEntries(Set<String> extensionsForClasspathContainer) {
+		IProject p = WebappsUtil.findWebappsProject();
+		if(p == null) {
+			logger.error2("Couldn't find webapps projects in workspace!");
+			return null;
+		}
+		IJavaProject webapps = JavaCore.create(p);
+		
 		ArrayList<IClasspathEntry> result = new ArrayList<>();
 
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
@@ -183,7 +189,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 				// We want the extension to be added to the classpath container.
 				// Uniquely register extensions either as jar or as project.
 				if (simpleExtensionPath.endsWith(".jar")) {
-					IPath fullExtensionPath = javaProject.getPath().append(HisConstants.EXTENSIONS_FOLDER).append(simpleExtensionPath);
+					IPath fullExtensionPath = webapps.getPath().append(HisConstants.EXTENSIONS_FOLDER).append(simpleExtensionPath);
 					// create a lib entry
 					IPath sourceAttachmentPath = workspace.append(fullExtensionPath);
 					IPath sourceAttachmentRootPath = null;
