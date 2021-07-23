@@ -49,7 +49,8 @@ public class ExtensionClasspathContainerUpdateJob extends Job {
 		try {
 			
 //			/*
-//			 * The following code prevents the occurrence of Java Model Exceptions. 
+//			 * The following code prevents the occurrence of Java Model Exceptions when
+//			 * adding extension projects to the workspace.
 //			 * 
 //			 * It is currently not active, since it uses classes from eclipse that
 //			 * do not belong to the public api and can be changed without notice. 
@@ -101,6 +102,7 @@ public class ExtensionClasspathContainerUpdateJob extends Job {
 		}
 		
 		logger.info("Ecl1 classpath container successfully updated :)");
+		
 		//Rebuild the workspace manually, because eclipse does not realize that a build is necessary by itself
 		new BuildJob().schedule();
 		return Status.OK_STATUS;

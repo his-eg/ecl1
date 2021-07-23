@@ -62,7 +62,8 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 	
 	/**
 	 * Checks if projects with ecl1 classpath containers are still in the workspace or if they have
-	 * been deleted by the user
+	 * been deleted by the user in the mean time. If so --> Remove them from the list of 
+	 * projects that we need to update
 	 * 
 	 */
 	private void checkIfProjectsWithClasspathContainerAreStillPresentInTheWorkspace() {
@@ -105,6 +106,8 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 					//extension is a member of this ecl1 classpath container
 					if(classpathEntry.getPath().segment(1).contains(extensionName)) {
 						returnSet.add(project);
+						//If at least one extension projet is a member of the ecl1 classpath container, we
+						//can break, because we need to update the whole container anyway. 
 						break;
 					}
 				}
@@ -220,6 +223,7 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 			 * resourceName matches any extension within the ecl1 classpath container
 			 */
 			if( (delta.getKind() & IResourceDelta.REMOVED) == IResourceDelta.REMOVED ) {
+				
 				String extensionName = delta.getResource().getName();
 				Set<IJavaProject> temp = collectProjectsWhereThisExtensionIsPresent(extensionName, javaProjectsWithClasspathContainer);
 				if(!temp.isEmpty()) {
@@ -232,9 +236,11 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 					logger.info(outputString);
 					projectsThatNeedToBeUpdated.addAll(temp);
 				}
+				
 			}
 
 			if( (delta.getFlags() & IResourceDelta.OPEN) == IResourceDelta.OPEN ) {
+				
 				String extensionName = delta.getResource().getName();
 				Set<IJavaProject> temp = collectProjectsWhereThisExtensionIsPresent(extensionName, javaProjectsWithClasspathContainer);
 				if(!temp.isEmpty()) {
@@ -247,6 +253,7 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 					logger.info(outputString);
 					projectsThatNeedToBeUpdated.addAll(temp);
 				}
+				
 			}
 
 		}
@@ -262,13 +269,12 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 	
 	private void scheduleUpdateJob(Set<IJavaProject> projectsThatNeedUpdates) {		
 		/*
-		 * The listener was triggered again while waiting to update the ecl1 classpath container. 
+		 * The listener might have been triggered again while waiting to update the ecl1 classpath container. 
 		 * 
 		 * Since it is possible that now more projects with ecl1 classpath containers need to be updated, we need to cancel
 		 * the old job and start a new job with the updated list of projects that need to be updated.  
 		 */
 		Job.getJobManager().cancel(ExtensionClasspathContainerUpdateJob.FAMILY);
-		
 		ExtensionClasspathContainerUpdateJob updateJob = new ExtensionClasspathContainerUpdateJob(projectsThatNeedUpdates);
 		updateJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
 		updateJob.schedule(DELAY);
