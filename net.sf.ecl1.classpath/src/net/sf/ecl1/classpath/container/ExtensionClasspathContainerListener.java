@@ -1,14 +1,19 @@
 package net.sf.ecl1.classpath.container;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.core.runtime.jobs.Job;
 
 import net.sf.ecl1.classpath.Activator;
@@ -25,13 +30,10 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 
 	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ExtensionClasspathContainerListener.class.getSimpleName());
 	
-	Set<String> extensionsInClasspathContainer = new HashSet<String>();
+	private static final ExtensionClasspathContainerListener instance = new ExtensionClasspathContainerListener();
 	
-	/** Path to the ecl1 classpath container*/
-	IPath containerPath;
-	/** Project that contains an ecl classpath container */
-	IJavaProject javaProject;
-	
+	Set<IJavaProject> javaProjectsWithClasspathContainer = new HashSet<>();
+		
 	ExtensionClasspathContainerUpdateJob updateJob;
 	
 	
@@ -47,28 +49,62 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 	static final long DELAY = 5000; //ms
 	
 
+	private ExtensionClasspathContainerListener() {}
 	
-	
-	//TODO: Both parameters necessary? Maybe only containerPath parameter is necessary?
-	public ExtensionClasspathContainerListener(IPath containerPath, IJavaProject javaProject) {
-		this.containerPath = containerPath;
-		this.javaProject = javaProject;
-		this.updateJob = new ExtensionClasspathContainerUpdateJob(containerPath, javaProject);
+	public static ExtensionClasspathContainerListener getInstance() {
+		return instance;
 	}
 	
-	private boolean isResourceMemberOfClasspathContainer(String resourceName) {
-		for(String extensionName : extensionsInClasspathContainer) {
-			if(extensionName.equals(resourceName)) {
-				return true;
+	public void addProjectWithClasspathContainer(IJavaProject p) {
+		javaProjectsWithClasspathContainer.add(p);
+	}
+	
+	
+	/**
+	 * Collects all projects in which the extension is present in the project's ecl1 classpath container
+	 * 
+	 * @param extensionName
+	 * @param allProjects
+	 * @return
+	 */
+	private Set<IJavaProject> collectProjectsWhereThisExtensionIsPresent(String extensionName, Set<IJavaProject> allProjects) {
+		Set<IJavaProject> returnSet = new HashSet<>();
+		
+		for(IJavaProject project : allProjects) {
+			try {
+				for(IClasspathEntry classpathEntry : project.getRawClasspath()) {
+					
+					//Exit early if anything else than IClasspathEntry.CPE_CONTAINER
+					if(classpathEntry.getEntryKind() != IClasspathEntry.CPE_CONTAINER) {
+						continue;
+					}
+					
+					//Exit early if not an ecl1 classpath container
+					if(!classpathEntry.getPath().segment(0).equals(ExtensionClasspathContainerPage.NET_SF_ECL1_ECL1_CONTAINER_ID)) {
+						continue;
+					}
+					
+					//extension is a member of this ecl1 classpath container
+					if(classpathEntry.getPath().segment(1).contains(extensionName)) {
+						returnSet.add(project);
+						break;
+					}
+				}
+			} catch (JavaModelException e) {
+				e.printStackTrace();
 			}
 		}
-		return false;
+		
+		return returnSet;
 	}
+	
 	
 	@Override
 	public void resourceChanged(IResourceChangeEvent event) {  
 
 		IResourceDelta rootDelta = event.getDelta();
+		
+		Set<IJavaProject> projectsThatNeedToBeUpdated = new HashSet<>();
 
 		//Just for debugging purposes.
 		//TODO: Comment me before releasing!
@@ -79,10 +115,6 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 //			System.out.println("Kind of child: " + child.getKind());
 //			System.out.println("Flags of child: " + child.getFlags());
 //		}
-
-		boolean classpathContainerUpdateNecessary = false;
-
-		
 		
 		/*
 		 * #############################################################
@@ -139,11 +171,12 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 		 * Flags --> IResourceDelta.OPEN   
 		 * 
 		 */
+
 		
 		//Only check direct children (aka projects) of rootDelta 
 		for(IResourceDelta delta : rootDelta.getAffectedChildren( (IResourceDelta.REMOVED | IResourceDelta.CHANGED | IResourceDelta.ADDED) )) {
 			/*
-			 * If the project changes which contains the ecl1 classpath container, 
+			 * If the project changes which contains an ecl1 classpath container, 
 			 * we can exit early.
 			 * 
 			 * Rational behind this: 
@@ -156,62 +189,64 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 			 * the ecl1 classpath container if a project _within_ the container changes,
 			 * we can exit early.
 			 */
-			if(javaProject.getElementName().equals(delta.getResource().getName())) {
+			if (javaProjectsWithClasspathContainer.stream().anyMatch( t -> t.getElementName().equals(delta.getResource().getName()))) {
 				continue;
-			}									
+			}
+											
 						
-			//TODO: Maybe don't parse the ecl1-container every time?
-			extensionsInClasspathContainer = ExtensionClasspathContainerInitializer.getExtensionsInClasspathContainer(containerPath);     
 			
 			/*
 			 * Note: We first check for flags for performance reasons and only after this we check if the 
 			 * resourceName matches any extension within the ecl1 classpath container
 			 */
-			if( (delta.getKind() & IResourceDelta.REMOVED) == IResourceDelta.REMOVED &&
-					isResourceMemberOfClasspathContainer(delta.getResource().getName())) {
-				logger.info("The extension " + delta.getResource().getName() + " was removed! Since this extension is contained in the ecl1 classpath container, the container needs to be updated!");
-				classpathContainerUpdateNecessary = true;
-				break;
+			if( (delta.getKind() & IResourceDelta.REMOVED) == IResourceDelta.REMOVED ) {
+				String extensionName = delta.getResource().getName();
+				Set<IJavaProject> temp = collectProjectsWhereThisExtensionIsPresent(extensionName, javaProjectsWithClasspathContainer);
+				if(!temp.isEmpty()) {
+					String outputString = "The following extension project: " + extensionName + " was removed.\n";
+					outputString += "The project is a member of the ecl1 classpath container of the following projects: [" + Arrays.toString(temp.toArray()) + "]\n";
+					outputString += "The ecl1 classpath container of these projects will be updated.";
+					logger.info(outputString);
+					projectsThatNeedToBeUpdated.addAll(temp);
+				}
 			}
 
-			if( (delta.getFlags() & IResourceDelta.OPEN) == IResourceDelta.OPEN && 
-					isResourceMemberOfClasspathContainer(delta.getResource().getName())) {
-				logger.info("The extension " + delta.getResource().getName() + " was either opened or closed! Since this extension is contained in the ecl1 classpath container, the container needs to be updated!");
-				classpathContainerUpdateNecessary = true;
-				break;
+			if( (delta.getFlags() & IResourceDelta.OPEN) == IResourceDelta.OPEN ) {
+				String extensionName = delta.getResource().getName();
+				Set<IJavaProject> temp = collectProjectsWhereThisExtensionIsPresent(extensionName, javaProjectsWithClasspathContainer);
+				if(!temp.isEmpty()) {
+					String outputString = "The following extension project: " + extensionName + " was either opened or closed!\n";
+					outputString += "The project is a member of the ecl1 classpath container of the following projects: [" + Arrays.toString(temp.toArray()) + "]\n";
+					outputString += "The ecl1 classpath container of these projects will be updated.";
+					logger.info(outputString);
+					projectsThatNeedToBeUpdated.addAll(temp);
+				}
 			}
 
 		}
 
 		
 		
-		if(classpathContainerUpdateNecessary) {
-			scheduleUpdateJob();
+		if(!projectsThatNeedToBeUpdated.isEmpty()) {
+			scheduleUpdateJob(projectsThatNeedToBeUpdated);
 		}
 		
 	}
 	
 	
-	private void scheduleUpdateJob() {
-		//Only schedule this job once
-		Job[] alreadyScheduledJobs = Job.getJobManager().find(ExtensionClasspathContainerUpdateJob.FAMILY);
-		if(alreadyScheduledJobs.length == 0) {
-			//Setting this rule prevents auto builds
-			updateJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
-			updateJob.schedule(DELAY);
-		}
-		
+	private void scheduleUpdateJob(Set<IJavaProject> projectsThatNeedUpdates) {		
 		/*
-		 * Every time the listener is triggered, the job is delayed further. 
+		 * The listener was triggered again while waiting to update the ecl1 classpath container. 
 		 * 
-		 * This is done to wait for the workspace to "calm down" and it becomes static 
-		 * (no more projects are deleted/added/changed and thus the listener is not triggered anymore). 
-		 * 
-		 * We do this to avoid updating the ecl1 classpath container multiple times (after every little change) and 
-		 * instead only update it (hopefully) once by grouping all relevant events together.  
-		 * 
+		 * Since it is possible that now more projects with ecl1 classpath containers need to be updated, we need to cancel
+		 * the old job and start a new job with the updated list of projects that need to be updated.  
 		 */
-		updateJob.wakeUp(DELAY);
+		Job.getJobManager().cancel(ExtensionClasspathContainerUpdateJob.FAMILY);
+		
+		ExtensionClasspathContainerUpdateJob updateJob = new ExtensionClasspathContainerUpdateJob(projectsThatNeedUpdates);
+		updateJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
+		updateJob.schedule(DELAY);
+		
 	}
 
 }

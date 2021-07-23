@@ -1,12 +1,18 @@
 package net.sf.ecl1.classpath.container;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.ClasspathContainerInitializer;
+import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.JavaCore;
+
 import net.sf.ecl1.classpath.Activator;
 import net.sf.ecl1.utilities.general.BuildJob;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
@@ -15,18 +21,19 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
 public class ExtensionClasspathContainerUpdateJob extends Job {
 
 	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ExtensionClasspathContainerUpdateJob.class.getSimpleName()); 
-	
-	/** Path to the ecl1 classpath container*/
-	IPath containerPath;
-	/** Project that contains an ecl classpath container */
-	IJavaProject javaProject;
+		
+	Set<IJavaProject> projectsThatNeedToBeUpdated;
 		
 	public static final Object FAMILY = new Object();	
 	
-	public ExtensionClasspathContainerUpdateJob(IPath containerPath, IJavaProject javaProject) {
+	public ExtensionClasspathContainerUpdateJob(Set<IJavaProject> projectsThatNeedToBeUpdated) {
 		super("Updating ecl1 classpath container");
-		this.containerPath = containerPath;
-		this.javaProject = javaProject;
+		this.projectsThatNeedToBeUpdated = projectsThatNeedToBeUpdated;
+		
+		logger.info("Updating the ecl1 classpath container is scheduled. The following projects will be updated: " );
+		for(IJavaProject p : projectsThatNeedToBeUpdated) {
+			logger.info(p.getElementName());
+		}
 	}
 
 	
@@ -41,15 +48,15 @@ public class ExtensionClasspathContainerUpdateJob extends Job {
 		logger.info("Updating the ecl1 classpath container");
 		try {
 			
-			/*
-			 * The following code prevents the occurrence of Java Model Exceptions. 
-			 * 
-			 * It is currently not active, since it uses classes from eclipse that
-			 * do not belong to the public api and can be changed without notice. 
-			 * 
-			 * More details about this design decision in the ticket: 
-			 * https://hiszilla.his.de/hiszilla/show_bug.cgi?id=261078
-			 */
+//			/*
+//			 * The following code prevents the occurrence of Java Model Exceptions. 
+//			 * 
+//			 * It is currently not active, since it uses classes from eclipse that
+//			 * do not belong to the public api and can be changed without notice. 
+//			 * 
+//			 * More details about this design decision in the ticket: 
+//			 * https://hiszilla.his.de/hiszilla/show_bug.cgi?id=261078
+//			 */
 //			int indexJobsCount = JavaModelManager.getIndexManager().awaitingJobsCount();
 // 
 //			while (indexJobsCount > 0) {
@@ -65,17 +72,29 @@ public class ExtensionClasspathContainerUpdateJob extends Job {
 //					return Status.CANCEL_STATUS;
 //				}
 //				indexJobsCount = JavaModelManager.getIndexManager().awaitingJobsCount();
-//			}
+//			}			
+			
+			for(IJavaProject project : projectsThatNeedToBeUpdated) {
+				//Get the path to the ecl1 classpath container for this project
+				for(IClasspathEntry classpathEntry : project.getRawClasspath()) {
+					
+					//Exit early if anything else than IClasspathEntry.CPE_CONTAINER
+					if(classpathEntry.getEntryKind() != IClasspathEntry.CPE_CONTAINER) {
+						continue;
+					}
+					
+					if(classpathEntry.getPath().segment(0).equals(ExtensionClasspathContainerPage.NET_SF_ECL1_ECL1_CONTAINER_ID)) {
+						//Found the containerpath -> Now perform update 
+						ClasspathContainerInitializer initializer = JavaCore.getClasspathContainerInitializer(ExtensionClasspathContainerPage.NET_SF_ECL1_ECL1_CONTAINER_ID);
+						initializer.initialize(classpathEntry.getPath(), project);
+						break;
+					}
+				
+				}
+
+			}
 			
 			
-			
-			
-			//Update ecl1 classpath container
-//			ClasspathContainerInitializer initializer = JavaCore.getClasspathContainerInitializer(ExtensionClasspathContainerPage.NET_SF_ECL1_ECL1_CONTAINER_ID);
-//			initializer.initialize(containerPath, javaProject);
-			
-			//Update ecl1 classpath container
-			ExtensionClasspathContainerInitializer.updateClasspathContainer(containerPath, javaProject);
 		} catch (CoreException e) {
 			logger.error2("Updating of the ecl1 classpath container caused an exception. This was the exception: ", e);
 			return Status.CANCEL_STATUS;

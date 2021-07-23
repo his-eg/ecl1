@@ -39,8 +39,6 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ExtensionClasspathContainerInitializer.class.getSimpleName());
 
 	private static final ExtensionUtil EXTENSION_UTIL = ExtensionUtil.getInstance();
-	
-	boolean listenerRegistered = false;
 
 	@Override
 	public void initialize(IPath containerPath, IJavaProject javaProject) throws CoreException {
@@ -50,7 +48,9 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 						"\nThis is the content of this container: " + containerPath.toOSString() + 
 						"\nThe ecl1 plugin will now attempt to initialize the container.");
 			}
-			registerListener(containerPath,javaProject);
+			
+			ExtensionClasspathContainerListener.getInstance().addProjectWithClasspathContainer(javaProject);
+			registerListener();
 			updateClasspathContainer(containerPath, javaProject);
 		} catch (CoreException e) {
 			logger.error2(e.getMessage(), e);
@@ -60,18 +60,10 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 
 
 	
-	private void registerListener(IPath containerPath, IJavaProject javaProject) {
-		/*
-		 * Add listener to workspace only once. This is necessary, because the initialize
-		 * method can be called by eclipse multiple times. 
-		 * 
-		 */
-		if(listenerRegistered == false) {
-			ExtensionClasspathContainerListener listener = new ExtensionClasspathContainerListener(containerPath, javaProject);
-			//We only want to be informed after a workspace change is completed
-			ResourcesPlugin.getWorkspace().addResourceChangeListener(listener, IResourceChangeEvent.POST_CHANGE);
-			listenerRegistered = true;
-		}
+	private void registerListener() {
+		//We only want to be informed after a workspace change is completed
+		//Even if addResourceChangeListener is called multiple times, the listener will only be added once.
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(ExtensionClasspathContainerListener.getInstance(), IResourceChangeEvent.POST_CHANGE);
 	}
 
 	/* (non-Javadoc)
