@@ -2,6 +2,7 @@ package net.sf.ecl1.classpath.container;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -59,6 +60,23 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 		javaProjectsWithClasspathContainer.add(p);
 	}
 	
+	/**
+	 * Checks if projects with ecl1 classpath containers are still in the workspace or if they have
+	 * been deleted by the user
+	 * 
+	 */
+	private void checkIfProjectsWithClasspathContainerAreStillPresentInTheWorkspace() {
+		
+		Iterator<IJavaProject> it = javaProjectsWithClasspathContainer.iterator();
+		while(it.hasNext()) {
+			IJavaProject project = it.next();
+			if(!project.exists()) {
+				it.remove();
+			}
+		}
+		
+	}
+	
 	
 	/**
 	 * Collects all projects in which the extension is present in the project's ecl1 classpath container
@@ -105,6 +123,8 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 		IResourceDelta rootDelta = event.getDelta();
 		
 		Set<IJavaProject> projectsThatNeedToBeUpdated = new HashSet<>();
+		
+		checkIfProjectsWithClasspathContainerAreStillPresentInTheWorkspace();
 
 		//Just for debugging purposes.
 		//TODO: Comment me before releasing!
