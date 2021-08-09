@@ -3,6 +3,7 @@ package net.sf.ecl1.git.auto.lfs.prune;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -47,12 +48,15 @@ public class AutoLfsPrune implements IStartup, Runnable {
 				
 	}
     
-    static public int parseGitLfsVersion(InputStream stream) {
+    static public int parseGitLfsVersion(InputStream stream) throws ParseException {
     	//Pattern matches a semantic version number (for example: 2.13.3)
     	Pattern p = Pattern.compile("\\d*\\.\\d*\\.\\d*");
     	try(Scanner scanner = new Scanner(stream);) {
         	//We assume that the version of git lfs is in the first line and is the first version number in this line
         	String versionAsString = scanner.findInLine(p);
+        	if (versionAsString == null) {
+        		throw new ParseException("Exception occured while trying to parse the version of git lfs",0);
+        	}
         	//Convert string to int
         	versionAsString = versionAsString.replace(".", "");
         	return Integer.parseInt(versionAsString);
@@ -157,9 +161,10 @@ public class AutoLfsPrune implements IStartup, Runnable {
 								detectedLFSVersion = true;
 
 							
-							} catch (IOException | InterruptedException e) {
+							} catch (IOException | InterruptedException | ParseException e) {
 								logger.error2("Failed to run \"git lfs --version\" command in the following project: "+ name);
 								logger.error2("Error message: " + e.getMessage(),e);
+								return Status.OK_STATUS;
 							} 
 							
 						}
