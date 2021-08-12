@@ -146,17 +146,17 @@ public class AutoLfsPrune implements IStartup, Runnable {
 						/*
 						 * Detect version of git lfs. 
 						 * 
-						 * We need the version number of git lfs, because if stashes are present on windows machines, we can only run "gif lfs prune", if "git lfs --version" is bigger or equal
+						 * We need the version number of git lfs, because if stashes are present on windows machines, we can only run "gif lfs prune", if "git lfs version" is bigger or equal
 						 * to version 2.13.3 because of this bug: https://github.com/git-lfs/git-lfs/issues/4401 that was fixed in 2.13.3
 						 * 
 						 */
 						if(detectedLFSVersion == false) {
 							
 							try {
-								ExecutionResult er = runCommandInRepo("git lfs --version",repo);
+								ExecutionResult er = runCommandInRepo("git lfs version",repo);
 								
 								if (er.getRc() != 0) {
-									printFailureMessage("git lfs --version");
+									printFailureMessage("git lfs version");
 									return Status.OK_STATUS;
 								}
 								
@@ -164,14 +164,14 @@ public class AutoLfsPrune implements IStartup, Runnable {
 								try {
 									LFSVersion = parseGitLfsVersion(er.getStdout().openInputStream());
 								} catch (ParseException e) {
-									printFailureMessage("git lfs --version");
+									printFailureMessage("git lfs version");
 									return Status.OK_STATUS;
 								}
 								detectedLFSVersion = true;
 
 							
 							} catch (IOException | InterruptedException e) {
-								logger.error2("Failed to run \"git lfs --version\" command in the following project: "+ name);
+								logger.error2("Failed to run \"git lfs version\" command in the following project: "+ name);
 								logger.error2("Error message: " + e.getMessage(),e);
 								return Status.OK_STATUS;
 							} 
