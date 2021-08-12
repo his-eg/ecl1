@@ -55,7 +55,7 @@ public class AutoLfsPrune implements IStartup, Runnable {
         	//We assume that the version of git lfs is in the first line and is the first version number in this line
         	String versionAsString = scanner.findInLine(p);
         	if (versionAsString == null) {
-        		throw new ParseException("Exception occured while trying to parse the version of git lfs",0);
+        		throw new ParseException("Exception occured while trying to parse the version of git lfs. One possible reason: git lfs is not installed on the machine.",0);
         	}
         	//Convert string to int
         	versionAsString = versionAsString.replace(".", "");
@@ -74,6 +74,12 @@ public class AutoLfsPrune implements IStartup, Runnable {
     	new Thread(this,"Auto lfs prune thread").start();
 	}
 
+	private void printFailureMessage(String command) {
+		logger.info("Command: \"" + command + "\" returned an error code or an exception occured! Aborting pruning in ALL projects in the workspace.");
+		logger.info("Most likely cause for the error code: \"git\" command is not available in your console.");
+		logger.info("This can be fixed by installing git in your console.");
+	}
+	
 	@Override
 	public void run() {
 		Job job = new Job("ecl1GitLfsPrune") {			
@@ -150,18 +156,21 @@ public class AutoLfsPrune implements IStartup, Runnable {
 								ExecutionResult er = runCommandInRepo("git lfs --version",repo);
 								
 								if (er.getRc() != 0) {
-									logger.info("Command: \"git lfs --version\" returned an error code! Aborting pruning in ALL projects in the workspace.");
-									logger.info("Most likely cause for the error code: \"git\" command is not available on your console.");
-									logger.info("This can be fixed by installing git in your console.");
+									printFailureMessage("git lfs --version");
 									return Status.OK_STATUS;
 								}
 								
 								
-								LFSVersion = parseGitLfsVersion(er.getStdout().openInputStream());
+								try {
+									LFSVersion = parseGitLfsVersion(er.getStdout().openInputStream());
+								} catch (ParseException e) {
+									printFailureMessage("git lfs --version");
+									return Status.OK_STATUS;
+								}
 								detectedLFSVersion = true;
 
 							
-							} catch (IOException | InterruptedException | ParseException e) {
+							} catch (IOException | InterruptedException e) {
 								logger.error2("Failed to run \"git lfs --version\" command in the following project: "+ name);
 								logger.error2("Error message: " + e.getMessage(),e);
 								return Status.OK_STATUS;
@@ -179,9 +188,7 @@ public class AutoLfsPrune implements IStartup, Runnable {
 								ExecutionResult er = runCommandInRepo("git stash list", repo);
 								
 								if (er.getRc() != 0) {
-									logger.info("Command: \"git stash list\" returned an error code! Aborting pruning in ALL projects in the workspace.");
-									logger.info("Most likely cause for the error code: \"git\" command is not available on your console.");
-									logger.info("This can be fixed by installing git in your console.");
+									printFailureMessage("git stash list");
 									return Status.OK_STATUS;
 								}
 
