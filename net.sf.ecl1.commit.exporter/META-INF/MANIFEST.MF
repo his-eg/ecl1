@@ -6,18 +6,11 @@ Bundle-Version: 0.3.0.2021-05-18
 Bundle-Activator: net.sf.ecl1.commit.exporter.CommitExportWizardPlugin
 Bundle-Vendor: HIS eG
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
  org.junit,
- org.eclipse.swt,
- net.sf.ecl1.utilities;bundle-version="0.4.5",
+ net.sf.ecl1.utilities,
  org.eclipse.jgit
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Import-Package: com.google.common.base;version="15.0.0",
- com.google.common.collect,
  org.apache.commons.io,
- org.eclipse.core.resources,
- org.eclipse.team.internal.core,
- org.eclipse.team.internal.core.subscribers,
- org.eclipse.team.ui,
- org.slf4j
+ org.eclipse.core.resources

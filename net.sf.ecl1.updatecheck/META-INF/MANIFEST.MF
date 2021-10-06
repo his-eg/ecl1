@@ -6,12 +6,10 @@ Bundle-Version: 0.3.0.2020-11-05
 Bundle-Activator: net.sf.ecl1.updatecheck.UpdateCheckActivator
 Bundle-Vendor: HIS eG
 Require-Bundle: org.eclipse.ui,
- org.eclipse.core.runtime,
  net.sf.ecl1.utilities
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Import-Package: org.eclipse.equinox.internal.p2.ui.model,
- org.eclipse.equinox.p2.core,
+Import-Package: org.eclipse.equinox.p2.core,
  org.eclipse.equinox.p2.engine;version="2.2.0",
  org.eclipse.equinox.p2.metadata;version="2.1.0",
  org.eclipse.equinox.p2.operations;version="2.0.0",
