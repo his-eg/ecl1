@@ -2,6 +2,8 @@ package net.sf.ecl1.importwizard;
 
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
@@ -109,7 +111,11 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 
         Set<String> extensionsInWorkspace = model.getExtensionsInWorkspace();
         for (String remoteExtensionName : model.getRemoteExtensions()) {
-            if (!extensionsInWorkspace.contains(remoteExtensionName) && !remoteExtensionName.contains(HisConstants.WEBAPPS) && !remoteExtensionName.contains(AUTOCOMMIT_EXTENSION_JAR)) {
+        	//Extension projects always have at least two dots (.) in their names. We filter out everything that does not have
+        	//two dots in its name...
+        	Pattern p = Pattern.compile(".+\\..+\\..+");
+        	Matcher m = p.matcher(remoteExtensionName);       	
+            if (!extensionsInWorkspace.contains(remoteExtensionName) && m.matches()) {
                 TableItem tableItem = new TableItem(projectTable, SWT.NONE);
                 tableItem.setChecked(false);
                 tableItem.setText(1, remoteExtensionName);
