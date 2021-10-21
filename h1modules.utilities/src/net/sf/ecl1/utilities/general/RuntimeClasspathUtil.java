@@ -66,7 +66,7 @@ public class RuntimeClasspathUtil {
 	}
 	
 	/**
-	 * Add a Java project including all its dependencies to the runtime classpath.
+	 * Adds a Java project including all its dependencies to the runtime classpath.
 	 * 
 	 * @param javaProject The java project to add
 	 * @param runtimeClasspath the runtime classpath to update
@@ -97,6 +97,8 @@ public class RuntimeClasspathUtil {
 	
 			// Add all other entries to the runtime classpath (typically libraries)
 			IClasspathEntry[] compileClasspath = javaProject.getRawClasspath();
+			// Fixes #266063
+			sortCompileClasspath(compileClasspath);
 			for (IClasspathEntry compileClasspathEntry : compileClasspath) {
 				if (compileClasspathEntry.getPath().equals(classesInstrFolder)) {
 					logger.debug("Skip compile classpath entry " + compileClasspathEntry + " which has been added to the runtime classpath before");
@@ -109,6 +111,33 @@ public class RuntimeClasspathUtil {
 		}
 	}
 	
+	/**
+	 * 
+	 * Sorts the compileClasspath by preserving the order as it is defined in the .classpath, except that
+	 * "webapps" is moved to the top
+	 * 
+	 * @param compileClasspath
+	 */
+	private static void sortCompileClasspath(IClasspathEntry[] compileClasspath) {
+		for(int i = 0; i < compileClasspath.length; i++) {
+			IClasspathEntry entry = compileClasspath[i];
+			//Find webapps
+			if(entry.getEntryKind() == IClasspathEntry.CPE_PROJECT && entry.getPath().lastSegment().equals("webapps")) {
+
+				//Move every entry down the list
+				for(int j = i; j > 0; j--) {
+					compileClasspath[j] = compileClasspath[j-1];
+				}
+				//Move webapps to the first position
+				compileClasspath[0] = entry;
+				
+				//We are done with sorting and thus with this method
+				break;
+			}
+		}
+		
+	}
+
 	/**
 	 * Add an arbitrary compile classpath entry to the runtime classpath.
 	 * This method is the core of the runtime classpath construction procedure.

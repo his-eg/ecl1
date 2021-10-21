@@ -2,7 +2,6 @@ package net.sf.ecl1.classpath;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
-
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -39,6 +38,11 @@ public class HisRuntimeClasspathProvider implements IRuntimeClasspathProvider {
 		// Add the Java project the JUnit test class belongs to, and all its classpath dependencies.
 		// If the JUnit test is part of a HisInOne extension, webapps will be a dependency.
 		IJavaProject javaProject = ProjectUtil.getJavaProjectForLaunchConfiguration(launchConfig);
+		if(javaProject == null ) {
+			logger.info("No java project was found for the following launch Configuration: " + launchConfig
+					   + "\nThus no runtime classpath can be calculated. ");
+			return runtimeClasspath.toArray(new IRuntimeClasspathEntry[runtimeClasspath.size()]);
+		}
 		RuntimeClasspathUtil.addJavaProjectToRuntimeClasspath(javaProject, runtimeClasspath);
 		if (WebappsUtil.isWebapps(javaProject.getProject())) {
 			// Add all Java extensions from webapps to the runtime classpath
