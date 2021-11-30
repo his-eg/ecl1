@@ -3,6 +3,11 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.3.0.2021-11-30##
+* webapps is now on top of the classpath
+* The extension importer does not offer projects anymore that are no HisInOne extension projects
+* Some bugfixes in git lfs autoprune
+
 ##Version 1.2.0.2021-07-12##
 * Make git hooks work under Linux
 * Improved resource loading in extension projects
