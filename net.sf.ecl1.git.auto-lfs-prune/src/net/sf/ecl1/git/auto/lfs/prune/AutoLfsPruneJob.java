@@ -31,7 +31,7 @@ public class AutoLfsPruneJob extends Job {
 	/** git lfs version 2.13.3 fixed a bug (see: https://github.com/git-lfs/git-lfs/issues/4401) that prohibited
 	 *  running the command "git lfs prune" when stashes were present on windows machines...
 	 */
-	private static final int LFS_VERSION_WITH_BUGFIX = 2133;
+	private static final String LFS_VERSION_WITH_BUGFIX = "2.13.3";
 	
 	
 	public AutoLfsPruneJob() {
@@ -49,18 +49,42 @@ public class AutoLfsPruneJob extends Job {
 				
 	}
     
-    private int parseGitLfsVersion(InputStream stream) throws ParseException {
+	/**
+	 * Taken from here: https://www.baeldung.com/java-comparing-versions
+	 * 
+	 * @param version1
+	 * @param version2
+	 * @return
+	 */
+	private int compareVersions(String version1, String version2) {
+	    int comparisonResult = 0;
+	    
+	    String[] version1Splits = version1.split("\\.");
+	    String[] version2Splits = version2.split("\\.");
+	    int maxLengthOfVersionSplits = Math.max(version1Splits.length, version2Splits.length);
+
+	    for (int i = 0; i < maxLengthOfVersionSplits; i++){
+	        Integer v1 = i < version1Splits.length ? Integer.parseInt(version1Splits[i]) : 0;
+	        Integer v2 = i < version2Splits.length ? Integer.parseInt(version2Splits[i]) : 0;
+	        int compare = v1.compareTo(v2);
+	        if (compare != 0) {
+	            comparisonResult = compare;
+	            break;
+	        }
+	    }
+	    return comparisonResult;
+	}
+	
+    private String parseGitLfsVersion(InputStream stream) throws ParseException {
     	//Pattern matches a semantic version number (for example: 2.13.3)
     	Pattern p = Pattern.compile("\\d*\\.\\d*\\.\\d*");
     	try(Scanner scanner = new Scanner(stream);) {
         	//We assume that the version of git lfs is in the first line and is the first version number in this line
-        	String versionAsString = scanner.findInLine(p);
-        	if (versionAsString == null) {
+        	String version = scanner.findInLine(p);
+        	if (version == null) {
         		throw new ParseException("Exception occured while trying to parse the version of git lfs. One possible reason: git lfs is not installed on the machine.",0);
         	}
-        	//Convert string to int
-        	versionAsString = versionAsString.replace(".", "");
-        	return Integer.parseInt(versionAsString);
+        	return version;
     	}
     }
     
@@ -76,7 +100,7 @@ public class AutoLfsPruneJob extends Job {
 		//Detect filesystem (windows or POSIX)
 		FS fs = FS.detect();
 		boolean detectedLFSVersion = false;
-		int LFSVersion = 0;
+		String LFSVersion = "0";
 		
 		List<IProject> projects = Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects());
 		logger.info("Found projects in Workspace: " + projects);
@@ -170,7 +194,7 @@ public class AutoLfsPruneJob extends Job {
 				/*
 				 * Run "git stash list" in the git-repo
 				 */
-				if(LFSVersion < LFS_VERSION_WITH_BUGFIX) {
+				if( compareVersions(LFSVersion, LFS_VERSION_WITH_BUGFIX) <= 0 ) {
 					try {
 						ExecutionResult er = runCommandInRepo("git stash list", repo);
 						
