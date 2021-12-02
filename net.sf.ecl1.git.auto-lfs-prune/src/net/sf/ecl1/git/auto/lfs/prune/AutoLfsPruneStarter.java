@@ -12,10 +12,10 @@ public class AutoLfsPruneStarter implements IStartup {
 	@Override
 	public void earlyStartup() {	
 		
+		AutoLfsPruneJob pruneJob = AutoLfsPruneActivator.getDefault().getPruneJob();
+		
 		// Schedules a new auto lfs prune job for immediate execution when run
 		Runnable autoLfsPruneJobScheduler = new Runnable() {
-			
-			AutoLfsPruneJob pruneJob = new AutoLfsPruneJob();
 			
 			@Override
 			public void run() {

@@ -1,12 +1,12 @@
 package net.sf.ecl1.git.auto.lfs.prune;
 
-import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class AutoLfsPruneActivator extends AbstractUIPlugin {
+public class AutoLfsPruneActivator extends Plugin {
 
 	// The plug-in ID
 	public static final String PLUGIN_ID = "net.sf.ecl1.git.auto-lfs-prune"; //$NON-NLS-1$
@@ -14,6 +14,8 @@ public class AutoLfsPruneActivator extends AbstractUIPlugin {
 	// The shared instance
 	private static AutoLfsPruneActivator plugin;
 	
+	private AutoLfsPruneJob pruneJob;
+
 	/**
 	 * The constructor
 	 */
@@ -27,6 +29,7 @@ public class AutoLfsPruneActivator extends AbstractUIPlugin {
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		plugin = this;
+		pruneJob = new AutoLfsPruneJob();
 	}
 
 	/*
@@ -34,8 +37,14 @@ public class AutoLfsPruneActivator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
-		plugin = null;
+		//Cancel job properly if platform (eclipse) shuts down. Otherwise we would get a nasty entry in our error log...
+		if (pruneJob != null) {
+			pruneJob.cancel();
+			//Wait for cancel to complete
+			pruneJob.join();
+		}
 		super.stop(context);
+		plugin = null;
 	}
 
 	/**
@@ -45,5 +54,9 @@ public class AutoLfsPruneActivator extends AbstractUIPlugin {
 	 */
 	public static AutoLfsPruneActivator getDefault() {
 		return plugin;
+	}
+	
+	public AutoLfsPruneJob getPruneJob() {
+		return pruneJob;
 	}
 }
