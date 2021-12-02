@@ -4,7 +4,7 @@
    <extension
          point="org.eclipse.ui.startup">
       <startup
-            class="net.sf.ecl1.git.auto.lfs.prune.AutoLfsPrune">
+            class="net.sf.ecl1.git.auto.lfs.prune.AutoLfsPruneStarter">
       </startup>
    </extension>
 
