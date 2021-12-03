@@ -67,6 +67,13 @@ public class P2Util {
 		logger.debug("Update Query Expression: " + query.getExpression());
 		IProfileRegistry registry = (IProfileRegistry) agent.getService(IProfileRegistry.SERVICE_NAME);
 		final IProfile profile = registry.getProfile(IProfileRegistry.SELF);
+		if (profile == null ) {
+			String errorMessage = "Could not update ecl1, because the running profile instance could not be located. "
+					+ "One possible reason for failing to locate the running profile instance is that this eclipse instance was started from another eclipse instance. "
+					+ "When starting eclipse from another eclipse instance, make sure to check the checkbox \"Support software installation in the launched application\" under Run Configurations --> Configuration";
+			logger.error2(errorMessage);
+			return new Status(IStatus.ERROR, ECL1_UPDATE_ID, errorMessage);
+		}
 		IQueryResult<IInstallableUnit> result = profile.query(query, monitor);
 		Set<IInstallableUnit> unitsForUpdate = result.toUnmodifiableSet();
 		logger.debug("Installable Units for update: " + unitsForUpdate);
