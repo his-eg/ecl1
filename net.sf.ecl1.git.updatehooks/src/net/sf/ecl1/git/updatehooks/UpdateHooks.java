@@ -40,7 +40,7 @@ public class UpdateHooks implements IStartup {
     
 	@Override
 	public void earlyStartup() {
-		Job job = new Job("ecl1UpdateGitHooks") {
+		Job job = new Job("ecl1: Updating git hooks in all git versioned HIS projects in the workspace") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				/*
@@ -61,13 +61,30 @@ public class UpdateHooks implements IStartup {
 							+ "https://wiki.his.de/mediawiki/index.php/Einrichtung_einer_HISinOne-Arbeitsumgebung#Eclipse_dazu_bef.C3.A4higen_Git_hooks_ausf.C3.BChren_zu_k.C3.B6nnen");
 				}
 				
+				/* -----------------------------------
+				 * Determine the number of projects that we have to process
+				 * -----------------------------------
+				 */
+				int totalAmountOfWork = 0;
+				//Webapps
+				IProject webapps = WebappsUtil.findWebappsProject();
+				if (webapps != null) {
+					totalAmountOfWork++;
+				}
+				//Extensions
+				IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+				TreeMap<String,String> extensions = new TreeMap<>();
+				ExtensionUtil.getInstance().scanForExtensionProjects(extensions);
+				totalAmountOfWork += extensions.entrySet().size();
+				monitor.beginTask("Updating git hooks", totalAmountOfWork);
+				
 				
 				/* -----------------------------------
 				 * Update git hook of webapps project
 				 * -----------------------------------
 				 */
-				IProject webapps = WebappsUtil.findWebappsProject();
 				if(webapps != null) {
+					monitor.subTask("webapps");
 					if(webapps.getLocation().append(".git").toFile().isFile()) {
 						logger.info("Current project is managed by git, but you are currently in a linked work tree. Updating the git hooks will not work in a linked work tree. Skipping...");
 					} else {
@@ -86,6 +103,7 @@ public class UpdateHooks implements IStartup {
 							logger.error2("Failed to update the git hooks of the webapps project. Exception: " + e.getMessage(), e);
 						}
 					}
+					monitor.worked(1);
 				} else {
 					logger.info("No webapps project found in your workspace.");
 				}
@@ -95,13 +113,8 @@ public class UpdateHooks implements IStartup {
 				 * Update git hook of all extension projects
 				 * ------------------------------------------
 				 */
-				IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-				
-				TreeMap<String,String> extensions = new TreeMap<>();
-				ExtensionUtil.getInstance().scanForExtensionProjects(extensions);
-				
-
 				for(Entry<String,String> e : extensions.entrySet()) {
+					monitor.subTask(e.getValue());
 					if(monitor.isCanceled()) {
 						return Status.CANCEL_STATUS;
 					}
@@ -121,7 +134,7 @@ public class UpdateHooks implements IStartup {
 								"\nException: " + e1.getMessage(), e1);
 					}
 
-					
+					monitor.worked(1);
 				}
 			
 				
