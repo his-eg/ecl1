@@ -35,7 +35,7 @@ public class AutoLfsPruneJob extends Job {
 	
 	
 	public AutoLfsPruneJob() {
-		super("ecl1GitLfsPrune");
+		super("ecl1: Pruning all git versioned projects in the workspace");
 	}
 	
 	private ExecutionResult runCommandInRepo(String command, Repository repo) throws IOException, InterruptedException {
@@ -104,7 +104,7 @@ public class AutoLfsPruneJob extends Job {
 		
 		List<IProject> projects = Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects());
 		logger.info("Found projects in Workspace: " + projects);
-		monitor.beginTask("Batch Git Lfs prune", projects.size());
+		monitor.beginTask("Pruning", projects.size());
 		
 		for (IProject p : projects) {
 			/*
@@ -116,7 +116,7 @@ public class AutoLfsPruneJob extends Job {
 			
 			
 			String name = p.getName();
-			monitor.subTask("Pruning " + name);
+			monitor.subTask(name);
 			File projectLocationFile = p.getLocation().append(".git").toFile();
 			logger.info(name + " with location " + projectLocationFile.getAbsolutePath());
 			
