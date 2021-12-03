@@ -43,8 +43,8 @@ public class AutoLfsPruneActivator extends Plugin {
 			//Wait for cancel to complete
 			pruneJob.join();
 		}
-		super.stop(context);
 		plugin = null;
+		super.stop(context);
 	}
 
 	/**
