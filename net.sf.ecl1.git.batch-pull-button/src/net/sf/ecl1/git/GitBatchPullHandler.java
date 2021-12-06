@@ -13,6 +13,8 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.WorkspaceJob;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -36,9 +38,9 @@ public class GitBatchPullHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		logger.info("Starting ecl1GitBatchPull");
-		Job job = new Job("ecl: Executing \"git pull\" for all git versioned projects in the workspace.") {
+		Job job = new WorkspaceJob("ecl: Executing \"git pull\" for all git versioned projects in the workspace.") {
 			@Override
-			protected IStatus run(IProgressMonitor monitor) {
+			public IStatus runInWorkspace(IProgressMonitor monitor) {
 				List<IProject> projects = Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects());
 				//Fixes #250882
 				Collections.sort(projects, projectComparator);
