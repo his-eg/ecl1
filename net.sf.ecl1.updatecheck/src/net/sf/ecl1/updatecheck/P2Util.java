@@ -46,15 +46,10 @@ public class P2Util {
 		try {
 			checkForUpdates(agent, monitor);
 		} finally {
-			// TODO: In rare cases, the following ungetService() statement throws an IllegalStateException.
-			// From https://www.cct.lsu.edu/~rguidry/ecl31docs/api/org/osgi/framework/BundleContext.html:
-			// "The BundleContext object is only valid during the execution of its context bundle; 
-			// that is, during the period from when the context bundle is in the STARTING, STOPPING, 
-			// and ACTIVE bundle states. If the BundleContext object is used subsequently, an 
-			// IllegalStateException must be thrown."
 			try {
 				bundleContext.ungetService(reference);
 			} catch (IllegalStateException e) {
+				//Should not happen. See #270218 for explanation
 				logger.error2("bundleContext.ungetService() failed: " + e.getMessage(), e); 
 			}
 		}
