@@ -36,7 +36,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		logger.info("Starting ecl1GitBatchPull");
-		Job job = new Job("ecl1GitBatchPull") {
+		Job job = new Job("ecl: Executing \"git pull\" for all git versioned projects in the workspace.") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				List<IProject> projects = Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects());
@@ -90,6 +90,8 @@ public class GitBatchPullHandler extends AbstractHandler {
 				return Status.OK_STATUS;
 			}
 		};
+		//Registering the job enables the activator to properly shutdown the job when eclipse shuts down
+		Activator.getDefault().setGitBatchPullJob(job);
 		job.schedule();
 		return null;
 	}

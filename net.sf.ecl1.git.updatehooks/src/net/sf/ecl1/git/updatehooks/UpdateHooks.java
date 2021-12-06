@@ -43,9 +43,6 @@ public class UpdateHooks implements IStartup {
 		Job job = new Job("ecl1: Updating git hooks in all git versioned HIS projects in the workspace") {
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
-				//Register the job at the activator to enable the activator to cancel the job, when eclipse shut sdown
-				UpdateHooksActivator.getDefault().setUpdateHooksJobs(this);
-				
 				/*
 				 * ---------------------------------
 				 * Warn Windows users (generally a good idea :) 
@@ -144,6 +141,8 @@ public class UpdateHooks implements IStartup {
 				return Status.OK_STATUS;
 			}
 		};
+		//Register the job at the activator to enable the activator to cancel the job, when eclipse shut sdown
+		UpdateHooksActivator.getDefault().setUpdateHooksJobs(job);
 		job.schedule();
 	}
 	

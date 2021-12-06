@@ -1,5 +1,6 @@
 package net.sf.ecl1.git;
 
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -14,6 +15,12 @@ public class Activator extends AbstractUIPlugin {
 
 	// The shared instance
 	private static Activator plugin;
+	
+	private Job gitBatchPullJob;
+	
+	public void setGitBatchPullJob(Job job) {
+		gitBatchPullJob = job;
+	}
 	
 	/**
 	 * The constructor
@@ -35,6 +42,10 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
+		if ( gitBatchPullJob != null ) {
+			gitBatchPullJob.cancel();
+			gitBatchPullJob.join();
+		}
 		plugin = null;
 		super.stop(context);
 	}
