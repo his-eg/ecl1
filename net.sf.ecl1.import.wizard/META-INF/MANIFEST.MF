@@ -10,7 +10,6 @@ Require-Bundle: org.eclipse.ui,
  com.google.guava;bundle-version="15.0.0",
  org.apache.commons.io;bundle-version="2.2.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Bundle-ClassPath: lib/org.jdom_1.1.1.v201101151400.jar,
- .
+Bundle-ClassPath: .
 Bundle-Activator: net.sf.ecl1.importwizard.Activator
 Bundle-ActivationPolicy: lazy

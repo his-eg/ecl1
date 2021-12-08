@@ -105,7 +105,6 @@ To apply the Apache License to your work, attach the following boilerplate notic
       <import plugin="org.eclipse.ui.console" version="3.6.201" match="greaterOrEqual"/>
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.jdt.launching"/>
-      <import plugin="org.eclipse.jgit" version="5.2.0" match="greaterOrEqual"/>
       <import plugin="org.apache.commons.io" version="2.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.team.ui"/>
       <import plugin="org.eclipse.equinox.p2.core"/>
