@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: ecl1 Classpath Container Provider
+Bundle-Name: Ecl1 Classpath Container Provider
 Bundle-SymbolicName: net.sf.ecl1.classpath;singleton:=true
 Bundle-Version: 0.7.0.2021-11-30
 Bundle-Activator: net.sf.ecl1.classpath.Activator

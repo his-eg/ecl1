@@ -3,6 +3,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Style-Type" content="text/css">
+<meta charset="utf-8"/>
 <link href="style.css" rel="stylesheet" type="text/css">
 <title>Ecl1: Eclipse Plugin for HISinOne Extensions</title>
 <link rel="icon" href="icon.png" type="image/png">
@@ -13,16 +14,15 @@
 <div id="content">
 <a id="pageicon" href="/"><img src="icon.png"></a>
 
-<h1>Ecl1: Eclipse Plugin for HISinOne Extensions</h1>
+<h1>Ecl1: Eclipse Toolset for HISinOne Extensions</h1>
 
-<p>Ecl1 is an Eclipse plugin that supports the development of <a href="http://www.hisinone.de">HISinOne</a> extensions.
-   The current released version of the ecl1 toolset is 1.3.0.2021-11-30.
-</p>
-
-<h2 id="features">Features</h2>
-
-	<p>Ecl1 provides a toolset, that supports the development of extensions for the campus management software HISinOne.</p>
-
+<h2 id="introduction">Introduction</h2>
+	
+	<p>Ecl1 is an Eclipse toolset that supports the development of <a href="http://www.hisinone.de">HISinOne</a> extensions.
+   		The current released version of the ecl1 toolset is 1.3.0.2021-11-30. </p>
+   		
+   	<p> Release notes can be found <a href="https://sourceforge.net/projects/ecl1/files/">here</a></p>	
+	
 	<ul>
 		<li>Wizard for new extension projects, that creates an empty project fitting to the required structure</li>
 		<li>Import Wizard for existing extension projects</li>
@@ -30,72 +30,134 @@
 		<li>Visualization of extension points in all projects</li>
 		<li>Automated support for projects contributing to an extension point in HISinOne</li>
 		<li>Extended Classpath support for embedding infrastructure extensions</li>
-		<li>Export wizard to created HIS specific hotfix XML snippets</li>
+		<li>Export wizard to create HIS specific hotfix XML snippets</li>
 		<li>Update Check for ecl1 on startup</li>
+		<li>And more!</li>
 	</ul>
-
-
-<h2 id="requirements">Requirements</h2>
-
-	<p>To use the Ecl1 toolset you need Eclipse 2018-06 or later and Java 8 or above. It runs both on Windows and Linux systems.</p>
 
 
 <h2 id="installation">Installation</h2>
 
-	<p>
-	   You can install the current version of the Ecl1 via our <a href="http://ecl1.sourceforge.net/update/">update site</a>.</br>
-	   <em>Note that since January 2017, Eclipse must be run with a JDK8 >= 8u101 having strong encryption to be able to update from Sourceforge sites.</em>
-    </p>
+	<p> You can install the current version of the Ecl1 via our <a href="http://ecl1.sourceforge.net/update/">update site</a>. </p>
+	   
+	   <p>To use the Ecl1 toolset you need Eclipse 2018-06 or later and Java 8 or above. It runs both on Windows and Linux systems.</p>
+	   <p><em>Note that since January 2017, Eclipse must be run with a JDK8 >= 8u101 having strong encryption to be able to update from Sourceforge sites. </em></p>
 
 	<p>After you have installed Ecl1, you should have a new category "HISinOne" for new projects, if you try to create a new project for example via pressing Ctrl + N</p>
 
-	<p>As alternative option you can download the latest plugin version via <a href="http://sourceforge.net/projects/ecl1/files/latest/download?source=files">sourceforge</a> as an update site archive.</p>
+	<p>As an alternative option, you can download the latest plugin version via <a href="http://sourceforge.net/projects/ecl1/files/latest/download?source=files">sourceforge</a> as an update site archive.</p>
 
 
-<h2 id="usage">How to use</h2>
+<h2 id="auto_start_plugins">Auto Start Plugins</h2>
+	
+	<p>
+		Some plugins of ecl1 are started when eclipse starts. 
+		To disable auto start plugins, navigate to: <code>Window → Preferences → Startup and Shutdown</code> and uncheck the undesired plugins. 
+	</p>
+	
+	<p> The following plugins are automatically started: </p> 
+	
+	<h3> Ecl1 Classpath Container </h3>
+	<p>
+	  This plugin initializes the ecl1 classpath container when eclipse is started. Without a properly initialized ecl1 classpath container,
+	  eclipse cannot compile webapps. Further information about classpath containers can be found <a href="https://www.eclipse.org/jdt/core/r2.0/classpath%20container/classpathContainer.html">here.</a>
+	</p>
 
-	<p>Ecl1 adds entry to the creation-assistant:
+	<h3> Ecl1 Git Auto Lfs Prune </h3>	
+	<p> 
+		Runs <code>git lfs prune</code> in every git versioned project in the workspace. <code>Git lfs prune</code> deletes local copies of LFS files that are old, thus freeing up disk space. Further information about <code>git lfs prune</code> can be found <a href="https://github.com/git-lfs/git-lfs/blob/main/docs/man/git-lfs-prune.1.ronn">here.</a>
+	</p>
+	
+	<h3> Ecl1 Update Git Hooks </h3>	
+	<p> 
+		Installs a git hook script in every HISinOne-Extension in the current workspace. These git hook scripts try to enforce the rule that every commit message must include a ticket no. (format: #123456). Further information about git hooks can be found <a href="https://git-scm.com/docs/githooks">here.</a>
+	</p>
+	
+	<h3> Ecl1 Update Check</h3>	
+	<p> 
+		Checks for ecl1 updates and proceeds to install them if found. Ecl1 updates can also be installed through the regular install mechanism of eclipse.  
+	</p>
+	
+	
+<h2 id="manual_plugins">Manually Started Plugins</h2>
 
-	<h3>Create a new Extension</h3>
+
+	<h3 id="create" >Create a new Extension</h3>
+	
+		<p>Ecl1 adds an entry to the creation-assistant:</p>
+		
 		<p>To create a new extension select "HISinOne Extension Project" from the category "HISinOne" after selecting New from File menu or pressing Ctrl + N.</p>
 		<img src="ecl1-new-wizzard.png">
 
 		<p>After selecting the wizard for a new HISinOne Extension Project, you need to choose a name for the extension you want to develop.
-		Ideally you pick a name that follows the java package naming conventions, as you can see in the following screenshot.</p>
+		Ideally, you pick a name that follows the java package naming conventions, as you can see in the following screenshot.</p>
 		<img src="ecl1-project-name.png">
 
 		<p><img src="ecl1-project-structure.png"></p>
 
-		<p>Finally you now have a fully operational HISinOne-extension skeleton. It even has a <a href="http://git-scm.com/">Git</a> repository prepared for sharing with fellow developers.</p>
+		<p>Finally, you now have a fully operational HISinOne-extension skeleton. It even has a <a href="http://git-scm.com/">Git</a> repository prepared for sharing with fellow developers.</p>
 
 <!-- TODO
 <h3>Create a new EnrollChecker</h3>
  -->
  	<h3>Import existing extensions</h3>
 
- 	<p>Invisibility of other extensions is a challenge. We try to tackle this hurdle with a dedicated import wizard for HISinOne-Extensions</p>
+ 	<p>The invisibility of other extensions is a challenge. We try to tackle this hurdle with a dedicated import wizard for HISinOne-Extensions</p>
 
- 	<p>In the category HISinOne the wizard Extension Import offers a simple one click way of importing a set of existing extensions into your workspace.
+ 	<p>In the category HISinOne the wizard Extension Import offers a simple one-click way of importing a set of existing extensions into your workspace.
  	<img alt="Screenshot of import wizard showing a list of HISinOne extensions for import" src="ecl1-import-wizard.png"></p>
 
  	<p>To make the import suitable to your custom environment, build server as source for available extensions and git server as version control system are configurable.
  	<img alt="Screenshot of preferences dialogue showing configuration parameters for extension import." src="ecl1-import-preferences.png"></p>
+ 	
+	<h3> Commit Exporter </h3>	
+	<p> 
+		Export wizard to create HIS specific hotfix XML snippets. Useful for creating hotfixes for HISinOne. 
+	</p>
+	
+	<h3> Git Batch Pull </h3>	
+	<p> 
+		Adds a button to eclipse. When pressed, eclipse executes <code>git pull</code> for all git versioned projects in the workspace. 
+	</p>
+	
+	<h3> Git Batch Pull </h3>	
+	<p> 
+		Adds a "Git Batch Pull Command" button to eclipse. When pressed, eclipse executes <code>git pull</code> for all git versioned projects in the workspace. 
+	</p>
+	
+	<h3> HIS Runtime Classpath Provider</h3>	
+	<p> 
+		Enriches the classpath when starting JUnit-Test from HIS-extensions. Without it, the JUnit-Tests don't run when started from eclipse. 
+	</p>
+	
+	<h3> HIS Extension Point Collector </h3>	
+	<p> 
+		Every HIS extension has a extension.ant.properties. When a HIS extension is built, ecl1 scans the extension for extended extension points and updates the extension.ant.properties accordingly. 
+	</p>
 
 <h2 id="bugs">Bug and Feature Requests</h2>
 
-	<p>If you miss a certain detail in the Ecl1 tool set or just found a bug please give us notice via tracker on sourceforge.</p>
-
-	<p><a href="https://sourceforge.net/p/ecl1/tickets/new/">Create a new ticket</a></p>
+	<p>If you miss a certain detail in the Ecl1 toolset or just found a bug please give us notice via the HIS bug tracker.</p>
+	
+	<p><a href="https://hiszilla.his.de/hiszilla/enter_bug.cgi?product=Infrastruktur%20%28SYS%29">Create a new ticket</a></p>
+	
+	<p>Please contact your HIS representative, if you don't have access rights to the bug tracker.</p>
+	
+	<p>
+	We also have a legacy bug tracker that we do not check anymore. 
+	<a href="https://sourceforge.net/p/ecl1/tickets/"><strong>Do not use anymore! </strong> Legacy bug tracker at sourceforge. </a>
+	</p>
 
 </div>
 
 <div id="toc">
-	<ul>
-	<li><a href="#requirements">Requirements</a></li>
-	<li><a href="#installation">Installation</a></li>
-	<li><a href="#usage">How to use</a></li>
-	<li><a href="#bugs">Bugs Reports</a></li>
-	</ul>
+	<ol>
+		<li><a href="#introduction">Introduction</a></li>
+		<li><a href="#installation">Installation</a></li>
+		<li><a href="#auto_start_plugins">Auto Start Plugins</a></li>
+		<li><a href="#manual_plugins">Manually Started Plugins</a></li>
+		<li><a href="#bugs">Bug Reports</a></li>
+	</ol>
 </div>
 
 

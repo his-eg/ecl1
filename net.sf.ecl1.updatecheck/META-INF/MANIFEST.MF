@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Update Check
+Bundle-Name: Ecl1 Update Check
 Bundle-SymbolicName: net.sf.ecl1.updatecheck;singleton:=true
 Bundle-Version: 0.4.0.2021-11-30
 Bundle-Activator: net.sf.ecl1.updatecheck.UpdateCheckActivator

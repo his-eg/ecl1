@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Update Git Hooks
+Bundle-Name: Ecl1 Update Git Hooks
 Bundle-SymbolicName: net.sf.ecl1.git.updatehooks;singleton:=true
 Bundle-Version: 0.5.0.2021-11-30
 Bundle-Activator: net.sf.ecl1.git.updatehooks.UpdateHooksActivator
