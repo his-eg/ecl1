@@ -42,7 +42,8 @@ public class GitBatchPullHandler extends AbstractHandler {
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
 				List<IProject> projects = Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects());
-				//Fixes #250882
+				//Unnecessary after finishing #267325. The problem definition for #250882 was flawed and therefore sort was 
+				//never really needed by the user. Even though it is pointless, it stays in, because it doesn't do any harm...
 				Collections.sort(projects, projectComparator);
 				logger.info("Found projects in Workspace: " + projects);
 				monitor.beginTask("Batch Git Pull", projects.size());
