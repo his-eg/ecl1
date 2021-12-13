@@ -3,6 +3,12 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.4.0.2021-12-13##
+* Auto batch pull now suppresses auto build job during pull
+* Several sub-plugins now cancel properly when Eclipse shuts down
+* Improved ecl1 documentation
+* Some cleanups, reduced plugin size
+
 ##Version 1.3.0.2021-11-30##
 * webapps is now on top of the classpath
 * The extension importer does not offer projects anymore that are no HisInOne extension projects

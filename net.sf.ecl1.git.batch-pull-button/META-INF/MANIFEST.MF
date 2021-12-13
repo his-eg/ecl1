@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Git Batch Pull Button
 Bundle-SymbolicName: net.sf.ecl1.git.batch-pull-button;singleton:=true
 Bundle-Activator: net.sf.ecl1.git.Activator
-Bundle-Version: 1.2.3.2021-11-30
+Bundle-Version: 1.3.0.2021-12-13
 Bundle-Vendor: HIS eG
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy

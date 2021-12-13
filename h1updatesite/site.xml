@@ -3,7 +3,7 @@
    <description name="HIS Eclipse Update Site" url="http://ecl1.sf.net/update">
       On this page you find all ecl1 plugins that support the development of HISinOne extensions.
    </description>
-   <feature url="features/h1modulesfeature_1.3.0.2021-11-30.jar" id="h1modulesfeature" version="1.3.0.2021-11-30">
+   <feature url="features/h1modulesfeature_1.4.0.2021-12-13.jar" id="h1modulesfeature" version="1.4.0.2021-12-13">
       <category name="de.his.cs.sys.extensions"/>
    </feature>
    <category-def name="de.his.cs.sys.extensions" label="Extension Tools"/>
