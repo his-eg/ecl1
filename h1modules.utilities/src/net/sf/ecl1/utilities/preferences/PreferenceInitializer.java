@@ -28,5 +28,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 		store.setDefault(PreferenceWrapper.LOG_LEVEL_PREFERENCE_KEY, "INFO");
         store.setDefault(PreferenceWrapper.GIT_SERVER_PREFERENCE_KEY, GITLAB_BASE_REPOSITORY_PATH);
         store.setDefault(PreferenceWrapper.DETECT_BRANCH_AUTOMATICALLY, true);
+        store.setDefault(PreferenceWrapper.DISPLAY_SUMMARY_OF_GIT_PULL, true);
     }
 }

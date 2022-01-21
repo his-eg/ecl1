@@ -11,4 +11,9 @@ Require-Bundle: org.eclipse.core.commands,
  org.eclipse.jgit,
  org.eclipse.ui.workbench,
  net.sf.ecl1.utilities
-Import-Package: org.eclipse.core.runtime
+Import-Package: org.eclipse.core.runtime,
+ org.eclipse.jface.dialogs,
+ org.eclipse.swt,
+ org.eclipse.swt.events,
+ org.eclipse.swt.layout,
+ org.eclipse.swt.widgets

@@ -28,6 +28,7 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
     private StringFieldEditor buildServerView;
     private StringFieldEditor templateRootUrls;
     private BooleanFieldEditor automaticBranchDetection;
+    private BooleanFieldEditor displaySummaryOfGitPull;
 
     public HISinOneExtensionsPreferencePage() {
         super(GRID);
@@ -67,11 +68,13 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
         buildServerView = new StringFieldEditor(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, "Branch of webapps: ", getFieldEditorParent());
         buildServerView.setEnabled(!getPreferenceStore().getBoolean(PreferenceWrapper.DETECT_BRANCH_AUTOMATICALLY), getFieldEditorParent());
         templateRootUrls = new StringFieldEditor(PreferenceWrapper.TEMPLATE_ROOT_URLS_PREFERENCE_KEY, "URLs for new project templates (comma-separated):", getFieldEditorParent());
+        displaySummaryOfGitPull = new BooleanFieldEditor(PreferenceWrapper.DISPLAY_SUMMARY_OF_GIT_PULL, "Display summary of git batch pull?", BooleanFieldEditor.SEPARATE_LABEL, getFieldEditorParent());
         addField(gitServer);
         addField(buildServer);
         addField(automaticBranchDetection);
         addField(buildServerView);
         addField(templateRootUrls);
+        addField(displaySummaryOfGitPull);
         // Loglevel Combobox
 		final String[][] logLevels = new String[4][2];
 		logLevels[0][0] = logLevels[0][1] = "DEBUG";

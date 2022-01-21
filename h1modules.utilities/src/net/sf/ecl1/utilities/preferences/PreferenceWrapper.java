@@ -29,6 +29,9 @@ public class PreferenceWrapper {
     
     /** Stores if the current branch of webapps should be detected automatically */
     public static final String DETECT_BRANCH_AUTOMATICALLY = "detectBranchAutomatically";
+    
+    /** Stores if the summary of the git batch pull should be displayed in a dialog to the user */
+    public static final String DISPLAY_SUMMARY_OF_GIT_PULL = "displaySummaryOfGitPull";
 
     
     /**
@@ -73,5 +76,13 @@ public class PreferenceWrapper {
 
 	public static boolean isDetectBranchAutomatically() {
 		return Activator.getPreferences().getBoolean(DETECT_BRANCH_AUTOMATICALLY);
+	}
+	
+	public static boolean isDisplaySummaryOfGitPull() {
+		return Activator.getPreferences().getBoolean(DISPLAY_SUMMARY_OF_GIT_PULL);
+	}
+	
+	public static void setDisplaySummaryOfGitPull(boolean v) {
+		Activator.getPreferences().setValue(DISPLAY_SUMMARY_OF_GIT_PULL, v);
 	}
 }
