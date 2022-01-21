@@ -51,7 +51,7 @@ public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 	public void addPages() {
 		super.addPages();
 		firstPage = new NewExtensionWizardPage("New HISinOne Module Project");
-		firstPage.setDescription("Unterstützung bei der Erstellung eines neuen HISinOne Extension Projekts");
+		firstPage.setDescription("Wizard for the creation of new HISinOne extension projects");
 		addPage(firstPage);
 	}
 
