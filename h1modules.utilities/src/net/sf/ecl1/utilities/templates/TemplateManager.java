@@ -46,6 +46,8 @@ public class TemplateManager {
     private String templatePath;
 
 	private final List<String> templateRootUrls;
+	
+	private final VariableReplacer variableReplacer;
 
     /**
      * Create a new template manager with a template and variables to replace in the template
@@ -57,6 +59,7 @@ public class TemplateManager {
         templateRootUrls = PreferenceWrapper.getTemplateRootUrls();
         this.templatePath = templatePath;
         this.variables = variables;
+        this.variableReplacer = new VariableReplacer(variables);
     }
 
     /**
@@ -91,31 +94,17 @@ public class TemplateManager {
      * Do line-wise variable replacement on template.
      *
      * @param templateRootUrl the template root URL from which to try to read
-     * @return result string with replaced variables, or null if the template could not be read
+     * @return result string with replaced variables, or empty string if the template could not be read
      */
     private String getContent(String templateRootUrl) {
-        StringBuilder result = new StringBuilder();
         String fullTemplateUrlString = templateRootUrl + "/" + templatePath;
-        
-        try (InputStream templateStream = DownloadHelper.getInputStreamFromUrlFollowingRedirects(fullTemplateUrlString);){
-        	
-        	logger.debug("Loading template from: " + fullTemplateUrlString);
-            BufferedReader br = new BufferedReader(new InputStreamReader(templateStream));
-            String line = "";
-            while((line = br.readLine() )!= null) {
-                String temp = line;
-                for (Entry<String, String> variableAssignment : this.variables.entrySet()) {
-                    temp = temp.replace(variableAssignment.getKey(), variableAssignment.getValue());
-                }
-                result.append(temp + System.getProperty("line.separator"));
-            }
-        } catch (IOException e) {
-        	logger.error2("Error fetching template '" + fullTemplateUrlString + "': " + e.getClass() + ": " + e.getMessage(), e);
-        	logger.error2("TemplatePath: " + this.templatePath);
-        	logger.error2("Variables: " + this.variables);
-            return null;
-        }
-        return result.toString().trim();
+        logger.debug("Loading template from: " + fullTemplateUrlString);
+        try {
+			return variableReplacer.replaceVariables(DownloadHelper.getInputStreamFromUrlFollowingRedirects(fullTemplateUrlString));
+		} catch (IOException e) {
+			logger.error("Failed to get the template from the following URL: " + fullTemplateUrlString + "\nThis was the exception: ", e);
+			return ""; //Return empty string
+		}
     }
 
     /**
