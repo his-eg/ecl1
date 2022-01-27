@@ -5,12 +5,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
-
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
+import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 import net.sf.ecl1.utilities.templates.TemplateFetcher;
 import net.sf.ecl1.utilities.templates.TemplateManager;
 
@@ -23,6 +26,8 @@ public class ResourceSupport {
 
     private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ResourceSupport.class.getSimpleName());
 
+    private static final String TEMPLATE_FOLDER_IN_WEBAPPS = "qisserver/WEB-INF/internal/extensionTemplates/current";
+    
     private static final String DEPENDENCIES_VARIABLE_NAME = "[dependencies]";
 
     private static final String DEPENDENCY_VARIABLE_NAME = "[dependency]";
@@ -62,18 +67,77 @@ public class ResourceSupport {
      * @throws UnsupportedEncodingException
      */
     public void createFiles() throws CoreException, UnsupportedEncodingException {
-
         // Prepare variables
         this.extensionAntPropertiesReplacements.put(DEPENDENCIES_VARIABLE_NAME, createAdditionalClassesFolderReferencesForSonar());
         this.extensionAntPropertiesReplacements.put("[additionaldependencies]", createAdditionalDependencyProperties());
         this.extensionAntPropertiesReplacements.put("[conditionelements]", createConditionElements());
         this.extensionAntPropertiesReplacements.put("[pathelements]", createPathElements());
 
-        // Downloading the template list from SF requires a JDK with strong encryption!
+        //Get templates either from webapps or from the web
+        IProject webapps = WebappsUtil.findWebappsProject();
+    	if (webapps.exists()) {
+    		logger.info("Using templates from webapps");
+    		createResourceFilesFromWebapps(webapps);
+    	} else {
+    		logger.info("Obtaining templates from the web");
+    		createResorceFilesFromWeb();
+    	}
+    }
+
+    /**
+     * Copies templates from webapps to new extension project 
+     * 
+     * @param webapps
+     * @throws CoreException
+     */
+    private void createResourceFilesFromWebapps(IProject webapps) throws CoreException {
+    	//Get base folder
+    	IFolder templateSourceFolder = webapps.getFolder(TEMPLATE_FOLDER_IN_WEBAPPS);
+    	
+    	int segmentsOfTemplateSourceFolder = templateSourceFolder.getFullPath().segmentCount();
+    	for(IResource resource : templateSourceFolder.members()) {
+    		copyResourceToNewExtensionProject(resource, segmentsOfTemplateSourceFolder);
+    	}
+	}
+    
+    
+    /**
+     * Copies the given resource to the new extension project
+     * 
+     * @param resource
+     * @param segmentsOfBaseFolder
+     * @throws CoreException
+     */
+    private void copyResourceToNewExtensionProject(IResource resource, int segmentsOfBaseFolder) throws CoreException {
+		IPath relativePathWithFilename = resource.getFullPath().removeFirstSegments(segmentsOfBaseFolder);
+		
+		if (resource.getType() == IResource.FOLDER) {
+    		//Create folder in project if it does not exist
+			if(!project.exists(relativePathWithFilename)) {
+				project.getFolder(relativePathWithFilename).create(IResource.FORCE, true, null);
+			}
+			//Recursively copy contents of this folder to new project as well
+			for(IResource child : ((IFolder)resource).members()) {
+				copyResourceToNewExtensionProject(child, segmentsOfBaseFolder);
+			}
+			
+		}
+		
+		if(resource.getType() == IResource.FILE) {
+			//TODO: Before (or maybe after copying) we must replace the variables in the templates
+			resource.copy(project.getFullPath().append(relativePathWithFilename), IResource.FORCE, null);
+		}
+		
+		
+	}
+
+
+	private void createResorceFilesFromWeb() throws CoreException{
+    	// Downloading the template list from SF requires a JDK with strong encryption!
         // See http://stackoverflow.com/questions/38203971/javax-net-ssl-sslhandshakeexception-received-fatal-alert-handshake-failure/
         Collection<String> templates = new TemplateFetcher().getTemplates();
 		if (templates == null) {
-			logger.error2("Could not load template list. The new project could not be set up completely.");
+			logger.error2("Could not get templates. The new project could not be set up completely.");
 			return;
 		}
 		
@@ -94,9 +158,10 @@ public class ResourceSupport {
         if (this.extensionAntPropertiesReplacements.get("[additionaldependencies]").isEmpty()) {
             this.project.getFile(COMPILE_CLASSPATH_XML).delete(true, new NullProgressMonitor());
         }
-    }
+	}
 
-    /**
+
+	/**
      * Creates the references to classes folders that are needed for sonar checks
      *
      * @return String with references to classes folders of required extensions' build results
