@@ -1,10 +1,12 @@
 package net.sf.ecl1.utilities.general;
 
+import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -16,6 +18,7 @@ import net.sf.ecl1.utilities.hisinone.HisConstants;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 import net.sf.ecl1.utilities.templates.TemplateFetcher;
 import net.sf.ecl1.utilities.templates.TemplateManager;
+import net.sf.ecl1.utilities.templates.VariableReplacer;
 
 /**
  * Simple Resource access support.
@@ -43,6 +46,8 @@ public class ResourceSupport {
     private final IProject project;
 
     private final Collection<String> requiredProjects;
+    
+    private final VariableReplacer variableReplacer;
 
     private final String PROPERTY_DEPENDENCY_TEMPLATE = "[dependency]=${WORKSPACE}/../../../[dependency]/workspace";
 
@@ -55,6 +60,7 @@ public class ResourceSupport {
     public ResourceSupport(IProject project, InitialProjectConfigurationChoices choices) {
         this.project = project;
         this.requiredProjects = choices.getProjectsToReference();
+        this.variableReplacer = new VariableReplacer(extensionAntPropertiesReplacements);
         extensionAntPropertiesReplacements.put("[name]", choices.getName());
         extensionAntPropertiesReplacements.put("[version]", choices.getVersion());
     }
@@ -102,7 +108,8 @@ public class ResourceSupport {
     
     
     /**
-     * Copies the given resource to the new extension project
+     * Copies the given resource to the new extension project and replaces 
+     * and fills all placeholder variables with the desired value. 
      * 
      * @param resource
      * @param segmentsOfBaseFolder
@@ -124,8 +131,10 @@ public class ResourceSupport {
 		}
 		
 		if(resource.getType() == IResource.FILE) {
-			//TODO: Before (or maybe after copying) we must replace the variables in the templates
-			resource.copy(project.getFullPath().append(relativePathWithFilename), IResource.FORCE, null);
+			IFile file = (IFile)resource;
+			String fileContentAsString = variableReplacer.replaceVariables(file.getContents());
+			ByteArrayInputStream fileContentAsStream = new ByteArrayInputStream(fileContentAsString.getBytes());
+			project.getFile(relativePathWithFilename).create(fileContentAsStream, true, null);
 		}
 		
 		
