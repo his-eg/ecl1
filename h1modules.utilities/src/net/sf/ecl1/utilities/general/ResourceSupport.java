@@ -81,7 +81,7 @@ public class ResourceSupport {
 
         //Get templates either from webapps or from the web
         IProject webapps = WebappsUtil.findWebappsProject();
-    	if (webapps.exists()) {
+    	if (webapps != null ) {
     		logger.info("Using templates from webapps");
     		createResourceFilesFromWebapps(webapps);
     	} else {
