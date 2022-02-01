@@ -3,6 +3,13 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.5.0.2022-02-01##
+* Improved new extension wizard user interface
+* Take new extension templates from webapps if webapps project is present
+* Suppress builds while the new extension wizard is active
+* Show error summary page if something went wrong during git batch pull
+* Updated documentation
+
 ##Version 1.4.0.2021-12-13##
 * Auto batch pull now suppresses auto build job during pull
 * Several sub-plugins now cancel properly when Eclipse shuts down

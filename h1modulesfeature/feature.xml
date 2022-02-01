@@ -2,7 +2,7 @@
 <feature
       id="h1modulesfeature"
       label="ecl1 - HISinOne Extension Tools"
-      version="1.4.0.2021-12-13"
+      version="1.5.0.2022-02-01"
       provider-name="HIS eG">
 
    <description url="http://ecl1.sf.net">
@@ -105,13 +105,16 @@ To apply the Apache License to your work, attach the following boilerplate notic
       <import plugin="org.eclipse.ui.console" version="3.6.201" match="greaterOrEqual"/>
       <import plugin="org.eclipse.debug.core"/>
       <import plugin="org.eclipse.jdt.launching"/>
-      <import plugin="org.apache.commons.io" version="2.2.0" match="greaterOrEqual"/>
+      <import plugin="org.apache.commons.io"/>
       <import plugin="org.eclipse.team.ui"/>
+      <import plugin="org.apache.commons.io" version="2.2.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.equinox.p2.core"/>
       <import plugin="org.eclipse.equinox.p2.engine"/>
       <import plugin="org.eclipse.equinox.p2.metadata"/>
       <import plugin="org.eclipse.equinox.p2.operations"/>
       <import plugin="org.eclipse.core.commands"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.swt"/>
    </requires>
 
    <plugin
