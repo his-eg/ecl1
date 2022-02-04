@@ -87,7 +87,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 									PullResult pullResult = pull.call();
 									parsePullResult(name, pullResult, multiStatus);
 								} catch (GitAPIException | JGitInternalException e) {
-									status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Error pulling from " + name + ": " + e.getMessage() + ". Skipping and proceeding.");
+									status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": " + e.getMessage() + ". Skipping and proceeding.");
 									multiStatus.add(status);
 								}
 							}
@@ -96,7 +96,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 						// ignore
 						logger.info(name + " is not managed via Git: " + rnfe.getMessage());
 					} catch (IOException e) {
-						status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, "Error pulling " + name + ": " + e.getMessage());
+						status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": " + e.getMessage());
 						multiStatus.add(status);
 					}
 					logger.info("Finished " + name);
