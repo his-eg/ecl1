@@ -2,6 +2,7 @@ package net.sf.ecl1.classpath.container;
 
 import java.util.Set;
 
+import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -12,9 +13,9 @@ import org.eclipse.jdt.core.ClasspathContainerInitializer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.GlobalBuildAction;
 import net.sf.ecl1.classpath.Activator;
-import net.sf.ecl1.utilities.general.BuildJob;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 
 /** Updates the ecl1 classpath container */
@@ -103,8 +104,10 @@ public class ExtensionClasspathContainerUpdateJob extends Job {
 		
 		logger.info("Ecl1 classpath container successfully updated :)");
 		
-		//Rebuild the workspace manually, because eclipse does not realize that a build is necessary by itself
-		new BuildJob().schedule();
+		//Trigger a global rebuild, because eclipse does not realize that a build is necessary by itself
+		GlobalBuildAction build = new GlobalBuildAction(PlatformUI.getWorkbench().getActiveWorkbenchWindow(),
+				IncrementalProjectBuilder.INCREMENTAL_BUILD);
+		build.doBuild();
 		return Status.OK_STATUS;
 	}
 

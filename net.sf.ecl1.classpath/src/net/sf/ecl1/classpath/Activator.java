@@ -1,5 +1,6 @@
 package net.sf.ecl1.classpath;
 
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -14,6 +15,18 @@ public class Activator extends AbstractUIPlugin {
 	// The shared instance
 	private static Activator plugin;
 	
+	private Job job;
+
+	public void setJob(Job job) {
+		this.job = job;
+	}
+
+	public Job getJob() {
+		return this.job;
+	}
+
+
+	
 	/**
 	 * The constructor
 	 */
@@ -26,6 +39,10 @@ public class Activator extends AbstractUIPlugin {
 	}
 
 	public void stop(BundleContext context) throws Exception {
+		if ( job != null ) {
+			job.cancel();
+			job.join();
+		}
 		plugin = null;
 		super.stop(context);
 	}

@@ -274,8 +274,20 @@ public class ExtensionClasspathContainerListener implements IResourceChangeListe
 		 * Since it is possible that now more projects with ecl1 classpath containers need to be updated, we need to cancel
 		 * the old job and start a new job with the updated list of projects that need to be updated.  
 		 */
-		Job.getJobManager().cancel(ExtensionClasspathContainerUpdateJob.FAMILY);
+		Activator activator = Activator.getDefault();
+
+		Job oldJob = activator.getJob();
+		if ( oldJob != null ) {
+			oldJob.cancel();
+			try {
+				oldJob.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
 		ExtensionClasspathContainerUpdateJob updateJob = new ExtensionClasspathContainerUpdateJob(projectsThatNeedUpdates);
+		activator.setJob(updateJob);
 		updateJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
 		updateJob.schedule(DELAY);
 		

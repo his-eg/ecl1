@@ -81,6 +81,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
 
         ExtensionImportJob importJob = new ExtensionImportJob(extensionsToImport, openProjectsAfterImport, deleteFolders); 
         
+        Activator.getDefault().setJob(importJob);
         //Acquiring this rule prevents auto builds
         importJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
         importJob.schedule();
