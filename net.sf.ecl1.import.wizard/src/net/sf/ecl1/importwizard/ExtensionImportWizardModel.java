@@ -1,29 +1,16 @@
 package net.sf.ecl1.importwizard;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
-
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.RemoteProjectSearchSupport;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
@@ -34,9 +21,9 @@ import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
  */
 public class ExtensionImportWizardModel {
     
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ExtensionImportWizardModel.class.getSimpleName());
+	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ExtensionImportWizardModel.class.getSimpleName());
 
-	private static final String JENKINS_WEBAPPS_NAME = "/webapps";
+	public static final String JENKINS_WEBAPPS_NAME = "/webapps";
 
     private RemoteProjectSearchSupport remoteProjectSearchSupport;
     
@@ -51,10 +38,12 @@ public class ExtensionImportWizardModel {
 
     // Extensions chosen by the user for installation
     private Set<String> selectedExtensions;
-
-    // map from extension to the extensions they need.
-    // a null list means that the extension dependency has not been initialized yet.
-    private Map<String, List<String>> extensions2dependencyExtensions;
+    
+    /**
+     * Key --> Name of the extension.
+     * Value --> classpath file from the extension, which was obtained from build.his.de 
+     */
+    private Map<String, ClasspathFile> classpathFiles;
 
     // dependent extensions
     private Collection<String> allRequiredDependencies = null;
@@ -64,7 +53,7 @@ public class ExtensionImportWizardModel {
     	remoteProjectSearchSupport = new RemoteProjectSearchSupport();
     	initRemoteExtensions();
         initExtensionsInWorkspace();
-        extensions2dependencyExtensions = new HashMap<String, List<String>>();
+        classpathFiles = new HashMap<String, ClasspathFile>();
     }
 
     String getBranch() {
@@ -139,9 +128,11 @@ public class ExtensionImportWizardModel {
         	// get one unprocessed extension
         	String extension = unprocessedExtensions.iterator().next();
         	unprocessedExtensions.remove(extension);
+        	
+        	ClasspathFile classpathFile = getClasspathFile(extension);
+        	
         	// find all required extensions
-        	Collection<String> directDependencies = findDirectlyRequiredExtensions(extension);
-        	for (String directDependency : directDependencies) {
+        	for (String directDependency : classpathFile.getRegularDependencies()) {
         		if (processedExtensions.contains(directDependency)) {
         			logger.debug("Extension " + directDependency + " has already been analyzed, skip...");
         		} else if (!selectedExtensions.contains(directDependency) && !allRequiredDependencies.contains(directDependency)) {
@@ -150,79 +141,36 @@ public class ExtensionImportWizardModel {
         				// the required extension does not exist yet, so it must be imported
         				logger.info("Extension " + directDependency + " has been auto-selected for import, because the selected extensions depend on it.");
         				allRequiredDependencies.add(directDependency);
-        			} // else: the required extension is already in workspace -> do not re-import, but check it's own dependencies
+        			} // else: the required extension is already in workspace -> do not re-import, but check it's dependencies
         			unprocessedExtensions.add(directDependency);
         		}
         	}
+        	
+        	
+        	
+        	
+        	/*
+        	 * TODO: 
+        	 * After finishing ticket https://hiszilla.his.de/hiszilla/show_bug.cgi?id=261078, continue work here. 
+        	 * Namely, finish this ticket here: https://hiszilla.his.de/hiszilla/show_bug.cgi?id=261078. 
+        	 * 
+        	 * At this code point the variable classpathFile already knows all members of the ecl1 classpath container. 
+        	 * Thus, we can use it to obtain the optional dependencies. 
+        	 */
+        	
         	processedExtensions.add(extension);
         }
     }
 
-	/**
-	 * Returns the list of extensions directly required by the given extension.
-	 * Only one dependency level is evaluated.
-	 * 
-	 * @param extension
-	 * @return list of extension names
-	 */
-	private List<String> findDirectlyRequiredExtensions(String extension) {
-		List<String> dependencyExtensions = extensions2dependencyExtensions.get(extension);
-		if (dependencyExtensions != null) {
-			return dependencyExtensions;
-		}
-		
-		// dependencies have not been initialized yet for the given extension.
-		// register empty list to signal that initialization has taken place now:
-		dependencyExtensions = new ArrayList<String>();
-		extensions2dependencyExtensions.put(extension, dependencyExtensions);
-		// try to read extension ".classpath" file
-    	String classpathContent = remoteProjectSearchSupport.getRemoteFileContent(extension, ".classpath", false);
-    	if (classpathContent == null) {
-    		// the extension is no Java project -> return empty list
-    		return dependencyExtensions;
+	
+    private ClasspathFile getClasspathFile(String extension) {
+    	ClasspathFile classpathFile = classpathFiles.get(extension);
+    	if (classpathFile != null) {
+    		return classpathFile;
     	}
-    	
-    	// create XML document
-    	Document doc = null;
-    	InputStream classpathContentStream = null;
-    	try {
-        	classpathContentStream = new ByteArrayInputStream(classpathContent.getBytes("UTF-8"));
-        	doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(classpathContentStream);
-    		classpathContentStream.close();
-    	} catch (IOException | SAXException | ParserConfigurationException e) {
-    		logger.error2("Exception parsing '.classpath' file for extension " + extension  + ": " + e.getMessage(), e);
-    	}
-    	if (doc==null) {
-    		logger.error2("Could not create XML document from '.classpath' file of extension " + extension);
-    		return dependencyExtensions; // return empty list
-    	}
-    	
-    	// parse XML: adapted from class ExtensionProjectDependencyLoader,
-    	// and converted to org.w3c.dom because there is no Eclipse Osgi bundle for org.jdom
-		Element root = doc.getDocumentElement();
-		NodeList classpathEntries = root.getElementsByTagName("classpathentry");
-		if (classpathEntries!=null) {
-	        int classpathEntriesCount = classpathEntries.getLength();
-	        for (int index=0; index<classpathEntriesCount; index++) {
-	        	Node node = classpathEntries.item(index);
-	        	if (!(node instanceof Element)) continue;
-	        	Element classpathEntry = (Element) node;
-	        	if (isProjectDependency(classpathEntry)) {
-	                String projectDependency = classpathEntry.getAttribute("path").substring(1);
-	                dependencyExtensions.add(projectDependency);
-	            }
-	        }
-		}
-		return dependencyExtensions;
-	}
-
-	// adapted from class ExtensionProjectDependencyLoader
-    private boolean isProjectDependency(Element classpathEntry) {
-        String kind = classpathEntry.getAttribute("kind");
-        boolean isSourceEntry = kind != null && "src".equals(kind);
-        String path = classpathEntry.getAttribute("path");
-        boolean isProjectRelatedEntry = path != null && !path.isEmpty() && path.startsWith("/") && !JENKINS_WEBAPPS_NAME.equals(path);
-    	return isSourceEntry && isProjectRelatedEntry;
+    	classpathFile = new ClasspathFile(extension);
+    	classpathFiles.put(extension, classpathFile);
+    	return classpathFile;
     }
 
     /**
