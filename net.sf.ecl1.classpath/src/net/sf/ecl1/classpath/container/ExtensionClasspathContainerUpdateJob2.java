@@ -23,11 +23,14 @@ public class ExtensionClasspathContainerUpdateJob2 extends Job {
 
 	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ExtensionClasspathContainerUpdateJob2.class.getSimpleName()); 
 		
+	
+	Set<IProject> modifiedProjects;
+	
 	/* 
 	 * Closing or removing a project must trigger an update job, because
 	 * the closed or removed project might have contained an ecl1 classpath container. 
 	 */
-	Set<IProject> closedOrRemovedProjects;
+	Set<IProject> removedProjects;
 	/*
 	 * Modifying a classpath file must trigger an update job, because 
 	 * an ecl1 classpath entry might have been removed from a .classpath file
@@ -37,23 +40,23 @@ public class ExtensionClasspathContainerUpdateJob2 extends Job {
 	 * Modifying an extension project must trigger an update job, because 
 	 * the extension project might be a member of the ecl1 classpath container
 	 */
-	Set<IProject> extensionProjects;
+	Set<IProject> addedProjects;
 		
-	public ExtensionClasspathContainerUpdateJob2(Set<IProject> closedOrRemovedProjects,
+	public ExtensionClasspathContainerUpdateJob2(Set<IProject> removedProjects,
 			Set<IProject> projectsWithModifiedClasspathFile,
-			Set<IProject> modifiedExtensionProjects) {
+			Set<IProject> addedProjects) {
 		super("Updating ecl1 classpath container");
-		this.closedOrRemovedProjects = closedOrRemovedProjects;
+		this.removedProjects = removedProjects;
 		this.projectsWithModifiedClasspathFile = projectsWithModifiedClasspathFile;
-		this.extensionProjects = modifiedExtensionProjects;
+		this.addedProjects = addedProjects;
 	}
 	
 	
 	@Override
-	protected IStatus run(IProgressMonitor monitor) {
+	protected IStatus run(IProgressMonitor monitor) {		
 		ProjectsWithContainer projectsWithContainer = ProjectsWithContainer.getInstance();
-
 		/*
+		 * TODO: Delete me?
 		 * 1. Process projects that might have an ecl1 classpath container and have been deleted <-- Done 
 		 * 2. Process projects that might have an ecl1 classpath container and their .classpath-file was modified <-- Done
 		 * 3. Update the ecl1 classpath container for all remaining projects with an ecl1 classpath container. 
@@ -64,20 +67,19 @@ public class ExtensionClasspathContainerUpdateJob2 extends Job {
 			/*
 			 * Remove projects that might have an ecl1 classpath container and have been deleted 
 			 */
-			for(IProject project : closedOrRemovedProjects) {
+			for(IProject project : removedProjects) {
 				/* 
 				 * If the project is not in the collection, the "removeProject" method will do no harm. 
 				 * Since it is safe, we always call this method. 
 				 */
 				projectsWithContainer.removeProject(project);
-				logger.debug("The following project had an ecl1 classpath container and was either removed or closed: " + project.getName());
 			}
 	
 			/*
-			 * Remove projects that had an ecl1 classpath container, that was deleted from the 
-			 * .classpath file 
+			 * Remove projects that had an ecl1 classpath container, but that was deleted from the 
+			 * .classpath-file 
 			 */
-			for(IProject project : projectsWithModifiedClasspathFile) {
+			projectLoop: for(IProject project : projectsWithModifiedClasspathFile) {
 				IJavaProject javaProject = JavaCore.create(project);
 				for(IClasspathEntry classpathEntry : javaProject.getRawClasspath()) {
 					
@@ -87,39 +89,34 @@ public class ExtensionClasspathContainerUpdateJob2 extends Job {
 						projectsWithContainer.addProject(project);
 						logger.debug("The .classpath-file of the following project was modified: " + project.getName() + 
 								"\nAfter the modification the .classpath-files contains an ecl1 classpath container.");
+						continue projectLoop;
 					}
 					
 				}
 				
 			}
 			
-			/*
-			 * Update the ecl1 classpath container for all projects, if necessary
-			 */
-			ClasspathContainerInitializer initializer = JavaCore.getClasspathContainerInitializer(ExtensionClasspathContainerPage.NET_SF_ECL1_ECL1_CONTAINER_ID);
-			//Go through all projects with an ecl1 classpath containers
-			outerLoop: for(IProject project : projectsWithContainer.getProjects()) {
+			
+			
+			if (!removedProjects.isEmpty() || !addedProjects.isEmpty() || !projectsWithContainer.isEmpty() ) {
+				/*
+				 * Update all projects with an ecl1 classpath container
+				 */
+				ClasspathContainerInitializer initializer = JavaCore.getClasspathContainerInitializer(ExtensionClasspathContainerPage.NET_SF_ECL1_ECL1_CONTAINER_ID);
+				projectLoop: for(IProject project : projectsWithContainer.getProjects()) {
 					IJavaProject javaProject = JavaCore.create(project);
-						for(IClasspathEntry classpathEntry : javaProject.getRawClasspath()) {
-							
-							if (classpathEntry.getEntryKind() == IClasspathEntry.CPE_CONTAINER && 
-									classpathEntry.getPath().segment(0).equals(ExtensionClasspathContainerPage.NET_SF_ECL1_ECL1_CONTAINER_ID )) {
-								//At this point, we found the ecl1 classpath container
-								
-								//Check if any of the modified extension projects is a member of the ecl1 classpath containers. If so --> Update. 
-								for(IProject extensionProject : extensionProjects) {
-									if(classpathEntry.getPath().segment(1).contains(extensionProject.getName())) {
-										initializer.initialize(classpathEntry.getPath(), javaProject);
-										logger.debug("The ecl1 classpath container of the following project was updated, because the status of one of the projects within the container changed.");
-										//We are done with this project. Check the next one
-										continue outerLoop;
-									}
-								}
-							}
+					for(IClasspathEntry classpathEntry : javaProject.getRawClasspath()) {
+						
+						if (classpathEntry.getEntryKind() == IClasspathEntry.CPE_CONTAINER && 
+								classpathEntry.getPath().segment(0).equals(ExtensionClasspathContainerPage.NET_SF_ECL1_ECL1_CONTAINER_ID )) {
+							initializer.initialize(classpathEntry.getPath(), javaProject);
+							logger.debug("The ecl1 classpath container of the following project was updated");
+							//We are done with this project. Check the next one
+							continue projectLoop;
 						}
-	
+					}
 				}
-		
+			}
 				
 				
 		} catch (CoreException e) {
