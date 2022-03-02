@@ -29,7 +29,7 @@ public class ClasspathFile {
 	private Collection<String> regularDependencies = new ArrayList<>();
 	private Collection<String> ecl1ContainerDependencies = new ArrayList<>();
 	
-    private RemoteProjectSearchSupport remoteProjectSearchSupport;
+    private RemoteProjectSearchSupport remoteProjectSearchSupport = new RemoteProjectSearchSupport();
 	
 	public ClasspathFile(String extension) {
 		String classpathContent = remoteProjectSearchSupport.getRemoteFileContent(extension, ".classpath", false);
