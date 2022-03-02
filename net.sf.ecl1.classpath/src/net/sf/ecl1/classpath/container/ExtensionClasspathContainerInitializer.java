@@ -50,8 +50,9 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 						"\nThe ecl1 plugin will now attempt to initialize the container.");
 			}
 			
-			ExtensionClasspathContainerListener.getInstance().addProjectWithClasspathContainer(javaProject);
-			registerListener();
+			ProjectsWithContainer.getInstance().addProject(javaProject.getProject());
+			//ExtensionClasspathContainerListener.getInstance().addProjectWithClasspathContainer(javaProject);
+			//registerListener();
 			updateClasspathContainer(containerPath, javaProject);
 		} catch (CoreException e) {
 			logger.error2(e.getMessage(), e);
@@ -61,6 +62,10 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 
 
 	
+	/**
+	 * Use {@link ProjectsWithContainer ProjectsWithContainer} instead
+	 */
+	@Deprecated()
 	private void registerListener() {
 		//We only want to be informed after a workspace change is completed
 		//Even if addResourceChangeListener is called multiple times, the listener will only be added once.
