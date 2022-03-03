@@ -21,24 +21,24 @@ import net.sf.ecl1.utilities.general.ConsoleLogger;
  * @author sohrt
  *
  */
-public class ProjectsWithContainer {
+public class ProjectsWithExtensionClasspathContainer {
 	
-	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ProjectsWithContainer.class.getSimpleName());
+	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ProjectsWithExtensionClasspathContainer.class.getSimpleName());
 	
-	private static final ProjectsWithContainer instance = new ProjectsWithContainer();
+	private static final ProjectsWithExtensionClasspathContainer instance = new ProjectsWithExtensionClasspathContainer();
 	
 	private Set<IProject> projectsWithEcl1ClasspathContainer = new HashSet<>();
 	
-	private ProjectsWithContainer() {}	
+	private ProjectsWithExtensionClasspathContainer() {}	
 	
-	public static ProjectsWithContainer getInstance() {
+	public static ProjectsWithExtensionClasspathContainer getInstance() {
 		return instance;
 	}
 	
 	synchronized public void addProject(IProject project) {
 		projectsWithEcl1ClasspathContainer.add(project);
 		
-		//We only want to be informed after a workspace change is completed
+		//We only want to be informed after a workspace change is completed. Thus IResourceChangeEvent.POST_CHANGE
 		//Even if addResourceChangeListener is called multiple times, the listener will only be added once.
 		ResourcesPlugin.getWorkspace().addResourceChangeListener(ExtensionClasspathContainerListener.getInstance(), IResourceChangeEvent.POST_CHANGE);
 		

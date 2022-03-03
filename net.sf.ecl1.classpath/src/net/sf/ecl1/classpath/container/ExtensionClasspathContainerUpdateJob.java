@@ -44,7 +44,7 @@ public class ExtensionClasspathContainerUpdateJob extends Job {
 	
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {		
-		ProjectsWithContainer projectsWithContainer = ProjectsWithContainer.getInstance();
+		ProjectsWithExtensionClasspathContainer projectsWithContainer = ProjectsWithExtensionClasspathContainer.getInstance();
 		
 		try {
 			

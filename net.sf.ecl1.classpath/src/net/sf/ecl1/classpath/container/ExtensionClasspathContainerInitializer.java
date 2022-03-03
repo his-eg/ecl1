@@ -50,7 +50,7 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 						"\nThe ecl1 plugin will now attempt to initialize the container.");
 			}
 			
-			ProjectsWithContainer.getInstance().addProject(javaProject.getProject());
+			ProjectsWithExtensionClasspathContainer.getInstance().addProject(javaProject.getProject());
 			updateClasspathContainer(containerPath, javaProject);
 		} catch (CoreException e) {
 			logger.error2(e.getMessage(), e);
