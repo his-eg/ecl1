@@ -51,8 +51,6 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 			}
 			
 			ProjectsWithContainer.getInstance().addProject(javaProject.getProject());
-			//ExtensionClasspathContainerListener.getInstance().addProjectWithClasspathContainer(javaProject);
-			//registerListener();
 			updateClasspathContainer(containerPath, javaProject);
 		} catch (CoreException e) {
 			logger.error2(e.getMessage(), e);
@@ -62,15 +60,6 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 
 
 	
-	/**
-	 * Use {@link ProjectsWithContainer ProjectsWithContainer} instead
-	 */
-	@Deprecated()
-	private void registerListener() {
-		//We only want to be informed after a workspace change is completed
-		//Even if addResourceChangeListener is called multiple times, the listener will only be added once.
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(ExtensionClasspathContainerListener.getInstance(), IResourceChangeEvent.POST_CHANGE);
-	}
 
 	/* (non-Javadoc)
 	 * @see org.eclipse.jdt.core.ClasspathContainerInitializer#canUpdateClasspathContainer(org.eclipse.core.runtime.IPath, org.eclipse.jdt.core.IJavaProject)
@@ -116,40 +105,6 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 		}
 	}
 
-	/**
-	 * Determine the extensions that need to be added to the ecl1 classpath container.
-	 * 
-	 * @deprecated use {@link #getExtensionsInClasspathContainer(IPath)} instead. 
-	 * This method was deprecated, because the check for the existence of extensions either as a jars
-	 * or as projects is costly and might even prevent eclipse from compiling webapps. Why?
-	 * <br>
-	 * All extensions within ecl1 are needed to compile webapps. This method checks, if
-	 * all extensions from the container are present as either jars or projects. However, if 
-	 * a project cannot be found as either a jar or as a project, this method just assumes that
-	 * the extensions is not needed to compile webapps... ¯\_(ツ)_/¯
-	 *
-	 * @param containerPath
-	 * @return set of extension that need to be added to the classpath container
-	 */
-	@Deprecated
-	private HashSet<String> getExtensionsForClasspathContainerAsSet(IPath containerPath) {
-		HashSet<String> extensionsForClasspathContainer = new HashSet<>();
-		if (containerPath != null && containerPath.segmentCount() == 2) {
-			String extensionsForClasspathContainerStr = containerPath.segment(1);
-			if (extensionsForClasspathContainerStr != null) {
-				List<String> extensionsForClasspathContainerList = Splitter.on(",").splitToList(extensionsForClasspathContainerStr);
-				for (String extension : extensionsForClasspathContainerList) {
-					boolean projectExists = EXTENSION_UTIL.doesExtensionProjectExist(extension);
-					boolean jarExists = EXTENSION_UTIL.doesExtensionJarExist(extension);
-					if (projectExists || jarExists) {
-						extensionsForClasspathContainer.add(extension);
-					}
-				}
-			}
-		}
-		logger.info("Extensions to add to the ecl1 classpath container: " + extensionsForClasspathContainer);
-		return extensionsForClasspathContainer;
-	}
 
 	/**
 	 * Parse the ecl1 container and return the names of all extensions within the container

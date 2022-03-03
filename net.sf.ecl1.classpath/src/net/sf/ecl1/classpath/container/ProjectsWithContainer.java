@@ -40,7 +40,7 @@ public class ProjectsWithContainer {
 		
 		//We only want to be informed after a workspace change is completed
 		//Even if addResourceChangeListener is called multiple times, the listener will only be added once.
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(ExtensionClasspathContainerListener2.getInstance(), IResourceChangeEvent.POST_CHANGE);
+		ResourcesPlugin.getWorkspace().addResourceChangeListener(ExtensionClasspathContainerListener.getInstance(), IResourceChangeEvent.POST_CHANGE);
 		
 		logger.debug("The following project was either imported/opened or an ecl1 classpath container was added: " + project.getName());
 	}
@@ -52,7 +52,7 @@ public class ProjectsWithContainer {
 		if (projectsWithEcl1ClasspathContainer.isEmpty()) {
 			logger.debug("No more projects with ecl1 classpath containers in the workspace."
 					+ " Removing listener that monitors changes which might trigger an update of the ecl1 classpath container.");
-			ResourcesPlugin.getWorkspace().removeResourceChangeListener(ExtensionClasspathContainerListener2.getInstance());
+			ResourcesPlugin.getWorkspace().removeResourceChangeListener(ExtensionClasspathContainerListener.getInstance());
 		}
 		
 		logger.debug("The following project was either closed/deleted or does no longer possess an ecl1 classpath container: " + project.getName());
