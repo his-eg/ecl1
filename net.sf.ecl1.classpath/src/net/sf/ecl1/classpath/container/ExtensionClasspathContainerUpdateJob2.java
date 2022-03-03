@@ -32,22 +32,15 @@ public class ExtensionClasspathContainerUpdateJob2 extends Job {
 	 */
 	Set<IProject> removedProjects;
 	/*
-	 * Modifying a classpath file must trigger an update job, because 
-	 * an ecl1 classpath entry might have been removed from a .classpath file
-	 */
-	Set<IProject> projectsWithModifiedClasspathFile;
-	/*
 	 * Modifying an extension project must trigger an update job, because 
 	 * the extension project might be a member of the ecl1 classpath container
 	 */
 	Set<IProject> addedProjects;
 		
 	public ExtensionClasspathContainerUpdateJob2(Set<IProject> removedProjects,
-			Set<IProject> projectsWithModifiedClasspathFile,
 			Set<IProject> addedProjects) {
 		super("Updating ecl1 classpath container");
 		this.removedProjects = removedProjects;
-		this.projectsWithModifiedClasspathFile = projectsWithModifiedClasspathFile;
 		this.addedProjects = addedProjects;
 	}
 	
@@ -74,29 +67,7 @@ public class ExtensionClasspathContainerUpdateJob2 extends Job {
 				 */
 				projectsWithContainer.removeProject(project);
 			}
-	
-			/*
-			 * Remove projects that had an ecl1 classpath container, but that was deleted from the 
-			 * .classpath-file 
-			 */
-			projectLoop: for(IProject project : projectsWithModifiedClasspathFile) {
-				IJavaProject javaProject = JavaCore.create(project);
-				for(IClasspathEntry classpathEntry : javaProject.getRawClasspath()) {
-					
-					if (classpathEntry.getEntryKind() == IClasspathEntry.CPE_CONTAINER && 
-							classpathEntry.getPath().segment(0).equals(ExtensionClasspathContainerPage.NET_SF_ECL1_ECL1_CONTAINER_ID)) {
-						//Add project. If it is already added, we do no harm by calling the add method again. Thus always add. 
-						projectsWithContainer.addProject(project);
-						logger.debug("The .classpath-file of the following project was modified: " + project.getName() + 
-								"\nAfter the modification the .classpath-files contains an ecl1 classpath container.");
-						continue projectLoop;
-					}
-					
-				}
-				
-			}
-			
-			
+
 			
 			if (!removedProjects.isEmpty() || !addedProjects.isEmpty() || !projectsWithContainer.isEmpty() ) {
 				/*

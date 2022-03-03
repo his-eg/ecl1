@@ -7,10 +7,8 @@ import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import net.sf.ecl1.classpath.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
-import net.sf.ecl1.utilities.general.ProjectNature;
 
 
 /**
@@ -32,7 +30,6 @@ public class ExtensionClasspathContainerListener2 implements IResourceChangeList
 	public void resourceChanged(IResourceChangeEvent event) {
 		
 		Set<IProject> deletedProjects = new HashSet<IProject>();
-		Set<IProject> modifiedProjects = new HashSet<IProject>();
 		Set<IProject> addedProjects = new HashSet<IProject>();
 		
 		IResourceDelta delta = event.getDelta();
@@ -63,15 +60,6 @@ public class ExtensionClasspathContainerListener2 implements IResourceChangeList
 	        		deletedProjects.add(project);
 	        	}
 	        }
-	        
-	        
-	        /*
-			 * Project's .classpath-file was changed
-			 */
-	        IResourceDelta modifiedClasspath = projectDelta.findMember(projectDelta.getFullPath().append(".classpath"));
-			if (modifiedClasspath != null) {
-				modifiedProjects.add(project);
-			}
 		}
 		
 		/*
@@ -84,8 +72,8 @@ public class ExtensionClasspathContainerListener2 implements IResourceChangeList
 		}
 			
 		
-		if ( !deletedProjects.isEmpty() || !modifiedProjects.isEmpty() || !addedProjects.isEmpty()) {
-			ExtensionClasspathContainerUpdateJob2 updateJob = new ExtensionClasspathContainerUpdateJob2(deletedProjects, modifiedProjects, addedProjects);
+		if ( !deletedProjects.isEmpty() || !addedProjects.isEmpty()) {
+			ExtensionClasspathContainerUpdateJob2 updateJob = new ExtensionClasspathContainerUpdateJob2(deletedProjects,addedProjects);
 			Activator.getDefault().addJob(updateJob);
 			updateJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
 			updateJob.schedule();
