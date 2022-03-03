@@ -1,0 +1,54 @@
+Tests: 
+------
+- Es gibt ein Projekt mit einem ecl1 classpath container im eclipse workspace
+	- Eclipse wird gestartet
+		- API-Extensions sind ausgecheckt
+			- ERWARTETES ERGEBNIS: 
+				- Inhalt des ecl1 classpath containers ist korrekt (ausgecheckte Extension sind als Projekte enthalten; andere Projekte als jar)
+				- Der Listener ist aktiv
+		- API-Extensions sind nicht ausgecheckt
+			- ERWATETES ERBEBNIS: 
+				- Inhalt des ecl1 classpath containers ist korrekt (ausgecheckte Extension sind als Projekte enthalten; andere Projekte als jar)
+				- Der Listener ist aktiv
+	- Eine API-Extension wird importiert
+		- ERWARTETES ERGEBNIS: 
+			- Inhalt des ecl1 classpath containers ist korrekt (ausgecheckte Extension sind als Projekte enthalten; andere Projekte als jar)
+			- Es wird ein Full-Build angestoßen
+	- Eine API-Extension wird geöffnet
+			- ERWARTETES ERGEBNIS: 
+				- Inhalt des ecl1 classpath containers ist korrekt (ausgecheckte Extension sind als Projekte enthalten; andere Projekte als jar)
+				- Es wird ein Full-Build angestoßen
+	- Eine API-Extension wird gelöscht:
+		- ERWARTETES ERGEBNIS: 
+			- Inhalt des ecl1 classpath containers ist korrekt (ausgecheckte Extension sind als Projekte enthalten; andere Projekte als jar)
+			- Es wird ein Full-Build angestoßen
+	- Eine API-Extension wird geschlossen: 
+		- ERWARTETES ERGEBNIS: 
+			- Inhalt des ecl1 classpath containers ist korrekt (ausgecheckte Extension sind als Projekte enthalten; andere Projekte als jar)
+			- Es wird ein Full-Build angestoßen	
+	- Ein Projekt mit ecl1 classpath container wird importiert	
+		- ERWARTETES ERGEBNIS: 
+			- Inhalt des ecl1 classpath containers ist korrekt (ausgecheckte Extension sind als Projekte enthalten; andere Projekte als jar)
+			- Der Listener ist aktiv
+	- Ein Projekt mit ecl1 classpath container wird geöffnet	
+		- ERWARTETES ERGEBNIS: 
+			- Inhalt des ecl1 classpath containers ist korrekt (ausgecheckte Extension sind als Projekte enthalten; andere Projekte als jar)
+			- Der Listener ist aktiv	
+	- Das letzte Projekt mit einem ecl1 classpath container wird geschlossen
+		- ERWARTETES ERGEBNIS: 
+			- Der Listener wird deaktiviert
+	- Das letzte Projekt mit einem ecl1 classpath container wird gelöscht
+		- ERWARTETES ERGEBNIS: 
+			- Der Listener wird deaktiviert		
+	- Der ecl1 classpath container wird aus einem Projekt entfernt. Dies war das letzte Projekt mit einem ecl1 classpath container im workspace
+		- ERWARTETES ERGEBNIS: 
+			- Der ecl1 classpath container wird entfernt
+	- Es wird ein neues Projekt zum ecl1 classpath hinzugefügt
+		- Dieses Projekt liegt nicht als ausgechecktes Projekt im workspace: 
+			- ERWARTETES ERGEBNIS: 
+				- Das Projekt wird als jar in den ecl1 classpath container eingefügt
+				- Es wird ein Full-Build angestoßen
+		- Das Projekt liegt ausgecheckt im workspace vor: 
+			- ERWARTETES ERGEBNIS: 
+				- Das Projekt wird ausgecheckt in den ecl1 classpath container eingefügt.
+				- Es wird ein Full-Build angestoßen
