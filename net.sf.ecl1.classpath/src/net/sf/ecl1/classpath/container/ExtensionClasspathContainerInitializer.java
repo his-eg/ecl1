@@ -103,9 +103,9 @@ public class ExtensionClasspathContainerInitializer extends ClasspathContainerIn
 
 		// now search extensions etc.
 		Set<String> extensionsForClasspathContainerSet = getExtensionsInClasspathContainer(containerPath);
-
-		Collection<IClasspathEntry> classpathContainerEntryList = Collections2.filter(createClasspathContainerEntries(extensionsForClasspathContainerSet), Predicates.notNull());
-		if (!classpathContainerEntryList.isEmpty()) {
+		
+		Collection<IClasspathEntry> classpathContainerEntryList = createClasspathContainerEntries(extensionsForClasspathContainerSet);
+		if (classpathContainerEntryList != null && !classpathContainerEntryList.isEmpty()) {
 			IClasspathEntry[] classpathContainerEntryArray = classpathContainerEntryList.toArray(new IClasspathEntry[classpathContainerEntryList.size()]);
 			ExtensionClassPathContainer extensionClassPathContainer = new ExtensionClassPathContainer(containerPath, classpathContainerEntryArray);
 			IClasspathContainer[] iClasspathContainers = new IClasspathContainer[] { extensionClassPathContainer };

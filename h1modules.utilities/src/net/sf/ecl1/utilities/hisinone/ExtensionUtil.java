@@ -93,6 +93,7 @@ public class ExtensionUtil {
         return extensions;
     }
     
+    
     /**
      * Scan for jar files in the extensions folder of the webapps project.
      *
@@ -103,7 +104,7 @@ public class ExtensionUtil {
         // scan folder webapps/qisserver/WEB-INF/extensions/ for extension jars
         if (webappsProject != null) {
             IFolder extensionsFolder = webappsProject.getFolder(HisConstants.EXTENSIONS_FOLDER);
-	        if (extensionsFolder.exists()) {
+	        if (extensionsFolder.getLocation().toFile().exists()) {
 	            //if there is an extensions folder, scan it
 	            IPath rawLocation = extensionsFolder.getRawLocation();
 	            List<File> extensionJars = Arrays.asList(rawLocation.toFile().listFiles(new FilenameFilter() {
