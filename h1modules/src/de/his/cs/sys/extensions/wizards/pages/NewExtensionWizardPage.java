@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
+import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 
 import de.his.cs.sys.extensions.wizards.pages.packages.HISinOneStrategy;
 import de.his.cs.sys.extensions.wizards.pages.packages.PackageStructureStrategy;
@@ -120,5 +121,23 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 	 */
 	public InitialProjectConfigurationChoices getInitialConfiguration() {
 		return new InitialProjectConfigurationChoices(getProjectsToReference(), getProjectName(), getInitialVersion());
+	}
+	
+	@Override
+	protected boolean validatePage() {
+		if (super.validatePage() == false ) {
+			return false;
+		}
+		
+		String projectName = getProjectName();
+		if(projectName.contains("_")) {
+			setErrorMessage(null);
+			setMessage("HISInOne Extension must not contain the character \"_\" in its name.");
+			return false;
+		}
+
+		setErrorMessage(null);
+		setMessage(null);
+		return true;
 	}
 }
