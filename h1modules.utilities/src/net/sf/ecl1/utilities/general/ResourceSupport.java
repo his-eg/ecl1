@@ -134,7 +134,17 @@ public class ResourceSupport {
 			IFile file = (IFile)resource;
 			String fileContentAsString = variableReplacer.replaceVariables(file.getContents());
 			ByteArrayInputStream fileContentAsStream = new ByteArrayInputStream(fileContentAsString.getBytes());
-			project.getFile(relativePathWithFilename).create(fileContentAsStream, true, null);
+			/*
+			 * Special handling of .project file. This file was already created at an earlier stage, because otherwise the project could not have been
+			 * opened (among other things).
+			 * 
+			 * We now replace (deleta and then copy) the already existing .project file with the file from our template folder, because the .project-file
+			 * from the template folder might contain more recent configuration. 
+			 */
+			if (file.getName().equals(".project")) {
+				project.getFile(relativePathWithFilename).delete(true, null);
+			} 
+			project.getFile(relativePathWithFilename).create(fileContentAsStream, true, null);	
 		}
 		
 		
