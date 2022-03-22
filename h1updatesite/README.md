@@ -3,6 +3,10 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.6.1.2022-03-22##
+* NewExtensionWizard prohibits extension names containing an underscore
+* NewExtensionWizard now uses the .project file from the template folder
+
 ##Version 1.6.0.2022-03-08##
 * Major changes to the ecl1 classpath container handling. E.g., the container is now created when an appropriate extension project is imported into the workspace
 

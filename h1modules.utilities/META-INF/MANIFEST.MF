@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Utilities for H1 extension tools
 Bundle-SymbolicName: net.sf.ecl1.utilities;singleton:=true
-Bundle-Version: 1.3.0.2022-03-08
+Bundle-Version: 1.3.1.2022-03-22
 Bundle-Activator: net.sf.ecl1.utilities.Activator
 Require-Bundle: org.eclipse.core.runtime;visibility:=reexport,
  org.eclipse.core.resources;visibility:=reexport,
