@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension-point id="mergeStrategy" name="%MergeStrategy-extension-point.name" schema="schema/mergeStrategy.exsd"/>
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="org.eclipse.egit.core.GitCorePreferenceInitializer"/>
+   </extension>
+
+  <extension point="org.eclipse.team.core.repository">
+	<repository
+       class="org.eclipse.egit.core.GitProvider"
+       id="org.eclipse.egit.core.GitProvider"
+       typeClass="org.eclipse.egit.core.internal.GitRepositoryProviderType">
+	</repository>
+  </extension>
+  <extension
+        point="org.eclipse.team.core.ignore">
+     <ignore
+           enabled="true"
+           pattern=".git"/>
+     <ignore
+           enabled="true"
+           pattern="*/.git/*"/>
+  </extension>
+  <extension
+        point="org.eclipse.core.contenttype.contentTypes">
+     <content-type
+           base-type="org.eclipse.core.runtime.text"
+           file-extensions="patch"
+           id="org.eclipse.egit.patch"
+           name="%patch_ContentTypeName"
+           priority="normal">
+     </content-type>
+  </extension>
+  <extension
+       point="org.eclipse.core.runtime.adapters">
+    <factory
+          adaptableType="org.eclipse.egit.core.internal.storage.GitFileRevision"
+          class="org.eclipse.egit.core.internal.AdapterFactory">
+       <adapter type="org.eclipse.jgit.lib.Repository"/>
+    </factory>
+    <factory
+          adaptableType="org.eclipse.core.resources.IResource"
+          class="org.eclipse.egit.core.internal.AdapterFactory">
+       <adapter type="org.eclipse.egit.core.info.GitInfo"/>
+    </factory>
+  </extension>
+  <extension
+       point="org.eclipse.core.filesystem.filesystems"
+       id="internalFS"
+       name="EGit-Internal File System" >
+    <filesystem scheme="egit-internal">
+       <run class="org.eclipse.egit.core.internal.efs.EgitFileSystem"/>
+       <!--
+       	  This EFS is a highly specialized *internal* file system that EGit uses
+       	  to provide access to conflicting files in merge editors. It is *not* a
+       	  general-purpose EFS for traversing git repositories. Third parties
+       	  should not use this EFS; if they do they are at their own peril. The
+       	  URI format and semantics may change at any time without notice. This
+       	  EFS is *not* API.
+       -->
+    </filesystem>
+  </extension>
+</plugin>

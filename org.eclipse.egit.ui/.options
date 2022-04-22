@@ -1,0 +1,18 @@
+# Main Debug Trace switch
+org.eclipse.egit.ui/debug = false
+# Trace location for HistoryView
+org.eclipse.egit.ui/debug/ui/historyview = false
+# General trace location for the EGit UI Plugin
+org.eclipse.egit.ui/debug/ui = false
+# Trace location for RepositoriesView
+org.eclipse.egit.ui/debug/ui/repositoriesview = false
+# Trace location for decoration
+org.eclipse.egit.ui/debug/ui/decoration = false
+# Trace location for quickdiff
+org.eclipse.egit.ui/debug/quickdiff = false
+# Trace location for RepositoryChangeScanner
+org.eclipse.egit.ui/debug/repochangescanner = false
+# Trace location for properties testers
+org.eclipse.egit.ui/debug/ui/propertiestesters = false
+# Trace location for selection handling
+org.eclipse.egit.ui/debug/ui/selection = false
