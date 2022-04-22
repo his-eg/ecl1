@@ -6,5 +6,9 @@
    <feature url="features/h1modulesfeature_1.6.0.2022-03-08.jar" id="h1modulesfeature" version="1.6.0.2022-03-08">
       <category name="de.his.cs.sys.extensions"/>
    </feature>
+   <feature url="features/org.eclipse.egit.bug577948.fastHistory_1.0.0.jar" id="org.eclipse.egit.bug577948.fastHistory" version="1.0.0" patch="true">
+      <category name="de.his.cs.sys.egit.fastHistory"/>
+   </feature>
    <category-def name="de.his.cs.sys.extensions" label="Extension Tools"/>
+   <category-def name="de.his.cs.sys.egit.fastHistory" label="Patch for EGit/JGit to speed up the history view"/>
 </site>
