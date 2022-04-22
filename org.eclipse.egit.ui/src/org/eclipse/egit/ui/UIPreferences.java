@@ -255,6 +255,9 @@ public final class UIPreferences {
 	public static final String HISTORY_COLUMN_COMMITTER_DATE = "HistoryView_ColumnCommitterDateShow"; //$NON-NLS-1$
 
 	/** */
+	public static final String HISTORY_SORT_TOPOLOGICAL = "HistoryView_sortTopological"; //$NON-NLS-1$
+
+	/** */
 	public static final String STAGING_VIEW_SHOW_NEW_COMMITS = "StagingView_ShowNewCommits"; //$NON-NLS-1$
 	/** */
 	public static final String STAGING_VIEW_COLUMN_LAYOUT = "StagingView_ColumnLayout"; //$NON-NLS-1$

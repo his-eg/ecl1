@@ -2160,6 +2160,9 @@ public class UIText extends NLS {
 	public static String ResourceHistory_verifySignatures;
 
 	/** */
+	public static String ResourceHistory_sortTopological;
+
+	/** */
 	public static String HardResetToRevisionAction_hardReset;
 
 	/** */
@@ -2245,6 +2248,9 @@ public class UIText extends NLS {
 
 	/** */
 	public static String HistoryPreferencePage_ShowInRevCommentGroupLabel;
+
+	/** */
+	public static String HistoryPreferencePage_SortTopologicalGroupLabel;
 
 	/** */
 	public static String HistoryPreferencePage_toggleAdditionalRefs;

@@ -128,6 +128,18 @@ public class HistoryPreferencePage extends FieldEditorPreferencePage implements
 				UIText.ResourceHistory_toggleCommentFill,
 				commentGroup));
 		updateMargins(commentGroup);
+
+		Group topoGroup = new Group(main, SWT.SHADOW_ETCHED_IN);
+		// we need a span of 2 to accommodate the field editors
+		GridDataFactory.fillDefaults().grab(true, false).span(2, 1)
+				.applyTo(topoGroup);
+		topoGroup.setText(
+				UIText.HistoryPreferencePage_SortTopologicalGroupLabel);
+		addField(new BooleanFieldEditor(
+				UIPreferences.HISTORY_SORT_TOPOLOGICAL,
+				UIText.ResourceHistory_sortTopological, topoGroup));
+		updateMargins(topoGroup);
+
 	}
 
 	/**

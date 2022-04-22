@@ -15,6 +15,9 @@ package org.eclipse.egit.ui.internal.history;
 
 import java.io.IOException;
 
+import org.eclipse.egit.ui.Activator;
+import org.eclipse.egit.ui.UIPreferences;
+import org.eclipse.jface.preference.IPersistentPreferenceStore;
 import org.eclipse.jgit.annotations.NonNull;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
@@ -24,8 +27,12 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revplot.PlotWalk;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.revwalk.RevSort;
 
 class SWTWalk extends PlotWalk {
+
+	private final IPersistentPreferenceStore store = (IPersistentPreferenceStore) Activator
+			.getDefault().getPreferenceStore();
 
 	@NonNull
 	private final Repository repo;
@@ -36,6 +43,9 @@ class SWTWalk extends PlotWalk {
 
 	SWTWalk(final @NonNull Repository repo) {
 		super(repo);
+		boolean sortTopological = store
+				.getBoolean(UIPreferences.HISTORY_SORT_TOPOLOGICAL);
+		sort(RevSort.TOPO, sortTopological);
 		this.repo = repo;
 	}
 
