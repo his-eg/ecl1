@@ -35,7 +35,7 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.osgi.util.NLS;
 
 class GenerateHistoryJob extends Job {
-	private static final int BATCH_SIZE = 256;
+	private static final int BATCH_SIZE = 8;
 
 	private final Object lock = new Object();
 
