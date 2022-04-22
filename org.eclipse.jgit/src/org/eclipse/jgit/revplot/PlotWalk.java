@@ -27,7 +27,6 @@ import java.util.Set;
 
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
-import org.eclipse.jgit.internal.JGitText;
 import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Ref;
@@ -97,13 +96,13 @@ public class PlotWalk extends RevWalk {
 		}
 	}
 
-	/** {@inheritDoc} */
-	@Override
-	public void sort(RevSort s, boolean use) {
-		if (s == RevSort.TOPO && !use)
-			throw new IllegalArgumentException(JGitText.get().topologicalSortRequired);
-		super.sort(s, use);
-	}
+//	/** {@inheritDoc} */
+//	@Override
+//	public void sort(RevSort s, boolean use) {
+//		if (s == RevSort.TOPO && !use)
+//			throw new IllegalArgumentException(JGitText.get().topologicalSortRequired);
+//		super.sort(s, use);
+//	}
 
 	/** {@inheritDoc} */
 	@Override
