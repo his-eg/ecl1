@@ -118,6 +118,11 @@ public class ResourceSupport {
     private void copyResourceToNewExtensionProject(IResource resource, int segmentsOfBaseFolder) throws CoreException {
 		IPath relativePathWithFilename = resource.getFullPath().removeFirstSegments(segmentsOfBaseFolder);
 		
+		//Remove .template-suffix if it exists. 
+		if (relativePathWithFilename.lastSegment().endsWith(TEMPLATE)) {
+			relativePathWithFilename = relativePathWithFilename.removeFileExtension();
+		}
+		
 		if (resource.getType() == IResource.FOLDER) {
     		//Create folder in project if it does not exist
 			if(!project.exists(relativePathWithFilename)) {
@@ -138,12 +143,14 @@ public class ResourceSupport {
 			 * Special handling of .project file. This file was already created at an earlier stage, because otherwise the project could not have been
 			 * opened (among other things).
 			 * 
-			 * We now replace (deleta and then copy) the already existing .project file with the file from our template folder, because the .project-file
+			 * We now replace (delete and then copy) the already existing .project file with the file from our template folder, because the .project-file
 			 * from the template folder might contain more recent configuration. 
+			 * 
 			 */
-			if (file.getName().equals(".project")) {
-				project.getFile(relativePathWithFilename).delete(true, null);
-			} 
+			if (file.getName().equals(".project.template")) { 
+				project.getFile(relativePathWithFilename).delete(true, null);  
+			}
+			
 			project.getFile(relativePathWithFilename).create(fileContentAsStream, true, null);	
 		}
 		
