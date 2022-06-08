@@ -3,6 +3,9 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.6.2.2022-06-08##
+* Template files can now have a ".template" file extension
+
 ##Version 1.6.1.2022-03-22##
 * NewExtensionWizard prohibits extension names containing an underscore
 * NewExtensionWizard now uses the .project file from the template folder
