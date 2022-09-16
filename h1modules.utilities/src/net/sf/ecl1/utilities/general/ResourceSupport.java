@@ -139,18 +139,17 @@ public class ResourceSupport {
 			IFile file = (IFile)resource;
 			String fileContentAsString = variableReplacer.replaceVariables(file.getContents());
 			ByteArrayInputStream fileContentAsStream = new ByteArrayInputStream(fileContentAsString.getBytes());
-			/*
-			 * Special handling of .project file. This file was already created at an earlier stage, because otherwise the project could not have been
-			 * opened (among other things).
-			 * 
-			 * We now replace (delete and then copy) the already existing .project file with the file from our template folder, because the .project-file
-			 * from the template folder might contain more recent configuration. 
-			 * 
-			 */
-			if (file.getName().equals(".project.template")) { 
-				project.getFile(relativePathWithFilename).delete(true, null);  
-			}
 			
+			/*
+			 * Even though this is a new project, eclipse has already put some files into the
+			 * project behind our back (at the time of writing at least the .project-file and 
+			 * .settings/org.eclipse.core.resources.prefs). These files must now be deleted
+			 * or else the later call of project.getFile(relativePathWithFilename).create() will
+			 * fail...
+			 */
+			if (project.getFile(relativePathWithFilename).exists()) {
+				project.getFile(relativePathWithFilename).delete(true, null);
+			}
 			project.getFile(relativePathWithFilename).create(fileContentAsStream, true, null);	
 		}
 		
