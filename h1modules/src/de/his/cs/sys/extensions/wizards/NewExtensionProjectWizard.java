@@ -4,6 +4,7 @@ package de.his.cs.sys.extensions.wizards;
 import java.net.URI;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -65,6 +66,15 @@ public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
 				IProject project = new ProjectSupport(firstPage.getStrategy().packagesToCreate(initialChoice.getName())).createProject(initialChoice, location);
 				new ForEachProjectSetupStepHandler(project, initialChoice).contribute();
+				
+				//Close and open project to fully "refresh" the project (by doing this
+				//eclipse realizes that this project is a git project)
+				project.close(monitor);
+				//Refresh is necessary, because otherwise eclipse might not register that 
+				//the project was closed.
+				project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+				project.open(monitor);
+				
 				//Exit job
 				return Status.OK_STATUS;
 			}
