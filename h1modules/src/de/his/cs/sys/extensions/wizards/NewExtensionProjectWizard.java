@@ -67,13 +67,13 @@ public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 				IProject project = new ProjectSupport(firstPage.getStrategy().packagesToCreate(initialChoice.getName())).createProject(initialChoice, location);
 				new ForEachProjectSetupStepHandler(project, initialChoice).contribute();
 				
-				//Close and open project to fully "refresh" the project (by doing this
-				//eclipse realizes that this project is a git project)
-				project.close(monitor);
-				//Refresh is necessary, because otherwise eclipse might not register that 
-				//the project was closed.
-				project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-				project.open(monitor);
+//				//Close and open project to fully "refresh" the project (by doing this
+//				//eclipse realizes that this project is a git project)
+//				project.close(monitor);
+//				//Refresh is necessary, because otherwise eclipse might not register that 
+//				//the project was closed.
+//				project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+//				project.open(monitor);
 				
 				//Exit job
 				return Status.OK_STATUS;
