@@ -3,6 +3,10 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.7.0.2022-11-30##
+* New extension wizard: ecl1 now deletes files that eclipse might have created in the new extension project behind our back
+* New extension wizard: ecl1 will try to connect the newly created extension with the correct git-repo at gitlab.his.de
+
 ##Version 1.6.2.2022-06-08##
 * Template files can now have a ".template" file extension
 
