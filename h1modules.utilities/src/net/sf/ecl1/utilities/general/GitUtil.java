@@ -106,8 +106,7 @@ public class GitUtil {
 	        IProject webappsProject = WebappsUtil.findWebappsProject();
 	        if(webappsProject != null) {
 	        	String webappsPath = webappsProject.getLocation().toString();
-	            try {
-	            	Git git = Git.open(new File(webappsPath));
+	            try (Git git = Git.open(new File(webappsPath))){
 					String branch = git.getRepository().getFullBranch();
 					//Remove "refs/heads/" from branch name
 					branch = branch.substring(branch.lastIndexOf("/")+1);

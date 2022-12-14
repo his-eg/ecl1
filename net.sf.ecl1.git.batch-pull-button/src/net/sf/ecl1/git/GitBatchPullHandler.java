@@ -74,8 +74,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 						continue;
 					}
 
-					try {
-						Git git = Git.open(projectLocationFile);
+					try (Git git = Git.open(projectLocationFile)){
 						logger.info("Getting remotes of " + name);
 						Set<String> remotes = git.getRepository().getRemoteNames();
 						if(remotes != null && !remotes.isEmpty()) {

@@ -212,6 +212,9 @@ public class CommitExporterWizardPage extends WizardPage {
             this.hotfixSnippetTextEditor.setStringValue(hotfixSnippet);
             setLogInfo("Hotfix XML snippet copied to clipboard!");
         }
+        if (git != null) {
+        	git.close();
+        }
     }
 
 

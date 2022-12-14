@@ -132,10 +132,108 @@ public class AutoLfsPruneJob extends Job {
 			/*
 			 * Try to open git-repo of this eclipse-project
 			 */
-			Repository repo;
-			try {
-				Git git = Git.open(projectLocationFile);
-				repo = git.getRepository();
+			try (Git git = Git.open(projectLocationFile);
+				 Repository repo = git.getRepository();) {
+				
+				/*
+				 * Perform necessary checks for windows machines
+				 * 
+				 */
+				if(fs instanceof FS_Win32) {
+					
+					/*
+					 * Detect version of git lfs. 
+					 * 
+					 * We need the version number of git lfs, because if stashes are present on windows machines, we can only run "gif lfs prune", if "git lfs version" is bigger or equal
+					 * to version 2.13.3 because of this bug: https://github.com/git-lfs/git-lfs/issues/4401 that was fixed in 2.13.3
+					 * 
+					 */
+					if(detectedLFSVersion == false) {
+						
+						try {
+							ExecutionResult er = runCommandInRepo("git lfs version",repo);
+							
+							if (er.getRc() != 0) {
+								printFailureMessage("git lfs version");
+								return Status.OK_STATUS;
+							}
+							
+							
+							try {
+								LFSVersion = parseGitLfsVersion(er.getStdout().openInputStream());
+							} catch (ParseException e) {
+								printFailureMessage("git lfs version");
+								return Status.OK_STATUS;
+							}
+							detectedLFSVersion = true;
+
+						
+						} catch (IOException | InterruptedException e) {
+							logger.error2("Failed to run \"git lfs version\" command in the following project: "+ name);
+							logger.error2("Error message: " + e.getMessage(),e);
+							return Status.OK_STATUS;
+						} 
+						
+					}
+					
+
+					
+					/*
+					 * Run "git stash list" in the git-repo
+					 */
+					if( compareVersions(LFSVersion, LFS_VERSION_WITH_BUGFIX) <= 0 ) {
+						try {
+							ExecutionResult er = runCommandInRepo("git stash list", repo);
+							
+							if (er.getRc() != 0) {
+								printFailureMessage("git stash list");
+								return Status.OK_STATUS;
+							}
+
+							if (er.getStdout().length() != 0) {
+								// If "git stash list" has output --> stashes present in this repo --> We cannot prune
+								logger.info("Found stashes in project: " + name + ". Cannot run \"git lfs prune\" when stashes are present and git lfs version is < 2.13.3! Aborting..."
+										+ "\nYou can run \"git stash clear\" to manually delete your stashes. ");
+								monitor.worked(1);
+								continue;
+							}
+							
+						} catch (IOException | InterruptedException e) {
+							logger.error2("Failed to run \"git stash list\" command in project: "+ name);
+							logger.error2("Error message: " + e.getMessage(),e);
+							monitor.worked(1);	
+							continue;
+						} 
+					}
+				}
+				
+				
+				
+				
+				/*
+				 * If we reached this part, we can prune!
+				 */
+				try {
+					ExecutionResult er = runCommandInRepo("git lfs prune", repo);
+					
+					if (er.getRc() != 0) {
+						logger.error2("Command: \"git lfs prune\" returned an error code! Prune attempt was not successful...");
+						logger.error2("Output of the error stream: " + new String(er.getStderr().toByteArray()));
+						monitor.worked(1);	
+						continue;
+					}
+					
+				} catch (IOException | InterruptedException e) {
+					logger.error2("Failed to run \"git lfs prune\" command in the following project: "+ name);
+					logger.error2("Error message: " + e.getMessage(),e);
+					monitor.worked(1);	
+					continue;
+				} 
+				
+				
+				logger.info("Successfully finished pruning: " + name);
+				monitor.worked(1);	
+				
 			} catch (org.eclipse.jgit.errors.RepositoryNotFoundException rnfe) {
 				// ignore
 				logger.info(name + " is not managed via Git: " + rnfe.getMessage());
@@ -147,105 +245,6 @@ public class AutoLfsPruneJob extends Job {
 				continue;
 			}
 			
-			
-			/*
-			 * Perform necessary checks for windows machines
-			 * 
-			 */
-			if(fs instanceof FS_Win32) {
-				
-				/*
-				 * Detect version of git lfs. 
-				 * 
-				 * We need the version number of git lfs, because if stashes are present on windows machines, we can only run "gif lfs prune", if "git lfs version" is bigger or equal
-				 * to version 2.13.3 because of this bug: https://github.com/git-lfs/git-lfs/issues/4401 that was fixed in 2.13.3
-				 * 
-				 */
-				if(detectedLFSVersion == false) {
-					
-					try {
-						ExecutionResult er = runCommandInRepo("git lfs version",repo);
-						
-						if (er.getRc() != 0) {
-							printFailureMessage("git lfs version");
-							return Status.OK_STATUS;
-						}
-						
-						
-						try {
-							LFSVersion = parseGitLfsVersion(er.getStdout().openInputStream());
-						} catch (ParseException e) {
-							printFailureMessage("git lfs version");
-							return Status.OK_STATUS;
-						}
-						detectedLFSVersion = true;
-
-					
-					} catch (IOException | InterruptedException e) {
-						logger.error2("Failed to run \"git lfs version\" command in the following project: "+ name);
-						logger.error2("Error message: " + e.getMessage(),e);
-						return Status.OK_STATUS;
-					} 
-					
-				}
-				
-
-				
-				/*
-				 * Run "git stash list" in the git-repo
-				 */
-				if( compareVersions(LFSVersion, LFS_VERSION_WITH_BUGFIX) <= 0 ) {
-					try {
-						ExecutionResult er = runCommandInRepo("git stash list", repo);
-						
-						if (er.getRc() != 0) {
-							printFailureMessage("git stash list");
-							return Status.OK_STATUS;
-						}
-
-						if (er.getStdout().length() != 0) {
-							// If "git stash list" has output --> stashes present in this repo --> We cannot prune
-							logger.info("Found stashes in project: " + name + ". Cannot run \"git lfs prune\" when stashes are present and git lfs version is < 2.13.3! Aborting..."
-									+ "\nYou can run \"git stash clear\" to manually delete your stashes. ");
-							monitor.worked(1);
-							continue;
-						}
-						
-					} catch (IOException | InterruptedException e) {
-						logger.error2("Failed to run \"git stash list\" command in project: "+ name);
-						logger.error2("Error message: " + e.getMessage(),e);
-						monitor.worked(1);	
-						continue;
-					} 
-				}
-			}
-			
-			
-			
-			
-			/*
-			 * If we reached this part, we can prune!
-			 */
-			try {
-				ExecutionResult er = runCommandInRepo("git lfs prune", repo);
-				
-				if (er.getRc() != 0) {
-					logger.error2("Command: \"git lfs prune\" returned an error code! Prune attempt was not successful...");
-					logger.error2("Output of the error stream: " + new String(er.getStderr().toByteArray()));
-					monitor.worked(1);	
-					continue;
-				}
-				
-			} catch (IOException | InterruptedException e) {
-				logger.error2("Failed to run \"git lfs prune\" command in the following project: "+ name);
-				logger.error2("Error message: " + e.getMessage(),e);
-				monitor.worked(1);	
-				continue;
-			} 
-			
-			
-			logger.info("Successfully finished pruning: " + name);
-			monitor.worked(1);	
 		}
 		
 		monitor.done();
