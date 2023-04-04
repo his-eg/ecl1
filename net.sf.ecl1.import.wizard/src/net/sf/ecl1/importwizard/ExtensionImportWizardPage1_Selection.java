@@ -96,7 +96,7 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
         });
 
         
-        Composite tableComposite = new Composite(projectChoice, SWT.BORDER);
+        Composite tableComposite = new Composite(projectChoice, SWT.NONE);
         TableColumnLayout tableColumnLayout = new TableColumnLayout();
         tableComposite.setLayout(tableColumnLayout);
         tableComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true,1,1));
@@ -105,15 +105,16 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
         projectTable.setLinesVisible(true);
         projectTable.setHeaderVisible(true);
         
-//        TableColumn column = new TableColumn(projectTable, SWT.NONE);
-//        tableColumnLayout.setColumnData(column, new ColumnWeightData(10));
+        TableColumn column = new TableColumn(projectTable, SWT.NONE);
+        column.setText("Name");
+        tableColumnLayout.setColumnData(column, new ColumnWeightData(1));
         
-        String[] headers = { "Import?", "Name" };
-        for (String header : headers) {
-            TableColumn c = new TableColumn(projectTable, SWT.NONE);
-            c.setText(header);
-           tableColumnLayout.setColumnData(c, new ColumnWeightData(1));
-        }
+//        String[] headers = { "Import?", "Name" };
+//        for (String header : headers) {
+//            TableColumn c = new TableColumn(projectTable, SWT.NONE);
+//            c.setText(header);
+//           tableColumnLayout.setColumnData(c, new ColumnWeightData(1));
+//        }
 
         Set<String> extensionsInWorkspace = model.getExtensionsInWorkspace();
         for (String remoteExtensionName : model.getRemoteExtensions()) {
@@ -124,7 +125,7 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
             if (!extensionsInWorkspace.contains(remoteExtensionName) && m.matches()) {
                 TableItem tableItem = new TableItem(projectTable, SWT.NONE);
                 tableItem.setChecked(false);
-                tableItem.setText(1, remoteExtensionName);
+                tableItem.setText(0, remoteExtensionName);
             }
         }
 
@@ -154,7 +155,7 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
         TableItem[] items = projectTable.getItems();
         for (TableItem item : items) {
             if (item.getChecked()) {
-                String text = item.getText(1);
+                String text = item.getText(0);
                 selectedExtensions.add(text);
             }
         }
