@@ -2,6 +2,8 @@ package net.sf.ecl1.importwizard;
 
 import java.util.Collection;
 
+import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -61,6 +63,7 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
         container = new Composite(parent, SWT.NONE);
         GridLayout gl = new GridLayout(1, false);
         container.setLayout(gl);
+        container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         
         Label branchInfo = new Label(container, SWT.TOP);
         branchInfo.setText("Branch: " + model.getBranch());
@@ -69,26 +72,31 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
         userSelectedInfo = new Label(container, SWT.TOP);
         userSelectedInfo.setText("Selected extensions:");
         
-        GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-        userSelectedTable = new Table(container, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
+        Composite selectedExtensionsComposite = new Composite(container, SWT.NONE); 
+        TableColumnLayout selectedExtensionsTableColumnLayout = new TableColumnLayout();
+        selectedExtensionsComposite.setLayout(selectedExtensionsTableColumnLayout);
+        selectedExtensionsComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        userSelectedTable = new Table(selectedExtensionsComposite, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
         userSelectedTable.setLinesVisible(true);
         userSelectedTable.setHeaderVisible(true);
-        userSelectedTable.setLayoutData(layoutData);
-        userSelectedTable.setSize(200, 600);
         userSelectedTableColumn = new TableColumn(userSelectedTable, SWT.NONE);
         userSelectedTableColumn.setText("Name");
+        selectedExtensionsTableColumnLayout.setColumnData(userSelectedTableColumn, new ColumnWeightData(10));
 
         // Show required dependent extensions
         dependentInfo = new Label(container, SWT.TOP);
         dependentInfo.setText("Additionally required extensions:");
 
-        dependentTable = new Table(container, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
+        Composite dependentExtensionsComposite = new Composite(container, SWT.NONE); 
+        TableColumnLayout dependentExtensionsTableColumnLayout = new TableColumnLayout();
+        dependentExtensionsComposite.setLayout(dependentExtensionsTableColumnLayout);
+        dependentExtensionsComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        dependentTable = new Table(dependentExtensionsComposite, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
         dependentTable.setLinesVisible(true);
         dependentTable.setHeaderVisible(true);
-        dependentTable.setLayoutData(layoutData);
-        dependentTable.setSize(200, 600);
         dependentTableColumn = new TableColumn(dependentTable, SWT.NONE);
         dependentTableColumn.setText("Name");
+        dependentExtensionsTableColumnLayout.setColumnData(dependentTableColumn, new ColumnWeightData(10));
         
         GridLayout gl2 = new GridLayout(2, false);
         Composite openAfterImportComposite = new Composite(container, SWT.BORDER | SWT.CENTER); // was TOP
@@ -120,7 +128,6 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
         	TableItem tableItem = new TableItem(table, SWT.NONE);
         	tableItem.setText(0, extension); // first column has index 0
         }
-        column.pack();
     }
     
     @Override

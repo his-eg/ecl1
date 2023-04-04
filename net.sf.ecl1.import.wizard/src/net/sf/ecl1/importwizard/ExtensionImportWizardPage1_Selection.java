@@ -5,6 +5,9 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.ColumnWeightData;
+import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -34,11 +37,6 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 	private static final String PAGE_NAME = "page1";
 	private static final String PAGE_DESCRIPTION = "Extension Import - Selection";
 
-	private static final String AUTOCOMMIT_EXTENSION_JAR = "AUTOCOMMIT_EXTENSION_JAR";
-	
-	// top-level container for this page
-	private Composite container;
-
     private Table projectTable;
 	
     // Extension Import Wizard data model
@@ -58,8 +56,8 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
     public void createControl(Composite parent) {
     	//logger.log("create controls for page 1");
         
-        container = new Composite(parent, SWT.NONE);
-        GridLayout gl = new GridLayout(1, false);
+        Composite container = new Composite(parent, SWT.NONE);
+        GridLayout gl = new GridLayout(1, true);
         container.setLayout(gl);
 
         Label branchInfo = new Label(container, SWT.TOP);
@@ -97,16 +95,24 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
             }
         });
 
-        projectTable = new Table(projectChoice, SWT.MULTI | SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
+        
+        Composite tableComposite = new Composite(projectChoice, SWT.BORDER);
+        TableColumnLayout tableColumnLayout = new TableColumnLayout();
+        tableComposite.setLayout(tableColumnLayout);
+        tableComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true,1,1));
+
+        projectTable = new Table(tableComposite, SWT.MULTI | SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
         projectTable.setLinesVisible(true);
         projectTable.setHeaderVisible(true);
-        projectTable.setLayoutData(layoutData);
-        projectTable.setSize(200, 600);
-
+        
+//        TableColumn column = new TableColumn(projectTable, SWT.NONE);
+//        tableColumnLayout.setColumnData(column, new ColumnWeightData(10));
+        
         String[] headers = { "Import?", "Name" };
         for (String header : headers) {
             TableColumn c = new TableColumn(projectTable, SWT.NONE);
             c.setText(header);
+           tableColumnLayout.setColumnData(c, new ColumnWeightData(1));
         }
 
         Set<String> extensionsInWorkspace = model.getExtensionsInWorkspace();
@@ -120,10 +126,6 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
                 tableItem.setChecked(false);
                 tableItem.setText(1, remoteExtensionName);
             }
-        }
-
-        for (int i = 0; i < headers.length; i++) {
-            projectTable.getColumn(i).pack();
         }
 
         setControl(container);
