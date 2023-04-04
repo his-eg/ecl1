@@ -11,16 +11,25 @@ import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 
 import net.sf.ecl1.utilities.general.GitUtil;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
@@ -72,8 +81,34 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
         projectChoice.setLayout(gl);
         projectChoice.setLayoutData(layoutData);
 
-        Label projectChoiceLabel = new Label(projectChoice, SWT.TOP);
-        projectChoiceLabel.setText("Importable Projects");
+        //Filter
+        Group filterGroup = new Group(projectChoice, SWT.SHADOW_ETCHED_IN);
+        filterGroup.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
+        filterGroup.setText("Filter");
+        filterGroup.setLayout(new GridLayout(1, false));
+        
+        Text regexInput = new Text(filterGroup, SWT.NONE);
+        regexInput.setMessage("Example: cm.exa.,cm.app.");
+        GridData regexInputGridData = new GridData(GridData.FILL_HORIZONTAL);
+        regexInput.setLayoutData(regexInputGridData);
+        regexInput.addModifyListener(new ModifyListener() {
+			
+			@Override
+			public void modifyText(ModifyEvent e) {
+				
+				String[] filters = regexInput.getText().strip().split(",");
+				
+				outerLoop: for(TableItem item : projectTable.getItems()) {
+					for(String filter : filters) {
+						if(item.getText().startsWith(filter)) {
+							item.setChecked(true);
+							continue outerLoop;
+						} 
+						item.setChecked(false);
+					}
+				}
+			}
+		});
 
         final Button selectAllButton = new Button(projectChoice, SWT.CHECK);
         selectAllButton.setText("Select all");
@@ -94,12 +129,11 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
                 }
             }
         });
-
         
         Composite tableComposite = new Composite(projectChoice, SWT.NONE);
         TableColumnLayout tableColumnLayout = new TableColumnLayout();
         tableComposite.setLayout(tableColumnLayout);
-        tableComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true,1,1));
+        tableComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         projectTable = new Table(tableComposite, SWT.MULTI | SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
         projectTable.setLinesVisible(true);
@@ -108,13 +142,6 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
         TableColumn column = new TableColumn(projectTable, SWT.NONE);
         column.setText("Name");
         tableColumnLayout.setColumnData(column, new ColumnWeightData(1));
-        
-//        String[] headers = { "Import?", "Name" };
-//        for (String header : headers) {
-//            TableColumn c = new TableColumn(projectTable, SWT.NONE);
-//            c.setText(header);
-//           tableColumnLayout.setColumnData(c, new ColumnWeightData(1));
-//        }
 
         Set<String> extensionsInWorkspace = model.getExtensionsInWorkspace();
         for (String remoteExtensionName : model.getRemoteExtensions()) {
