@@ -75,7 +75,9 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
         Composite selectedExtensionsComposite = new Composite(container, SWT.NONE); 
         TableColumnLayout selectedExtensionsTableColumnLayout = new TableColumnLayout();
         selectedExtensionsComposite.setLayout(selectedExtensionsTableColumnLayout);
-        selectedExtensionsComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        GridData selectedExtensionsGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+        selectedExtensionsGridData.heightHint = parent.getSize().y / 2;
+        selectedExtensionsComposite.setLayoutData(selectedExtensionsGridData);
         userSelectedTable = new Table(selectedExtensionsComposite, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
         userSelectedTable.setLinesVisible(true);
         userSelectedTable.setHeaderVisible(true);
@@ -90,7 +92,9 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
         Composite dependentExtensionsComposite = new Composite(container, SWT.NONE); 
         TableColumnLayout dependentExtensionsTableColumnLayout = new TableColumnLayout();
         dependentExtensionsComposite.setLayout(dependentExtensionsTableColumnLayout);
-        dependentExtensionsComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        GridData dependentExtensionsGridData = new GridData(SWT.FILL, SWT.FILL, true, true);
+        dependentExtensionsGridData.heightHint = parent.getSize().y / 2;
+        dependentExtensionsComposite.setLayoutData(dependentExtensionsGridData);
         dependentTable = new Table(dependentExtensionsComposite, SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
         dependentTable.setLinesVisible(true);
         dependentTable.setHeaderVisible(true);
