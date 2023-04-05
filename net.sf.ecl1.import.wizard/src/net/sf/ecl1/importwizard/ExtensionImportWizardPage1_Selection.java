@@ -88,7 +88,7 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
         filterGroup.setLayout(new GridLayout(1, false));
         
         Text regexInput = new Text(filterGroup, SWT.NONE);
-        regexInput.setMessage("Example: cm.exa.,cm.app.");
+        regexInput.setMessage("Use commas to chain filters. Example: cm.exa.,cm.app.");
         GridData regexInputGridData = new GridData(GridData.FILL_HORIZONTAL);
         regexInput.setLayoutData(regexInputGridData);
         regexInput.addModifyListener(new ModifyListener() {
@@ -96,11 +96,20 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 			@Override
 			public void modifyText(ModifyEvent e) {
 				
-				String[] filters = regexInput.getText().strip().split(",");
+				if (regexInput.getText().isBlank()) {
+					for(TableItem item : projectTable.getItems()) {
+						item.setChecked(false);
+					}
+					return;
+				}
 				
+				String[] filters = regexInput.getText().split(",");
 				outerLoop: for(TableItem item : projectTable.getItems()) {
 					for(String filter : filters) {
-						if(item.getText().startsWith(filter)) {
+						if (filter.isBlank()) {
+							continue;
+						}
+						if(item.getText().startsWith(filter.strip())) {
 							item.setChecked(true);
 							continue outerLoop;
 						} 
