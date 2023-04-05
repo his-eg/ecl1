@@ -131,8 +131,12 @@ public class ExtensionImportWizardModel {
         	
         	ClasspathFile classpathFile = getClasspathFile(extension);
         	
+        	Collection<String> directDependencies = classpathFile.getRegularDependencies();	
+        	if (AngularExtensionDetector.isAngularExtension(extension)) {
+        		directDependencies.add("cs.sys.angularbase");
+        	}
         	// find all required extensions
-        	for (String directDependency : classpathFile.getRegularDependencies()) {
+        	for (String directDependency : directDependencies) {
         		if (processedExtensions.contains(directDependency)) {
         			logger.debug("Extension " + directDependency + " has already been analyzed, skip...");
         		} else if (!selectedExtensions.contains(directDependency) && !allRequiredDependencies.contains(directDependency)) {
