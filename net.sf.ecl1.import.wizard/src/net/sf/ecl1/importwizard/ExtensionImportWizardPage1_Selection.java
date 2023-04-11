@@ -84,11 +84,11 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
         //Filter
         Group filterGroup = new Group(projectChoice, SWT.SHADOW_ETCHED_IN);
         filterGroup.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
-        filterGroup.setText("Filter");
+        filterGroup.setText("Select by expression");
         filterGroup.setLayout(new GridLayout(1, false));
         
         Text regexInput = new Text(filterGroup, SWT.NONE);
-        regexInput.setMessage("Use commas to chain filters. Example: cm.exa.,cm.app.");
+        regexInput.setMessage("Use commas to chain expressions. Example: cm.exa.,cm.app.");
         GridData regexInputGridData = new GridData(GridData.FILL_HORIZONTAL);
         regexInput.setLayoutData(regexInputGridData);
         regexInput.addModifyListener(new ModifyListener() {
