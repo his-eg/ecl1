@@ -96,7 +96,7 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 			@Override
 			public void modifyText(ModifyEvent e) {
 				
-				if (regexInput.getText().isBlank()) {
+				if (regexInput.getText().trim().isEmpty()) {
 					for(TableItem item : projectTable.getItems()) {
 						item.setChecked(false);
 					}
@@ -106,10 +106,10 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 				String[] filters = regexInput.getText().split(",");
 				outerLoop: for(TableItem item : projectTable.getItems()) {
 					for(String filter : filters) {
-						if (filter.isBlank()) {
+						if (filter.trim().isEmpty()) {
 							continue;
 						}
-						if(item.getText().startsWith(filter.strip())) {
+						if(item.getText().startsWith(filter.trim())) {
 							item.setChecked(true);
 							continue outerLoop;
 						} 
