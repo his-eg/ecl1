@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ecl1 Git Auto Lfs Prune
 Bundle-SymbolicName: net.sf.ecl1.git.auto-lfs-prune;singleton:=true
-Bundle-Version: 0.6.0.2021-12-13
+Bundle-Version: 0.7.0.2023-05-16
 Bundle-Activator: net.sf.ecl1.git.auto.lfs.prune.AutoLfsPruneActivator
 Bundle-Vendor: HIS eG
 Require-Bundle: org.eclipse.ui,

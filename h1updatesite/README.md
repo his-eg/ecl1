@@ -3,6 +3,11 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.8.0.2023-05-16##
+* Extension import: New option to select several extensions at once.
+* Extension import: cs.sys.angularbase is recognized as dependency when an angular extension is imported.
+* Minor bugfix: Close git repositories after usage to free up file handles.
+
 ##Version 1.7.0.2022-11-30##
 * New extension wizard: ecl1 now deletes files that eclipse might have created in the new extension project behind our back
 * New extension wizard: ecl1 will try to connect the newly created extension with the correct git-repo at gitlab.his.de
