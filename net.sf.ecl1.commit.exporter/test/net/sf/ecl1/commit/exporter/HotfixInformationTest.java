@@ -29,7 +29,7 @@ public class HotfixInformationTest {
     public void setUp() {
     	Set<String> fileNames = new HashSet<>();
     	fileNames.add("WEB-INF/conf/importdata/gx-hisinone.xml");
-        hotfixInformation = new HotfixInformation("test", "description", "12345,54321", false, fileNames,null);
+        hotfixInformation = new HotfixInformation("test", "description", "12345,54321", false, fileNames, new HashSet<>(), new HashSet<>());
     }
 
     /**

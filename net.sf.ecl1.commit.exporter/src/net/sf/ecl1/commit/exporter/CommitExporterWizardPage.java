@@ -1,10 +1,10 @@
 package net.sf.ecl1.commit.exporter;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -16,7 +16,6 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.errors.RepositoryNotFoundException;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
@@ -62,9 +61,11 @@ public class CommitExporterWizardPage extends WizardPage {
 
     private StringFieldEditor hotfixSnippetTextEditor;
 
-    private Set<String> addedOrModifiedFiles = new TreeSet<String>();
+    private Set<String> addedOrModifiedFilesFromQisserver = new TreeSet<String>();
     
-    private Set<String> deletedFiles = new TreeSet<String>();
+    private Set<String> deletedFilesFromQisserver = new TreeSet<String>();
+    
+    private Set<Map.Entry<String, String>> externalAddedOrModifiedFiles = new TreeSet<>();
 
     private SimplePropertyChangeListener propertyChangeListener;
     
@@ -189,10 +190,11 @@ public class CommitExporterWizardPage extends WizardPage {
         if (validUserInput()) {
 
             diffStorage.computeDiff(commitTable.getCheckedElements(), git);
-        	addedOrModifiedFiles = diffStorage.getAddedOrModifiedFiles();
-        	deletedFiles = diffStorage.getDeletedFiles();
+        	addedOrModifiedFilesFromQisserver = diffStorage.getAddedOrModifiedFilesFromQisserver();
+        	deletedFilesFromQisserver = diffStorage.getDeletedFilesFromQisserver();
+        	externalAddedOrModifiedFiles = diffStorage.getExternalAddedOrModifiedFiles();
 
-            if (validate && addedOrModifiedFiles.isEmpty()) {
+            if (validate && addedOrModifiedFilesFromQisserver.isEmpty()) {
                 setLogError("The selected commits contain no files or all modified files are outside of qisserver!");
                 return;
             }
@@ -201,7 +203,7 @@ public class CommitExporterWizardPage extends WizardPage {
             String description = hotfixDescription.getStringValue();
             String hiszilla = hiszillaTickets.getStringValue();
             boolean isDbUpdateRequired = dbUpdateRequired.getBooleanValue();
-            String hotfixSnippet = new HotfixInformation(title, description, hiszilla, isDbUpdateRequired, addedOrModifiedFiles, deletedFiles).toXml();
+            String hotfixSnippet = new HotfixInformation(title, description, hiszilla, isDbUpdateRequired, addedOrModifiedFilesFromQisserver, deletedFilesFromQisserver, externalAddedOrModifiedFiles).toXml();
             logger.debug("Created hotfix snippet:\n" + hotfixSnippet);
 
             // add content to clipboard

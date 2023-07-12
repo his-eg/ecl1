@@ -2,9 +2,12 @@ package net.sf.ecl1.commit.exporter.git;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -28,37 +31,59 @@ import org.eclipse.jgit.treewalk.TreeWalk;
  */
 public class DiffTool {
 
-    /**
-     * All files that have been added or modified by the user checked commits. 
-     */
+    /** All files that have been added or modified by the selected commits. */
 	private Set<String> addedOrModifiedFiles = new TreeSet<>();
 	
-	/** Deletes files by user checked commits. */
+	
+    /** All files from the qisserver folder that have been added or modified by the selected commits.  */
+	private Set<String> addedOrModifiedFilesFromQisserver = new TreeSet<>();
+	
+	/** Deleted files. Computed from the selected commits. */
 	private Set<String> deletedFiles = new TreeSet<>();
+	
+	/** Deleted files within the qisserver folder. Computed from the selected commits. */
+	private Set<String> deletedFilesFromQisserver = new TreeSet<>();
+	
+	/** 
+	 * Added or deleted files from the folders/files besides the qisserver folder (e.g.: the ROOT folder).
+	 * Computed from the selected commits. 
+	 * 
+	 * Key is the folder
+	 * Value is the file within the folder
+	 */
+	private Set<Map.Entry<String, String>> externalAddedOrModifiedFiles = new HashSet<>();
 	
 	private boolean diffComputed = false;
 	
 	
-	public Set<String> getAddedOrModifiedFiles() {
+	public Set<String> getAddedOrModifiedFilesFromQisserver() {
 		if(diffComputed) {
-			return addedOrModifiedFiles;
+			return addedOrModifiedFilesFromQisserver;
 		} else {
 			return new TreeSet<String>();
 		}
 	}
 
-	public Set<String> getDeletedFiles() {
+	public Set<String> getDeletedFilesFromQisserver() {
 		if(diffComputed) {
-			return deletedFiles;
+			return deletedFilesFromQisserver;
 		} else {
 			return new TreeSet<String>();
+		}
+	}
+	
+	public Set<Map.Entry<String, String>> getExternalAddedOrModifiedFiles() {
+		if (diffComputed) {
+			return externalAddedOrModifiedFiles;
+		} else {
+			return new TreeSet<Map.Entry<String,String>>();
 		}
 	}
 
 	/**
 	 * This method returns all files that have been added or modified by the given RevCommits/StagedChanges.
 	 * 
-     * his method expects within the given Object[]-array either RevCommits or StagedChanges. 
+	 * his method expects within the given Object[]-array either RevCommits or StagedChanges. 
 	 * 
 	 * @param checkedElements must by either RevCommits or StagedChanges
 	 * @param git The git-repo the RevCommits or StagedChanges belong to
@@ -66,10 +91,11 @@ public class DiffTool {
 	public void computeDiff(Object[] checkedElements, Git git) {
 		/*
 		 * Delete previous diff
-		 * 
 	     */
 	    addedOrModifiedFiles = new TreeSet<>();
-	    deletedFiles = new TreeSet<String>();
+	    deletedFiles = new TreeSet<>();
+	    addedOrModifiedFilesFromQisserver = new TreeSet<>();
+	    externalAddedOrModifiedFiles = new HashSet<>();
 	
 	    if (checkedElements.length == 0) {
 	        return;
@@ -103,22 +129,51 @@ public class DiffTool {
 	     */
 	    if (stagedChanges) {
 	        computeStagedChanges(git);
-	    }
-	
-	    
-	
+	    }	    
 	    
 	    /*
-	     * This does two things: 
-	     * 1. Every file that does not start with qisserver is removed from the list. 
-	     * 2. Strip qisserver/ from the start of every remaining file.
+	     * Note: 
+	     * superx is ignored, since it is not in the webapps repo. Since the ecl1 CommitExporter
+	     * only works with the webapps-repo, it will never detect changes from the superx project. 
 	     */
 	    String qisserver = "qisserver/";
-	    addedOrModifiedFiles = addedOrModifiedFiles.stream().filter(s -> s.startsWith(qisserver))
-	    		.map(s -> s.substring(qisserver.length()))
-	    		.collect(Collectors.toCollection(TreeSet::new));
+	    for (String file : addedOrModifiedFiles) {
+	    	/*
+	    	 * Strip qisserver at beginning. This must be done, because
+	    	 * the qisserver-folder might be named differently on the customer's
+	    	 * servers. The class PatchInstallerProcess from webapps knows how
+	    	 * to handle the stripped 'qisserver' part
+	    	 */
+	    	if (file.startsWith(qisserver)) {
+	    		file = file.substring(qisserver.length());
+	    		addedOrModifiedFilesFromQisserver.add(file);
+	    		continue;
+	    	}
+	    	
+	    	// If it is not in qisserver, it is external -> This is handled here
+	    	int startOfSubstring = file.indexOf("/");
+	    	String folder;
+	    	String restOfPath;
+	    	/*
+	    	 * File is located directly besides webapps and _not_ in a folder.
+	    	 * This case is not correctly processed by the PatchInstallerProcess of HISInOne.
+	    	 * We therefore ignore changed files besides webapps. 
+	    	 */
+	    	if (startOfSubstring == -1 ) {
+	    		continue;
+	    	} 
+    		folder = file.substring(0, startOfSubstring);
+    		restOfPath = file.substring(startOfSubstring + 1);	    		
+	    	externalAddedOrModifiedFiles.add(new AbstractMap.SimpleEntry<String, String>(folder, restOfPath));
+	    }
 	    
-	    deletedFiles = deletedFiles.stream().filter(s -> s.startsWith(qisserver))
+	    
+	    /*
+	     * Currently the PatchInstallerProcess from webapps is only able to delete
+	     * files from qisserver. Therefore, we only have to process files that start
+	     * with qisserver.
+	     */
+	    deletedFilesFromQisserver = deletedFiles.stream().filter(s -> s.startsWith(qisserver))
 	    		.map(s -> s.substring(qisserver.length()))
 	    		.collect(Collectors.toCollection(TreeSet::new));
 	    
