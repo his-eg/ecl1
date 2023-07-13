@@ -224,10 +224,6 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
     public IWizardPage getNextPage() {
     	ExtensionImportWizardPage2_Confirmation page2 = ((ExtensionImportWizard) this.getWizard()).page2;
 		page2.onEnterPage();
-		System.out.println("The following extensions have been selected:");
-		for(String e : model.getSelectedExtensions()) {
-			System.out.println(e);
-		}
     	return page2;
     }
 
