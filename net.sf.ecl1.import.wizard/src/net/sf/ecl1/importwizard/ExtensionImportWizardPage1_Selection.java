@@ -1,10 +1,5 @@
 package net.sf.ecl1.importwizard;
 
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -25,6 +20,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
+import net.sf.ecl1.importwizard.ExtensionImportWizardModel.Extension;
 import net.sf.ecl1.utilities.general.GitUtil;
 
 /**
@@ -33,34 +29,6 @@ import net.sf.ecl1.utilities.general.GitUtil;
  * @author keunecke
  */
 public class ExtensionImportWizardPage1_Selection extends WizardPage {
-
-	class Extension implements Comparable<Extension> {
-    	
-    	boolean checked = false;
-    	String name;
-    	
-    	Extension(String name) {
-    		this.name = name;
-    	}
-
-		public boolean isChecked() {
-			return checked;
-		}
-
-		public void setChecked(boolean checked) {
-			this.checked = checked;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		@Override
-		public int compareTo(Extension o) {
-			return name.compareTo(o.getName());
-		}
-    	
-    }
 	
 	//private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
@@ -71,10 +39,6 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 	
     // Extension Import Wizard data model
     private ExtensionImportWizardModel model;
-    
-    private Set<Extension> extensions;
-    
-    
     
     /**
      * Create first ExtensionImportWizardPage, containing the extension selection dialog.
@@ -90,19 +54,6 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
     public void createControl(Composite parent) {
     	//logger.log("create controls for page 1");
         
-        //Populate extensions-collection by communicating with build.his.de
-    	extensions = new TreeSet<>();
-    	Set<String> extensionsInWorkspace = model.getExtensionsInWorkspace();
-        for (String remoteExtensionName : model.getRemoteExtensions()) {
-        	//Extension projects always have at least two dots (.) in their names. We filter out everything that does not have
-        	//two dots in its name...
-        	Pattern p = Pattern.compile(".+\\..+\\..+");
-        	Matcher m = p.matcher(remoteExtensionName);       	
-            if (!extensionsInWorkspace.contains(remoteExtensionName) && m.matches()) {
-            	extensions.add(new Extension(remoteExtensionName));
-            }
-        }
-    	
     	Composite container = new Composite(parent, SWT.NONE);
         GridLayout gl = new GridLayout(1, true);
         container.setLayout(gl);
@@ -139,17 +90,16 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 				
 				//Show all extensions if filter text is empty
 				if(filterExpression.getText().trim().isEmpty()) {
-					for(Extension extension : extensions) {
+					for(Extension extension : model.getSelectableExtensions()) {
 			        	TableItem tableItem = new TableItem(projectTable, SWT.NONE);
 			        	tableItem.setChecked(extension.isChecked());
 			        	tableItem.setText(extension.getName());
 					}
-					
 				}
 				
 				//Determine which extensions to show after filtering
 				String[] filters = filterExpression.getText().split(",");
-				outerLoop: for(Extension extension : extensions) {
+				outerLoop: for(Extension extension : model.getSelectableExtensions()) {
 					for(String filter : filters) {
 						if (filter.trim().isEmpty()) {
 							continue;
@@ -217,7 +167,7 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 			
 			private void handleEvent(SelectionEvent e) {
 				if (e.detail == SWT.CHECK) {
-					for(Extension extension : extensions) {
+					for(Extension extension : model.getSelectableExtensions()) {
 						TableItem tableItem = (TableItem) e.item;
 						if (extension.getName().equals(tableItem.getText())) {
 							extension.setChecked(tableItem.getChecked());
@@ -232,7 +182,7 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
         column.setText("Name");
         tableColumnLayout.setColumnData(column, new ColumnWeightData(1));
 
-        for(Extension e : extensions) {
+        for(Extension e : model.getSelectableExtensions()) {
         	TableItem tableItem = new TableItem(projectTable, SWT.NONE);
         	tableItem.setChecked(false);
         	tableItem.setText(e.getName());
@@ -254,7 +204,7 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
     	outerLoop: for(TableItem tableItem : projectTable.getItems()) {
     		//Update UI
     		tableItem.setChecked(selected);
-    		for(Extension e : extensions) {
+    		for(Extension e : model.getSelectableExtensions()) {
     			if (e.getName().equals(tableItem.getText())) {
     				//Update model
     				e.setChecked(selected);
@@ -272,22 +222,13 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
     // between page transitions is simpler than overriding Wizard.getNextPage(), because we don't need case distinctions.
     @Override
     public IWizardPage getNextPage() {
-    	this.initSelectedExtensions();
     	ExtensionImportWizardPage2_Confirmation page2 = ((ExtensionImportWizard) this.getWizard()).page2;
 		page2.onEnterPage();
+		System.out.println("The following extensions have been selected:");
+		for(String e : model.getSelectedExtensions()) {
+			System.out.println(e);
+		}
     	return page2;
     }
 
-    /**
-     * Get user selected extensions to import from page 1
-     */
-    private void initSelectedExtensions() {
-        Set<String> selectedExtensions = new TreeSet<String>();
-        for (Extension extension : extensions) {
-        	if (extension.isChecked()) {
-        		selectedExtensions.add(extension.getName());
-        	}
-        }
-        model.setSelectedExtensions(selectedExtensions);
-    }
 }

@@ -7,10 +7,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+
 import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.RemoteProjectSearchSupport;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
@@ -24,20 +28,58 @@ public class ExtensionImportWizardModel {
 	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ExtensionImportWizardModel.class.getSimpleName());
 
 	public static final String JENKINS_WEBAPPS_NAME = "/webapps";
+	
+	class Extension implements Comparable<Extension> {
+	    	
+    	boolean checked = false;
+    	String name;
+    	
+    	Extension(String name) {
+    		this.name = name;
+    	}
+
+		public boolean isChecked() {
+			return checked;
+		}
+
+		public void setChecked(boolean checked) {
+			this.checked = checked;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public int compareTo(Extension o) {
+			return name.compareTo(o.getName());
+		}
+    	
+    }
 
     private RemoteProjectSearchSupport remoteProjectSearchSupport;
     
     // actual branch
     private String branch;
     
-    // All extensions existing on repo server
+    /**
+     * All extensions existing on repo server. 
+     * 
+     * Extensions are defined as having two dots in their name. 
+     * All other projects on the repo server are filtered out. 
+     */
     private Set<String> remoteExtensions;
 
-    // All extensions existing in workspace
+    /**
+     * All extensions existing in workspace
+     */
     private Set<String> extensionsInWorkspace;
 
-    // Extensions chosen by the user for installation
-    private Set<String> selectedExtensions;
+    /**
+     * Selectable extensions are extensions that are present on the 
+     * remote server and are _not_ in the local workspace. 
+     */
+    private Set<Extension> selectableExtensions;
     
     /**
      * Key --> Name of the extension.
@@ -53,6 +95,7 @@ public class ExtensionImportWizardModel {
     	remoteProjectSearchSupport = new RemoteProjectSearchSupport();
     	initRemoteExtensions();
         initExtensionsInWorkspace();
+        initSelectableExtensions();
         classpathFiles = new HashMap<String, ClasspathFile>();
     }
 
@@ -60,6 +103,25 @@ public class ExtensionImportWizardModel {
     	return branch;
     }
 
+    
+
+    private void initSelectableExtensions() {
+    	selectableExtensions = new TreeSet<>();
+    	for(String remoteExtension : remoteExtensions) {
+    		if (!extensionsInWorkspace.contains(remoteExtension)) {
+    			selectableExtensions.add(new Extension(remoteExtension));
+    		}
+    	}
+    }
+    
+    /**
+     * Returns all extensions that can be selected by the user. 
+     */
+    Set<Extension> getSelectableExtensions() {
+    	return selectableExtensions;
+    }
+    
+    
     /**
      * Read remote extensions from configured build server.
      */
@@ -69,18 +131,13 @@ public class ExtensionImportWizardModel {
         String branch = getBranch();
         for (String remoteProjectIncludingBranch : remoteProjectsIncludingBranch) {
             String remoteProject = remoteProjectIncludingBranch.replace("_" + branch, "");
-            if (remoteProject!=null && !remoteProject.trim().isEmpty()) {
+        	Pattern p = Pattern.compile(".+\\..+\\..+");
+        	Matcher m = p.matcher(remoteProject);  
+            if (remoteProject != null && !remoteProject.trim().isEmpty() && m.matches()) {
             	//logger.debug("Found remote project '" + remoteProjectIncludingBranch + "' , store it as '" + remoteProject + "'");
             	remoteExtensions.add(remoteProject);
             }
         }
-    }
-
-    /**
-     * @return collection of remote extensions, initialized by wizard page 1
-     */
-    Collection<String> getRemoteExtensions() {
-    	return remoteExtensions;
     }
     
     /**
@@ -99,16 +156,14 @@ public class ExtensionImportWizardModel {
             extensionsInWorkspace.add(name);
         }
     }
-
-	Set<String> getExtensionsInWorkspace() {
-		return extensionsInWorkspace;
-	}
-	
-	void setSelectedExtensions(Set<String> selectedExtensions) {
-		this.selectedExtensions = selectedExtensions;
-	}
 	
 	Set<String> getSelectedExtensions() {
+		Set<String> selectedExtensions = new TreeSet<>();
+		for (Extension e : selectableExtensions) {
+			if (e.isChecked()) {
+				selectedExtensions.add(e.getName());
+			}
+		}
 		return selectedExtensions;
 	}
     
@@ -119,11 +174,11 @@ public class ExtensionImportWizardModel {
 	 */
     void findDependenciesOfSelectedExtensions() {
     	logger.debug("remoteExtensions = " + remoteExtensions);
-    	logger.debug("selectedExtensions = " + selectedExtensions);
+    	logger.debug("selectedExtensions = " + getSelectedExtensions());
         
     	allRequiredDependencies = new ArrayList<String>(); // the result of this method
     	Set<String> processedExtensions = new HashSet<String>(); // required to avoid infinite loops when cyclic extension dependencies exist
-        Set<String> unprocessedExtensions = new TreeSet<String>(selectedExtensions); // copy to keep selectedExtensions unmodified
+        Set<String> unprocessedExtensions = new TreeSet<String>(getSelectedExtensions()); // copy to keep selectedExtensions unmodified
         while (!unprocessedExtensions.isEmpty()) {
         	// get one unprocessed extension
         	String extension = unprocessedExtensions.iterator().next();
@@ -139,7 +194,7 @@ public class ExtensionImportWizardModel {
         	for (String directDependency : directDependencies) {
         		if (processedExtensions.contains(directDependency)) {
         			logger.debug("Extension " + directDependency + " has already been analyzed, skip...");
-        		} else if (!selectedExtensions.contains(directDependency) && !allRequiredDependencies.contains(directDependency)) {
+        		} else if (!getSelectedExtensions().contains(directDependency) && !allRequiredDependencies.contains(directDependency)) {
         			// the required extension has not been selected and not been registered before
         			if (!extensionsInWorkspace.contains(directDependency)) {
         				// the required extension does not exist yet, so it must be imported
@@ -149,9 +204,6 @@ public class ExtensionImportWizardModel {
         			unprocessedExtensions.add(directDependency);
         		}
         	}
-        	
-        	
-        	
         	
         	/*
         	 * TODO: 
