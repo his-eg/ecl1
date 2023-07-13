@@ -7,32 +7,25 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 import net.sf.ecl1.utilities.general.GitUtil;
-import net.sf.ecl1.utilities.hisinone.HisConstants;
 
 /**
  * Extension import configuration wizard page.
@@ -41,7 +34,35 @@ import net.sf.ecl1.utilities.hisinone.HisConstants;
  */
 public class ExtensionImportWizardPage1_Selection extends WizardPage {
 
-    //private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
+	class Extension implements Comparable<Extension> {
+    	
+    	boolean checked = false;
+    	String name;
+    	
+    	Extension(String name) {
+    		this.name = name;
+    	}
+
+		public boolean isChecked() {
+			return checked;
+		}
+
+		public void setChecked(boolean checked) {
+			this.checked = checked;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		@Override
+		public int compareTo(Extension o) {
+			return name.compareTo(o.getName());
+		}
+    	
+    }
+	
+	//private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
 
 	private static final String PAGE_NAME = "page1";
 	private static final String PAGE_DESCRIPTION = "Extension Import - Selection";
@@ -50,6 +71,10 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 	
     // Extension Import Wizard data model
     private ExtensionImportWizardModel model;
+    
+    private Set<Extension> extensions;
+    
+    
     
     /**
      * Create first ExtensionImportWizardPage, containing the extension selection dialog.
@@ -65,7 +90,20 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
     public void createControl(Composite parent) {
     	//logger.log("create controls for page 1");
         
-        Composite container = new Composite(parent, SWT.NONE);
+        //Populate extensions-collection by communicating with build.his.de
+    	extensions = new TreeSet<>();
+    	Set<String> extensionsInWorkspace = model.getExtensionsInWorkspace();
+        for (String remoteExtensionName : model.getRemoteExtensions()) {
+        	//Extension projects always have at least two dots (.) in their names. We filter out everything that does not have
+        	//two dots in its name...
+        	Pattern p = Pattern.compile(".+\\..+\\..+");
+        	Matcher m = p.matcher(remoteExtensionName);       	
+            if (!extensionsInWorkspace.contains(remoteExtensionName) && m.matches()) {
+            	extensions.add(new Extension(remoteExtensionName));
+            }
+        }
+    	
+    	Composite container = new Composite(parent, SWT.NONE);
         GridLayout gl = new GridLayout(1, true);
         container.setLayout(gl);
 
@@ -78,64 +116,81 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 
         GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
         Composite projectChoice = new Composite(container, SWT.BORDER | SWT.TOP);
-        projectChoice.setLayout(gl);
+        projectChoice.setLayout(new GridLayout(1, false));
         projectChoice.setLayoutData(layoutData);
 
         //Filter
         Group filterGroup = new Group(projectChoice, SWT.SHADOW_ETCHED_IN);
         filterGroup.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
-        filterGroup.setText("Select by expression");
-        filterGroup.setLayout(new GridLayout(1, false));
+        filterGroup.setText("Filter by expression");
+        filterGroup.setLayout(new GridLayout(2, false));
         
-        Text regexInput = new Text(filterGroup, SWT.NONE);
-        regexInput.setMessage("Use commas to chain expressions. Example: cm.exa.,cm.app.");
-        GridData regexInputGridData = new GridData(GridData.FILL_HORIZONTAL);
-        regexInput.setLayoutData(regexInputGridData);
-        regexInput.addModifyListener(new ModifyListener() {
+        Text filterExpression = new Text(filterGroup, SWT.NONE);
+        filterExpression.setMessage("Use commas to chain expressions. Example: cm.exa.,cm.app.");
+        GridData filterExpressionGridData = new GridData(GridData.FILL_HORIZONTAL);
+        filterExpressionGridData.horizontalSpan = 2;
+        filterExpression.setLayoutData(filterExpressionGridData);
+        filterExpression.addModifyListener(new ModifyListener() {
 			
 			@Override
 			public void modifyText(ModifyEvent e) {
 				
-				if (regexInput.getText().trim().isEmpty()) {
-					for(TableItem item : projectTable.getItems()) {
-						item.setChecked(false);
+				projectTable.removeAll();
+				
+				//Show all extensions if filter text is empty
+				if(filterExpression.getText().trim().isEmpty()) {
+					for(Extension extension : extensions) {
+			        	TableItem tableItem = new TableItem(projectTable, SWT.NONE);
+			        	tableItem.setChecked(extension.isChecked());
+			        	tableItem.setText(extension.getName());
 					}
-					return;
+					
 				}
 				
-				String[] filters = regexInput.getText().split(",");
-				outerLoop: for(TableItem item : projectTable.getItems()) {
+				//Determine which extensions to show after filtering
+				String[] filters = filterExpression.getText().split(",");
+				outerLoop: for(Extension extension : extensions) {
 					for(String filter : filters) {
 						if (filter.trim().isEmpty()) {
 							continue;
 						}
-						if(item.getText().startsWith(filter.trim())) {
-							item.setChecked(true);
+						if (extension.getName().startsWith(filter.trim())) {
+				        	TableItem tableItem = new TableItem(projectTable, SWT.NONE);
+				        	tableItem.setChecked(extension.isChecked());
+				        	tableItem.setText(extension.getName());
 							continue outerLoop;
-						} 
-						item.setChecked(false);
+						}
 					}
 				}
 			}
 		});
 
-        final Button selectAllButton = new Button(projectChoice, SWT.CHECK);
-        selectAllButton.setText("Select all");
+        final Button selectAllButton = new Button(filterGroup, SWT.PUSH);
+        selectAllButton.setText("&Select all");
         selectAllButton.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                handleSelect(selectAllButton.getSelection());
+                handleSelect(true);
             }
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-                handleSelect(selectAllButton.getSelection());
+                handleSelect(true);
+            }
+            
+        });
+        
+        final Button deselectAllButton = new Button(filterGroup, SWT.PUSH);
+        deselectAllButton.setText("&Deselect all");
+        deselectAllButton.addSelectionListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                handleSelect(false);
             }
 
-            private void handleSelect(boolean selection) {
-                for (TableItem item : projectTable.getItems()) {
-                    item.setChecked(selection);
-                }
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                handleSelect(false);
             }
         });
         
@@ -147,26 +202,66 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
         projectTable = new Table(tableComposite, SWT.MULTI | SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
         projectTable.setLinesVisible(true);
         projectTable.setHeaderVisible(true);
+        //Update model when TableItem get checked/unchecked
+        projectTable.addSelectionListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				handleEvent(e);
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent e) {
+				handleEvent(e);
+			}
+			
+			private void handleEvent(SelectionEvent e) {
+				if (e.detail == SWT.CHECK) {
+					for(Extension extension : extensions) {
+						TableItem tableItem = (TableItem) e.item;
+						if (extension.getName().equals(tableItem.getText())) {
+							extension.setChecked(tableItem.getChecked());
+						}
+					}
+				}
+			}
+			
+		});
         
         TableColumn column = new TableColumn(projectTable, SWT.NONE);
         column.setText("Name");
         tableColumnLayout.setColumnData(column, new ColumnWeightData(1));
 
-        Set<String> extensionsInWorkspace = model.getExtensionsInWorkspace();
-        for (String remoteExtensionName : model.getRemoteExtensions()) {
-        	//Extension projects always have at least two dots (.) in their names. We filter out everything that does not have
-        	//two dots in its name...
-        	Pattern p = Pattern.compile(".+\\..+\\..+");
-        	Matcher m = p.matcher(remoteExtensionName);       	
-            if (!extensionsInWorkspace.contains(remoteExtensionName) && m.matches()) {
-                TableItem tableItem = new TableItem(projectTable, SWT.NONE);
-                tableItem.setChecked(false);
-                tableItem.setText(0, remoteExtensionName);
-            }
+        for(Extension e : extensions) {
+        	TableItem tableItem = new TableItem(projectTable, SWT.NONE);
+        	tableItem.setChecked(false);
+        	tableItem.setText(e.getName());
         }
 
         setControl(container);
         setPageComplete(true); // enable "next"-button
+    }
+    
+    /**
+     * 
+     * Called from the "Select all" and "Deselect all" button. 
+     * Either select or deselect all currently displayed extensions in 
+     * the table. 
+     * 
+     * @param selected
+     */
+    private void handleSelect(boolean selected) {
+    	outerLoop: for(TableItem tableItem : projectTable.getItems()) {
+    		//Update UI
+    		tableItem.setChecked(selected);
+    		for(Extension e : extensions) {
+    			if (e.getName().equals(tableItem.getText())) {
+    				//Update model
+    				e.setChecked(selected);
+    				continue outerLoop;
+    			}
+    		}
+    	}
     }
     
     /**
@@ -188,12 +283,10 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
      */
     private void initSelectedExtensions() {
         Set<String> selectedExtensions = new TreeSet<String>();
-        TableItem[] items = projectTable.getItems();
-        for (TableItem item : items) {
-            if (item.getChecked()) {
-                String text = item.getText(0);
-                selectedExtensions.add(text);
-            }
+        for (Extension extension : extensions) {
+        	if (extension.isChecked()) {
+        		selectedExtensions.add(extension.getName());
+        	}
         }
         model.setSelectedExtensions(selectedExtensions);
     }
