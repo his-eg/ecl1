@@ -73,15 +73,7 @@ public class P2Util {
 		Set<IInstallableUnit> unitsForUpdate = result.toUnmodifiableSet();
 		logger.debug("Installable Units for update: " + unitsForUpdate);
 		
-		UpdateOperation operation;
-		if(!unitsForUpdate.isEmpty()) {
-			logger.info("Creating UpdateOperation for: " + unitsForUpdate);
-			operation = new UpdateOperation(session, unitsForUpdate);
-		} else {
-			// XXX can this case happen at all ?
-			logger.debug("Creating UpdateOperation for everything");
-			operation = new UpdateOperation(session);
-		}
+		UpdateOperation operation = new UpdateOperation(session, unitsForUpdate);
 		
 		// Check if updates for ecl1 are available
 		SubMonitor sub = SubMonitor.convert(monitor, "Checking for application updates...", 200);
@@ -100,7 +92,7 @@ public class P2Util {
 			// patches vs. updates, etc. In this example, we simply update as
 			// suggested by the operation.
 			
-			Update ecl1Update = findEcl1Update(possibleUpdates); // XXX only required if the update operation is not restricted to ecl1 ?
+			Update ecl1Update = findEcl1Update(possibleUpdates);
 			if(ecl1Update != null) {
 				operation.setSelectedUpdates(new Update[]{ecl1Update});
 				ProvisioningJob job = operation.getProvisioningJob(monitor);
@@ -128,6 +120,24 @@ public class P2Util {
 		return status;
 	}
 
+	/**
+	 * This method is very likely superfluous.
+	 * <br><br>
+	 * Why? 
+	 * <br>
+	 * The way the ecl1 repo is set up, only the latest version of ecl1 is available for download.
+	 * Thus, when {@link UpdateOperation#getPossibleUpdates()} is called, it will only return one 
+	 * match (but wrapped in a collection). This method extracts the only possible match from 
+	 * the collection. So instead we could have just used: 
+	 * <br>
+	 * return possibleUpdates[0];
+	 * 
+	 * Anyway, we keep this method unchanged here, because if something about the ecl1 repo
+	 * changes, this method will maybe make sense here. 
+	 * 
+	 * @param possibleUpdates
+	 * @return
+	 */
 	private static Update findEcl1Update(Update[] possibleUpdates) {
 		if (possibleUpdates != null && possibleUpdates.length>0) {
 			for (Update update : possibleUpdates) {
