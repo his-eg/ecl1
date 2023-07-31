@@ -3,6 +3,11 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.9.0.2023-07-31##
+* CommitExporter: Files in folders besides "qisserver" are now processed as well.
+* Import-Wizard: TextInput now filters instead of selecting. Also added a "Deselect all" button.
+* The commit-msg hook now makes sure that the Hiszilla ticket number can be found by mySQL search indices.
+
 ##Version 1.8.0.2023-05-16##
 * Extension import: New option to select several extensions at once.
 * Extension import: cs.sys.angularbase is recognized as dependency when an angular extension is imported.
