@@ -75,21 +75,39 @@ public class GitBatchPullHandler extends AbstractHandler {
 					}
 
 					try (Git git = Git.open(projectLocationFile)){
-						logger.info("Getting remotes of " + name);
+						//Check preconditions
+						//Check if master branch is checked out locally
+						if (!git.getRepository().getBranch().equals("master")) {
+							status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": Master branch is not locally checked out. Please checkout master branch for this repo for git batch pull to succeed. Skipping and proceeding.");
+							multiStatus.add(status);
+							monitor.worked(1);
+							continue;
+						}
+						//Check if remote "origin" is locally known
 						Set<String> remotes = git.getRepository().getRemoteNames();
-						if(remotes != null && !remotes.isEmpty()) {
-							for (String remote : remotes) {
-								try {
-									PullCommand pull = git.pull();
-									pull.setRemote(remote);
-									logger.info(name + " has remotes. Starting to pull remote '" + remote + "'.");
-									PullResult pullResult = pull.call();
-									parsePullResult(name, pullResult, multiStatus);
-								} catch (GitAPIException | JGitInternalException e) {
-									status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": " + e.getMessage() + ". Skipping and proceeding.");
-									multiStatus.add(status);
-								}
+						boolean foundOrigin = false;
+						for(String remote : remotes ) {
+							if (remote.equals("origin")) {
+								foundOrigin = true;
 							}
+						}
+						if(!foundOrigin) {
+							status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": No remote \"origin\" locally known. Skipping and proceeding.");
+							multiStatus.add(status);
+							monitor.worked(1);
+							continue;
+						}
+
+						try {
+							PullCommand pull = git.pull();
+							pull.setRemote("origin");
+							pull.setRemoteBranchName("master");
+							logger.info("Pulling branch \"master\" of project " + name + " from the remote \"origin\"");
+							PullResult pullResult = pull.call();
+							parsePullResult(name, pullResult, multiStatus);
+						} catch (GitAPIException | JGitInternalException e) {
+							status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": " + e.getMessage() + ". Skipping and proceeding.");
+							multiStatus.add(status);
 						}
 					} catch (org.eclipse.jgit.errors.RepositoryNotFoundException rnfe) {
 						// ignore
