@@ -3,6 +3,9 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.9.1.2023-10-08##
+* Batch Git Pull: Extensions not in master branch are omitted.
+
 ##Version 1.9.0.2023-07-31##
 * CommitExporter: Files in folders besides "qisserver" are now processed as well.
 * Import-Wizard: TextInput now filters instead of selecting. Also added a "Deselect all" button.
