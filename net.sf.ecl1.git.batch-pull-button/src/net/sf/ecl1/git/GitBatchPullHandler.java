@@ -65,7 +65,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 					String name = p.getName();
 					monitor.subTask("Pulling " + name);
 					File projectLocationFile = p.getLocation().append(".git").toFile();
-					logger.info(name + " with location " + projectLocationFile.getAbsolutePath());
+					logger.info("Processing " + name + " with location " + projectLocationFile.getAbsolutePath());
 					
 					if(projectLocationFile.isFile()) {
 						status = new Status(IStatus.INFO, Activator.PLUGIN_ID, name + " is managed by git, but you are currently in a linked work tree. Git Batch Pull will not work in a linked work tree. Skipping...");
@@ -75,34 +75,8 @@ public class GitBatchPullHandler extends AbstractHandler {
 					}
 
 					try (Git git = Git.open(projectLocationFile)){
-						//Check preconditions
-						//Check if master branch is checked out locally
-						if (!git.getRepository().getBranch().equals("master")) {
-							status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": Master branch is not locally checked out. Please checkout master branch for this repo for git batch pull to succeed. Skipping and proceeding.");
-							multiStatus.add(status);
-							monitor.worked(1);
-							continue;
-						}
-						//Check if remote "origin" is locally known
-						Set<String> remotes = git.getRepository().getRemoteNames();
-						boolean foundOrigin = false;
-						for(String remote : remotes ) {
-							if (remote.equals("origin")) {
-								foundOrigin = true;
-							}
-						}
-						if(!foundOrigin) {
-							status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": No remote \"origin\" locally known. Skipping and proceeding.");
-							multiStatus.add(status);
-							monitor.worked(1);
-							continue;
-						}
-
 						try {
 							PullCommand pull = git.pull();
-							pull.setRemote("origin");
-							pull.setRemoteBranchName("master");
-							logger.info("Pulling branch \"master\" of project " + name + " from the remote \"origin\"");
 							PullResult pullResult = pull.call();
 							parsePullResult(name, pullResult, multiStatus);
 						} catch (GitAPIException | JGitInternalException e) {
