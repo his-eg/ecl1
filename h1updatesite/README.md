@@ -3,6 +3,9 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.9.2.2023-11-07##
+* Bugfix: Batch Git Pull Button is again able to pull other branches than "master"
+
 ##Version 1.9.1.2023-10-08##
 * Batch Git Pull: Extensions not in master branch are omitted.
 
