@@ -17,14 +17,6 @@
             name="HISinOne Extension Project"
             project="true">
       </wizard>
-      <wizard
-            category="de.his.cs.sys.extensions"
-            class="de.his.cs.sys.extensions.wizards.NewEnrollCheckerWizard"
-            icon="META-INF/resource/door_in.gif"
-            id="de.his.cs.sys.extensions.wizards.NewEnrollCheckerWizard"
-            name="EnrollChecker"
-            project="false">
-      </wizard>
    </extension>
 
 </plugin>
