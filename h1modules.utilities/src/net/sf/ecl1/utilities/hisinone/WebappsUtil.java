@@ -32,7 +32,7 @@ public class WebappsUtil {
         for (IProject project : projects) {
         	// the extension folder distinguishes hisinone and qis projects
             IFolder extensionsFolder = project.getFolder(HisConstants.EXTENSIONS_FOLDER);           
-            if (extensionsFolder.getLocation().toFile().exists()) {
+            if (extensionsFolder != null && extensionsFolder.exists()) {
             	// We found a hisinone project.
             	webappsCandidates.add(project);
             	String projectName = project.getName();
