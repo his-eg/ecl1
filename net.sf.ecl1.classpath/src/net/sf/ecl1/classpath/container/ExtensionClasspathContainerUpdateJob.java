@@ -17,6 +17,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.GlobalBuildAction;
 import net.sf.ecl1.classpath.Activator;
 import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.hisinone.HisConstants;
 
 /** Updates the ecl1 classpath container */
 public class ExtensionClasspathContainerUpdateJob extends Job {
@@ -64,13 +65,13 @@ public class ExtensionClasspathContainerUpdateJob extends Job {
 				/*
 				 * Update all projects with an ecl1 classpath container
 				 */
-				ClasspathContainerInitializer initializer = JavaCore.getClasspathContainerInitializer(ExtensionClasspathContainerPage.NET_SF_ECL1_ECL1_CONTAINER_ID);
+				ClasspathContainerInitializer initializer = JavaCore.getClasspathContainerInitializer(HisConstants.NET_SF_ECL1_ECL1_CONTAINER_ID);
 				projectLoop: for(IProject project : projectsWithContainer.getProjects()) {
 					IJavaProject javaProject = JavaCore.create(project);
 					for(IClasspathEntry classpathEntry : javaProject.getRawClasspath()) {
 						
 						if (classpathEntry.getEntryKind() == IClasspathEntry.CPE_CONTAINER && 
-								classpathEntry.getPath().segment(0).equals(ExtensionClasspathContainerPage.NET_SF_ECL1_ECL1_CONTAINER_ID )) {
+								classpathEntry.getPath().segment(0).equals(HisConstants.NET_SF_ECL1_ECL1_CONTAINER_ID )) {
 							initializer.initialize(classpathEntry.getPath(), javaProject);
 							logger.debug("The ecl1 classpath container of the following project was updated");
 							//We are done with this project. Process the next one

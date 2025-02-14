@@ -12,4 +12,9 @@ public interface HisConstants {
      */
     public static final String EXTENSIONS_FOLDER = "qisserver/WEB-INF/extensions/";
 
+	/**
+	 * ClasspathContainer ID
+	 */
+    public static final String NET_SF_ECL1_ECL1_CONTAINER_ID = "net.sf.ecl1.ECL1_CONTAINER";
+
 }
