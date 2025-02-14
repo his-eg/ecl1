@@ -1,5 +1,6 @@
 package net.sf.ecl1.utilities;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -48,5 +49,19 @@ public class Activator extends AbstractUIPlugin {
     
     public static IPreferenceStore getPreferences() {
         return Activator.getDefault().getPreferenceStore();
+    }
+
+    /**
+     * Check if application is running inside Eclipse
+     * @return true if running in Eclipse
+     */
+    public static boolean isRunningInEclipse() {
+        try {
+            // If workspace is accessible, it's running inside Eclipse
+            ResourcesPlugin.getWorkspace();
+            return true;
+        } catch (IllegalStateException e) {
+            return false;
+        }
     }
 }
