@@ -1,22 +1,28 @@
 package net.sf.ecl1.utilities.preferences;
 
-import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.general.GitUtil;
-import net.sf.ecl1.utilities.general.NetUtil;
-
+import java.io.File;
 import java.util.Collection;
 
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.PreferenceStore;
+import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+
+import net.sf.ecl1.utilities.Activator;
+import net.sf.ecl1.utilities.general.GitUtil;
+import net.sf.ecl1.utilities.general.NetUtil;
+import net.sf.ecl1.utilities.preferences.standalone.StandalonePreferenceStore;
 
 /**
  * HISinOne-Extension-Tools preferences page
@@ -29,29 +35,71 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
     private StringFieldEditor templateRootUrls;
     private BooleanFieldEditor automaticBranchDetection;
     private BooleanFieldEditor displaySummaryOfGitPull;
+    // standalone
+    private RadioGroupFieldEditor selectedStore;
+    private boolean isStandaloneStore = false;
 
     public HISinOneExtensionsPreferencePage() {
         super(GRID);
         setPreferenceStore(Activator.getPreferences());
         setDescription("Preferences for HISinOne-Extension-Tools");
     }
+
+    public HISinOneExtensionsPreferencePage(PreferenceStore store) {
+        super(GRID);
+        setPreferenceStore(store);
+        isStandaloneStore = true;
+        setTitle("HISinOne-Extensions Preferences");
+        setDescription("Preferences for HISinOne-Extension-Tools");
+    }
     
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-    	
-    	//Enable/disable manual setting of branch
-    	if(event.getSource().equals(automaticBranchDetection)) {
-    		boolean newValue = ((Boolean) event.getNewValue()).booleanValue();
-    		buildServerView.setEnabled(!newValue, getFieldEditorParent());
-    		
-    		//Update branch immediately if automatic detection is set to true by user
-    		if(newValue) {
-    			getPreferenceStore().setValue(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, GitUtil.getCheckedOutBranchOfWebapps());
-    			buildServerView.load();
-    		}
-    	}
-    	
-    	super.propertyChange(event);
+        //Enable/disable manual setting of branch
+        if(event.getSource().equals(automaticBranchDetection)) {
+            boolean newValue = ((Boolean) event.getNewValue()).booleanValue();
+            buildServerView.setEnabled(!newValue, getFieldEditorParent());
+            
+            //Update branch immediately if automatic detection is set to true by user
+            if(newValue) {
+                if(isStandaloneStore){
+                    //TODO fix this after GitUtil can handle standalone
+                    getPreferenceStore().setValue(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, "Unknown_branch fix standalone");
+                }else{
+                    getPreferenceStore().setValue(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, GitUtil.getCheckedOutBranchOfWebapps());
+                }
+                buildServerView.load();
+            }
+        // standalone - switch store
+        }else if(event.getSource().equals(selectedStore)){
+            switchSelectedStore();
+        }
+        super.propertyChange(event);
+    }
+
+    private void switchSelectedStore(){
+        String newSelectedStore = selectedStore.getSelectionValue();
+        if (!newSelectedStore.equals(getPreferenceStore().getString(PreferenceWrapper.SELECTED_STORE))) {
+            // check if eclipse store file exists before changing store
+            if(newSelectedStore.equals(PreferenceWrapper.SELECT_ECLIPSE) && !new File(PreferenceWrapper.ECLIPSE_STORE_PATH).exists()){
+                MessageDialog.openConfirm(getShell(), "No eclipse store file found!",
+                "No eclipse store file found! \n\nUnable to change store path to: "+ PreferenceWrapper.ECLIPSE_STORE_PATH);
+                // reset selection
+                selectedStore.load();
+            // switch store
+            }else{
+                boolean confirmed = MessageDialog.openConfirm(getShell(), "Confirm Store Change",
+                "To change the preference store, the menu will need to be manually restarted. Do you want to continue?");
+
+                if (confirmed) {
+                    StandalonePreferenceStore.switchStore(newSelectedStore);
+                    getShell().dispose();
+                }else{
+                    // reset selection
+                    selectedStore.load();
+                }
+            }
+        }
     }
 
     /**
@@ -76,12 +124,30 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
         addField(templateRootUrls);
         addField(displaySummaryOfGitPull);
         // Loglevel Combobox
-		final String[][] logLevels = new String[4][2];
-		logLevels[0][0] = logLevels[0][1] = "DEBUG";
-		logLevels[1][0] = logLevels[1][1] = "INFO";
-		logLevels[2][0] = logLevels[2][1] = "WARN";
-		logLevels[3][0] = logLevels[3][1] = "ERROR";
-		addField(new ComboFieldEditor(PreferenceWrapper.LOG_LEVEL_PREFERENCE_KEY, "Log-Level", logLevels, getFieldEditorParent()));
+        final String[][] logLevels = new String[4][2];
+        logLevels[0][0] = logLevels[0][1] = "DEBUG";
+        logLevels[1][0] = logLevels[1][1] = "INFO";
+        logLevels[2][0] = logLevels[2][1] = "WARN";
+        logLevels[3][0] = logLevels[3][1] = "ERROR";
+        addField(new ComboFieldEditor(PreferenceWrapper.LOG_LEVEL_PREFERENCE_KEY, "Log-Level", logLevels, getFieldEditorParent()));
+
+        // standalone
+        if(!Activator.isRunningInEclipse()){
+            selectedStore = new RadioGroupFieldEditor(PreferenceWrapper.SELECTED_STORE, "Select path to load the preference store:", 
+                2, new String[][] { {"Eclipse", PreferenceWrapper.SELECT_ECLIPSE}, {"Standalone", PreferenceWrapper.SELECT_STANDALONE} }, 
+                getFieldEditorParent(), true);
+            addField(selectedStore);
+
+            Label storePathLabel = new Label(getFieldEditorParent(), SWT.NONE);
+            storePathLabel.setText("Store path: ");
+
+            Label storePathText = new Label(getFieldEditorParent(), SWT.NONE);
+            if(getPreferenceStore().getString(PreferenceWrapper.SELECTED_STORE).equals(PreferenceWrapper.SELECT_ECLIPSE)){
+                storePathText.setText(PreferenceWrapper.ECLIPSE_STORE_PATH);
+            }else{
+                storePathText.setText(PreferenceWrapper.STANDALONE_STORE_PATH);
+            }
+        }
     }
 
     /* (non-Javadoc)
