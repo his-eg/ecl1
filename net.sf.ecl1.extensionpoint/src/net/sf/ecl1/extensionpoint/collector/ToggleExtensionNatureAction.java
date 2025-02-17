@@ -13,7 +13,7 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 
 import net.sf.ecl1.extensionpoint.ExtensionPointBuilderPlugin;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 /**
  * Action to add/remove the extension nature from a project

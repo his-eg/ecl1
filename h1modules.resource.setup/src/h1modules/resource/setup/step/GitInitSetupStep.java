@@ -15,8 +15,8 @@ import org.eclipse.jgit.transport.URIish;
 
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
 import h1modules.resource.setup.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.InitialProjectConfigurationChoices;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 /**
  * Initialize a git repository in the project root

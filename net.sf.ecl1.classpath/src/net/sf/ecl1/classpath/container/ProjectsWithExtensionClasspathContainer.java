@@ -9,7 +9,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jdt.core.IJavaProject;
 
 import net.sf.ecl1.classpath.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 /**
  * 

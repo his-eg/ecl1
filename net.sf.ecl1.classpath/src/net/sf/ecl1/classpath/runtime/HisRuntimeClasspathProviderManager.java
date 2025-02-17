@@ -11,7 +11,7 @@ import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.ui.IStartup;
 
 import net.sf.ecl1.classpath.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 /**
  * This class registers HisRuntimeClasspathProvider as the classpath provider for JUnit launch configurations.

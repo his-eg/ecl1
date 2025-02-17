@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
 import net.sf.ecl1.utilities.Activator;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 /**
  * A utility for Eclipse projects and Java projects.

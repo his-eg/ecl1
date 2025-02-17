@@ -23,6 +23,7 @@ import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.hisinone.ExtensionUtil;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 /**
  * Utility for manipulation of the runtime classpath.

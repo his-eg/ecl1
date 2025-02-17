@@ -15,8 +15,8 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 
-import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.RemoteProjectSearchSupport;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 /**

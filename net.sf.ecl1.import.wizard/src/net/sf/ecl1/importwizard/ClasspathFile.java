@@ -16,9 +16,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.RemoteProjectSearchSupport;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 public class ClasspathFile {
 

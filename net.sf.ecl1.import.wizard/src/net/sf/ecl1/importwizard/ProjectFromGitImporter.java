@@ -1,6 +1,6 @@
 package net.sf.ecl1.importwizard;
 
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 import java.io.File;

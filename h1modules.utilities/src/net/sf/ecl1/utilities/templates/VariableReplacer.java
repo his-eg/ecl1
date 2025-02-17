@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 public class VariableReplacer {
 	

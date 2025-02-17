@@ -1,7 +1,7 @@
 package net.sf.ecl1.utilities.templates;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 import java.io.BufferedReader;

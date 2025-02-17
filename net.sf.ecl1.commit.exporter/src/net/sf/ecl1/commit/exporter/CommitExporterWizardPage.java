@@ -32,10 +32,10 @@ import org.eclipse.swt.widgets.Label;
 import net.sf.ecl1.commit.exporter.git.CommitTableFactory;
 import net.sf.ecl1.commit.exporter.git.DiffTool;
 import net.sf.ecl1.commit.exporter.git.StagedChanges;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.GitUtil;
 import net.sf.ecl1.utilities.hisinone.ReleaseXmlUtil;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 public class CommitExporterWizardPage extends WizardPage {
 

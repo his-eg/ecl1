@@ -24,9 +24,9 @@ import org.eclipse.jgit.util.FS_POSIX;
 import org.eclipse.jgit.util.FS_Win32;
 import org.eclipse.ui.IStartup;
 
-import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.hisinone.ExtensionUtil;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 public class UpdateHooks implements IStartup {
     

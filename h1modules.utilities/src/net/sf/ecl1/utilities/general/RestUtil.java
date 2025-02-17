@@ -14,6 +14,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import net.sf.ecl1.utilities.Activator;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 /**
  * simple util for calling rest services

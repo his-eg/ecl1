@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 /**

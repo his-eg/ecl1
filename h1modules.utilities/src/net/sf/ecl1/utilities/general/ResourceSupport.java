@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 import net.sf.ecl1.utilities.templates.TemplateFetcher;
 import net.sf.ecl1.utilities.templates.TemplateManager;
 import net.sf.ecl1.utilities.templates.VariableReplacer;

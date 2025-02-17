@@ -27,9 +27,9 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.Sets;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.FileUtil;
 import net.sf.ecl1.utilities.general.GitUtil;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 /**
  * Utilities for management of release.xml files

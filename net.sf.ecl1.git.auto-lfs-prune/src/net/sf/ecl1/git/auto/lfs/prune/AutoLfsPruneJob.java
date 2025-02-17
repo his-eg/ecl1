@@ -22,7 +22,7 @@ import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.FS_Win32;
 import org.eclipse.jgit.util.FS.ExecutionResult;
 
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 public class AutoLfsPruneJob extends Job {
 	

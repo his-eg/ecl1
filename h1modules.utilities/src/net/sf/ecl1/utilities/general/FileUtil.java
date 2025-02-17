@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import org.eclipse.core.resources.IFile;
 
 import net.sf.ecl1.utilities.Activator;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 /**
  * Utility methods to access files in a HISinOne project.

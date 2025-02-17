@@ -26,7 +26,8 @@ import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.core.runtime.MultiStatus;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 /**

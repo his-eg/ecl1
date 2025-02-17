@@ -16,8 +16,8 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.GlobalBuildAction;
 import net.sf.ecl1.classpath.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 /** Updates the ecl1 classpath container */
 public class ExtensionClasspathContainerUpdateJob extends Job {

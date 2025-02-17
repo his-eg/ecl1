@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.TreeSet;
 
 import net.sf.ecl1.utilities.Activator;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 import org.apache.commons.io.IOUtils;

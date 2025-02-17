@@ -14,6 +14,7 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 public class GitUtil {
 

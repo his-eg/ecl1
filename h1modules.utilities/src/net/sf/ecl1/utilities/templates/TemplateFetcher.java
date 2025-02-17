@@ -11,7 +11,7 @@ import java.util.List;
 import com.google.common.collect.Sets;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 /**
