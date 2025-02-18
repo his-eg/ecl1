@@ -27,6 +27,7 @@ Export-Package: net.sf.ecl1.utilities.general;
    org.eclipse.jdt.launching,
    org.eclipse.debug.core",
  net.sf.ecl1.utilities.hisinone;uses:="org.eclipse.core.resources",
+ net.sf.ecl1.utilities.logging,
  net.sf.ecl1.utilities.preferences;uses:="org.eclipse.ui,org.eclipse.jface.preference,org.eclipse.core.runtime.preferences",
  net.sf.ecl1.utilities.templates
 Import-Package: org.apache.commons.io,
