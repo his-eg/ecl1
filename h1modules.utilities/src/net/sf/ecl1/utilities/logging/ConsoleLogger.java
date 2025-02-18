@@ -18,7 +18,7 @@ import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
  * 
  * @author keunecke, tneumann
  */
-public class ConsoleLogger {
+public class ConsoleLogger extends LoggerDelegateStub implements ICommonLogger{
 
     /**
      * The name of the console this project should always acquire
@@ -63,10 +63,12 @@ public class ConsoleLogger {
      * Logs a debug log to the console.
      * @param message
      */
+    @Override
     public void debug(String message) {
     	log(LogLevel.DEBUG, message, null, false);
     }
 
+    @Override
     public void debug(String message, Throwable t) {
     	log(LogLevel.DEBUG, message, t, false);
     }
@@ -75,10 +77,12 @@ public class ConsoleLogger {
      * Logs an info log to the console.
      * @param message
      */
+    @Override
     public void info(String message) {
     	log(LogLevel.INFO, message, null, false);
     }
 
+    @Override
     public void info(String message, Throwable t) {
     	log(LogLevel.INFO, message, t, false);
     }
@@ -87,10 +91,12 @@ public class ConsoleLogger {
      * Logs an error to the console.
      * @param message
      */
+    @Override
     public void warn(String message) {
     	log(LogLevel.WARN, message, null, false);
     }
 
+    @Override
     public void warn(String message, Throwable t) {
     	log(LogLevel.WARN, message, t, false);
     }
@@ -99,10 +105,12 @@ public class ConsoleLogger {
      * Logs a warning to console and the "Error Log" view.
      * @param message
      */
+    @Override
     public void warn2(String message) {
     	log(LogLevel.WARN, message, null, true);
     }
 
+    @Override
     public void warn2(String message, Throwable t) {
     	log(LogLevel.WARN, message, t, true);
     }
@@ -111,10 +119,12 @@ public class ConsoleLogger {
      * Logs an error to the console .
      * @param message
      */
+    @Override
     public void error(String message) {
     	log(LogLevel.ERROR, message, null, false);
     }
 
+    @Override
     public void error(String message, Throwable t) {
     	log(LogLevel.ERROR, message, t, false);
     }
@@ -123,10 +133,12 @@ public class ConsoleLogger {
      * Logs an error to console and the "Error Log" view.
      * @param message
      */
+    @Override
     public void error2(String message) {
     	log(LogLevel.ERROR, message, null, true);
     }
 
+    @Override
     public void error2(String message, Throwable t) {
     	log(LogLevel.ERROR, message, t, true);
     }
