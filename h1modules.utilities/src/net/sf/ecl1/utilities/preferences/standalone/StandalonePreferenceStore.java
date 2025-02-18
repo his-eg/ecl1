@@ -51,16 +51,15 @@ public class StandalonePreferenceStore {
             createStoreFileIfNotExists();
             preferenceStore = new PreferenceStore(PreferenceWrapper.STANDALONE_STORE_PATH);
             preferenceStore.setValue(PreferenceWrapper.SELECTED_STORE, PreferenceWrapper.SELECT_STANDALONE);
-            try {
-                preferenceStore.save();
-            } catch (IOException e) {
-                //TODO log
-            }
         }
     
         try {
             preferenceStore.load();
             new PreferenceInitializer().initializeDefaultPreferencesStandalone(preferenceStore);
+            
+            if(preferenceStore.needsSaving()){
+                preferenceStore.save();
+            }
         } catch (IOException e) {
             //TODO log
             System.err.println("Could not load preferences: " + e.getMessage());
