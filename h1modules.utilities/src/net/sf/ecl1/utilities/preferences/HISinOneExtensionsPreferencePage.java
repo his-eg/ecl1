@@ -1,14 +1,14 @@
 package net.sf.ecl1.utilities.preferences;
 
-import java.io.File;
+import java.nio.file.Paths;
 import java.util.Collection;
 
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.PreferenceStore;
-import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
@@ -22,7 +22,6 @@ import com.google.common.collect.Lists;
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.general.GitUtil;
 import net.sf.ecl1.utilities.general.NetUtil;
-import net.sf.ecl1.utilities.preferences.standalone.StandalonePreferenceStore;
 
 /**
  * HISinOne-Extension-Tools preferences page
@@ -35,9 +34,6 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
     private StringFieldEditor templateRootUrls;
     private BooleanFieldEditor automaticBranchDetection;
     private BooleanFieldEditor displaySummaryOfGitPull;
-    // standalone
-    private RadioGroupFieldEditor selectedStore;
-    private boolean isStandaloneStore = false;
 
     public HISinOneExtensionsPreferencePage() {
         super(GRID);
@@ -48,7 +44,6 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
     public HISinOneExtensionsPreferencePage(PreferenceStore store) {
         super(GRID);
         setPreferenceStore(store);
-        isStandaloneStore = true;
         setTitle("HISinOne-Extensions Preferences");
         setDescription("Preferences for HISinOne-Extension-Tools");
     }
@@ -62,44 +57,16 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
             
             //Update branch immediately if automatic detection is set to true by user
             if(newValue) {
-                if(isStandaloneStore){
+                if(Activator.isRunningInEclipse()){
+                    getPreferenceStore().setValue(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, GitUtil.getCheckedOutBranchOfWebapps());
+                }else{
                     //TODO fix this after GitUtil can handle standalone
                     getPreferenceStore().setValue(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, "Unknown_branch fix standalone");
-                }else{
-                    getPreferenceStore().setValue(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, GitUtil.getCheckedOutBranchOfWebapps());
                 }
                 buildServerView.load();
             }
-        // standalone - switch store
-        }else if(event.getSource().equals(selectedStore)){
-            switchSelectedStore();
         }
         super.propertyChange(event);
-    }
-
-    private void switchSelectedStore(){
-        String newSelectedStore = selectedStore.getSelectionValue();
-        if (!newSelectedStore.equals(getPreferenceStore().getString(PreferenceWrapper.SELECTED_STORE))) {
-            // check if eclipse store file exists before changing store
-            if(newSelectedStore.equals(PreferenceWrapper.SELECT_ECLIPSE) && !new File(PreferenceWrapper.ECLIPSE_STORE_PATH).exists()){
-                MessageDialog.openConfirm(getShell(), "No eclipse store file found!",
-                "No eclipse store file found! \n\nUnable to change store path to: "+ PreferenceWrapper.ECLIPSE_STORE_PATH);
-                // reset selection
-                selectedStore.load();
-            // switch store
-            }else{
-                boolean confirmed = MessageDialog.openConfirm(getShell(), "Confirm Store Change",
-                "To change the preference store, the menu will need to be manually restarted. Do you want to continue?");
-
-                if (confirmed) {
-                    StandalonePreferenceStore.switchStore(newSelectedStore);
-                    getShell().dispose();
-                }else{
-                    // reset selection
-                    selectedStore.load();
-                }
-            }
-        }
     }
 
     /**
@@ -131,23 +98,18 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
         logLevels[3][0] = logLevels[3][1] = "ERROR";
         addField(new ComboFieldEditor(PreferenceWrapper.LOG_LEVEL_PREFERENCE_KEY, "Log-Level", logLevels, getFieldEditorParent()));
 
-        // standalone
-        if(!Activator.isRunningInEclipse()){
-            selectedStore = new RadioGroupFieldEditor(PreferenceWrapper.SELECTED_STORE, "Select path to load the preference store:", 
-                2, new String[][] { {"Eclipse", PreferenceWrapper.SELECT_ECLIPSE}, {"Standalone", PreferenceWrapper.SELECT_STANDALONE} }, 
-                getFieldEditorParent(), true);
-            addField(selectedStore);
-
-            Label storePathLabel = new Label(getFieldEditorParent(), SWT.NONE);
-            storePathLabel.setText("Store path: ");
-
-            Label storePathText = new Label(getFieldEditorParent(), SWT.NONE);
-            if(getPreferenceStore().getString(PreferenceWrapper.SELECTED_STORE).equals(PreferenceWrapper.SELECT_ECLIPSE)){
-                storePathText.setText(PreferenceWrapper.ECLIPSE_STORE_PATH);
-            }else{
-                storePathText.setText(PreferenceWrapper.STANDALONE_STORE_PATH);
-            }
+        String storePath;
+        if(Activator.isRunningInEclipse()){
+            IPath workspacePath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
+            storePath = Paths.get(workspacePath.toString()).resolve(PreferenceWrapper.ECLIPSE_STORE_PATH).toString();
+        }else{
+            String workspacePath = System.getProperty("user.dir");
+            storePath = Paths.get(workspacePath).getParent().resolve(PreferenceWrapper.ECLIPSE_STORE_PATH).toString();
         }
+        Label storePathLabel = new Label(getFieldEditorParent(), SWT.NONE);
+        storePathLabel.setText("Store Path: ");
+        Label storePathText = new Label(getFieldEditorParent(), SWT.NONE);
+        storePathText.setText(storePath);
     }
 
     /* (non-Javadoc)

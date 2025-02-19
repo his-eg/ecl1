@@ -36,20 +36,8 @@ public class PreferenceWrapper {
     /** Stores if the summary of the git batch pull should be displayed in a dialog to the user */
     public static final String DISPLAY_SUMMARY_OF_GIT_PULL = "displaySummaryOfGitPull";
 
-    /** Standalone default path for preference store */
-    public static final String STANDALONE_STORE_PATH = "net.sf.ecl1.utilities.prefs";
-
     /** Eclipse default path for preference store */
-    public static final String ECLIPSE_STORE_PATH = "..\\.metadata\\.plugins\\org.eclipse.core.runtime\\.settings\\net.sf.ecl1.utilities.prefs";
-
-    /** Stores the selected store, eclipse or standalone */
-    public static final String SELECTED_STORE = "selectedStore";
-
-    /** Name for eclipse store selection */
-    public static final String SELECT_ECLIPSE = "eclipse";
-
-    /** Name for standalone store selection */
-    public static final String SELECT_STANDALONE = "standalone";
+    public static final String ECLIPSE_STORE_PATH = ".metadata\\.plugins\\org.eclipse.core.runtime\\.settings\\net.sf.ecl1.utilities.prefs";
 
     private static IPreferenceStore preferenceStore = null;
 
@@ -59,7 +47,7 @@ public class PreferenceWrapper {
             if(Activator.isRunningInEclipse()){
                 preferenceStore = Activator.getPreferences();
             }else{
-                preferenceStore = StandalonePreferenceStore.getSelectedStore();
+                preferenceStore = StandalonePreferenceStore.getStore();
             }
         }
         return preferenceStore;

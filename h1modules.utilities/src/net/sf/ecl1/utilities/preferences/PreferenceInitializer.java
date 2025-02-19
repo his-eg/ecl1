@@ -29,7 +29,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         setDefaults(store);
         //TODO fix this after GitUtil can handle standalone
         store.setDefault(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, "Unknown_branch fix standalone");
-        store.setDefault(PreferenceWrapper.SELECTED_STORE, PreferenceWrapper.SELECT_ECLIPSE);
     }
 
     private void setDefaults(IPreferenceStore store){

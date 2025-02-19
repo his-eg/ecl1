@@ -13,7 +13,7 @@ import net.sf.ecl1.utilities.preferences.HISinOneExtensionsPreferencePage;
 public class PreferencesApp {
 
     private static void openPreferencePage() {
-        PreferenceStore preferenceStore = StandalonePreferenceStore.getSelectedStore();
+        PreferenceStore preferenceStore = StandalonePreferenceStore.getStore();
         Display display = new Display();
         Shell shell = new Shell(display);
 
@@ -21,7 +21,6 @@ public class PreferencesApp {
         preferenceManager.addToRoot(new PreferenceNode("general", new HISinOneExtensionsPreferencePage(preferenceStore)));
 
         PreferenceDialog dialog = new PreferenceDialog(shell, preferenceManager);
-        dialog.setPreferenceStore(preferenceStore);
         dialog.open();
 
         if (!shell.isDisposed()) {
