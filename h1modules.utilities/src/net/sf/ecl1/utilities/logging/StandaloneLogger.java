@@ -1,16 +1,43 @@
 package net.sf.ecl1.utilities.logging;
 
-import org.slf4j.Logger;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
+
 
 /**
  * Class for logging to other environments than Eclipse.
  */
-public class StandaloneLogger extends LoggerDelegateStub implements ICommonLogger{
+public class StandaloneLogger implements ICommonLogger{
 
-    private final Logger slf4jLogger;
+    private final Logger logger;
 
-    public StandaloneLogger(Logger slf4jLogger) {
-        this.slf4jLogger = slf4jLogger;
+    public StandaloneLogger(String className) {
+        logger = Logger.getLogger(className);
+        Level level = getLogLevel();
+        for (Handler handler : logger.getParent().getHandlers()) {
+            handler.setLevel(level);
+        }
+        logger.setLevel(level);
+    }
+
+    private Level getLogLevel(){
+        String preferenceLogLevel = PreferenceWrapper.getLogLevel();
+        switch (preferenceLogLevel) {
+            case "DEBUG": 
+                return Level.FINE;
+            case "INFO": 
+                return Level.INFO;
+            case "WARN": 
+                return Level.WARNING;
+            case "ERROR": 
+                return Level.SEVERE;
+            default:
+                //no preference store, use fine/debug as default
+                return Level.FINE;
+        }
     }
     
     /**
@@ -19,7 +46,7 @@ public class StandaloneLogger extends LoggerDelegateStub implements ICommonLogge
      */
     @Override
     public void debug(String message) {
-    	slf4jLogger.debug(message);
+        logger.log(Level.FINE, message);
     }
 
     /**
@@ -29,7 +56,7 @@ public class StandaloneLogger extends LoggerDelegateStub implements ICommonLogge
      */
     @Override
     public void debug(String message, Throwable t) {
-        slf4jLogger.debug(message, t);
+        logger.log(Level.FINE, message, t);
     }
 
     /**
@@ -38,7 +65,7 @@ public class StandaloneLogger extends LoggerDelegateStub implements ICommonLogge
      */
     @Override
     public void info(String message) {
-    	slf4jLogger.info(message);
+    	logger.log(Level.INFO, message);
     }
 
     /**
@@ -48,7 +75,7 @@ public class StandaloneLogger extends LoggerDelegateStub implements ICommonLogge
      */
     @Override
     public void info(String message, Throwable t) {
-        slf4jLogger.info(message, t);
+        logger.log(Level.INFO, message, t);
     }
 
     /**
@@ -57,7 +84,7 @@ public class StandaloneLogger extends LoggerDelegateStub implements ICommonLogge
      */
     @Override
     public void warn(String message) {
-    	slf4jLogger.warn(message);
+    	logger.log(Level.WARNING, message);
     }
 
     /**
@@ -67,7 +94,7 @@ public class StandaloneLogger extends LoggerDelegateStub implements ICommonLogge
      */
     @Override
     public void warn(String message, Throwable t) {
-    	slf4jLogger.warn(message, t);
+    	logger.log(Level.WARNING, message, t);
     }
 
     /**
@@ -95,7 +122,7 @@ public class StandaloneLogger extends LoggerDelegateStub implements ICommonLogge
      */
     @Override
     public void error(String message) {
-    	slf4jLogger.error(message);
+    	logger.log(Level.SEVERE, message);
     }
 
     /**
@@ -105,7 +132,7 @@ public class StandaloneLogger extends LoggerDelegateStub implements ICommonLogge
      */
     @Override
     public void error(String message, Throwable t) {
-    	slf4jLogger.error(message, t);
+    	logger.log(Level.SEVERE, message, t);
     }
 
     /**

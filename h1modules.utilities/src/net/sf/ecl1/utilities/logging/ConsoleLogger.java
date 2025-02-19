@@ -18,7 +18,7 @@ import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
  * 
  * @author keunecke, tneumann
  */
-public class ConsoleLogger extends LoggerDelegateStub implements ICommonLogger{
+public class ConsoleLogger implements ICommonLogger{
 
     /**
      * The name of the console this project should always acquire
