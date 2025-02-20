@@ -14,12 +14,13 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 public class GitUtil {
 
-	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, GitUtil.class.getSimpleName());
-	
+    private static final ICommonLogger logger = LoggerFactory.getLogger(GitUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+
 	/**
      * Starts from the supplied path and scans up through the parentdirectory tree until a Git repository is found.
      * <br><br>

@@ -16,7 +16,8 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 
 import net.sf.ecl1.utilities.general.RemoteProjectSearchSupport;
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 /**
@@ -25,7 +26,7 @@ import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
  */
 public class ExtensionImportWizardModel {
     
-	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ExtensionImportWizardModel.class.getSimpleName());
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ExtensionImportWizardModel.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
 
 	public static final String JENKINS_WEBAPPS_NAME = "/webapps";
 	

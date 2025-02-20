@@ -36,7 +36,7 @@ import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 public class WorkspaceImpl implements IWorkspace {
 
-    ICommonLogger logger = LoggerFactory.getLogger(WorkspaceImpl.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(WorkspaceImpl.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
 
 
     @Override

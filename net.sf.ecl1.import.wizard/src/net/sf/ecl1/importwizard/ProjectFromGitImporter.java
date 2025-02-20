@@ -1,8 +1,5 @@
 package net.sf.ecl1.importwizard;
 
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
-import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
-
 import java.io.File;
 
 import org.eclipse.core.resources.IProject;
@@ -16,6 +13,10 @@ import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
+import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
+
 /**
  * Imports projects from a git repo into local workspace
  *
@@ -23,8 +24,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
  */
 public class ProjectFromGitImporter {
 	
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ProjectFromGitImporter.class.getSimpleName());
-	
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ProjectFromGitImporter.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+
     // base path of the source repo configured in preferences, e.g. "ssh://git@git.his.de/"
     private final String baseRepositoryPath;
 

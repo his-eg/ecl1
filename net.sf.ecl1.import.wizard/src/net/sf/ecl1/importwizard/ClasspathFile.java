@@ -18,12 +18,13 @@ import org.xml.sax.SAXException;
 
 import net.sf.ecl1.utilities.general.RemoteProjectSearchSupport;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 public class ClasspathFile {
 
-	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ClasspathFile.class.getSimpleName());
-	
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ClasspathFile.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+
 	public static final String ECL1_CLASSPATH_CONTAINER = HisConstants.NET_SF_ECL1_ECL1_CONTAINER_ID + "/";
 	public static final String JENKINS_WEBAPPS_NAME = "/webapps";
 	
