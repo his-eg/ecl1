@@ -1,11 +1,10 @@
 package net.sf.ecl1.utilities.standalone.wokspace;
 
+import java.io.File;
 import java.net.URI;
-import java.nio.file.Paths;
 import java.util.Map;
 
 import org.eclipse.core.resources.FileInfoMatcherDescription;
-import org.eclipse.core.resources.IBuildConfiguration;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -13,7 +12,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IPathVariableManager;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceFilterDescription;
 import org.eclipse.core.resources.IResourceProxy;
@@ -25,170 +23,149 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.core.runtime.content.IContentTypeMatcher;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
-public class ProjectImpl implements IProject{
+public class FolderImpl implements IFolder {
 
-    private final String name;
+    private final String path;
 
-    public ProjectImpl(String name) {
-        this.name = name;
+    public FolderImpl(String path) {
+        this.path = path;
     }
 
     @Override
-    public String getName() {
-        return name;
+    public boolean exists() {
+        File folder = new File(path);
+        return (folder.exists() && folder.isDirectory());
     }
 
-    @Override
-    public IFolder getFolder(String name) {
-        //TODO check this
-        IPath root = new WorkspaceImpl().getRoot().getLocation();
-        return new FolderImpl(Paths.get(root.toOSString(), name).toString());
-    }
-
-    @Override
-    public void create(IProjectDescription description, IProgressMonitor monitor) throws CoreException {
-        //nop
-    }
-
-    @Override
-    public void open(IProgressMonitor monitor) throws CoreException {
-        //nop
-    }
-
-
-    @Override
-    public void open(int updateFlags, IProgressMonitor monitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'open(int updateFlags, IProgressMonitor monitor)'");
-    }
-    
-    @Override
-    public void create(IProjectDescription description, int updateFlags, IProgressMonitor monitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'create(IProjectDescription description, int updateFlags, IProgressMonitor monitor)'");
-    }
-    
-    @Override
-    public void create(IProgressMonitor monitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'create(IProgressMonitor monitor)'");
-    }
-    
     @Override
     public boolean exists(IPath path) {
-        throw new UnsupportedOperationException("Unimplemented method 'exists(IPath path)'");
+        File folder = path.toFile();
+        return (folder.exists() && folder.isDirectory());
     }
-    
+
+    @Override
+    public IPath getLocation() {
+        return new PathImpl(path);
+    }
+
+    @Override
+    public IPath getRawLocation() {
+       return getLocation();
+    }
+
     @Override
     public IResource findMember(String path) {
         throw new UnsupportedOperationException("Unimplemented method 'findMember(String path)'");
     }
-    
+
     @Override
     public IResource findMember(String path, boolean includePhantoms) {
         throw new UnsupportedOperationException("Unimplemented method 'findMember(String path, boolean includePhantoms)'");
     }
-    
+
     @Override
     public IResource findMember(IPath path) {
         throw new UnsupportedOperationException("Unimplemented method 'findMember(IPath path)'");
     }
-    
+
     @Override
     public IResource findMember(IPath path, boolean includePhantoms) {
         throw new UnsupportedOperationException("Unimplemented method 'findMember(IPath path, boolean includePhantoms)'");
     }
-    
+
     @Override
     public String getDefaultCharset() throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'getDefaultCharset()'");
     }
-    
+
     @Override
     public String getDefaultCharset(boolean checkImplicit) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'getDefaultCharset(boolean checkImplicit)'");
     }
-    
+
     @Override
     public IFile getFile(IPath path) {
         throw new UnsupportedOperationException("Unimplemented method 'getFile(IPath path)'");
     }
-    
+
     @Override
     public IFolder getFolder(IPath path) {
         throw new UnsupportedOperationException("Unimplemented method 'getFolder(IPath path)'");
     }
-    
+
     @Override
     public IResource[] members() throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'members()'");
     }
-    
+
     @Override
     public IResource[] members(boolean includePhantoms) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'members(boolean includePhantoms)'");
     }
-    
+
     @Override
     public IResource[] members(int memberFlags) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'members(int memberFlags)'");
     }
-    
+
     @Override
     public IFile[] findDeletedMembersWithHistory(int depth, IProgressMonitor monitor) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'findDeletedMembersWithHistory(int depth, IProgressMonitor monitor)'");
     }
-    
-    @Override
-    public void setDefaultCharset(String charset) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'setDefaultCharset(String charset)'");
-    }
-    
-    @Override
-    public void setDefaultCharset(String charset, IProgressMonitor monitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'setDefaultCharset(String charset, IProgressMonitor monitor)'");
-    }
-    
-    @Override
-    public IResourceFilterDescription createFilter(int type, FileInfoMatcherDescription matcherDescription, int updateFlags, IProgressMonitor monitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'createFilter(int type, FileInfoMatcherDescription matcherDescription, int updateFlags, IProgressMonitor monitor)'");
-    }
-    
-    @Override
-    public IResourceFilterDescription[] getFilters() throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'getFilters()'");
-    }
-    
-    @Override
-    public void accept(IResourceProxyVisitor visitor, int memberFlags) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'accept(IResourceProxyVisitor visitor, int memberFlags)'");
-    }
-    
-    @Override
-    public void accept(IResourceProxyVisitor visitor, int depth, int memberFlags) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'accept(IResourceProxyVisitor visitor, int depth, int memberFlags)'");
-    }
-    
-    @Override
-    public void accept(IResourceVisitor visitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'accept(IResourceVisitor visitor)'");
-    }
-    
-    @Override
-    public void accept(IResourceVisitor visitor, int depth, boolean includePhantoms) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'accept(IResourceVisitor visitor, int depth, boolean includePhantoms)'");
-    }
-    
-    @Override
-    public void accept(IResourceVisitor visitor, int depth, int memberFlags) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'accept(IResourceVisitor visitor, int depth, int memberFlags)'");
-    }
-    
+
     @Override
     public void clearHistory(IProgressMonitor monitor) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'clearHistory(IProgressMonitor monitor)'");
     }
-    
+
+    @Override
+    public void setDefaultCharset(String charset) throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'setDefaultCharset(String charset)'");
+    }
+
+    @Override
+    public void setDefaultCharset(String charset, IProgressMonitor monitor) throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'setDefaultCharset(String charset, IProgressMonitor monitor)'");
+    }
+
+    @Override
+    public IResourceFilterDescription createFilter(int type, FileInfoMatcherDescription matcherDescription,
+            int updateFlags, IProgressMonitor monitor) throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'createFilter(int type, FileInfoMatcherDescription matcherDescription, int updateFlags, IProgressMonitor monitor)'");
+    }
+
+    @Override
+    public IResourceFilterDescription[] getFilters() throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'getFilters()'");
+    }
+
+    @Override
+    public void accept(IResourceProxyVisitor visitor, int memberFlags) throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'accept(IResourceProxyVisitor visitor, int memberFlags)'");
+    }
+
+    @Override
+    public void accept(IResourceProxyVisitor visitor, int depth, int memberFlags) throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'accept(IResourceProxyVisitor visitor, int depth, int memberFlags)'");
+    }
+
+    @Override
+    public void accept(IResourceVisitor visitor) throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'accept(IResourceVisitor visitor)'");
+    }
+
+    @Override
+    public void accept(IResourceVisitor visitor, int depth, boolean includePhantoms) throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'accept(IResourceVisitor visitor, int depth, boolean includePhantoms)'");
+    }
+
+    @Override
+    public void accept(IResourceVisitor visitor, int depth, int memberFlags) throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'accept(IResourceVisitor visitor, int depth, int memberFlags)'");
+    }
+
     @Override
     public void copy(IPath destination, boolean force, IProgressMonitor monitor) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'copy(IPath destination, boolean force, IProgressMonitor monitor)'");
@@ -235,11 +212,6 @@ public class ProjectImpl implements IProject{
     }
     
     @Override
-    public boolean exists() {
-        throw new UnsupportedOperationException("Unimplemented method 'exists()'");
-    }
-    
-    @Override
     public IMarker findMarker(long id) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'findMarker(long id)'");
     }
@@ -270,11 +242,6 @@ public class ProjectImpl implements IProject{
     }
     
     @Override
-    public IPath getLocation() {
-        throw new UnsupportedOperationException("Unimplemented method 'getLocation()'");
-    }
-    
-    @Override
     public URI getLocationURI() {
         throw new UnsupportedOperationException("Unimplemented method 'getLocationURI()'");
     }
@@ -287,6 +254,11 @@ public class ProjectImpl implements IProject{
     @Override
     public long getModificationStamp() {
         throw new UnsupportedOperationException("Unimplemented method 'getModificationStamp()'");
+    }
+    
+    @Override
+    public String getName() {
+        throw new UnsupportedOperationException("Unimplemented method 'getName()'");
     }
     
     @Override
@@ -317,11 +289,6 @@ public class ProjectImpl implements IProject{
     @Override
     public IPath getProjectRelativePath() {
         throw new UnsupportedOperationException("Unimplemented method 'getProjectRelativePath()'");
-    }
-    
-    @Override
-    public IPath getRawLocation() {
-        throw new UnsupportedOperationException("Unimplemented method 'getRawLocation()'");
     }
     
     @Override
@@ -403,7 +370,7 @@ public class ProjectImpl implements IProject{
     public boolean isPhantom() {
         throw new UnsupportedOperationException("Unimplemented method 'isPhantom()'");
     }
-
+    
     @Override
     public boolean isReadOnly() {
         throw new UnsupportedOperationException("Unimplemented method 'isReadOnly()'");
@@ -423,7 +390,7 @@ public class ProjectImpl implements IProject{
     public boolean isTeamPrivateMember(int options) {
         throw new UnsupportedOperationException("Unimplemented method 'isTeamPrivateMember(int options)'");
     }
-    
+
     @Override
     public void move(IPath destination, boolean force, IProgressMonitor monitor) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'move(IPath destination, boolean force, IProgressMonitor monitor)'");
@@ -483,8 +450,8 @@ public class ProjectImpl implements IProject{
     @Override
     public void setPersistentProperty(QualifiedName key, String value) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'setPersistentProperty(QualifiedName key, String value)'");
-    }    
-
+    }
+    
     @Override
     public void setReadOnly(boolean readOnly) {
         throw new UnsupportedOperationException("Unimplemented method 'setReadOnly(boolean readOnly)'");
@@ -526,54 +493,28 @@ public class ProjectImpl implements IProject{
     }
     
     @Override
-    public void build(int kind, String builderName, Map<String, String> args, IProgressMonitor monitor)
-            throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'build(int kind, String builderName, Map<String, String> args, IProgressMonitor monitor)'");
+    public void create(boolean force, boolean local, IProgressMonitor monitor) throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'create(boolean force, boolean local, IProgressMonitor monitor)'");
     }
     
     @Override
-    public void build(int kind, IProgressMonitor monitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'build(int kind, IProgressMonitor monitor)'");
+    public void create(int updateFlags, boolean local, IProgressMonitor monitor) throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'create(int updateFlags, boolean local, IProgressMonitor monitor)'");
     }
     
     @Override
-    public void build(IBuildConfiguration config, int kind, IProgressMonitor monitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'build(IBuildConfiguration config, int kind, IProgressMonitor monitor)'");
+    public void createLink(IPath localLocation, int updateFlags, IProgressMonitor monitor) throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'createLink(IPath localLocation, int updateFlags, IProgressMonitor monitor)'");
     }
     
     @Override
-    public void close(IProgressMonitor monitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'close(IProgressMonitor monitor)'");
+    public void createLink(URI location, int updateFlags, IProgressMonitor monitor) throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'createLink(URI location, int updateFlags, IProgressMonitor monitor)'");
     }
     
     @Override
-    public void delete(boolean deleteContent, boolean force, IProgressMonitor monitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'delete(boolean deleteContent, boolean force, IProgressMonitor monitor)'");
-    }
-    
-    @Override
-    public IBuildConfiguration getActiveBuildConfig() throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'getActiveBuildConfig()'");
-    }
-    
-    @Override
-    public IBuildConfiguration getBuildConfig(String configName) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'getBuildConfig(String configName)'");
-    }
-    
-    @Override
-    public IBuildConfiguration[] getBuildConfigs() throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'getBuildConfigs()'");
-    }
-    
-    @Override
-    public IContentTypeMatcher getContentTypeMatcher() throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'getContentTypeMatcher()'");
-    }
-    
-    @Override
-    public IProjectDescription getDescription() throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'getDescription()'");
+    public void delete(boolean force, boolean keepHistory, IProgressMonitor monitor) throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'delete(boolean force, boolean keepHistory, IProgressMonitor monitor)'");
     }
     
     @Override
@@ -582,84 +523,13 @@ public class ProjectImpl implements IProject{
     }
     
     @Override
-    public IProjectNature getNature(String natureId) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'getNature(String natureId)'");
+    public IFolder getFolder(String name) {
+        throw new UnsupportedOperationException("Unimplemented method 'getFolder(String name)'");
     }
     
     @Override
-    public IPath getWorkingLocation(String id) {
-        throw new UnsupportedOperationException("Unimplemented method 'getWorkingLocation(String id)'");
-    }
-    
-    @Override
-    public IProject[] getReferencedProjects() throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'getReferencedProjects()'");
-    }
-    
-    @Override
-    public void clearCachedDynamicReferences() {
-        throw new UnsupportedOperationException("Unimplemented method 'clearCachedDynamicReferences()'");
-    }
-    
-    @Override
-    public IProject[] getReferencingProjects() {
-        throw new UnsupportedOperationException("Unimplemented method 'getReferencingProjects()'");
-    }
-    
-    @Override
-    public IBuildConfiguration[] getReferencedBuildConfigs(String configName, boolean includeMissing)
+    public void move(IPath destination, boolean force, boolean keepHistory, IProgressMonitor monitor)
             throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'getReferencedBuildConfigs(String configName, boolean includeMissing)'");
-    }
-    
-    @Override
-    public boolean hasBuildConfig(String configName) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'hasBuildConfig(String configName)'");
-    }
-    
-    @Override
-    public boolean hasNature(String natureId) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'hasNature(String natureId)'");
-    }
-    
-    @Override
-    public boolean isNatureEnabled(String natureId) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'isNatureEnabled(String natureId)'");
-    }
-    
-    @Override
-    public boolean isOpen() {
-        throw new UnsupportedOperationException("Unimplemented method 'isOpen()'");
-    }
-    
-    @Override
-    public void loadSnapshot(int options, URI snapshotLocation, IProgressMonitor monitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'loadSnapshot(int options, URI snapshotLocation, IProgressMonitor monitor)'");
-    }
-    
-    @Override
-    public void move(IProjectDescription description, boolean force, IProgressMonitor monitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'move(IProjectDescription description, boolean force, IProgressMonitor monitor)'");
-    }
-    
-    @Override
-    public void saveSnapshot(int options, URI snapshotLocation, IProgressMonitor monitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'saveSnapshot(int options, URI snapshotLocation, IProgressMonitor monitor)'");
-    }
-    
-    @Override
-    public void setDescription(IProjectDescription description, IProgressMonitor monitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'setDescription(IProjectDescription description, IProgressMonitor monitor)'");
-    }
-    
-    @Override
-    public void setDescription(IProjectDescription description, int updateFlags, IProgressMonitor monitor)
-            throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'setDescription(IProjectDescription description, int updateFlags, IProgressMonitor monitor)'");
-    }
-    
-    @Override
-    public String getDefaultLineSeparator() throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'getDefaultLineSeparator()'");
+        throw new UnsupportedOperationException("Unimplemented method 'move(IPath destination, boolean force, boolean keepHistory, IProgressMonitor monitor)'");
     }
 }
