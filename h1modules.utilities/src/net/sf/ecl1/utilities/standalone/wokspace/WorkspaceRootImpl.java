@@ -81,7 +81,8 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
 
     @Override
     public IProject[] getProjects(int memberFlags) {
-        throw new UnsupportedOperationException("Unimplemented method 'getProjects(int memberFlags)'");
+        // Standalone has no hidden projects
+        return getProjects();
     }
     
     @Override
