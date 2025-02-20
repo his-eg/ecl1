@@ -29,12 +29,25 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 public class WorkspaceRootImpl implements IWorkspaceRoot {
+    private final String path;
 
-    @Override
-    public IPath getLocation() {
+    public WorkspaceRootImpl(){
         Path ecl1Path = Paths.get(System.getProperty("user.dir"));
-        String workspacePath = ecl1Path.getParent().toString();
-        return new PathImpl(workspacePath);
+        this.path = ecl1Path.getParent().toString();
+    }
+
+    public WorkspaceRootImpl(boolean useParent){
+        Path ecl1Path = Paths.get(System.getProperty("user.dir"));
+        if(useParent){
+            this.path = ecl1Path.getParent().getParent().toString();
+        }else{
+            this.path = ecl1Path.getParent().toString();
+        }
+    }
+
+	@Override
+    public IPath getLocation() {
+        return new PathImpl(path);
     }
 
     @Override
