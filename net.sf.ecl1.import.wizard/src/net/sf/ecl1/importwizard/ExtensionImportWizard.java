@@ -3,12 +3,13 @@ package net.sf.ecl1.importwizard;
 import java.util.Collection;
 import java.util.HashSet;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
+
+import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceFactory;
 
 /**
  * Wizard for import of extension projects listed on a jenkins.
@@ -83,7 +84,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
         
         Activator.getDefault().setJob(importJob);
         //Acquiring this rule prevents auto builds
-        importJob.setRule(ResourcesPlugin.getWorkspace().getRuleFactory().buildRule());
+        importJob.setRule(WorkspaceFactory.getWorkspace().getRuleFactory().buildRule());
         importJob.schedule();
 
         return true;

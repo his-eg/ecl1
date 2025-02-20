@@ -7,12 +7,12 @@ import java.util.List;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
+import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceFactory;
 
 public class WebappsUtil {
 
@@ -26,7 +26,7 @@ public class WebappsUtil {
      * @return the project serving as core webapps
      */
     public static IProject findWebappsProject() {
-        List<IProject> projects = Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects(IWorkspaceRoot.INCLUDE_HIDDEN));
+        List<IProject> projects = Arrays.asList(WorkspaceFactory.getWorkspace().getRoot().getProjects(IWorkspaceRoot.INCLUDE_HIDDEN));
         IProject webapps = null;
         List<IProject> webappsCandidates = new ArrayList<>();
     	List<String> candidateNames = new ArrayList<>();

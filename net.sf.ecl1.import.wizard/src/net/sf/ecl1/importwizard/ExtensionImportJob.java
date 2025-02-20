@@ -7,7 +7,6 @@ import java.util.Collection;
 import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -21,6 +20,7 @@ import com.google.common.collect.Lists;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
+import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceFactory;
 
 /**
  * The job that actually performs deleting of existing folders in the workspace and the extension import.
@@ -87,7 +87,7 @@ public class ExtensionImportJob extends Job {
                 logger.info(taskName);
 
                 // do one task
-                IWorkspace workspace = ResourcesPlugin.getWorkspace();
+                IWorkspace workspace = WorkspaceFactory.getWorkspace();
                 IWorkspaceRoot root = workspace.getRoot();
                 File workspaceFile = root.getLocation().toFile();
                 File extensionFolder = new File(workspaceFile, extension);
@@ -157,7 +157,7 @@ public class ExtensionImportJob extends Job {
      * @see {@link ExtensionImportWizardModel.initExtensionsInWorkspace()}
      */
     private Collection<String> checkForExistingFolders(Collection<String> extensionsToImport) {
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        IWorkspace workspace = WorkspaceFactory.getWorkspace();
         IWorkspaceRoot root = workspace.getRoot();
         IPath fullPath = root.getLocation();
         File workspaceFile = fullPath.toFile();

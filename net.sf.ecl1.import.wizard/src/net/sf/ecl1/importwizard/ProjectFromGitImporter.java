@@ -6,7 +6,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceDescription;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jgit.api.CloneCommand;
@@ -16,6 +15,7 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
+import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceFactory;
 
 /**
  * Imports projects from a git repo into local workspace
@@ -60,7 +60,7 @@ public class ProjectFromGitImporter {
         String fullRepositoryPath = getFullRepositoryPath(extensionToImport);
     	logger.debug("Extension " + extensionToImport + ": fullRepositoryPath = " + fullRepositoryPath);
     	if (fullRepositoryPath != null) {
-            IWorkspace workspace = ResourcesPlugin.getWorkspace();
+            IWorkspace workspace = WorkspaceFactory.getWorkspace();
             IPath workspacePath = workspace.getRoot().getLocation();
             IPath extensionPath = workspacePath.append(extensionToImport);
             File extensionFolder = extensionPath.toFile();
@@ -130,7 +130,7 @@ public class ProjectFromGitImporter {
     }
 
     private void setWorkspaceAutoBuild(boolean flag) throws CoreException {
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        IWorkspace workspace = WorkspaceFactory.getWorkspace();
         final IWorkspaceDescription description = workspace.getDescription();
         description.setAutoBuilding(flag);
         workspace.setDescription(description);

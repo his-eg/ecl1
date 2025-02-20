@@ -13,12 +13,12 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 
 import net.sf.ecl1.utilities.general.RemoteProjectSearchSupport;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
+import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceFactory;
 
 /**
  * The data model of the Extension Import Wizard.
@@ -149,7 +149,7 @@ public class ExtensionImportWizardModel {
      */
     private void initExtensionsInWorkspace() {
     	extensionsInWorkspace = new TreeSet<String>();
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        IWorkspace workspace = WorkspaceFactory.getWorkspace();
         IWorkspaceRoot root = workspace.getRoot();
         IProject[] projects = root.getProjects();
         for (IProject iProject : projects) {
