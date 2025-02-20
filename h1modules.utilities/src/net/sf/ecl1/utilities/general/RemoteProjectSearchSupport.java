@@ -6,7 +6,8 @@ import java.util.Collection;
 import java.util.TreeSet;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 import org.apache.commons.io.IOUtils;
@@ -19,7 +20,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class RemoteProjectSearchSupport {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, RemoteProjectSearchSupport.class.getSimpleName());
+    private static final ICommonLogger logger = LoggerFactory.getLogger(RemoteProjectSearchSupport.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
 
     private class BuildJob {
         private String name;
