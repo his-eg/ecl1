@@ -51,7 +51,7 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
             if (subfolders != null) {
                 for (File folder : subfolders) {
                     if (folder.getName().equals(name)) {
-                        return new ProjectImpl(name);
+                        return new ProjectImpl(name, workspacePath);
                     }
                 }
             }
@@ -69,7 +69,7 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
             if (subfolders != null) {
                 IProject[] projects = new IProject[subfolders.length];
                 for (int i = 0; i < subfolders.length; i++) {
-                    projects[i] = new ProjectImpl(subfolders[i].getName());
+                    projects[i] = new ProjectImpl(subfolders[i].getName(), workspacePath);
                 }
                 return projects;
             }

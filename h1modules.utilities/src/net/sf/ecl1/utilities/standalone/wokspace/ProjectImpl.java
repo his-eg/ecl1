@@ -31,9 +31,11 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 public class ProjectImpl implements IProject{
 
     private final String name;
+    private final String projectPath;
 
-    public ProjectImpl(String name) {
+    public ProjectImpl(String name, IPath workspacePath) {
         this.name = name;
+        this.projectPath = Paths.get(workspacePath.toOSString(), name).toString();
     }
 
     @Override
@@ -43,9 +45,12 @@ public class ProjectImpl implements IProject{
 
     @Override
     public IFolder getFolder(String name) {
-        //TODO check this
-        IPath root = new WorkspaceImpl().getRoot().getLocation();
-        return new FolderImpl(Paths.get(root.toOSString(), name).toString());
+        return new FolderImpl(Paths.get(projectPath, name).toString());
+    }
+
+    @Override
+    public IPath getLocation() {
+        return new PathImpl(projectPath);
     }
 
     @Override
@@ -267,11 +272,6 @@ public class ProjectImpl implements IProject{
     @Override
     public long getLocalTimeStamp() {
         throw new UnsupportedOperationException("Unimplemented method 'getLocalTimeStamp()'");
-    }
-    
-    @Override
-    public IPath getLocation() {
-        throw new UnsupportedOperationException("Unimplemented method 'getLocation()'");
     }
     
     @Override
