@@ -14,7 +14,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
 
@@ -26,7 +25,7 @@ import net.sf.ecl1.utilities.logging.LoggerFactory;
  */
 public class RestUtil {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(WebappsUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(RestUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
 
     /**
      * Create a JSON input stream for the given target URL.
