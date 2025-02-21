@@ -29,6 +29,16 @@ public class PathImpl implements IPath {
     }
 
     @Override
+    public IPath append(String path) {
+        return new PathImpl(Paths.get(this.path, path).toString());
+    }
+
+    @Override
+    public IPath append(IPath path) {
+        return new PathImpl(Paths.get(this.path, path.toString()).toString());
+    }
+
+    @Override
     public IPath clone() {
         return new PathImpl(path);
     }
@@ -42,16 +52,6 @@ public class PathImpl implements IPath {
     @Override
     public IPath addTrailingSeparator() {
         throw new UnsupportedOperationException("Unimplemented method 'addTrailingSeparator()'");
-    }
-    
-    @Override
-    public IPath append(String path) {
-        throw new UnsupportedOperationException("Unimplemented method 'append(String path)'");
-    }
-    
-    @Override
-    public IPath append(IPath path) {
-        throw new UnsupportedOperationException("Unimplemented method 'append(IPath path)'");
     }
     
     @Override
