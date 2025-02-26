@@ -19,6 +19,7 @@ public class StandaloneLogger implements ICommonLogger{
         Level level = getLogLevel();
         for (Handler handler : logger.getParent().getHandlers()) {
             handler.setLevel(level);
+            handler.setFormatter(new StandaloneFormatter());
         }
         logger.setLevel(level);
     }
