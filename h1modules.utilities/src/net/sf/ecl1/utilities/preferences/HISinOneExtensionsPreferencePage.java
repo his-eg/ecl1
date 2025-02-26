@@ -57,12 +57,7 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
             
             //Update branch immediately if automatic detection is set to true by user
             if(newValue) {
-                if(Activator.isRunningInEclipse()){
-                    getPreferenceStore().setValue(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, GitUtil.getCheckedOutBranchOfWebapps());
-                }else{
-                    //TODO fix this after GitUtil can handle standalone
-                    getPreferenceStore().setValue(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, "Unknown_branch fix standalone");
-                }
+                getPreferenceStore().setValue(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, GitUtil.getCheckedOutBranchOfWebapps());
                 buildServerView.load();
             }
         }
