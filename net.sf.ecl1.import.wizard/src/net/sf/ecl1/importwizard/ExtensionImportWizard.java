@@ -3,6 +3,8 @@ package net.sf.ecl1.importwizard;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
@@ -81,7 +83,11 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
         boolean deleteFolders = page2.deleteFolders();
 
         ExtensionImportJob importJob = new ExtensionImportJob(extensionsToImport, openProjectsAfterImport, deleteFolders); 
-        
+        if(!net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
+            IProgressMonitor dummyMonitor = new NullProgressMonitor();
+            importJob.run(dummyMonitor);
+            return true;
+        }
         Activator.getDefault().setJob(importJob);
         //Acquiring this rule prevents auto builds
         importJob.setRule(WorkspaceFactory.getWorkspace().getRuleFactory().buildRule());
