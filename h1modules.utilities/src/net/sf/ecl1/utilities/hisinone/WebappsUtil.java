@@ -13,6 +13,7 @@ import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceFactory;
+import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceRootImpl;
 
 public class WebappsUtil {
 
@@ -26,7 +27,13 @@ public class WebappsUtil {
      * @return the project serving as core webapps
      */
     public static IProject findWebappsProject() {
-        List<IProject> projects = Arrays.asList(WorkspaceFactory.getWorkspace().getRoot().getProjects(IWorkspaceRoot.INCLUDE_HIDDEN));
+        List<IProject> projects;
+        if(Activator.isRunningInEclipse()){
+            projects = Arrays.asList(WorkspaceFactory.getWorkspace().getRoot().getProjects(IWorkspaceRoot.INCLUDE_HIDDEN));
+        }else{
+            IWorkspaceRoot root = new WorkspaceRootImpl(true);
+            projects = Arrays.asList(root.getProjects(IWorkspaceRoot.INCLUDE_HIDDEN));
+        }
         IProject webapps = null;
         List<IProject> webappsCandidates = new ArrayList<>();
     	List<String> candidateNames = new ArrayList<>();
