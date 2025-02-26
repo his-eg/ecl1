@@ -11,6 +11,11 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.SshSessionFactory;
+import org.eclipse.jgit.transport.sshd.JGitKeyCache;
+import org.eclipse.jgit.transport.sshd.SshdSessionFactory;
+import org.eclipse.jgit.transport.sshd.SshdSessionFactoryBuilder;
+import org.eclipse.jgit.util.FS;
 
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
@@ -66,6 +71,12 @@ public class ProjectFromGitImporter {
             File extensionFolder = extensionPath.toFile();
             String branch = PreferenceWrapper.getBuildServerView();
 
+            boolean standalone = false;
+            if(!net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
+                setupStandaloneSsh();
+                standalone = true;
+            }
+            
             try {
                 try {
                     CloneCommand clone = Git.cloneRepository();
@@ -77,13 +88,17 @@ public class ProjectFromGitImporter {
                 } catch (GitAPIException e) {
             		logger.error2(e.getMessage(), e);
                 }
+                
+                if(standalone){
+                    // skip eclipse specific code
+                    return;
+                }
 
                 IProject extensionProject = workspace.getRoot().getProject(extensionToImport);
                 IProjectDescription description = extensionProject.getWorkspace().newProjectDescription(extensionProject.getName());
 
                 extensionProject.create(description, null);
 
-                
                 if (openProjectOnCreation) {
                     extensionProject.open(null);
                 }
@@ -134,5 +149,18 @@ public class ProjectFromGitImporter {
         final IWorkspaceDescription description = workspace.getDescription();
         description.setAutoBuilding(flag);
         workspace.setDescription(description);
+    }
+
+    /**
+     * Sets up standalone SSH authentication for JGit.  
+     * In Eclipse, SSH authentication is handled automatically via preferences
+     */
+    private void setupStandaloneSsh(){
+        File sshDir = new File(FS.DETECTED.userHome(), ".ssh");
+		SshdSessionFactory sshdSessionFactory = new SshdSessionFactoryBuilder()
+				.setPreferredAuthentications("publickey")
+				.setHomeDirectory(FS.DETECTED.userHome())
+				.setSshDirectory(sshDir).build(new JGitKeyCache());
+		SshSessionFactory.setInstance(sshdSessionFactory);
     }
 }
