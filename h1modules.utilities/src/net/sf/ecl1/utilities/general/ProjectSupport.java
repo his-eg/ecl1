@@ -4,13 +4,11 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -23,7 +21,9 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
+import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceFactory;
 
 /**
  * manages project creation
@@ -32,8 +32,8 @@ import net.sf.ecl1.utilities.logging.ConsoleLogger;
  */
 public class ProjectSupport {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ProjectSupport.class.getSimpleName());
-    
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ProjectSupport.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+
     private static final String[] SOURCE_FOLDERS = { "src/java", "src/test", "src/generated"};
     
     private static final String[] FOLDERS_TO_CREATE =  { "src/java", "src/test", "src/generated", "resource", ".settings" };
@@ -145,7 +145,7 @@ public class ProjectSupport {
 		return javaProject;
 	}
 
-	    /**
+	/**
      * Creates an empty project at the given location
      * 
      * @param name
@@ -153,10 +153,10 @@ public class ProjectSupport {
      * @return the new project
      */
 	public IProject createBaseProject(String name, URI location) {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
+		IProject project = WorkspaceFactory.getWorkspace().getRoot().getProject(name);
 		if (!project.exists()) {
 			IProjectDescription desc = project.getWorkspace().newProjectDescription(project.getName());
-			URI workspaceLocation = ResourcesPlugin.getWorkspace().getRoot().getLocationURI();
+			URI workspaceLocation = WorkspaceFactory.getWorkspace().getRoot().getLocationURI();
 			URI projectLocation = location;
 			if (location != null && location.equals(workspaceLocation)) {
 				projectLocation = null;
