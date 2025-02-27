@@ -1,6 +1,7 @@
 package net.sf.ecl1.utilities.standalone.wokspace;
 
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
@@ -63,6 +64,16 @@ public class ProjectImpl implements IProject{
         //nop
     }
 
+    @Override
+    public boolean exists(IPath path) {
+        return Files.exists(Paths.get(projectPath, path.toString()));
+    }
+
+    @Override
+    public boolean exists() {
+        return Files.exists(Paths.get(projectPath));
+    }
+
 
     @Override
     public void open(int updateFlags, IProgressMonitor monitor) throws CoreException {
@@ -77,11 +88,6 @@ public class ProjectImpl implements IProject{
     @Override
     public void create(IProgressMonitor monitor) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'create(IProgressMonitor monitor)'");
-    }
-    
-    @Override
-    public boolean exists(IPath path) {
-        throw new UnsupportedOperationException("Unimplemented method 'exists(IPath path)'");
     }
     
     @Override
@@ -237,11 +243,6 @@ public class ProjectImpl implements IProject{
     @Override
     public void deleteMarkers(String type, boolean includeSubtypes, int depth) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'deleteMarkers(String type, boolean includeSubtypes, int depth)'");
-    }
-    
-    @Override
-    public boolean exists() {
-        throw new UnsupportedOperationException("Unimplemented method 'exists()'");
     }
     
     @Override
