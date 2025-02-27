@@ -74,6 +74,22 @@ public class ProjectImpl implements IProject{
         return Files.exists(Paths.get(projectPath));
     }
 
+    @Override
+    public IWorkspace getWorkspace() {
+        // always returns default workspace
+        return new WorkspaceImpl();
+    }
+
+    @Override
+    public int getType() {
+        return 1 << 2; // bit mask value 4
+    }
+
+    @Override
+    public IPath getFullPath() {
+        return new PathImpl(projectPath);
+    }
+
 
     @Override
     public void open(int updateFlags, IProgressMonitor monitor) throws CoreException {
@@ -266,11 +282,6 @@ public class ProjectImpl implements IProject{
     }
     
     @Override
-    public IPath getFullPath() {
-        throw new UnsupportedOperationException("Unimplemented method 'getFullPath()'");
-    }
-    
-    @Override
     public long getLocalTimeStamp() {
         throw new UnsupportedOperationException("Unimplemented method 'getLocalTimeStamp()'");
     }
@@ -343,16 +354,6 @@ public class ProjectImpl implements IProject{
     @Override
     public Object getSessionProperty(QualifiedName key) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'getSessionProperty(QualifiedName key)'");
-    }
-    
-    @Override
-    public int getType() {
-        throw new UnsupportedOperationException("Unimplemented method 'getType()'");
-    }
-    
-    @Override
-    public IWorkspace getWorkspace() {
-        throw new UnsupportedOperationException("Unimplemented method 'getWorkspace()'");
     }
     
     @Override
