@@ -58,19 +58,7 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
     @Override
     public IProject getProject(String name) {
         IPath workspacePath = getLocation();
-        File parentFolder = workspacePath.toFile();
-        if (parentFolder.exists() && parentFolder.isDirectory()) {
-            File[] subfolders = parentFolder.listFiles(File::isDirectory);
-            if (subfolders != null) {
-                for (File folder : subfolders) {
-                    if (folder.getName().equals(name)) {
-                        return new ProjectImpl(name, workspacePath);
-                    }
-                }
-            }
-        }
-        // Project not found 
-        return null;
+        return new ProjectImpl(name, workspacePath);
     }
 
     @Override
