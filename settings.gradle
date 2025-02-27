@@ -1,4 +1,5 @@
 rootProject.name = 'ecl1'
 
+include 'h1modules'
 include 'h1modules.utilities'
 include 'net.sf.ecl1.import.wizard'
