@@ -1,7 +1,10 @@
 package net.sf.ecl1.utilities.standalone.wokspace;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import org.eclipse.core.resources.FileInfoMatcherDescription;
@@ -25,7 +28,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
+import net.sf.ecl1.utilities.Activator;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
+
 public class FolderImpl implements IFolder {
+
+    private static final ICommonLogger logger = LoggerFactory.getLogger(FolderImpl.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+
 
     private final String path;
 
@@ -54,6 +64,28 @@ public class FolderImpl implements IFolder {
     public IPath getRawLocation() {
        return getLocation();
     }
+
+    @Override
+    public IContainer getParent() {
+        String workspace = new WorkspaceRootImpl().getLocation().toString();
+        String parent = Paths.get(path).getParent().toString();
+        if(!parent.equals(workspace)){
+            return new FolderImpl(parent);
+        }
+        // parent is workspace root
+        return new WorkspaceRootImpl();
+    }
+
+    @Override
+    public void create(boolean force, boolean local, IProgressMonitor monitor) throws CoreException {
+        //TODO local?
+        try {
+            Files.createDirectories(Paths.get(path));
+        } catch (IOException e) {
+            logger.error("Unable to create folder at: " + path);    
+        } 
+    }
+
 
     @Override
     public IResource findMember(String path) {
@@ -264,11 +296,6 @@ public class FolderImpl implements IFolder {
     @Override
     public IPathVariableManager getPathVariableManager() {
         throw new UnsupportedOperationException("Unimplemented method 'getPathVariableManager()'");
-    }
-    
-    @Override
-    public IContainer getParent() {
-        throw new UnsupportedOperationException("Unimplemented method 'getParent()'");
     }
     
     @Override
@@ -490,11 +517,6 @@ public class FolderImpl implements IFolder {
     @Override
     public boolean isConflicting(ISchedulingRule rule) {
         throw new UnsupportedOperationException("Unimplemented method 'isConflicting(ISchedulingRule rule)'");
-    }
-    
-    @Override
-    public void create(boolean force, boolean local, IProgressMonitor monitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'create(boolean force, boolean local, IProgressMonitor monitor)'");
     }
     
     @Override
