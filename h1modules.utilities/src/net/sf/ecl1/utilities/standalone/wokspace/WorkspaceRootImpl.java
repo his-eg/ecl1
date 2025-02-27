@@ -97,6 +97,11 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
         // Standalone has no hidden projects
         return getProjects();
     }
+
+    @Override
+    public URI getLocationURI() {
+        return Paths.get(path).toUri();
+    }
     
     @Override
     public boolean exists(IPath path) {
@@ -292,11 +297,6 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
     @Override
     public long getLocalTimeStamp() {
         throw new UnsupportedOperationException("Unimplemented method 'getLocalTimeStamp()'");
-    }
-    
-    @Override
-    public URI getLocationURI() {
-        throw new UnsupportedOperationException("Unimplemented method 'getLocationURI()'");
     }
     
     @Override
