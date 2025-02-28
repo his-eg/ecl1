@@ -73,7 +73,7 @@ public class FolderImpl implements IFolder {
             return new FolderImpl(parent);
         }
         // parent is workspace root
-        return new WorkspaceRootImpl();
+        return null;
     }
 
     @Override
