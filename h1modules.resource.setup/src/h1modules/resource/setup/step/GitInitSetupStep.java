@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -18,6 +17,7 @@ import h1modules.resource.setup.Activator;
 import net.sf.ecl1.utilities.general.InitialProjectConfigurationChoices;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
+import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceFactory;
 
 /**
  * Initialize a git repository in the project root
@@ -40,7 +40,7 @@ public class GitInitSetupStep implements ProjectSetupStep {
     	}
     	
     	IPath rawLocation = project.getFullPath();
-    	File ws = ResourcesPlugin.getWorkspace().getRoot().getLocation().toFile();
+    	File ws = WorkspaceFactory.getWorkspace().getRoot().getLocation().toFile();
     		
 		try {
 			//Git init
