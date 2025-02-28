@@ -24,6 +24,8 @@ sourceSets {
     main {
         java {
             srcDir 'src'
+            exclude 'de/his/cs/sys/extensions/wizards/pages/NewExtensionWizardPage.java'
+            exclude 'de/his/cs/sys/extensions/wizards/NewExtensionProjectWizard.java'
         }
     }
 }
