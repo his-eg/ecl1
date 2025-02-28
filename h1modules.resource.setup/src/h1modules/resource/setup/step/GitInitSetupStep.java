@@ -16,7 +16,8 @@ import org.eclipse.jgit.transport.URIish;
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
 import h1modules.resource.setup.Activator;
 import net.sf.ecl1.utilities.general.InitialProjectConfigurationChoices;
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 /**
  * Initialize a git repository in the project root
@@ -25,8 +26,8 @@ import net.sf.ecl1.utilities.logging.ConsoleLogger;
  */
 public class GitInitSetupStep implements ProjectSetupStep {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, GitInitSetupStep.class.getSimpleName());
-    
+    private static final ICommonLogger logger = LoggerFactory.getLogger(GitInitSetupStep.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+  
     @Override
     public void performStep(IProject project, InitialProjectConfigurationChoices choices) {
     	String remoteURI = calculateRemoteURI(project);

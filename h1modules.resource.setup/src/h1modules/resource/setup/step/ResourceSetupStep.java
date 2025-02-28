@@ -9,7 +9,8 @@ import de.his.cs.sys.extensions.steps.ProjectSetupStep;
 import h1modules.resource.setup.Activator;
 import net.sf.ecl1.utilities.general.InitialProjectConfigurationChoices;
 import net.sf.ecl1.utilities.general.ResourceSupport;
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 /**
  * @author keunecke
@@ -17,7 +18,7 @@ import net.sf.ecl1.utilities.logging.ConsoleLogger;
  */
 public class ResourceSetupStep implements ProjectSetupStep {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ResourceSetupStep.class.getSimpleName());
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ResourceSetupStep.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
 
     @Override
     public void performStep(IProject project, InitialProjectConfigurationChoices choices) {
