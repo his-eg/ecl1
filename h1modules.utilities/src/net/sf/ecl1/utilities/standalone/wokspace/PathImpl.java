@@ -43,6 +43,12 @@ public class PathImpl implements IPath {
         return new PathImpl(path);
     }
 
+    @Override
+    public String lastSegment() {
+        // getFileName() returns last segment can be a dir
+        return Paths.get(path).getFileName().toString();
+    }
+
 
     @Override
     public IPath addFileExtension(String extension) {
@@ -102,11 +108,6 @@ public class PathImpl implements IPath {
     @Override
     public boolean isValidSegment(String segment) {
         throw new UnsupportedOperationException("Unimplemented method 'isValidSegment(String segment)'");
-    }
-    
-    @Override
-    public String lastSegment() {
-        throw new UnsupportedOperationException("Unimplemented method 'lastSegment()'");
     }
     
     @Override
