@@ -11,7 +11,8 @@ import java.util.List;
 import com.google.common.collect.Sets;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 /**
@@ -21,8 +22,8 @@ import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
  */
 public class TemplateFetcher {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, TemplateFetcher.class.getSimpleName());
-
+    private static final ICommonLogger logger = LoggerFactory.getLogger(TemplateFetcher.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+	
 	private final List<String> templateRootUrls;
 
     /**

@@ -16,7 +16,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.templates.TemplateFetcher;
 import net.sf.ecl1.utilities.templates.TemplateManager;
 import net.sf.ecl1.utilities.templates.VariableReplacer;
@@ -28,7 +29,7 @@ import net.sf.ecl1.utilities.templates.VariableReplacer;
  */
 public class ResourceSupport {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ResourceSupport.class.getSimpleName());
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ResourceSupport.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
 
     private static final String TEMPLATE_FOLDER_IN_WEBAPPS = "qisserver/WEB-INF/internal/extensionTemplates/current";
     
