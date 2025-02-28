@@ -5,7 +5,6 @@ import java.io.File;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jgit.api.CloneCommand;
@@ -58,8 +57,6 @@ public class ProjectFromGitImporter {
      * @throws CoreException
      */
     public void importProject(String extensionToImport) throws CoreException {
-    	
-//        disableAutoBuild();
         
         // Compute full repository URL depending on configuration
         String fullRepositoryPath = getFullRepositoryPath(extensionToImport);
@@ -109,7 +106,6 @@ public class ProjectFromGitImporter {
                 if (extensionFolder.exists()) {
                     extensionFolder.delete();
                 }
-//                enableAutoBuild();
             }
     	}
     }
@@ -134,21 +130,6 @@ public class ProjectFromGitImporter {
 		}
 		// Create new URL according to https://hiszilla.his.de/hiszilla/show_bug.cgi?id=194146
 		return baseRepositoryPath + "h1/" + segment1 + "/" + segment2 + "/" + extensionToImport;
-    }
-    
-    private void enableAutoBuild() throws CoreException {
-        setWorkspaceAutoBuild(true);
-    }
-
-    private void disableAutoBuild() throws CoreException {
-        setWorkspaceAutoBuild(false);
-    }
-
-    private void setWorkspaceAutoBuild(boolean flag) throws CoreException {
-        IWorkspace workspace = WorkspaceFactory.getWorkspace();
-        final IWorkspaceDescription description = workspace.getDescription();
-        description.setAutoBuilding(flag);
-        workspace.setDescription(description);
     }
 
     /**
