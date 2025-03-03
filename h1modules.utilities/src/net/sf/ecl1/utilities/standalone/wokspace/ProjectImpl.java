@@ -2,6 +2,7 @@ package net.sf.ecl1.utilities.standalone.wokspace;
 
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
@@ -28,6 +29,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.content.IContentTypeMatcher;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
+
+import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 
 public class ProjectImpl implements IProject{
 
@@ -102,9 +105,28 @@ public class ProjectImpl implements IProject{
 
     @Override
     public IPath getFullPath() {
-        return new PathImpl(projectPath);
+        return getFullPath(projectPath);
     }
 
+    protected static IPath getFullPath(String path){
+        Path workspacePath = Paths.get(new WorkspaceRootImpl().getLocation().toString());
+        Path projectPath = Paths.get(path);
+        // standalone only knows about projects in workspace-folder, handle webapps manually
+        IProject webapps = WebappsUtil.findWebappsProject();
+        String webappsName;
+        if(webapps != null){
+            webappsName = webapps.getName();
+            if(path.contains(webappsName)){
+                while(!projectPath.startsWith(webappsName)){
+                    projectPath = projectPath.subpath(1, projectPath.getNameCount());
+                }
+                return new PathImpl(projectPath.toString());
+            }
+        }
+        // use subpath to remove workspaceroot from path
+        Path relativePath = workspacePath.relativize(projectPath.subpath(1, projectPath.getNameCount())); 
+        return new PathImpl(relativePath.toString()); 
+    }
 
     @Override
     public void open(int updateFlags, IProgressMonitor monitor) throws CoreException {
