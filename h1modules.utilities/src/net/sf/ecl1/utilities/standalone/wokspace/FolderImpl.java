@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,27 +28,27 @@ import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
-import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.logging.ICommonLogger;
-import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 public class FolderImpl implements IFolder {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(FolderImpl.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
-
-
-    private final String path;
+    private final Path path;
 
     public FolderImpl(String path) {
+        this.path = Paths.get(path);
+    }
+
+    public FolderImpl(Path path) {
         this.path = path;
     }
 
     @Override
     public boolean exists() {
-        File folder = new File(path);
+        File folder = path.toFile();
         return (folder.exists() && folder.isDirectory());
     }
 
@@ -70,7 +71,7 @@ public class FolderImpl implements IFolder {
     @Override
     public IContainer getParent() {
         String workspace = new WorkspaceRootImpl().getLocation().toString();
-        String parent = Paths.get(path).getParent().toString();
+        String parent = path.getParent().toString();
         if(!parent.equals(workspace)){
             return new FolderImpl(parent);
         }
@@ -81,9 +82,9 @@ public class FolderImpl implements IFolder {
     @Override
     public void create(boolean force, boolean local, IProgressMonitor monitor) throws CoreException {
         try {
-            Files.createDirectories(Paths.get(path));
+            Files.createDirectories(path);
         } catch (IOException e) {
-            logger.error("Unable to create folder at: " + path);    
+            throw new CoreException(new Status(IStatus.ERROR, FolderImpl.class, "Error creating directories at: " + path.toString()));
         } 
     }
 
@@ -94,12 +95,12 @@ public class FolderImpl implements IFolder {
 
     @Override
     public IPath getFullPath() {
-        return ProjectImpl.getFullPath(path);
+        return ProjectImpl.getFullPath(path.toString());
     }
 
     @Override
     public IResource[] members() throws CoreException {
-        File folder = new File(path);
+        File folder = path.toFile();
         List<IResource> children = new ArrayList<>();
         if (folder.exists() && folder.isDirectory()) {
             // Get all files and subdirectories
@@ -120,10 +121,10 @@ public class FolderImpl implements IFolder {
     @Override
     public int getType() {
         // cant get type for project
-        if(path.equals(new WorkspaceRootImpl().getLocation().toString())){
+        if(path.toString().equals(new WorkspaceRootImpl().getLocation().toString())){
             return WorkspaceImpl.TYPE_ROOT;
         }
-        File folder = new File(path);
+        File folder = path.toFile();
         if(folder.exists() && folder.isDirectory()){
             return WorkspaceImpl.TYPE_FOLDER;
         }else if(folder.exists() && folder.isFile()){
