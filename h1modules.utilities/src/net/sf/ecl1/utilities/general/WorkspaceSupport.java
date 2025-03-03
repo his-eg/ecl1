@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import net.sf.ecl1.utilities.hisinone.HisConstants;
-import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceFactory;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
  * @author keunecke

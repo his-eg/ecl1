@@ -17,7 +17,7 @@ import h1modules.resource.setup.Activator;
 import net.sf.ecl1.utilities.general.InitialProjectConfigurationChoices;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
-import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceFactory;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
  * Initialize a git repository in the project root

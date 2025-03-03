@@ -19,7 +19,7 @@ import net.sf.ecl1.utilities.hisinone.HisConstants;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
-import net.sf.ecl1.utilities.standalone.wokspace.FileImpl;
+import net.sf.ecl1.utilities.standalone.workspace.FileImpl;
 import net.sf.ecl1.utilities.templates.TemplateFetcher;
 import net.sf.ecl1.utilities.templates.TemplateManager;
 import net.sf.ecl1.utilities.templates.VariableReplacer;

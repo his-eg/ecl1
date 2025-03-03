@@ -12,8 +12,8 @@ import org.eclipse.core.runtime.Path;
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
-import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceFactory;
-import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceRootImpl;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceRootImpl;
 
 public class WebappsUtil {
 

@@ -19,7 +19,7 @@ import org.eclipse.jgit.util.FS;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
-import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceFactory;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
  * Imports projects from a git repo into local workspace

@@ -21,7 +21,7 @@ import com.google.common.collect.Lists;
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.general.GitUtil;
 import net.sf.ecl1.utilities.general.NetUtil;
-import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceFactory;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
  * HISinOne-Extension-Tools preferences page

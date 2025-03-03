@@ -1,4 +1,4 @@
-package net.sf.ecl1.utilities.standalone.wokspace;
+package net.sf.ecl1.utilities.standalone.workspace;
 
 import java.io.InputStream;
 import java.net.URI;
