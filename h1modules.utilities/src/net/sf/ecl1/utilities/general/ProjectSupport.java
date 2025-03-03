@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
+import net.sf.ecl1.utilities.standalone.ClasspathHandler;
 import net.sf.ecl1.utilities.standalone.wokspace.WorkspaceFactory;
 
 /**
@@ -65,17 +66,42 @@ public class ProjectSupport {
 		IProject project = createBaseProject(projectName, location);
 		
 		try {
-            addNatures(project, projectName);
-            addToProjectStructure(project, FOLDERS_TO_CREATE);
-            setSourceFolders(project, SOURCE_FOLDERS);
-            addProjectDependencies(project, choices.getProjectsToReference());
-    		setJreEnvironment(project);
+			addToProjectStructure(project, FOLDERS_TO_CREATE);
+			if(Activator.isRunningInEclipse()){
+				addNatures(project, projectName);
+				setSourceFolders(project, SOURCE_FOLDERS);
+				addProjectDependencies(project, choices.getProjectsToReference());
+				setJreEnvironment(project);
+			}else{
+				setupClasspathStandalone(project.getLocation().toString(), choices.getProjectsToReference());
+				//TODO natures
+			}
+
         } catch (CoreException e) {
             logger.error2("Exception creating new project '" + projectName + "': " + e.getMessage(), e);
             project = null; // XXX: This may cause an NPE somewhere else, like in TemplateManager.writeContent()
         }
 
 		return project;
+	}
+
+	/**
+	 * Does the same as setSourceFolders, addProjectDependencies, setJreEnvironment but for standalone
+	 */
+	private void setupClasspathStandalone(String projectPath, Collection<String> projectsToReference){
+		ClasspathHandler handler = new ClasspathHandler(projectPath);
+		// setSourceFolders
+		for (String srcPathName : SOURCE_FOLDERS) {
+			handler.addEntry("src", srcPathName);
+		}
+		// addProjectDependencies
+		for (String referencedProject : projectsToReference) {
+			handler.addEntry("src", referencedProject);
+		}
+		// setJreEnvironment
+		handler.addEntry("con", "org.eclipse.jdt.launching.JRE_CONTAINER");
+		// set output
+		handler.addEntry("output", "bin");
 	}
 
 	/**
@@ -154,7 +180,8 @@ public class ProjectSupport {
      */
 	public IProject createBaseProject(String name, URI location) {
 		IProject project = WorkspaceFactory.getWorkspace().getRoot().getProject(name);
-		if (!project.exists()) {
+		// no need for standalone to create project
+		if (!project.exists() && Activator.isRunningInEclipse()) {
 			IProjectDescription desc = project.getWorkspace().newProjectDescription(project.getName());
 			URI workspaceLocation = WorkspaceFactory.getWorkspace().getRoot().getLocationURI();
 			URI projectLocation = location;
@@ -168,7 +195,7 @@ public class ProjectSupport {
 					project.open(null);
 				}
 			} catch (CoreException e) {
-	    		logger.error2(e.getMessage(), e);
+				logger.error2(e.getMessage(), e);
 			}
 		}
 		return project;
