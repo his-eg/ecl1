@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.FileInfoMatcherDescription;
@@ -78,12 +80,57 @@ public class FolderImpl implements IFolder {
 
     @Override
     public void create(boolean force, boolean local, IProgressMonitor monitor) throws CoreException {
-        //TODO local?
         try {
             Files.createDirectories(Paths.get(path));
         } catch (IOException e) {
             logger.error("Unable to create folder at: " + path);    
         } 
+    }
+
+    @Override
+    public void create(int updateFlags, boolean local, IProgressMonitor monitor) throws CoreException {
+       create(false, local, monitor);
+    }
+
+    @Override
+    public IPath getFullPath() {
+        return ProjectImpl.getFullPath(path);
+    }
+
+    @Override
+    public IResource[] members() throws CoreException {
+        File folder = new File(path);
+        List<IResource> children = new ArrayList<>();
+        if (folder.exists() && folder.isDirectory()) {
+            // Get all files and subdirectories
+            File[] files = folder.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isDirectory()) {
+                        children.add(new FolderImpl(file.getAbsolutePath()));
+                    } else {
+                        children.add(new FileImpl(file.getAbsolutePath()));
+                    }
+                }
+            }
+        }
+        return children.toArray(new IResource[0]);
+    }
+
+    @Override
+    public int getType() {
+        // cant get type for project
+        if(path.equals(new WorkspaceRootImpl().getLocation().toString())){
+            return WorkspaceImpl.TYPE_ROOT;
+        }
+        File folder = new File(path);
+        if(folder.exists() && folder.isDirectory()){
+            return WorkspaceImpl.TYPE_FOLDER;
+        }else if(folder.exists() && folder.isFile()){
+            return WorkspaceImpl.TYPE_FILE;
+        }
+        // no type
+        return 0;
     }
 
 
@@ -125,11 +172,6 @@ public class FolderImpl implements IFolder {
     @Override
     public IFolder getFolder(IPath path) {
         throw new UnsupportedOperationException("Unimplemented method 'getFolder(IPath path)'");
-    }
-
-    @Override
-    public IResource[] members() throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'members()'");
     }
 
     @Override
@@ -264,11 +306,6 @@ public class FolderImpl implements IFolder {
     }
     
     @Override
-    public IPath getFullPath() {
-        throw new UnsupportedOperationException("Unimplemented method 'getFullPath()'");
-    }
-    
-    @Override
     public long getLocalTimeStamp() {
         throw new UnsupportedOperationException("Unimplemented method 'getLocalTimeStamp()'");
     }
@@ -336,11 +373,6 @@ public class FolderImpl implements IFolder {
     @Override
     public Object getSessionProperty(QualifiedName key) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'getSessionProperty(QualifiedName key)'");
-    }
-    
-    @Override
-    public int getType() {
-        throw new UnsupportedOperationException("Unimplemented method 'getType()'");
     }
     
     @Override
@@ -517,11 +549,6 @@ public class FolderImpl implements IFolder {
     @Override
     public boolean isConflicting(ISchedulingRule rule) {
         throw new UnsupportedOperationException("Unimplemented method 'isConflicting(ISchedulingRule rule)'");
-    }
-    
-    @Override
-    public void create(int updateFlags, boolean local, IProgressMonitor monitor) throws CoreException {
-        throw new UnsupportedOperationException("Unimplemented method 'create(int updateFlags, boolean local, IProgressMonitor monitor)'");
     }
     
     @Override
