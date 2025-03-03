@@ -58,16 +58,6 @@ public class ProjectImpl implements IProject{
     }
 
     @Override
-    public void create(IProjectDescription description, IProgressMonitor monitor) throws CoreException {
-        //nop
-    }
-
-    @Override
-    public void open(IProgressMonitor monitor) throws CoreException {
-        //nop
-    }
-
-    @Override
     public boolean exists(IPath path) {
         return Files.exists(Paths.get(projectPath, path.toString()));
     }
@@ -126,6 +116,16 @@ public class ProjectImpl implements IProject{
         // use subpath to remove workspaceroot from path
         Path relativePath = workspacePath.relativize(projectPath.subpath(1, projectPath.getNameCount())); 
         return new PathImpl(relativePath.toString()); 
+    }
+
+    @Override
+    public void create(IProjectDescription description, IProgressMonitor monitor) throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'create(IProjectDescription description, IProgressMonitor monitor)'");
+    }
+
+    @Override
+    public void open(IProgressMonitor monitor) throws CoreException {
+        throw new UnsupportedOperationException("Unimplemented method 'open(IProgressMonitor monitor)'");
     }
 
     @Override
