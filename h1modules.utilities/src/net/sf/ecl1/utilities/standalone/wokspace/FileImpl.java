@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.net.URI;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.Map;
 
 import org.eclipse.core.resources.IContainer;
@@ -34,17 +34,19 @@ import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 public class FileImpl implements IFile{
     
-    private final String path;
     private final File file;
 
     public FileImpl(String path) {
-        this.path = path;
         this.file = new File(path);
+    }
+
+    public FileImpl(Path path) {
+        this.file = path.toFile();
     }
 
     @Override
     public IPath getFullPath() {
-        return ProjectImpl.getFullPath(path);
+        return ProjectImpl.getFullPath(file.toPath().toString());
     }
 
     @Override
@@ -83,7 +85,7 @@ public class FileImpl implements IFile{
 
     @Override
     public IContainer getParent() {
-        File parent = Paths.get(path).getParent().toFile();
+        File parent = file.toPath().getParent().toFile();
         if(file.isFile()){
             return (IContainer) new FileImpl(parent.getAbsolutePath());
         }else{
