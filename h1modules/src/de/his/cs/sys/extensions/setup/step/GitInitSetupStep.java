@@ -1,4 +1,4 @@
-package h1modules.resource.setup.step;
+package de.his.cs.sys.extensions.setup.step;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,8 +12,8 @@ import org.eclipse.jgit.lib.ConfigConstants;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.transport.URIish;
 
+import de.his.cs.sys.extensions.Activator;
 import de.his.cs.sys.extensions.steps.ProjectSetupStep;
-import h1modules.resource.setup.Activator;
 import net.sf.ecl1.utilities.general.InitialProjectConfigurationChoices;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;

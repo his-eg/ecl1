@@ -3,8 +3,8 @@ package de.his.cs.sys.extensions.standalone;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.wizard.Wizard;
 
-import h1modules.resource.setup.step.GitInitSetupStep;
-import h1modules.resource.setup.step.ResourceSetupStep;
+import de.his.cs.sys.extensions.setup.step.GitInitSetupStep;
+import de.his.cs.sys.extensions.setup.step.ResourceSetupStep;
 import net.sf.ecl1.utilities.general.InitialProjectConfigurationChoices;
 import net.sf.ecl1.utilities.general.ProjectSupport;
 

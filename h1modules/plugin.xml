@@ -18,5 +18,15 @@
             project="true">
       </wizard>
    </extension>
-
+   <extension
+         point="cs.sys.extensions.ProjectSetupSteps">
+      <Step
+            class="de.his.cs.sys.extensions.setup.step.ResourceSetupStep"
+            name="Resource Setup">
+      </Step>
+      <Step
+            class="de.his.cs.sys.extensions.setup.step.GitInitSetupStep"
+            name="Resource Setup">
+      </Step>
+   </extension>
 </plugin>
