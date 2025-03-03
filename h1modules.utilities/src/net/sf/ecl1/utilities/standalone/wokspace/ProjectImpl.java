@@ -86,6 +86,21 @@ public class ProjectImpl implements IProject{
     }
 
     @Override
+    public IFile getFile(IPath path) {
+        return new FileImpl(Paths.get(projectPath).resolve(path.toString()).toString());
+    }
+
+    @Override
+    public IFile getFile(String name) {
+        return new FileImpl(Paths.get(projectPath).resolve(name).toString());
+    }
+
+    @Override
+    public IFolder getFolder(IPath path) {
+        return new FolderImpl(Paths.get(projectPath).resolve(path.toString()).toString());
+    }
+
+    @Override
     public IPath getFullPath() {
         return new PathImpl(projectPath);
     }
@@ -134,16 +149,6 @@ public class ProjectImpl implements IProject{
     @Override
     public String getDefaultCharset(boolean checkImplicit) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'getDefaultCharset(boolean checkImplicit)'");
-    }
-    
-    @Override
-    public IFile getFile(IPath path) {
-        throw new UnsupportedOperationException("Unimplemented method 'getFile(IPath path)'");
-    }
-    
-    @Override
-    public IFolder getFolder(IPath path) {
-        throw new UnsupportedOperationException("Unimplemented method 'getFolder(IPath path)'");
     }
     
     @Override
@@ -576,11 +581,6 @@ public class ProjectImpl implements IProject{
     @Override
     public IProjectDescription getDescription() throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'getDescription()'");
-    }
-    
-    @Override
-    public IFile getFile(String name) {
-        throw new UnsupportedOperationException("Unimplemented method 'getFile(String name)'");
     }
     
     @Override
