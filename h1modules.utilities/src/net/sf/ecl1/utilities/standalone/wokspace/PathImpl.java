@@ -7,36 +7,41 @@ import java.nio.file.Paths;
 import org.eclipse.core.runtime.IPath;
 
 public class PathImpl implements IPath {
-    private final String path;
+    private final Path path;
 
     public PathImpl(String path) {
+        this.path = Paths.get(path);
+    }
+
+    public PathImpl(Path path) {
         this.path = path;
     }
+
 
     @Override
     public String toOSString() {
         //converts to os-string
-        return Paths.get(path).toString();
+        return path.toString();
     }
 
     @Override
     public String toString() {
-        return path;
+        return path.toString();
     }
 
     @Override
     public File toFile() {
-        return new File(path);
+        return path.toFile();
     }
 
     @Override
     public IPath append(String path) {
-        return new PathImpl(Paths.get(this.path, path).toString());
+        return new PathImpl(this.path.resolve(path));
     }
 
     @Override
     public IPath append(IPath path) {
-        return new PathImpl(Paths.get(this.path, path.toString()).toString());
+        return new PathImpl(this.path.resolve(path.toPath()));
     }
 
     @Override
@@ -47,19 +52,18 @@ public class PathImpl implements IPath {
     @Override
     public String lastSegment() {
         // getFileName() returns last segment can be a dir
-        return Paths.get(path).getFileName().toString();
+        return path.getFileName().toString();
     }
 
     @Override
     public int segmentCount() {
-        return Paths.get(path).getNameCount();
+        return path.getNameCount();
     }
 
     @Override
     public IPath removeFirstSegments(int count) {
-        Path newPath = Paths.get(path);
-        newPath = newPath.subpath(count, newPath.getNameCount());
-        return new PathImpl(newPath.toString());
+        Path newPath = path.subpath(count, path.getNameCount());
+        return new PathImpl(newPath);
     }
 
     @Override
@@ -68,7 +72,7 @@ public class PathImpl implements IPath {
         int dotIndex = fileName.lastIndexOf('.');
         // make sure file doesnt start with .
         if(dotIndex > 0) {
-            return new PathImpl(Paths.get(path).resolveSibling(fileName.substring(0, dotIndex)).toString());
+            return new PathImpl(path.resolveSibling(fileName.substring(0, dotIndex)));
         }
         return new PathImpl(path);
     }
