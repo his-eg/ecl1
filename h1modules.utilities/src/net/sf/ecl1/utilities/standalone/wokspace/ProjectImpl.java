@@ -35,11 +35,11 @@ import net.sf.ecl1.utilities.hisinone.WebappsUtil;
 public class ProjectImpl implements IProject{
 
     private final String name;
-    private final String projectPath;
+    private final Path projectPath;
 
     public ProjectImpl(String name, IPath workspacePath) {
         this.name = name;
-        this.projectPath = Paths.get(workspacePath.toOSString(), name).toString();
+        this.projectPath = Paths.get(workspacePath.toOSString(), name);
     }
 
     @Override
@@ -49,22 +49,22 @@ public class ProjectImpl implements IProject{
 
     @Override
     public IFolder getFolder(String name) {
-        return new FolderImpl(Paths.get(projectPath, name).toString());
+        return new FolderImpl(projectPath.resolve(name).toString());
     }
 
     @Override
     public IPath getLocation() {
-        return new PathImpl(projectPath);
+        return new PathImpl(projectPath.toString());
     }
 
     @Override
     public boolean exists(IPath path) {
-        return Files.exists(Paths.get(projectPath, path.toString()));
+        return Files.exists(projectPath.resolve(path.toString()));
     }
 
     @Override
     public boolean exists() {
-        return Files.exists(Paths.get(projectPath));
+        return Files.exists(projectPath);
     }
 
     @Override
@@ -80,22 +80,22 @@ public class ProjectImpl implements IProject{
 
     @Override
     public IFile getFile(IPath path) {
-        return new FileImpl(Paths.get(projectPath).resolve(path.toString()).toString());
+        return new FileImpl(projectPath.resolve(path.toString()).toString());
     }
 
     @Override
     public IFile getFile(String name) {
-        return new FileImpl(Paths.get(projectPath).resolve(name).toString());
+        return new FileImpl(projectPath.resolve(name).toString());
     }
 
     @Override
     public IFolder getFolder(IPath path) {
-        return new FolderImpl(Paths.get(projectPath).resolve(path.toString()).toString());
+        return new FolderImpl(projectPath.resolve(path.toString()).toString());
     }
 
     @Override
     public IPath getFullPath() {
-        return getFullPath(projectPath);
+        return getFullPath(projectPath.toString());
     }
 
     protected static IPath getFullPath(String path){
