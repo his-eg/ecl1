@@ -30,13 +30,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
-import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.logging.ICommonLogger;
-import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 public class WorkspaceImpl implements IWorkspace {
-
-    private static final ICommonLogger logger = LoggerFactory.getLogger(WorkspaceImpl.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
 
     protected static final int TYPE_FILE = 0x1;
     protected static final int TYPE_FOLDER = 0x2;
@@ -50,21 +45,18 @@ public class WorkspaceImpl implements IWorkspace {
 
     @Override
     public void setDescription(IWorkspaceDescription description) {
-        logger.debug("Standalone Workspace has no description");
+        throw new UnsupportedOperationException("Unimplemented method 'setDescription(IWorkspaceDescription description)'");
     }
 
     @Override
     public IWorkspaceDescription getDescription() {
-        logger.debug("Standalone Workspace has no description");
-        return null;
+        throw new UnsupportedOperationException("Unimplemented method 'getDescription'");
     }
 
     @Override
     public IProjectDescription newProjectDescription(String projectName) {
-        logger.debug("Standalone Workspace has no description");
-        return null;
+        throw new UnsupportedOperationException("Unimplemented method 'newProjectDescription(String projectName)'");
     }
-
 
     @Override
     public <T> T getAdapter(Class<T> adapter) {
