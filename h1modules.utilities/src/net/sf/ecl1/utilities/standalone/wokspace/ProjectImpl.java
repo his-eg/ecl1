@@ -49,12 +49,12 @@ public class ProjectImpl implements IProject{
 
     @Override
     public IFolder getFolder(String name) {
-        return new FolderImpl(projectPath.resolve(name).toString());
+        return new FolderImpl(projectPath.resolve(name));
     }
 
     @Override
     public IPath getLocation() {
-        return new PathImpl(projectPath.toString());
+        return new PathImpl(projectPath);
     }
 
     @Override
@@ -80,17 +80,17 @@ public class ProjectImpl implements IProject{
 
     @Override
     public IFile getFile(IPath path) {
-        return new FileImpl(projectPath.resolve(path.toString()).toString());
+        return new FileImpl(projectPath.resolve(path.toString()));
     }
 
     @Override
     public IFile getFile(String name) {
-        return new FileImpl(projectPath.resolve(name).toString());
+        return new FileImpl(projectPath.resolve(name));
     }
 
     @Override
     public IFolder getFolder(IPath path) {
-        return new FolderImpl(projectPath.resolve(path.toString()).toString());
+        return new FolderImpl(projectPath.resolve(path.toString()));
     }
 
     @Override
