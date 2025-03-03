@@ -13,4 +13,3 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .
 Bundle-Activator: net.sf.ecl1.importwizard.Activator
 Bundle-ActivationPolicy: lazy
-Import-Package: net.sf.ecl1.classpath.container
