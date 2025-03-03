@@ -38,6 +38,10 @@ public class WorkspaceImpl implements IWorkspace {
 
     private static final ICommonLogger logger = LoggerFactory.getLogger(WorkspaceImpl.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
 
+    protected static final int TYPE_FILE = 0x1;
+    protected static final int TYPE_FOLDER = 0x2;
+    protected static final int TYPE_PROJECT = 0x4;
+    protected static final int TYPE_ROOT = 0x8;
 
     @Override
     public IWorkspaceRoot getRoot() {

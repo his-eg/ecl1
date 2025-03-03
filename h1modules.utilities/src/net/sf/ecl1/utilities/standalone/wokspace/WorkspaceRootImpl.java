@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 public class WorkspaceRootImpl implements IWorkspaceRoot {
+
     private final String path;
 
     public WorkspaceRootImpl(){
@@ -89,6 +90,11 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
     @Override
     public URI getLocationURI() {
         return Paths.get(path).toUri();
+    }
+
+    @Override
+    public int getType() {
+        return WorkspaceImpl.TYPE_ROOT;
     }
     
     @Override
@@ -350,11 +356,6 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
     @Override
     public Object getSessionProperty(QualifiedName key) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'getSessionProperty(QualifiedName key)'");
-    }
-    
-    @Override
-    public int getType() {
-        throw new UnsupportedOperationException("Unimplemented method 'getType()'");
     }
     
     @Override

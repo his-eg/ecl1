@@ -82,7 +82,7 @@ public class ProjectImpl implements IProject{
 
     @Override
     public int getType() {
-        return 1 << 2; // bit mask value 4
+        return WorkspaceImpl.TYPE_PROJECT;
     }
 
     @Override
