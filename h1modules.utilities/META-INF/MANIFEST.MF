@@ -30,7 +30,8 @@ Export-Package: net.sf.ecl1.utilities.general;
  net.sf.ecl1.utilities.logging,
  net.sf.ecl1.utilities.preferences;uses:="org.eclipse.ui,org.eclipse.jface.preference,org.eclipse.core.runtime.preferences",
  net.sf.ecl1.utilities.standalone.workspace,
- net.sf.ecl1.utilities.templates
+ net.sf.ecl1.utilities.templates,
+ net.sf.ecl1.utilities
 Import-Package: org.apache.commons.io,
  org.eclipse.jdt.core,
  org.eclipse.team.ui
