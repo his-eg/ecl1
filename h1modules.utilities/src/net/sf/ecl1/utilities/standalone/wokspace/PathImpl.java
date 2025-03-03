@@ -1,6 +1,7 @@
 package net.sf.ecl1.utilities.standalone.wokspace;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.eclipse.core.runtime.IPath;
@@ -49,6 +50,28 @@ public class PathImpl implements IPath {
         return Paths.get(path).getFileName().toString();
     }
 
+    @Override
+    public int segmentCount() {
+        return Paths.get(path).getNameCount();
+    }
+
+    @Override
+    public IPath removeFirstSegments(int count) {
+        Path newPath = Paths.get(path);
+        newPath = newPath.subpath(count, newPath.getNameCount());
+        return new PathImpl(newPath.toString());
+    }
+
+    @Override
+    public IPath removeFileExtension() {
+        String fileName = lastSegment();
+        int dotIndex = fileName.lastIndexOf('.');
+        // make sure file doesnt start with .
+        if(dotIndex > 0) {
+            return new PathImpl(Paths.get(path).resolveSibling(fileName.substring(0, dotIndex)).toString());
+        }
+        return new PathImpl(path);
+    }
 
     @Override
     public IPath addFileExtension(String extension) {
@@ -136,16 +159,6 @@ public class PathImpl implements IPath {
     }
     
     @Override
-    public IPath removeFileExtension() {
-        throw new UnsupportedOperationException("Unimplemented method 'removeFileExtension()'");
-    }
-    
-    @Override
-    public IPath removeFirstSegments(int count) {
-        throw new UnsupportedOperationException("Unimplemented method 'removeFirstSegments(int count)'");
-    }
-    
-    @Override
     public IPath removeLastSegments(int count) {
         throw new UnsupportedOperationException("Unimplemented method 'removeLastSegments(int count)'");
     }
@@ -158,11 +171,6 @@ public class PathImpl implements IPath {
     @Override
     public String segment(int index) {
         throw new UnsupportedOperationException("Unimplemented method 'segment(int index)'");
-    }
-    
-    @Override
-    public int segmentCount() {
-        throw new UnsupportedOperationException("Unimplemented method 'segmentCount()'");
     }
     
     @Override
