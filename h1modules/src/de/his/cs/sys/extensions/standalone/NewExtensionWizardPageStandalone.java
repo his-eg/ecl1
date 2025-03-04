@@ -66,13 +66,6 @@ public class NewExtensionWizardPageStandalone extends WizardPage {
 		pojectNameLabel.setText("Project name:");
         projectNameText = new Text(composite, SWT.BORDER);
         projectNameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 3, 1));
-		projectNameText.addModifyListener(event -> {
-			if(projectNameText.getText().contains("_")) {
-				setMessage("HISInOne Extension must not contain the character \"_\" in its name.");
-			}else{
-				setMessage(null);
-			}
-		});
 
         // Checkbox for "Use default location"
         useDefaultLocationCheckbox = new Button(composite, SWT.CHECK);
@@ -143,6 +136,21 @@ public class NewExtensionWizardPageStandalone extends WizardPage {
 			}
 		}
 		projectList.select(index);
+
+		// Project name listener
+		projectNameText.addModifyListener(event -> {
+			if(projectNameText.getText().contains("_")) {
+				setMessage("HISInOne Extension must not contain the character \"_\" in its name.", WizardPage.ERROR);
+				setPageComplete(false);
+			}else if(references.contains(projectNameText.getText())){
+				setMessage("A project with that name already exists in the workspace.", WizardPage.ERROR);
+				setPageComplete(false);
+			}else{
+				setMessage(null);
+				setPageComplete(true);
+			}
+
+		});
 		
 		Label warnAboutOldTemplatesLabel = new Label(composite, SWT.TOP);
 		warnAboutOldTemplatesLabel.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true , false , 4, 1)); 
