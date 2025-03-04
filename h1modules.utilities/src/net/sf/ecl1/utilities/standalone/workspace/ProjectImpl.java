@@ -49,6 +49,10 @@ public class ProjectImpl implements IProject{
 
     @Override
     public IFolder getFolder(String name) {
+        // dont resolve absolute paths
+        if(name.startsWith("/") || name.startsWith("\\")){
+            name = name.substring(1);
+        }
         return new FolderImpl(projectPath.resolve(name));
     }
 
