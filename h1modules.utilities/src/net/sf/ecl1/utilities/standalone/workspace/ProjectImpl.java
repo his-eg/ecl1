@@ -117,9 +117,8 @@ public class ProjectImpl implements IProject{
                 return new PathImpl(projectPath.toString());
             }
         }
-        // use subpath to remove workspaceroot from path
-        Path relativePath = workspacePath.relativize(projectPath.subpath(1, projectPath.getNameCount())); 
-        return new PathImpl(relativePath.toString()); 
+        // return path relative to workspace
+        return new PathImpl(workspacePath.relativize(projectPath));
     }
 
     @Override
