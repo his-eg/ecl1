@@ -17,15 +17,16 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 /**
  * A utility for Eclipse projects and Java projects.
  * @author TNeumann
  */
 public class ProjectUtil {
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ProjectUtil.class.getSimpleName());
 
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ProjectUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
 	
     public static boolean isJavaProject(IProject project) {
     	try {

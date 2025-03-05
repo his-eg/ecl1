@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+
 /**
  * Extension import configuration wizard, page 2 handling dependent extensions.
  * 
@@ -23,8 +24,6 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
 	
-    //private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
-
 	private static final String PAGE_NAME = "page2";
 	private static final String PAGE_DESCRIPTION = "Extension Import - Dependencies";
 
@@ -57,9 +56,7 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
     }
     
     @Override
-    public void createControl(Composite parent) {
-    	//logger.log("create controls for page 2");
-        
+    public void createControl(Composite parent) { 
         container = new Composite(parent, SWT.NONE);
         GridLayout gl = new GridLayout(1, false);
         container.setLayout(gl);
@@ -119,7 +116,6 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
     }
     
     void onEnterPage() {
-    	//logger.log("create data for page 2");
         setExtensionsTable(userSelectedTable, userSelectedTableColumn, model.getSelectedExtensions());
         model.findDependenciesOfSelectedExtensions();
         setExtensionsTable(dependentTable, dependentTableColumn, model.getDependenciesOfSelectedExtensions());

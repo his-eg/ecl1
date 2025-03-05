@@ -30,8 +30,6 @@ import net.sf.ecl1.utilities.general.GitUtil;
  */
 public class ExtensionImportWizardPage1_Selection extends WizardPage {
 	
-	//private static final ConsoleLogger logger = ConsoleLogger.getEcl1Logger();
-
 	private static final String PAGE_NAME = "page1";
 	private static final String PAGE_DESCRIPTION = "Extension Import - Selection";
 
@@ -52,8 +50,6 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
 
     @Override
     public void createControl(Composite parent) {
-    	//logger.log("create controls for page 1");
-        
     	Composite container = new Composite(parent, SWT.NONE);
         GridLayout gl = new GridLayout(1, true);
         container.setLayout(gl);

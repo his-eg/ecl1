@@ -8,7 +8,8 @@ import java.nio.file.Paths;
 import org.eclipse.core.resources.IFile;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 /**
  * Utility methods to access files in a HISinOne project.
@@ -17,7 +18,7 @@ import net.sf.ecl1.utilities.logging.ConsoleLogger;
  */
 public class FileUtil {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, FileUtil.class.getSimpleName());
+    private static final ICommonLogger logger = LoggerFactory.getLogger(FileUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
 
     /**
      * Read a file's content to a string

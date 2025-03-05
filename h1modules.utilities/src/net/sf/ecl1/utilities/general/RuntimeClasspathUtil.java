@@ -23,15 +23,17 @@ import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.hisinone.ExtensionUtil;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 /**
  * Utility for manipulation of the runtime classpath.
  * @author TNeumann
  */
 public class RuntimeClasspathUtil {
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, RuntimeClasspathUtil.class.getSimpleName());
 
+    private static final ICommonLogger logger = LoggerFactory.getLogger(RuntimeClasspathUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+	
     private static final String JRE_CONTAINER_PREFIX = "org.eclipse.jdt.launching.JRE_CONTAINER";
 
     /**
