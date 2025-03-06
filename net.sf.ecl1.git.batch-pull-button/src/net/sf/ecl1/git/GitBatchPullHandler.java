@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -24,10 +23,10 @@ import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.statushandlers.StatusManager;
 import org.eclipse.core.runtime.MultiStatus;
 
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 /**
@@ -37,8 +36,8 @@ import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
  */
 public class GitBatchPullHandler extends AbstractHandler {
 		
-	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, GitBatchPullHandler.class.getSimpleName());
-	
+    private static final ICommonLogger logger = LoggerFactory.getLogger(GitBatchPullHandler.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
+
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		
@@ -98,55 +97,54 @@ public class GitBatchPullHandler extends AbstractHandler {
 				return displayResultStatus(multiStatus);
 			}
 			
-			/**
-			 * Parse the pullResult and write the result into the multiStatus
-			 * 
-			 * @param projectName
-			 * @param pullResult
-			 * @param multiStatus
-			 */
-			private void parsePullResult(String projectName, PullResult pullResult, MultiStatus multiStatus) {
-				Status status;
-				if(!pullResult.isSuccessful()) {
-					if (pullResult.getMergeResult() != null && !pullResult.getMergeResult().getMergeStatus().isSuccessful()) {
-						status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Pull from " + projectName + " was not successful, because the merge failed.");
-						multiStatus.add(status);
-					}
-					if(pullResult.getRebaseResult() != null && !pullResult.getRebaseResult().getStatus().isSuccessful()) {
-						status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Pull from " + projectName + " was not successful, because the rebase failed.");
-						multiStatus.add(status);
-					}
-				}
-			}
-			
-			
-			/**
-			 * Creates a dialog that summarizes the result of the git batch pull
-			 * 
-			 * @param result
-			 * @return
-			 */
-			private IStatus displayResultStatus(IStatus result) {
-				//Jobs are running outside of the UI thread and therefore cannot display anything to the user themselves.
-				//--> Create the runnable to display the result
-				PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
-					
-					@Override
-					public void run() {
-						if (PreferenceWrapper.isDisplaySummaryOfGitPull()) {
-							new GitBatchPullSummaryErrorDialog(result).open();
-						}
-					}
-				});
-				return result;
-			}
 		};
 		//Registering the job enables the activator to properly shutdown the job when eclipse shuts down
 		Activator.getDefault().setGitBatchPullJob(job);
 		job.schedule();
 		return null;
 	}
-	
+
+	/**
+	 * Parse the pullResult and write the result into the multiStatus
+	 * 
+	 * @param projectName
+	 * @param pullResult
+	 * @param multiStatus
+	 */
+	private void parsePullResult(String projectName, PullResult pullResult, MultiStatus multiStatus) {
+		Status status;
+		if(!pullResult.isSuccessful()) {
+			if (pullResult.getMergeResult() != null && !pullResult.getMergeResult().getMergeStatus().isSuccessful()) {
+				status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Pull from " + projectName + " was not successful, because the merge failed.");
+				multiStatus.add(status);
+			}
+			if(pullResult.getRebaseResult() != null && !pullResult.getRebaseResult().getStatus().isSuccessful()) {
+				status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Pull from " + projectName + " was not successful, because the rebase failed.");
+				multiStatus.add(status);
+			}
+		}
+	}
+
+	/**
+	 * Creates a dialog that summarizes the result of the git batch pull
+	 * 
+	 * @param result
+	 * @return
+	 */
+	private IStatus displayResultStatus(IStatus result) {
+		//Jobs are running outside of the UI thread and therefore cannot display anything to the user themselves.
+		//--> Create the runnable to display the result
+		PlatformUI.getWorkbench().getDisplay().asyncExec(new Runnable() {
+
+			@Override
+			public void run() {
+				if (PreferenceWrapper.isDisplaySummaryOfGitPull()) {
+					new GitBatchPullSummaryErrorDialog(result).open();
+				}
+			}
+		});
+		return result;
+	}
 	
 	/**
 	 * 
