@@ -31,6 +31,7 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     public ExtensionImportWizard() {
         super();
         model = new ExtensionImportWizardModel();
+        setWindowTitle(WINDOW_TITLE);
     }
 
     /* (non-Javadoc)
@@ -38,7 +39,6 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
      */
     @Override
     public void init(IWorkbench workbench, IStructuredSelection selection) {
-        setWindowTitle(WINDOW_TITLE);
         setNeedsProgressMonitor(true);
     }
 
