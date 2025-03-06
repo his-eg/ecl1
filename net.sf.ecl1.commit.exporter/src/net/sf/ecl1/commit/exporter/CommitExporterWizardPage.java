@@ -35,11 +35,12 @@ import net.sf.ecl1.commit.exporter.git.StagedChanges;
 import net.sf.ecl1.utilities.general.GitUtil;
 import net.sf.ecl1.utilities.hisinone.ReleaseXmlUtil;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 public class CommitExporterWizardPage extends WizardPage {
 
-	private static final ConsoleLogger logger = new ConsoleLogger(CommitExportWizardPlugin.getDefault().getLog(), CommitExportWizardPlugin.PLUGIN_ID, CommitExporterWizardPage.class.getSimpleName());
+    private static final ICommonLogger logger = LoggerFactory.getLogger(CommitExporterWizardPage.class.getSimpleName(), CommitExportWizardPlugin.PLUGIN_ID, CommitExportWizardPlugin.getDefault());
 
     private CheckboxTableViewer commitTable;
 
