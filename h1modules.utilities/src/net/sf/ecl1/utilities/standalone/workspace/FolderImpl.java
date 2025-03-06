@@ -133,7 +133,11 @@ public class FolderImpl implements IFolder {
         // no type
         return 0;
     }
-
+    
+    @Override
+    public IFile getFile(String name) {
+        return new FileImpl(path.resolve(name));
+    }
 
     @Override
     public IResource findMember(String path) {
@@ -565,11 +569,6 @@ public class FolderImpl implements IFolder {
     @Override
     public void delete(boolean force, boolean keepHistory, IProgressMonitor monitor) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'delete(boolean force, boolean keepHistory, IProgressMonitor monitor)'");
-    }
-    
-    @Override
-    public IFile getFile(String name) {
-        throw new UnsupportedOperationException("Unimplemented method 'getFile(String name)'");
     }
     
     @Override
