@@ -94,6 +94,11 @@ public class FileImpl implements IFile{
     }
 
     @Override
+    public URI getLocationURI() {
+        return file.toURI();
+    }
+
+    @Override
     public void accept(IResourceProxyVisitor visitor, int memberFlags) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'accept'");
     }
@@ -191,11 +196,6 @@ public class FileImpl implements IFile{
     @Override
     public IPath getLocation() {
         throw new UnsupportedOperationException("Unimplemented method 'getLocation'");
-    }
-
-    @Override
-    public URI getLocationURI() {
-        throw new UnsupportedOperationException("Unimplemented method 'getLocationURI'");
     }
 
     @Override
