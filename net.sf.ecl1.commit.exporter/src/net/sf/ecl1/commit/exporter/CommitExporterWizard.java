@@ -9,11 +9,14 @@ public class CommitExporterWizard extends Wizard implements IExportWizard {
 
     private CommitExporterWizardPage page;
     
+    public CommitExporterWizard() {
+        super();
+        setWindowTitle("Export Commits");
+    }
+
     @Override
     public void init(IWorkbench workbench, IStructuredSelection selection) {  	    	
-    	setWindowTitle("Export Commits");
-        this.page = new CommitExporterWizardPage();
-        addPage(page);
+        //do nothing yet
     }
 
     @Override
@@ -21,5 +24,12 @@ public class CommitExporterWizard extends Wizard implements IExportWizard {
         page.setValidationRequired();
         page.createHotfix();
         return (page.getErrorMessage() == null);
+    }
+
+    @Override
+    public void addPages(){
+        super.addPages();
+        this.page = new CommitExporterWizardPage();
+        addPage(page);
     }
 }
