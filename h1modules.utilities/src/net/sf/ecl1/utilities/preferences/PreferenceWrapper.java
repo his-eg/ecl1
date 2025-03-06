@@ -1,12 +1,16 @@
 package net.sf.ecl1.utilities.preferences;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceStore;
 
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.general.GitUtil;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.standalone.StandalonePreferenceStore;
 
 /**
@@ -15,6 +19,8 @@ import net.sf.ecl1.utilities.preferences.standalone.StandalonePreferenceStore;
  */
 public class PreferenceWrapper {
     
+    private static final ICommonLogger logger = LoggerFactory.getLogger(PreferenceWrapper.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
+
     /** Preference for URI to git server */
     public static final String GIT_SERVER_PREFERENCE_KEY = "gitServer";
 
@@ -104,5 +110,19 @@ public class PreferenceWrapper {
 	
 	public static void setDisplaySummaryOfGitPull(boolean v) {
         getStore().setValue(DISPLAY_SUMMARY_OF_GIT_PULL, v);
+        saveStore();
 	}
+
+    /*
+     * Ensures that changes to the standalone preference store are persisted.
+     */
+    private static void saveStore(){
+        if(getStore().needsSaving()){
+            try {
+                ((PreferenceStore) getStore()).save();
+            } catch (IOException e) {
+                logger.error("Error while saving to preference store", e);
+            }
+        }
+    }
 }
