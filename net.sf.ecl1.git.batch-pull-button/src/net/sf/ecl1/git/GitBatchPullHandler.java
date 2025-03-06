@@ -46,7 +46,9 @@ public class GitBatchPullHandler extends AbstractHandler {
 		// standalone
 		if(!net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
 			IStatus multiStatus = gitBatchPullJob(new NullProgressMonitor());
-			new GitBatchPullSummaryErrorDialog(multiStatus).open();
+			if (PreferenceWrapper.isDisplaySummaryOfGitPull()) {
+				new GitBatchPullSummaryErrorDialog(multiStatus).open();
+			}
 			return null;
 		}
 
