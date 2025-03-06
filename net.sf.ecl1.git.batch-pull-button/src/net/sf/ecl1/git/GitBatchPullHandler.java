@@ -45,64 +45,70 @@ public class GitBatchPullHandler extends AbstractHandler {
 		Job job = new WorkspaceJob("ecl1: Executing \"git pull\" for all git versioned projects in the workspace.") {
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
-				/** Stores the result of this job */
-				MultiStatus multiStatus = new MultiStatus(Activator.PLUGIN_ID, 0, "Problems occured during \"Batch Git Pull Command\"");
-				Status status;
-		
-				List<IProject> projects = Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects());
-				//Unnecessary after finishing #267325. The problem definition for #250882 was flawed and therefore sort was 
-				//never really needed by the user. Even though it is pointless, it stays in, because it doesn't do any harm...
-				Collections.sort(projects, projectComparator);
-				logger.info("Found projects in Workspace: " + projects);
-				monitor.beginTask("Batch Git Pull", projects.size());
-				for (IProject p : projects) {
-					//Check, if user has requested a cancel
-					if(monitor.isCanceled()) {
-						multiStatus.add(Status.CANCEL_STATUS);
-						return displayResultStatus(multiStatus);
-					}
-					
-					String name = p.getName();
-					monitor.subTask("Pulling " + name);
-					File projectLocationFile = p.getLocation().append(".git").toFile();
-					logger.info("Processing " + name + " with location " + projectLocationFile.getAbsolutePath());
-					
-					if(projectLocationFile.isFile()) {
-						status = new Status(IStatus.INFO, Activator.PLUGIN_ID, name + " is managed by git, but you are currently in a linked work tree. Git Batch Pull will not work in a linked work tree. Skipping...");
-						multiStatus.add(status);
-						monitor.worked(1);
-						continue;
-					}
-
-					try (Git git = Git.open(projectLocationFile)){
-						try {
-							PullCommand pull = git.pull();
-							PullResult pullResult = pull.call();
-							parsePullResult(name, pullResult, multiStatus);
-						} catch (GitAPIException | JGitInternalException e) {
-							status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": " + e.getMessage() + ". Skipping and proceeding.");
-							multiStatus.add(status);
-						}
-					} catch (org.eclipse.jgit.errors.RepositoryNotFoundException rnfe) {
-						// ignore
-						logger.info(name + " is not managed via Git: " + rnfe.getMessage());
-					} catch (IOException e) {
-						status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": " + e.getMessage());
-						multiStatus.add(status);
-					}
-					logger.info("Finished " + name);
-					monitor.worked(1);
-				}				
-				monitor.done();
+				IStatus multiStatus = gitBatchPullJob(monitor);
 				return displayResultStatus(multiStatus);
 			}
-			
 		};
+		
 		//Registering the job enables the activator to properly shutdown the job when eclipse shuts down
 		Activator.getDefault().setGitBatchPullJob(job);
 		job.schedule();
 		return null;
 	}
+
+	public IStatus gitBatchPullJob(IProgressMonitor monitor) {
+		/** Stores the result of this job */
+		MultiStatus multiStatus = new MultiStatus(Activator.PLUGIN_ID, 0, "Problems occured during \"Batch Git Pull Command\"");
+		Status status;
+
+		List<IProject> projects = Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects());
+		//Unnecessary after finishing #267325. The problem definition for #250882 was flawed and therefore sort was 
+		//never really needed by the user. Even though it is pointless, it stays in, because it doesn't do any harm...
+		Collections.sort(projects, projectComparator);
+		logger.info("Found projects in Workspace: " + projects);
+		monitor.beginTask("Batch Git Pull", projects.size());
+		for (IProject p : projects) {
+			//Check, if user has requested a cancel
+			if(monitor.isCanceled()) {
+				multiStatus.add(Status.CANCEL_STATUS);
+				return displayResultStatus(multiStatus);
+			}
+			
+			String name = p.getName();
+			monitor.subTask("Pulling " + name);
+			File projectLocationFile = p.getLocation().append(".git").toFile();
+			logger.info("Processing " + name + " with location " + projectLocationFile.getAbsolutePath());
+			
+			if(projectLocationFile.isFile()) {
+				status = new Status(IStatus.INFO, Activator.PLUGIN_ID, name + " is managed by git, but you are currently in a linked work tree. Git Batch Pull will not work in a linked work tree. Skipping...");
+				multiStatus.add(status);
+				monitor.worked(1);
+				continue;
+			}
+
+			try (Git git = Git.open(projectLocationFile)){
+				try {
+					PullCommand pull = git.pull();
+					PullResult pullResult = pull.call();
+					parsePullResult(name, pullResult, multiStatus);
+				} catch (GitAPIException | JGitInternalException e) {
+					status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": " + e.getMessage() + ". Skipping and proceeding.");
+					multiStatus.add(status);
+				}
+			} catch (org.eclipse.jgit.errors.RepositoryNotFoundException rnfe) {
+				// ignore
+				logger.info(name + " is not managed via Git: " + rnfe.getMessage());
+			} catch (IOException e) {
+				status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": " + e.getMessage());
+				multiStatus.add(status);
+			}
+			logger.info("Finished " + name);
+			monitor.worked(1);
+		}				
+		monitor.done();
+		return multiStatus;
+	}
+	
 
 	/**
 	 * Parse the pullResult and write the result into the multiStatus
