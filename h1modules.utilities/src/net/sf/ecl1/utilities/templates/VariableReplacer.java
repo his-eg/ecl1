@@ -13,7 +13,7 @@ import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 public class VariableReplacer {
 	
-    private static final ICommonLogger logger = LoggerFactory.getLogger(VariableReplacer.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(VariableReplacer.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 	
 	private final Map<String, String> variables;
 

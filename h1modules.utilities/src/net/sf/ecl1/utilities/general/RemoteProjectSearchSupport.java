@@ -20,7 +20,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class RemoteProjectSearchSupport {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(RemoteProjectSearchSupport.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(RemoteProjectSearchSupport.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
     private class BuildJob {
         private String name;

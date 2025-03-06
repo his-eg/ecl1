@@ -25,7 +25,7 @@ import net.sf.ecl1.utilities.logging.LoggerFactory;
  */
 public class RestUtil {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(RestUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(RestUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
     /**
      * Create a JSON input stream for the given target URL.

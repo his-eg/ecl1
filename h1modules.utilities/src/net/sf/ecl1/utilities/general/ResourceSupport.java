@@ -31,7 +31,7 @@ import net.sf.ecl1.utilities.templates.VariableReplacer;
  */
 public class ResourceSupport {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(ResourceSupport.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ResourceSupport.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
     private static final String TEMPLATE_FOLDER_IN_WEBAPPS = "qisserver/WEB-INF/internal/extensionTemplates/current";
     

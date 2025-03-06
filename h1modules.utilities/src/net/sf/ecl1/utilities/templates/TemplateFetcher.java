@@ -22,7 +22,7 @@ import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
  */
 public class TemplateFetcher {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(TemplateFetcher.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(TemplateFetcher.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 	
 	private final List<String> templateRootUrls;
 

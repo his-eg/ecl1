@@ -30,7 +30,7 @@ import com.google.common.collect.Maps;
  */
 public class TemplateManager {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(TemplateManager.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(TemplateManager.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 	
     private static final Map<String, String> nameReplacements = Maps.newHashMap();
     static {

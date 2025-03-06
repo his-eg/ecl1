@@ -32,7 +32,7 @@ import net.sf.ecl1.utilities.logging.LoggerFactory;
  */
 public class RuntimeClasspathUtil {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(RuntimeClasspathUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(RuntimeClasspathUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 	
     private static final String JRE_CONTAINER_PREFIX = "org.eclipse.jdt.launching.JRE_CONTAINER";
 

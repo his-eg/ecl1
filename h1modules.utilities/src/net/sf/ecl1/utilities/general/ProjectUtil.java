@@ -26,7 +26,7 @@ import net.sf.ecl1.utilities.logging.LoggerFactory;
  */
 public class ProjectUtil {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(ProjectUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ProjectUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 	
     public static boolean isJavaProject(IProject project) {
     	try {

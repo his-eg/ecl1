@@ -33,7 +33,7 @@ import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
  */
 public class ProjectSupport {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(ProjectSupport.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ProjectSupport.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
     private static final String[] SOURCE_FOLDERS = { "src/java", "src/test", "src/generated"};
     

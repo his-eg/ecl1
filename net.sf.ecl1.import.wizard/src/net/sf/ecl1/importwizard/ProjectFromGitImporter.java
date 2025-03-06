@@ -28,7 +28,7 @@ import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
  */
 public class ProjectFromGitImporter {
 	
-    private static final ICommonLogger logger = LoggerFactory.getLogger(ProjectFromGitImporter.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ProjectFromGitImporter.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
     // base path of the source repo configured in preferences, e.g. "ssh://git@git.his.de/"
     private final String baseRepositoryPath;

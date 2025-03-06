@@ -1,6 +1,6 @@
 package net.sf.ecl1.utilities.logging;
 
-import org.eclipse.core.runtime.ILog;
+import org.eclipse.core.runtime.Plugin;
 
 import net.sf.ecl1.utilities.Activator;
 
@@ -22,15 +22,15 @@ public class LoggerFactory {
      * 
      * @param className class that wants to log
      * @param pluginId the identifier of the plugin that wants to log or null (standalone)
-     * @param errorLogLogger ILog (logs to Eclipse's ErrorLog view) or null (standalone)
+     * @param activatorPlugin Plugin instance (logs to Eclipse's ErrorLog view) or null (standalone)
      * 
      */
-    public static ICommonLogger getLogger(String className, String pluginId, ILog errorLogLogger) {
+    public static ICommonLogger getLogger(String className, String pluginId, Plugin activatorPlugin) {
         if (Activator.isRunningInEclipse()) {
-            if (errorLogLogger == null || pluginId == null) {
-                throw new IllegalArgumentException("Eclipse environment requires errorLogLogger and pluginId");
+            if (activatorPlugin == null || pluginId == null) {
+                throw new IllegalArgumentException("Eclipse environment requires a Plugin instance and pluginId");
             }
-            return new ConsoleLogger(errorLogLogger, pluginId, className);
+            return new ConsoleLogger(activatorPlugin.getLog(), pluginId, className);
         } else {
             return new StandaloneLogger(className);
         }

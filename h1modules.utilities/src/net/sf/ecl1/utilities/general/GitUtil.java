@@ -19,7 +19,7 @@ import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 public class GitUtil {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(GitUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(GitUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
 	/**
      * Starts from the supplied path and scans up through the parentdirectory tree until a Git repository is found.

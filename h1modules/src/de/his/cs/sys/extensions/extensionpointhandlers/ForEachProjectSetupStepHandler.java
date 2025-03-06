@@ -18,7 +18,7 @@ import net.sf.ecl1.utilities.logging.LoggerFactory;
  */
 public class ForEachProjectSetupStepHandler {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(ForEachProjectSetupStepHandler.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ForEachProjectSetupStepHandler.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
 	private final IProject project;
 	private final InitialProjectConfigurationChoices initialChoice;

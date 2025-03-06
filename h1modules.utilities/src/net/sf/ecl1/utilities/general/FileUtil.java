@@ -18,7 +18,7 @@ import net.sf.ecl1.utilities.logging.LoggerFactory;
  */
 public class FileUtil {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(FileUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(FileUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
     /**
      * Read a file's content to a string

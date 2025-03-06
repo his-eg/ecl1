@@ -26,7 +26,7 @@ import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
  */
 public class ExtensionImportWizardModel {
     
-    private static final ICommonLogger logger = LoggerFactory.getLogger(ExtensionImportWizardModel.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ExtensionImportWizardModel.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
 	public static final String JENKINS_WEBAPPS_NAME = "/webapps";
 	

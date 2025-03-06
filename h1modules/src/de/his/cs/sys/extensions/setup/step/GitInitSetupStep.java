@@ -26,7 +26,7 @@ import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
  */
 public class GitInitSetupStep implements ProjectSetupStep {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(GitInitSetupStep.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(GitInitSetupStep.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
   
     @Override
     public void performStep(IProject project, InitialProjectConfigurationChoices choices) {

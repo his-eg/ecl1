@@ -23,7 +23,7 @@ import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 public class ClasspathFile {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(ClasspathFile.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ClasspathFile.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
 	public static final String ECL1_CLASSPATH_CONTAINER = HisConstants.NET_SF_ECL1_ECL1_CONTAINER_ID + "/";
 	public static final String JENKINS_WEBAPPS_NAME = "/webapps";

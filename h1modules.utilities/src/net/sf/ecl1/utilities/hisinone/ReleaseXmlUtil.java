@@ -39,7 +39,7 @@ import net.sf.ecl1.utilities.logging.LoggerFactory;
  */
 public class ReleaseXmlUtil {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(ReleaseXmlUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault() != null ? Activator.getDefault().getLog() : null);
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ReleaseXmlUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 	
 	private static final String RELEASE_XML_FOLDER = "qisserver/WEB-INF/conf/service/patches/hisinone";
 	
