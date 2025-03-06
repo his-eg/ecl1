@@ -9,9 +9,7 @@ import java.util.List;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -24,10 +22,12 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
  * Executes a pull command on all open projects using Git as SCM
@@ -39,9 +39,17 @@ public class GitBatchPullHandler extends AbstractHandler {
     private static final ICommonLogger logger = LoggerFactory.getLogger(GitBatchPullHandler.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
 	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
+	public Object execute(ExecutionEvent event) {
 		
 		logger.info("Starting ecl1GitBatchPull");
+
+		// standalone
+		if(!net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
+			IStatus multiStatus = gitBatchPullJob(new NullProgressMonitor());
+			new GitBatchPullSummaryErrorDialog(multiStatus).open();
+			return null;
+		}
+
 		Job job = new WorkspaceJob("ecl1: Executing \"git pull\" for all git versioned projects in the workspace.") {
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
@@ -61,7 +69,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 		MultiStatus multiStatus = new MultiStatus(Activator.PLUGIN_ID, 0, "Problems occured during \"Batch Git Pull Command\"");
 		Status status;
 
-		List<IProject> projects = Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects());
+		List<IProject> projects = Arrays.asList(WorkspaceFactory.getWorkspace().getRoot().getProjects());
 		//Unnecessary after finishing #267325. The problem definition for #250882 was flawed and therefore sort was 
 		//never really needed by the user. Even though it is pointless, it stays in, because it doesn't do any harm...
 		Collections.sort(projects, projectComparator);
