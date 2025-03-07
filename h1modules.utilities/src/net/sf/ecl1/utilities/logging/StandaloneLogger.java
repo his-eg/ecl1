@@ -13,6 +13,7 @@ import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 public class StandaloneLogger implements ICommonLogger{
 
     private final Logger logger;
+    private static boolean prefStoreInitialized = false;
 
     public StandaloneLogger(String className) {
         logger = Logger.getLogger(className);
@@ -25,7 +26,16 @@ public class StandaloneLogger implements ICommonLogger{
     }
 
     private Level getLogLevel(){
-        String preferenceLogLevel = PreferenceWrapper.getLogLevel();
+        String preferenceLogLevel;
+        // The inititalisation of the preference store depends on WebappsUtil which uses the logger
+        if(!prefStoreInitialized && logger.getName().equals("WebappsUtil")){
+            // set log level to debug while initializing preference store
+            preferenceLogLevel = "DEBUG";
+        }else{
+            preferenceLogLevel = PreferenceWrapper.getLogLevel();
+        }
+        prefStoreInitialized = true;
+
         switch (preferenceLogLevel) {
             case "DEBUG": 
                 return Level.FINE;
