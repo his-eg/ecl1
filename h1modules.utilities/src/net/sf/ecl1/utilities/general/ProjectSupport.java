@@ -38,6 +38,8 @@ public class ProjectSupport {
     private static final String[] SOURCE_FOLDERS = { "src/java", "src/test", "src/generated"};
     
     private static final String[] FOLDERS_TO_CREATE =  { "src/java", "src/test", "src/generated", "resource", ".settings" };
+
+	private static final String JRE_ENVIRONMENT = "org.eclipse.jdt.launching.JRE_CONTAINER";
     
     private final Collection<String> packagesToCreate;
     
@@ -67,14 +69,12 @@ public class ProjectSupport {
 		
 		try {
 			addToProjectStructure(project, FOLDERS_TO_CREATE);
-			if(Activator.isRunningInEclipse()){
-				addNatures(project, projectName);
+			if(Activator.isRunningInEclipse()){  
 				setSourceFolders(project, SOURCE_FOLDERS);
 				addProjectDependencies(project, choices.getProjectsToReference());
 				setJreEnvironment(project);
 			}else{
 				setupClasspathStandalone(project.getLocation().toString(), choices.getProjectsToReference());
-				//TODO natures
 			}
 
         } catch (CoreException e) {
@@ -99,7 +99,7 @@ public class ProjectSupport {
 			handler.addEntry("src", referencedProject);
 		}
 		// setJreEnvironment
-		handler.addEntry("con", "org.eclipse.jdt.launching.JRE_CONTAINER");
+		handler.addEntry("con", JRE_ENVIRONMENT);
 		// set output
 		handler.addEntry("output", "bin");
 	}
@@ -114,7 +114,7 @@ public class ProjectSupport {
 		IJavaProject javaProject = createJavaProject(project);
 		
 		// add JRE container to classpath
-		IClasspathEntry containerEntry = JavaCore.newContainerEntry(new Path("org.eclipse.jdt.launching.JRE_CONTAINER"), false);
+		IClasspathEntry containerEntry = JavaCore.newContainerEntry(new Path(JRE_ENVIRONMENT), false);
 		IClasspathEntry[] oldClassPath = javaProject.getRawClasspath();
 		ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>(Arrays.asList(oldClassPath));
 		list.add(containerEntry);
@@ -151,7 +151,7 @@ public class ProjectSupport {
 	 * 
 	 * @param project
 	 * @param paths
-	 * @throws JavaModelException
+	 * @throws JavaModelException 
 	 */
 	public void setSourceFolders(IProject project, String[] paths) throws JavaModelException {
 		IJavaProject javaProject = createJavaProject(project);
@@ -189,6 +189,8 @@ public class ProjectSupport {
 				projectLocation = null;
 			}
 			desc.setLocationURI(projectLocation);
+			// Add initial java nature, because it is expected by IJavaProject.setRawClasspath
+		    desc.setNatureIds(new String[]{JavaCore.NATURE_ID});
 			try {
 				project.create(desc, null);
 				if (!project.isOpen()) {
@@ -229,38 +231,5 @@ public class ProjectSupport {
 		    createFolder(newProject.getFolder("/src/java/" + packageName.replace('.', '/')));
 		    createFolder(newProject.getFolder("/src/test/" + packageName.replace('.', '/')));
         }
-	}
-
-    /**
-     * Add natures to the project
-     * @param project
-     * @param projectName
-     * @throws CoreException
-     */
-	public void addNatures(IProject project, String projectName) throws CoreException {
-		addNature(project, projectName, ProjectNature.JAVA);
-        addNature(project, projectName, ProjectNature.ECL1);
-        addNature(project, projectName, ProjectNature.MACKER);
-	}
-
-	private void addNature(IProject project, String projectName, ProjectNature nature) throws CoreException {
-		String natureStr = nature.getNature();
-		if (!project.hasNature(natureStr)) {
-			IProjectDescription description = project.getDescription();
-			String[] prevNatures = description.getNatureIds();
-			String[] newNatures = new String[prevNatures.length + 1];
-			System.arraycopy(prevNatures, 0, newNatures, 0, prevNatures.length);
-			newNatures[prevNatures.length] = natureStr;
-			// Check if the new nature is known in the workspace. Otherwise (e.g. if we'ld try to add the Macker nature
-			// without having Eclipse Macker installed) we'ld get an Eclipse CoreException thrown by project.setDescription()
-			IStatus status = project.getWorkspace().validateNatureSet(newNatures);
-			if (status.getCode() == IStatus.OK) {
-				description.setNatureIds(newNatures);
-				IProgressMonitor monitor = null; // here we could create a proper progress monitor
-				project.setDescription(description, monitor);
-			} else {
-				logger.error2("Project nature '" + natureStr + "' could not be added. Probably it is not supported in the workspace.");
-			}
-		}
 	}
 }
