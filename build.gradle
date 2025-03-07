@@ -1,0 +1,53 @@
+/*
+ VSCode with the RedHat Java extension uses Eclipse internally and creates Eclipse metadata files.
+
+ The RedHat Java extension provides the setting `java.import.generatesMetadataFilesAtProjectRoot` to store Eclipse metadata outside the project directory.
+ However, this setting does not work if Eclipse metadata files already exist in the project directory.
+
+ To keep the original Eclipse project working and remove unwanted changes, use this task.
+*/
+tasks.register('gitRestoreEclipseFiles') {
+    description = "Restores and cleans Eclipse-related files created by VSCode (RedHat) in all subprojects"
+    group = "git"
+
+    // Create list of root- and all sub-projects
+    def projectDirs = [layout.projectDirectory.asFile] + subprojects*.layout.projectDirectory.asFile
+    
+    def filesToDiscard = [
+        ".settings/org.eclipse.buildship.core.prefs",
+        ".settings/org.eclipse.core.resources.prefs",
+        ".settings/org.eclipse.jdt.core.prefs",
+        ".project",
+        ".classpath"
+    ]
+
+    doLast {
+        println "Restoring and cleaning Eclipse project files in all subprojects..."
+
+        projectDirs.each { projectDir ->
+            filesToDiscard.each { file ->
+                def targetFile = new File(projectDir, file)
+                if (targetFile.exists()) {
+                    try {
+                        // Restore changes in tracked files
+                        def restoreProcess = new ProcessBuilder("git", "restore", "--worktree", "--", file)
+                            .directory(projectDir)
+                            .inheritIO()
+                            .start()
+                        restoreProcess.waitFor()
+
+                        // Delete untracked files
+                        def cleanProcess = new ProcessBuilder("git", "clean", "-f", "--", file)
+                            .directory(projectDir)
+                            .inheritIO()
+                            .start()
+                        cleanProcess.waitFor()
+                    } catch (Exception e) {
+                        println "Skipping $file in ${projectDir.name} (error: ${e.message})"
+                    }
+                }
+            }
+        }
+        println "Eclipse files restored and untracked files deleted in all subprojects."
+    }
+}
