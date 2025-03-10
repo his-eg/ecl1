@@ -4,6 +4,8 @@ import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
+import de.his.cs.sys.extensions.wizards.NewExtensionProjectWizard;
+
 
 public class NewExtensionProjectWizardApp {
 
@@ -11,7 +13,7 @@ public class NewExtensionProjectWizardApp {
         Display display = new Display();
         Shell shell = new Shell(display);
 
-        NewExtensionProjectWizardStandalone wizard = new NewExtensionProjectWizardStandalone();
+        NewExtensionProjectWizard wizard = new NewExtensionProjectWizard();
         WizardDialog dialog = new WizardDialog(shell, wizard);
         dialog.open();
 
