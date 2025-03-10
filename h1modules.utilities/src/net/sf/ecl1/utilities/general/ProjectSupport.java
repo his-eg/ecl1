@@ -12,8 +12,6 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -21,8 +19,6 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.logging.ICommonLogger;
-import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.standalone.ClasspathHandler;
 import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
@@ -32,8 +28,6 @@ import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
  * @author keunecke
  */
 public class ProjectSupport {
-
-    private static final ICommonLogger logger = LoggerFactory.getLogger(ProjectSupport.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
     private static final String[] SOURCE_FOLDERS = { "src/java", "src/test", "src/generated"};
     
@@ -65,9 +59,10 @@ public class ProjectSupport {
 		Assert.isTrue(choices.getName().trim().length() > 0);
 
 		String projectName = choices.getName();
-		IProject project = createBaseProject(projectName, location);
+		IProject project;
 		
 		try {
+			project = createBaseProject(projectName, location);
 			addToProjectStructure(project, FOLDERS_TO_CREATE);
 			if(Activator.isRunningInEclipse()){  
 				setSourceFolders(project, SOURCE_FOLDERS);
@@ -78,8 +73,7 @@ public class ProjectSupport {
 			}
 
         } catch (CoreException e) {
-            logger.error2("Exception creating new project '" + projectName + "': " + e.getMessage(), e);
-            project = null; // XXX: This may cause an NPE somewhere else, like in TemplateManager.writeContent()
+			throw new RuntimeException("Exception creating new project '" + projectName + "': " + e.getMessage(), e);
         }
 
 		return project;
@@ -130,20 +124,16 @@ public class ProjectSupport {
 	 * @param referencedProjects
 	 * @throws JavaModelException
 	 */
-	public void addProjectDependencies(IProject project, Collection<String> referencedProjects) {
-	    try {
-    		IJavaProject javaProject = createJavaProject(project);
-    		for (String referencedProject : referencedProjects) {
-    			IPath path = new Path("/" + referencedProject);
-    			IClasspathEntry projectEntry = JavaCore.newProjectEntry(path);
-    			IClasspathEntry[] oldClassPath = javaProject.getRawClasspath();
-    			ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>(Arrays.asList(oldClassPath));
-    			list.add(projectEntry);
-    			javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
-    		}
-	    } catch (JavaModelException e) {
-    		logger.error2(e.getMessage(), e);
-	    }
+	public void addProjectDependencies(IProject project, Collection<String> referencedProjects) throws JavaModelException {
+    	IJavaProject javaProject = createJavaProject(project);
+    	for (String referencedProject : referencedProjects) {
+    		IPath path = new Path("/" + referencedProject);
+    		IClasspathEntry projectEntry = JavaCore.newProjectEntry(path);
+    		IClasspathEntry[] oldClassPath = javaProject.getRawClasspath();
+    		ArrayList<IClasspathEntry> list = new ArrayList<IClasspathEntry>(Arrays.asList(oldClassPath));
+    		list.add(projectEntry);
+    		javaProject.setRawClasspath(list.toArray(new IClasspathEntry[0]), null);
+    	}
 	}
 
 	/**
@@ -177,8 +167,9 @@ public class ProjectSupport {
      * @param name
      * @param location
      * @return the new project
-     */
-	public IProject createBaseProject(String name, URI location) {
+	 * @throws CoreException 
+	*/
+	public IProject createBaseProject(String name, URI location) throws CoreException {
 		IProject project = WorkspaceFactory.getWorkspace().getRoot().getProject(name);
 		// no need for standalone to create project
 		if (!project.exists() && Activator.isRunningInEclipse()) {
@@ -190,14 +181,11 @@ public class ProjectSupport {
 			}
 			desc.setLocationURI(projectLocation);
 			// Add initial java nature, because it is expected by IJavaProject.setRawClasspath
-		    desc.setNatureIds(new String[]{JavaCore.NATURE_ID});
-			try {
-				project.create(desc, null);
-				if (!project.isOpen()) {
-					project.open(null);
-				}
-			} catch (CoreException e) {
-				logger.error2(e.getMessage(), e);
+			desc.setNatureIds(new String[]{JavaCore.NATURE_ID});
+			
+			project.create(desc, null);
+			if (!project.isOpen()) {
+				project.open(null);
 			}
 		}
 		return project;
