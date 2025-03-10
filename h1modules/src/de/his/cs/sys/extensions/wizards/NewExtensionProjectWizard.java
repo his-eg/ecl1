@@ -4,7 +4,6 @@ package de.his.cs.sys.extensions.wizards;
 import java.net.URI;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -18,6 +17,8 @@ import org.eclipse.ui.IWorkbench;
 
 import de.his.cs.sys.extensions.Activator;
 import de.his.cs.sys.extensions.extensionpointhandlers.ForEachProjectSetupStepHandler;
+import de.his.cs.sys.extensions.setup.step.GitInitSetupStep;
+import de.his.cs.sys.extensions.setup.step.ResourceSetupStep;
 import de.his.cs.sys.extensions.wizards.pages.NewExtensionWizardPage;
 import net.sf.ecl1.utilities.general.InitialProjectConfigurationChoices;
 import net.sf.ecl1.utilities.general.ProjectSupport;
@@ -45,13 +46,17 @@ public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 
 	@Override
 	public boolean performFinish() {
-		final URI location;
-		if(!firstPage.useDefaults()) {
-			location = firstPage.getLocationURI();
-		} else {
-			location = null; 
-		}	
+		final URI location = firstPage.getLocationURI();
 		InitialProjectConfigurationChoices initialChoice = firstPage.getInitialConfiguration();
+
+		// standalone
+		if(!net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
+			IProject project = new ProjectSupport(firstPage.getStrategy().packagesToCreate(initialChoice.getName())).createProject(initialChoice, firstPage.getLocationURI());
+			new GitInitSetupStep().performStep(project, initialChoice);
+			new ResourceSetupStep().performStep(project, initialChoice);
+			//Exit wizard
+			return true;
+		}
 		
 		/*
 		 * We are wrapping the actual creation of the extension project into a workspace job, because
@@ -66,8 +71,6 @@ public class NewExtensionProjectWizard extends Wizard implements INewWizard {
 			public IStatus runInWorkspace(IProgressMonitor monitor) throws CoreException {
 				IProject project = new ProjectSupport(firstPage.getStrategy().packagesToCreate(initialChoice.getName())).createProject(initialChoice, location);
 				new ForEachProjectSetupStepHandler(project, initialChoice).contribute();
-
-
 				
 				//Exit job
 				return Status.OK_STATUS;
