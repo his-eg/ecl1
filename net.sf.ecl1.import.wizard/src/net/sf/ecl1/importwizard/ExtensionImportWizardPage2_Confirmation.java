@@ -99,17 +99,20 @@ public class ExtensionImportWizardPage2_Confirmation extends WizardPage {
         dependentTableColumn.setText("Name");
         dependentExtensionsTableColumnLayout.setColumnData(dependentTableColumn, new ColumnWeightData(10));
         
-        GridLayout gl2 = new GridLayout(2, false);
-        Composite openAfterImportComposite = new Composite(container, SWT.BORDER | SWT.CENTER); // was TOP
-        openAfterImportComposite.setLayout(gl2);
-        openAfterImport = new Button(openAfterImportComposite, SWT.CHECK);
-        openAfterImport.setText("Open extensions after import?");
-        openAfterImport.setToolTipText("Should wizard open extension projects after import?");
-        openAfterImport.setSelection(true);
-
-        deleteExistingFolders = new Button(openAfterImportComposite, SWT.CHECK);
-        deleteExistingFolders.setText("Delete folders?");
-        deleteExistingFolders.setToolTipText("Should wizard delete existing folders named like extensions for import?");
+        // remove unsed buttons from standalone
+        if(net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
+            GridLayout gl2 = new GridLayout(2, false);
+            Composite openAfterImportComposite = new Composite(container, SWT.BORDER | SWT.CENTER); // was TOP
+            openAfterImportComposite.setLayout(gl2);
+            openAfterImport = new Button(openAfterImportComposite, SWT.CHECK);
+            openAfterImport.setText("Open extensions after import?");
+            openAfterImport.setToolTipText("Should wizard open extension projects after import?");
+            openAfterImport.setSelection(true);
+    
+            deleteExistingFolders = new Button(openAfterImportComposite, SWT.CHECK);
+            deleteExistingFolders.setText("Delete folders?");
+            deleteExistingFolders.setToolTipText("Should wizard delete existing folders named like extensions for import?");
+        }
 
         setControl(container);
         setPageComplete(false);

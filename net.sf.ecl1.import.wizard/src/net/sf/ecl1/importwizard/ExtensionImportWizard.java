@@ -52,7 +52,6 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
         addPage(page1);
         page2 = new ExtensionImportWizardPage2_Confirmation(model);
         addPage(page2);
-        //logger.log("pageCount = " + this.getPageCount());
     }
 
     /**
@@ -65,7 +64,6 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     public boolean canFinish() {
     	IWizardPage currentPage = this.getContainer().getCurrentPage();
     	boolean canFinish = (currentPage instanceof ExtensionImportWizardPage2_Confirmation);
-    	//logger.debug("currentPage = " + currentPage.getName() + ", canFinish = " + canFinish);
     	return canFinish;
     }
     
@@ -77,17 +75,21 @@ public class ExtensionImportWizard extends Wizard implements IImportWizard {
     @Override
     public boolean performFinish() {
     	// variables to be used in the Job class implementation must be final
-        Collection<String> extensionsToImport = new HashSet<String>(model.getSelectedExtensions()); // copy
+        Collection<String> extensionsToImport = new HashSet<>(model.getSelectedExtensions()); // copy
         extensionsToImport.addAll(model.getDependenciesOfSelectedExtensions());
-        boolean openProjectsAfterImport = page2.openProjectsAfterImport();
-        boolean deleteFolders = page2.deleteFolders();
 
-        ExtensionImportJob importJob = new ExtensionImportJob(extensionsToImport, openProjectsAfterImport, deleteFolders); 
         if(!net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
+            ExtensionImportJob importJob = new ExtensionImportJob(extensionsToImport, false, false); 
             IProgressMonitor dummyMonitor = new NullProgressMonitor();
             importJob.run(dummyMonitor);
+            // Exit wizard
             return true;
         }
+
+        boolean openProjectsAfterImport = page2.openProjectsAfterImport();
+        boolean deleteFolders = page2.deleteFolders();
+        ExtensionImportJob importJob = new ExtensionImportJob(extensionsToImport, openProjectsAfterImport, deleteFolders); 
+
         Activator.getDefault().setJob(importJob);
         //Acquiring this rule prevents auto builds
         importJob.setRule(WorkspaceFactory.getWorkspace().getRuleFactory().buildRule());
