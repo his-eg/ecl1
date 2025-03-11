@@ -30,8 +30,6 @@ import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.content.IContentTypeMatcher;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
-import net.sf.ecl1.utilities.hisinone.WebappsUtil;
-
 public class ProjectImpl implements IProject{
 
     private final String name;
@@ -105,18 +103,6 @@ public class ProjectImpl implements IProject{
     protected static IPath getFullPath(String path){
         Path workspacePath = Paths.get(new WorkspaceRootImpl().getLocation().toString());
         Path projectPath = Paths.get(path);
-        // standalone only knows about projects in workspace-folder, handle webapps manually
-        IProject webapps = WebappsUtil.findWebappsProject();
-        String webappsName;
-        if(webapps != null){
-            webappsName = webapps.getName();
-            if(path.contains(webappsName)){
-                while(!projectPath.startsWith(webappsName)){
-                    projectPath = projectPath.subpath(1, projectPath.getNameCount());
-                }
-                return new PathImpl(projectPath.toString());
-            }
-        }
         // return path relative to workspace
         return new PathImpl(workspacePath.relativize(projectPath));
     }
