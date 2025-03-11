@@ -33,11 +33,11 @@ dependencies {
 }
 
 sourceSets {
-  main {
-    java {
-      srcDir 'src'
+    main {
+        java {
+            srcDir 'src'
+        }
     }
-  }
 }
 
 java {
@@ -46,4 +46,26 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
+}
+
+tasks.register("runSymlinkCreator", JavaExec) {
+    description = "Creates a symlink to a given path in the workspace folder."
+    group = "util"
+    mainClass.set("net.sf.ecl1.utilities.standalone.SymlinkCreator")
+    classpath = sourceSets.main.runtimeClasspath
+    workingDir = rootProject.projectDir.parentFile
+
+    println "symlinkTarget: ${project.hasProperty('symlinkTarget') ? project.symlinkTarget : 'not set'}"
+
+    args project.hasProperty('symlinkTarget') ? project.symlinkTarget.split(',') : []
+
+}
+
+tasks.register("addWebappsSymlink", JavaExec) {
+    description = "Creates a symlink to Webapps in the workspace folder."
+    group = "util"
+    mainClass.set("net.sf.ecl1.utilities.standalone.SymlinkCreator")
+    classpath = sourceSets.main.runtimeClasspath
+    workingDir = rootProject.projectDir.parentFile
+    args = ['../webapps']
 }
