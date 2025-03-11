@@ -20,7 +20,7 @@ public class StandalonePreferenceStore {
     }
 
     private static void initializeStore(){
-        String path = "..\\" + PreferenceWrapper.ECLIPSE_STORE_PATH;
+        String path = PreferenceWrapper.ECLIPSE_STORE_PATH;
         File file = new File(path);
         if(!file.exists()){
             try {
