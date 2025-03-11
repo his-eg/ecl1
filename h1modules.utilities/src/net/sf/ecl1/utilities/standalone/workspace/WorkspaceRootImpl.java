@@ -36,15 +36,6 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
         this.path = Paths.get(System.getProperty("user.dir"));
     }
 
-    public WorkspaceRootImpl(boolean useParent){
-        Path ecl1Path = Paths.get(System.getProperty("user.dir"));
-        if(useParent){
-           this.path = ecl1Path.getParent();
-        }else{
-          this.path = ecl1Path;
-        }
-    }
-
 	@Override
     public IPath getLocation() {
         return new PathImpl(path);
