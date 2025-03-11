@@ -13,7 +13,6 @@ import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
-import net.sf.ecl1.utilities.standalone.workspace.WorkspaceRootImpl;
 
 public class WebappsUtil {
 
@@ -28,18 +27,14 @@ public class WebappsUtil {
      */
     public static IProject findWebappsProject() {
         List<IProject> projects;
-        if(Activator.isRunningInEclipse()){
-            projects = Arrays.asList(WorkspaceFactory.getWorkspace().getRoot().getProjects(IWorkspaceRoot.INCLUDE_HIDDEN));
-        }else{
-            IWorkspaceRoot root = new WorkspaceRootImpl(true);
-            projects = Arrays.asList(root.getProjects(IWorkspaceRoot.INCLUDE_HIDDEN));
-        }
+        projects = Arrays.asList(WorkspaceFactory.getWorkspace().getRoot().getProjects(IWorkspaceRoot.INCLUDE_HIDDEN));
+
         IProject webapps = null;
         List<IProject> webappsCandidates = new ArrayList<>();
     	List<String> candidateNames = new ArrayList<>();
         for (IProject project : projects) {
         	// the extension folder distinguishes hisinone and qis projects
-            IFolder extensionsFolder = project.getFolder(HisConstants.EXTENSIONS_FOLDER);           
+            IFolder extensionsFolder = project.getFolder(HisConstants.EXTENSIONS_FOLDER);
             if (extensionsFolder != null && extensionsFolder.exists()) {
             	// We found a hisinone project.
             	webappsCandidates.add(project);
