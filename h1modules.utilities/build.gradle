@@ -48,6 +48,14 @@ java {
     }
 }
 
+tasks.register("runPreferences", JavaExec) {
+    description = "Runs the PreferencesApp."
+    group = "application"
+    main = 'net.sf.ecl1.utilities.preferences.standalone.PreferencesApp'
+    classpath = sourceSets.main.runtimeClasspath
+    workingDir = rootProject.projectDir.parentFile
+}
+
 tasks.register("runSymlinkCreator", JavaExec) {
     description = "Creates a symlink to a given path in the workspace folder."
     group = "util"

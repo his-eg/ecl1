@@ -50,3 +50,11 @@ java {
         languageVersion = JavaLanguageVersion.of(17)
     }
 }
+
+tasks.register("runImportWizard", JavaExec) {
+    description = "Runs the ImportWizardApp."
+    group = "application"
+    main = 'net.sf.ecl1.importwizard.standalone.ImportWizardApp'
+    classpath = sourceSets.main.runtimeClasspath
+    workingDir = rootProject.projectDir.parentFile
+}
