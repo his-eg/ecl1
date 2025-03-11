@@ -16,7 +16,7 @@ public class CommitExporterWizardApp {
 
         CommitExporterWizard wizard = new CommitExporterWizard();
         WizardDialog.setDefaultImage(icon);
-        WizardDialog dialog = new WizardDialog(null, wizard);
+        WizardDialog dialog = new WizardDialog(display.getActiveShell(), wizard);
         dialog.open();
 
         if (!icon.isDisposed()) {

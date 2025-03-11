@@ -21,7 +21,7 @@ public class PreferencesApp {
         PreferenceManager preferenceManager = new PreferenceManager();
         preferenceManager.addToRoot(new PreferenceNode("general", new HISinOneExtensionsPreferencePage(preferenceStore)));
         PreferenceDialog.setDefaultImage(icon);
-        PreferenceDialog dialog = new PreferenceDialog(null, preferenceManager);
+        PreferenceDialog dialog = new PreferenceDialog(display.getActiveShell(), preferenceManager);
         dialog.open();
 
         if (!icon.isDisposed()) {
