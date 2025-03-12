@@ -24,9 +24,8 @@ public class ProjectUtil {
     public static boolean isJavaProject(IProject project) {
     	try {
 			return project.hasNature(JavaCore.NATURE_ID);
-		} catch (CoreException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (CoreException e) {
+            logger.error("Error checking Java nature for project: " + project.getName() + "\n" + e.getMessage(), e);
 		}
 		return false;
 	}
