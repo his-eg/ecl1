@@ -1,0 +1,80 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+	  {
+      "label": "ecl1: Open Commit-Exporter",
+      "type": "shell",
+      "command": "./gradlew",  
+	    "windows": {
+        "command": ".\\gradlew.bat"
+      },
+      "args": [
+        "runCommitExporter", 
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/ecl1"
+      },
+	    "problemMatcher": ["$gradle"]
+    },
+    {
+      "label": "ecl1: Run git batch pull",
+      "type": "shell",
+      "command": "./gradlew",  
+	    "windows": {
+        "command": ".\\gradlew.bat"
+      },
+      "args": [
+        "runGitBatchPull", 
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/ecl1"
+      },
+	    "problemMatcher": ["$gradle"]
+    },
+    {
+      "label": "ecl1: Import Extension",
+      "type": "shell",
+      "command": "./gradlew",  
+	    "windows": {
+        "command": ".\\gradlew.bat"
+      },
+      "args": [
+        "runImportWizard", 
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/ecl1"
+      },
+	    "problemMatcher": ["$gradle"]
+    },
+    {
+      "label": "ecl1: Create new Extension-Project",
+      "type": "shell",
+      "command": "./gradlew",  
+	    "windows": {
+        "command": ".\\gradlew.bat"
+      },
+      "args": [
+        "runNewExtensionProjectWizard", 
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/ecl1"
+      },
+	    "problemMatcher": ["$gradle"]
+    },
+    {
+      "label": "ecl1: Open Preferences",
+      "type": "shell",
+      "command": "./gradlew",  
+	    "windows": {
+        "command": ".\\gradlew.bat"
+      },
+      "args": [
+        "runPreferences", 
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/ecl1"
+      },
+	    "problemMatcher": ["$gradle"]
+    },
+  ]
+}
