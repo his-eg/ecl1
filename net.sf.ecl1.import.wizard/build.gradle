@@ -12,7 +12,6 @@ dependencies {
     implementation 'org.eclipse.jgit:org.eclipse.jgit:7.1.0.202411261347-r'
     implementation 'org.eclipse.platform:org.eclipse.core.resources:3.22.0'
     implementation 'org.eclipse.platform:org.eclipse.e4.ui.workbench:1.10.0'
-    implementation 'org.eclipse.platform:org.eclipse.core.runtime:3.24.0'
     implementation 'org.eclipse.platform:org.eclipse.equinox.common:3.17.0'
     implementation 'org.eclipse.platform:org.eclipse.core.expressions:3.9.400'
     implementation 'org.eclipse.platform:org.eclipse.core.runtime:3.32.0'
