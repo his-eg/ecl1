@@ -1,5 +1,10 @@
 package net.sf.ecl1.commit.exporter.git;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -137,7 +142,8 @@ public class CommitTableFactory {
             public String getText(Object element) {
                 if (element instanceof RevCommit) {
                     RevCommit c = (RevCommit) element;
-                    return c.getAuthorIdent().getWhen().toString();
+                    Instant timestamp = c.getAuthorIdent().getWhenAsInstant();
+                    return DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH).withZone(ZoneId.systemDefault()).format(timestamp);
                 }
                 //Must be StagedChanges then...
                 StagedChanges c = (StagedChanges) element;
