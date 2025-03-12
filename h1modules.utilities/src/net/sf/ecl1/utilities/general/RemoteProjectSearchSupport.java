@@ -2,6 +2,7 @@ package net.sf.ecl1.utilities.general;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.TreeSet;
 
@@ -99,7 +100,7 @@ public class RemoteProjectSearchSupport {
     	}
     	String fileContent = null;
     	try {
-    		fileContent = IOUtils.toString(inStream);
+    		fileContent = IOUtils.toString(inStream, StandardCharsets.UTF_8);
     	} catch (IOException e) {
     		logger.error2("IOException reading remote file: " + e.getMessage(), e);
     	}
