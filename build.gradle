@@ -51,3 +51,10 @@ tasks.register('gitRestoreEclipseFiles') {
         println "Eclipse files restored and untracked files deleted in all subprojects."
     }
 }
+
+tasks.register('initVSCWorkspace') {
+    description = "Create symlink to webapps and copy tasks.json into workspace."
+    group = "util"
+    dependsOn(":h1modules.utilities:copyVSCodeTasks")
+    dependsOn(":h1modules.utilities:addWebappsSymlink")
+}
