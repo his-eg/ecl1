@@ -9,7 +9,7 @@
         "command": ".\\gradlew.bat"
       },
       "args": [
-        "runCommitExporter", 
+        ":net.sf.ecl1.commit.exporter:run"
       ],
       "options": {
         "cwd": "${workspaceFolder}/ecl1"
@@ -24,7 +24,7 @@
         "command": ".\\gradlew.bat"
       },
       "args": [
-        "runGitBatchPull", 
+        ":net.sf.ecl1.git.batch-pull-button:run"
       ],
       "options": {
         "cwd": "${workspaceFolder}/ecl1"
@@ -39,7 +39,7 @@
         "command": ".\\gradlew.bat"
       },
       "args": [
-        "runImportWizard", 
+        ":net.sf.ecl1.import.wizard:run"
       ],
       "options": {
         "cwd": "${workspaceFolder}/ecl1"
@@ -54,7 +54,7 @@
         "command": ".\\gradlew.bat"
       },
       "args": [
-        "runNewExtensionProjectWizard", 
+        ":h1modules:run"
       ],
       "options": {
         "cwd": "${workspaceFolder}/ecl1"
@@ -69,12 +69,12 @@
         "command": ".\\gradlew.bat"
       },
       "args": [
-        "runPreferences", 
+        ":h1modules.utilities:run"
       ],
       "options": {
         "cwd": "${workspaceFolder}/ecl1"
       },
 	    "problemMatcher": ["$gradle"]
-    },
+    }
   ]
 }
