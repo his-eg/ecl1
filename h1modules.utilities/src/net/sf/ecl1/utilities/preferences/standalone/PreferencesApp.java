@@ -16,6 +16,10 @@ public class PreferencesApp {
     private static void open() {
         PreferenceStore preferenceStore = StandalonePreferenceStore.getStore();
         Display display = new Display();
+        // Make Dialog blink in taskbar
+        display.asyncExec(() -> {  
+            display.getActiveShell().forceActive();
+        });
         Image icon = new Image(display, IconPaths.getEcl1IconPath()); 
 
         PreferenceManager preferenceManager = new PreferenceManager();

@@ -9,6 +9,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Shell;
 
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
@@ -21,6 +22,13 @@ public class GitBatchPullSummaryErrorDialog extends ErrorDialog {
 		 */
 		super(null, null, null, status, IStatus.INFO | IStatus.WARNING | IStatus.ERROR);
 	}
+
+	/**
+	 * Constructor for standalone 
+	 */
+    public GitBatchPullSummaryErrorDialog(Shell activeShell, IStatus multiStatus) {
+        super(activeShell, null, null, multiStatus, IStatus.INFO | IStatus.WARNING | IStatus.ERROR);
+    }
 	
 	/**
 	 * Adds a checkbox under the normal dialog area. 

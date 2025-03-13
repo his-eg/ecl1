@@ -24,6 +24,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
@@ -49,7 +50,11 @@ public class GitBatchPullHandler extends AbstractHandler {
 		if(!net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
 			IStatus multiStatus = gitBatchPullJob(new NullProgressMonitor());
 			if (PreferenceWrapper.isDisplaySummaryOfGitPull()) {
-				GitBatchPullSummaryErrorDialog errorDialog = new GitBatchPullSummaryErrorDialog(multiStatus);
+				Display display = new Display();
+				display.asyncExec(() -> {  
+					display.getActiveShell().forceActive();
+				});
+				GitBatchPullSummaryErrorDialog errorDialog = new GitBatchPullSummaryErrorDialog(display.getActiveShell(), multiStatus);
 				Image icon = new Image(null, IconPaths.getEcl1IconPath());
 				GitBatchPullSummaryErrorDialog.setDefaultImage(icon);
 				errorDialog.open();

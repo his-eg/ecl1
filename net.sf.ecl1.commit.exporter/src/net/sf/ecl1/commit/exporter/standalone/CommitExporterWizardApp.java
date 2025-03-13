@@ -12,6 +12,10 @@ public class CommitExporterWizardApp {
 
     private static void open(){
         Display display = new Display();
+        // Make Dialog blink in taskbar
+        display.asyncExec(() -> {  
+            display.getActiveShell().forceActive();
+        });
         Image icon = new Image(display, IconPaths.getEcl1IconPath()); 
         CommitExporterWizard wizard = new CommitExporterWizard();
         WizardDialog.setDefaultImage(icon);
