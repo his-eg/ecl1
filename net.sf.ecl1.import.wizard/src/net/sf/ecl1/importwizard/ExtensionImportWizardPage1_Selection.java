@@ -57,7 +57,7 @@ public class ExtensionImportWizardPage1_Selection extends WizardPage {
         Label branchInfo = new Label(container, SWT.TOP);
         branchInfo.setText("Branch: " + model.getBranch());
         
-        if(model.getBranch() == GitUtil.UNKNOWN_BRANCH) {
+        if(model.getBranch().equals(GitUtil.UNKNOWN_BRANCH)) {
         	setErrorMessage("Could not determine branch of git repository of webapps project. Either there is no repo or you are on a linked work tree.");
         }
 
