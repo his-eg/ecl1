@@ -23,10 +23,12 @@ import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.swt.graphics.Image;
 
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
+import net.sf.ecl1.utilities.standalone.IconPaths;
 import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
@@ -47,7 +49,10 @@ public class GitBatchPullHandler extends AbstractHandler {
 		if(!net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
 			IStatus multiStatus = gitBatchPullJob(new NullProgressMonitor());
 			if (PreferenceWrapper.isDisplaySummaryOfGitPull()) {
-				new GitBatchPullSummaryErrorDialog(multiStatus).open();
+				GitBatchPullSummaryErrorDialog errorDialog = new GitBatchPullSummaryErrorDialog(multiStatus);
+				Image icon = new Image(null, IconPaths.getEcl1IconPath());
+				GitBatchPullSummaryErrorDialog.setDefaultImage(icon);
+				errorDialog.open();
 			}
 			return null;
 		}
