@@ -12,7 +12,7 @@ public class NewExtensionProjectWizardApp {
 
     private static void open(){
         Display display = new Display();
-        Image icon = new Image(display, IconPaths.ECL1_ICON); 
+        Image icon = new Image(display, IconPaths.getEcl1IconPath()); 
 
         NewExtensionProjectWizard wizard = new NewExtensionProjectWizard();
         WizardDialog.setDefaultImage(icon);

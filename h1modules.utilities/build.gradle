@@ -58,12 +58,10 @@ tasks.register("runSymlinkCreator", JavaExec) {
     group = "util"
     mainClass.set("net.sf.ecl1.utilities.standalone.SymlinkCreator")
     classpath = sourceSets.main.runtimeClasspath
-    workingDir = rootProject.projectDir.parentFile
 
     println "symlinkTarget: ${project.hasProperty('symlinkTarget') ? project.symlinkTarget : 'not set'}"
 
     args project.hasProperty('symlinkTarget') ? project.symlinkTarget.split(',') : []
-
 }
 
 tasks.register("addWebappsSymlink", JavaExec) {
@@ -71,7 +69,6 @@ tasks.register("addWebappsSymlink", JavaExec) {
     group = "util"
     mainClass.set("net.sf.ecl1.utilities.standalone.SymlinkCreator")
     classpath = sourceSets.main.runtimeClasspath
-    workingDir = rootProject.projectDir.parentFile
     args = ['../webapps']
 }
 

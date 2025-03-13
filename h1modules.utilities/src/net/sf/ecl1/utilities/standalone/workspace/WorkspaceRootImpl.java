@@ -33,7 +33,7 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
     private final Path path;
 
     public WorkspaceRootImpl(){
-        this.path = Paths.get(System.getProperty("user.dir"));
+        this.path = Paths.get(System.getProperty("user.dir")).getParent().getParent();
     }
 
 	@Override

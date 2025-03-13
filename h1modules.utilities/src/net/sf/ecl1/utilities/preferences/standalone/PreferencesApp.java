@@ -16,7 +16,7 @@ public class PreferencesApp {
     private static void open() {
         PreferenceStore preferenceStore = StandalonePreferenceStore.getStore();
         Display display = new Display();
-        Image icon = new Image(display, IconPaths.ECL1_ICON); 
+        Image icon = new Image(display, IconPaths.getEcl1IconPath()); 
 
         PreferenceManager preferenceManager = new PreferenceManager();
         preferenceManager.addToRoot(new PreferenceNode("general", new HISinOneExtensionsPreferencePage(preferenceStore)));

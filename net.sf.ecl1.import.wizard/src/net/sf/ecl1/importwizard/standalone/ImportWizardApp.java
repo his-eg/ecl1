@@ -12,7 +12,7 @@ public class ImportWizardApp {
 
     private static void open(){
         Display display = new Display();
-        Image icon = new Image(display, IconPaths.ECL1_ICON); 
+        Image icon = new Image(display, IconPaths.getEcl1IconPath()); 
 
         ExtensionImportWizard wizard = new ExtensionImportWizard();
         WizardDialog.setDefaultImage(icon);

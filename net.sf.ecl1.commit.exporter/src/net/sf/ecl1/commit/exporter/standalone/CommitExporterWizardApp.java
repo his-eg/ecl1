@@ -12,8 +12,7 @@ public class CommitExporterWizardApp {
 
     private static void open(){
         Display display = new Display();
-        Image icon = new Image(display, IconPaths.ECL1_ICON); 
-
+        Image icon = new Image(display, IconPaths.getEcl1IconPath()); 
         CommitExporterWizard wizard = new CommitExporterWizard();
         WizardDialog.setDefaultImage(icon);
         WizardDialog dialog = new WizardDialog(display.getActiveShell(), wizard);
