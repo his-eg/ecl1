@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 repositories {
@@ -50,10 +51,6 @@ java {
     }
 }
 
-tasks.register("runImportWizard", JavaExec) {
-    description = "Runs the ImportWizardApp."
-    group = "application"
-    main = 'net.sf.ecl1.importwizard.standalone.ImportWizardApp'
-    classpath = sourceSets.main.runtimeClasspath
-    workingDir = rootProject.projectDir.parentFile
+application {
+    mainClass = 'net.sf.ecl1.importwizard.standalone.ImportWizardApp'
 }

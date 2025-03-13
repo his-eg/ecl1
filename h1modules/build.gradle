@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 repositories {
@@ -37,10 +38,6 @@ java {
     }
 }
 
-tasks.register("runNewExtensionProjectWizard", JavaExec) {
-    description = "Runs the NewExtensionProjectWizardApp."
-    group = "application"
-    main = 'de.his.cs.sys.extensions.standalone.NewExtensionProjectWizardApp'
-    classpath = sourceSets.main.runtimeClasspath
-    workingDir = rootProject.projectDir.parentFile
+application {
+    mainClass = 'de.his.cs.sys.extensions.standalone.NewExtensionProjectWizardApp'
 }

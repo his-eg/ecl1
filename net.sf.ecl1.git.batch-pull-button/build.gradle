@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 repositories {
@@ -38,10 +39,6 @@ java {
     }
 }
 
-tasks.register("runGitBatchPull", JavaExec) {
-    description = "Runs the GitBatchPullApp."
-    group = "application"
-    main = 'net.sf.ecl1.git.standalone.GitBatchPullApp'
-    classpath = sourceSets.main.runtimeClasspath
-    workingDir = rootProject.projectDir.parentFile
+application {
+    mainClass = 'net.sf.ecl1.git.standalone.GitBatchPullApp'
 }

@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 repositories {
@@ -48,12 +49,8 @@ java {
     }
 }
 
-tasks.register("runPreferences", JavaExec) {
-    description = "Runs the PreferencesApp."
-    group = "application"
-    main = 'net.sf.ecl1.utilities.preferences.standalone.PreferencesApp'
-    classpath = sourceSets.main.runtimeClasspath
-    workingDir = rootProject.projectDir.parentFile
+application {
+    mainClass = 'net.sf.ecl1.utilities.preferences.standalone.PreferencesApp'
 }
 
 tasks.register("runSymlinkCreator", JavaExec) {

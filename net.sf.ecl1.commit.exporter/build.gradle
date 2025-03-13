@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
 repositories {
@@ -38,10 +39,6 @@ java {
     }
 }
 
-tasks.register("runCommitExporter", JavaExec) {
-    description = "Runs the CommitExporterWizardApp."
-    group = "application"
-    main = 'net.sf.ecl1.commit.exporter.standalone.CommitExporterWizardApp'
-    classpath = sourceSets.main.runtimeClasspath
-    workingDir = rootProject.projectDir.parentFile
+application {
+    mainClass = 'net.sf.ecl1.commit.exporter.standalone.CommitExporterWizardApp'
 }
