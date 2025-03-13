@@ -12,12 +12,23 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
-    "commands": [
-      {
-        "command": "ecl1.helloWorld",
-        "title": "Hello World"
-      }
-    ]
+    "views": {
+      "ecl1Sidebar": [
+        {
+          "id": "ecl1TasksTreeView",
+          "name": "Tasks"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ecl1Sidebar",
+          "title": "Ecl1",
+          "icon": ""
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

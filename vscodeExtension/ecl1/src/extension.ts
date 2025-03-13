@@ -1,27 +1,48 @@
 // The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "ecl1" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('ecl1.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from ecl1!');
-	});
-
-	context.subscriptions.push(disposable);
-
+class Ecl1TaskTreeItem extends vscode.TreeItem {
+	
+    constructor(public readonly task: vscode.Task) {
+		// Remove first 6 chars from task name - 'ecl1: Name' -> 'Name'
+        super(task.name.slice(6), vscode.TreeItemCollapsibleState.None);
+        this.tooltip = 'Run task ' + task.name;
+        this.command = {
+            command: 'runTaskFromTree',
+            title: 'Run Task',
+            arguments: [task]
+        };
+    }
 }
 
-// This method is called when your extension is deactivated
+class Ecl1TaskTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
+
+    getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
+        return element;
+    }
+
+	async getChildren(): Promise<vscode.TreeItem[]> {
+        const tasks = await vscode.tasks.fetchTasks();
+        // Only use tasks that start with 'ecl1:'
+        const filteredTasks = tasks.filter(task => task.name.startsWith('ecl1:'));
+
+        return filteredTasks.map(task => new Ecl1TaskTreeItem(task));
+    }
+}
+
+export function activate(context: vscode.ExtensionContext) {
+    // Register tree view
+    const treeDataProvider = new Ecl1TaskTreeDataProvider();
+    vscode.window.createTreeView('ecl1TasksTreeView', {
+        treeDataProvider
+    });
+
+    // Command to run the task selected in the tree view
+    let runTaskFromTree = vscode.commands.registerCommand('runTaskFromTree', (task: vscode.Task) => {
+        vscode.tasks.executeTask(task);
+    });
+
+    context.subscriptions.push(runTaskFromTree);
+}
+
 export function deactivate() {}
