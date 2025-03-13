@@ -7,4 +7,11 @@ bin
 # Ignore Gradle build output directory
 build
 
+# Ignore Visual Studio Code workspace-specific settings and configurations
 .vscode
+
+# Ignore Node.js dependencies
+node_modules
+
+# Ignore build output directory for VSCode extension
+out
