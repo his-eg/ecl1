@@ -77,4 +77,8 @@ tasks.register('copyVSCodeTasks', Copy) {
     group = "util"
     from file("${rootProject.projectDir}/h1modules.utilities/src/net/sf/ecl1/utilities/standalone/vscode/tasks.json")
     into file("${rootProject.projectDir.parentFile}/.vscode")
+
+    println """Copied tasks.json 
+        from: ${rootProject.projectDir}/h1modules.utilities/src/net/sf/ecl1/utilities/standalone/vscode/tasks.json
+        to:   ${rootProject.projectDir.parentFile}/.vscode"""
 }
