@@ -1,9 +1,7 @@
 package net.sf.ecl1.utilities.preferences;
 
-import java.nio.file.Paths;
 import java.util.Collection;
 
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -21,7 +19,6 @@ import com.google.common.collect.Lists;
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.general.GitUtil;
 import net.sf.ecl1.utilities.general.NetUtil;
-import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
  * HISinOne-Extension-Tools preferences page
@@ -93,8 +90,7 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
         logLevels[3][0] = logLevels[3][1] = "ERROR";
         addField(new ComboFieldEditor(PreferenceWrapper.LOG_LEVEL_PREFERENCE_KEY, "Log-Level", logLevels, getFieldEditorParent()));
 
-        IPath workspacePath = WorkspaceFactory.getWorkspace().getRoot().getLocation();
-        String storePath = Paths.get(workspacePath.toString()).resolve(PreferenceWrapper.ECLIPSE_STORE_PATH).toString();
+        String storePath = PreferenceWrapper.getEclipseStorePath();
 
         Label storePathLabel = new Label(getFieldEditorParent(), SWT.NONE);
         storePathLabel.setText("Store Path: ");

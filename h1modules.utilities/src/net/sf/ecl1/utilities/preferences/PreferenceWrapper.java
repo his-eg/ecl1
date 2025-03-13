@@ -12,6 +12,7 @@ import net.sf.ecl1.utilities.general.GitUtil;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.standalone.StandalonePreferenceStore;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
  * Encapsulate access to Eclipse preferences.
@@ -43,7 +44,7 @@ public class PreferenceWrapper {
     public static final String DISPLAY_SUMMARY_OF_GIT_PULL = "displaySummaryOfGitPull";
 
     /** Eclipse default path for preference store */
-    public static final String ECLIPSE_STORE_PATH = ".metadata\\.plugins\\org.eclipse.core.runtime\\.settings\\net.sf.ecl1.utilities.prefs";
+    private static final String ECLIPSE_STORE_PATH = ".metadata\\.plugins\\org.eclipse.core.runtime\\.settings\\net.sf.ecl1.utilities.prefs";
 
     private static IPreferenceStore preferenceStore = null;
 
@@ -112,6 +113,10 @@ public class PreferenceWrapper {
         getStore().setValue(DISPLAY_SUMMARY_OF_GIT_PULL, v);
         saveStore();
 	}
+
+    public static String getEclipseStorePath(){
+        return WorkspaceFactory.getWorkspace().getRoot().getLocation().toPath().resolve(ECLIPSE_STORE_PATH).toString();
+    }
 
     /*
      * Ensures that changes to the standalone preference store are persisted.

@@ -2,13 +2,11 @@ package net.sf.ecl1.utilities.preferences.standalone;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 
 import org.eclipse.jface.preference.PreferenceStore;
 
 import net.sf.ecl1.utilities.preferences.PreferenceInitializer;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
-import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 public class StandalonePreferenceStore {
 
@@ -22,8 +20,7 @@ public class StandalonePreferenceStore {
     }
 
     private static void initializeStore(){
-        Path workspacePath = WorkspaceFactory.getWorkspace().getRoot().getLocation().toPath();
-        String path = workspacePath.resolve(PreferenceWrapper.ECLIPSE_STORE_PATH).toString();
+        String path = PreferenceWrapper.getEclipseStorePath();
         File file = new File(path);
         if(!file.exists()){
             try {
@@ -33,7 +30,7 @@ public class StandalonePreferenceStore {
                 System.out.println("Created new preference store at: " + file.getAbsolutePath());
             } catch (IOException e) {
                 // no log because logger initialisation depends on this store
-                System.err.println("Created new preference store at: " + file.getAbsolutePath());      
+                System.err.println("Exception creating new preference store at: " + file.getAbsolutePath() + "\n" + e.getMessage());      
             }
         }
 
