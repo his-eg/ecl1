@@ -21,9 +21,6 @@ dependencies {
     implementation ('org.eclipse.platform:org.eclipse.ui.workbench:3.134.0'){
       transitive = false
     }
-    implementation('org.eclipse.platform:org.eclipse.ui:3.207.0') {
-        transitive = false
-    }
     implementation('org.eclipse.platform:org.eclipse.ui.console:3.14.200') {
         transitive = false
     }
