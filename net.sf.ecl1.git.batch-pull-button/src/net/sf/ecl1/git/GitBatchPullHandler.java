@@ -76,7 +76,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 		return null;
 	}
 
-	public IStatus gitBatchPullJob(IProgressMonitor monitor) {
+	private IStatus gitBatchPullJob(IProgressMonitor monitor) {
 		/** Stores the result of this job */
 		MultiStatus multiStatus = new MultiStatus(Activator.PLUGIN_ID, 0, "Problems occured during \"Batch Git Pull Command\"");
 		Status status;
