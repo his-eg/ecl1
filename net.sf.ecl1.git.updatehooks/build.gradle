@@ -34,3 +34,6 @@ java {
     }
 }
 
+application {
+    mainClass = 'net.sf.ecl1.git.updatehooks.standalone.UpdateHooksApp'
+}
