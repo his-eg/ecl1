@@ -76,9 +76,12 @@ public class CopyTasks {
                 for (JsonElement sourceElement : sourceArray) {
                     boolean exists = false;
                     // Loop through targetArray to check if the element already exists
-                    for (JsonElement targetElement : targetArray) {
+                    for (int i = 0; i < targetArray.size(); i++) {
+                        JsonElement targetElement = targetArray.get(i);
                         if (targetElement.getAsJsonObject().get("label").getAsString()
                             .equals(sourceElement.getAsJsonObject().get("label").getAsString())) {
+                            // If it exists, replace the target element with the source element
+                            targetArray.set(i, sourceElement);
                             exists = true;
                             break;
                         }
