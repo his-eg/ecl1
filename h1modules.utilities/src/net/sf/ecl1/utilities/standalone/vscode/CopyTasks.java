@@ -74,7 +74,19 @@ public class CopyTasks {
                 JsonArray targetArray = targetTasks.getAsJsonArray();
                 JsonArray sourceArray = sourceTasks.getAsJsonArray();
                 for (JsonElement sourceElement : sourceArray) {
-                    targetArray.add(sourceElement);
+                    boolean exists = false;
+                    // Loop through targetArray to check if the element already exists
+                    for (JsonElement targetElement : targetArray) {
+                        if (targetElement.getAsJsonObject().get("label").getAsString()
+                            .equals(sourceElement.getAsJsonObject().get("label").getAsString())) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    // Only add the source element if it doesnt already exist
+                    if (!exists) {
+                        targetArray.add(sourceElement);
+                    }
                 }
             }
             saveJsonToFile(jsonObjectTarget, targetPath);
