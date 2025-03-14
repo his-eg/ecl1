@@ -2,7 +2,6 @@ package net.sf.ecl1.git.updatehooks;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -11,7 +10,6 @@ import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -26,11 +24,13 @@ import org.eclipse.ui.IStartup;
 
 import net.sf.ecl1.utilities.hisinone.ExtensionUtil;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
+
 
 public class UpdateHooks implements IStartup {
     
-	private static final ConsoleLogger logger = new ConsoleLogger(UpdateHooksActivator.getDefault().getLog(), UpdateHooksActivator.PLUGIN_ID, UpdateHooks.class.getSimpleName());
+    private static final ICommonLogger logger = LoggerFactory.getLogger(UpdateHooks.class.getSimpleName(), UpdateHooksActivator.PLUGIN_ID, UpdateHooksActivator.getDefault());
     
     private static final String HOOKS_DIR_ECLIPSE_PROJECTS = ".git/hooks/commit-msg";
     private static final String HOOKS_DIR_ECL1 = "/githooks/commit-msg";
