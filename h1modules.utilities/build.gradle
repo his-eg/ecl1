@@ -72,13 +72,9 @@ tasks.register("addWebappsSymlink", JavaExec) {
     args = ['../webapps']
 }
 
-tasks.register('copyVSCodeTasks', Copy) {
+tasks.register('copyVSCodeTasks', JavaExec) {
     description = "Copy tasks.json into VSCode workspace."
     group = "util"
-    from file("${rootProject.projectDir}/h1modules.utilities/src/net/sf/ecl1/utilities/standalone/vscode/tasks.json")
-    into file("${rootProject.projectDir.parentFile}/.vscode")
-
-    println """Copied tasks.json 
-        from: ${rootProject.projectDir}/h1modules.utilities/src/net/sf/ecl1/utilities/standalone/vscode/tasks.json
-        to:   ${rootProject.projectDir.parentFile}/.vscode"""
+    mainClass.set("net.sf.ecl1.utilities.standalone.vscode.CopyTasks")
+    classpath = sourceSets.main.runtimeClasspath
 }
