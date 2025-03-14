@@ -41,23 +41,23 @@ public class CopyTasks {
         Gson gson = new Gson();
 
         try (
-            JsonReader targeteReader = new JsonReader(new FileReader(targetPath.toFile()));
+            JsonReader targetReader = new JsonReader(new FileReader(targetPath.toFile()));
             JsonReader srcReader = new JsonReader(new FileReader(sourcePath.toFile()));
             ) 
         {
             JsonObject jsonObjectTarget;
             try {
-                jsonObjectTarget = gson.fromJson(targeteReader, JsonObject.class);
+                jsonObjectTarget = gson.fromJson(targetReader, JsonObject.class);
             } catch (JsonIOException | JsonSyntaxException e) {
                 // If target file is malformed replace it by copying
-                targeteReader.close();
+                targetReader.close();
                 srcReader.close();
                 copyFile(sourcePath, targetPath);
                 return; // Exit success
             }
             // If target file is empty
             if(jsonObjectTarget == null) {
-                targeteReader.close();
+                targetReader.close();
                 srcReader.close();
                 copyFile(sourcePath, targetPath);
                 return; // Exit success
