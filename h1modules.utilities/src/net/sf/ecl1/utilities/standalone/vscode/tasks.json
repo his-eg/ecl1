@@ -102,6 +102,26 @@
       "problemMatcher": [
         "$gradle"
       ]
+    },
+
+
+
+    {
+      "label": "ecl1 autostart: Update git hooks",
+      "type": "shell",
+      "command": "./gradlew",
+      "windows": {
+        "command": ".\\gradlew.bat"
+      },
+      "args": [
+        ":net.sf.ecl1.git.updatehooks:run"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/ecl1"
+      },
+      "problemMatcher": [
+        "$gradle"
+      ]
     }
   ]
 }
