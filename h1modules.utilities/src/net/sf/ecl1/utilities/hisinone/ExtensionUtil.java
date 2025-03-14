@@ -10,9 +10,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
  * Utilities for extension handling.
@@ -64,7 +65,7 @@ public class ExtensionUtil {
      * @return
      */
     public boolean doesExtensionProjectExist(String extension) {
-        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(extension);
+        IProject project = WorkspaceFactory.getWorkspace().getRoot().getProject(extension);
         return project.exists() && isExtensionProject(project);
     }
 
@@ -128,7 +129,7 @@ public class ExtensionUtil {
      */
     public void scanForExtensionProjects(TreeMap<String, String> extensions) {
         //scan workspace for extension projects
-        IWorkspaceRoot ws = ResourcesPlugin.getWorkspace().getRoot();
+        IWorkspaceRoot ws = WorkspaceFactory.getWorkspace().getRoot();
         List<IProject> projects = Arrays.asList(ws.getProjects(0));
         for (IProject project : projects) {
             if (isExtensionProject(project)) {
