@@ -23,7 +23,7 @@ import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
  */
 public class ToggleEcl1VisibilityInWorkspace {
 
-    private static final ICommonLogger logger = LoggerFactory.getLogger(CopyTasks.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ToggleEcl1VisibilityInWorkspace.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
     private static final String ECL1_FOLDER = "**/ecl1";
     
