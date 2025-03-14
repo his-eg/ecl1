@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonIOException;
@@ -86,7 +87,7 @@ public class CopyTasks {
     /** Saves JsonObject to a filePath. */
     private static void saveJsonToFile(JsonObject jsonObject, Path filePath) {
         try (FileWriter writer = new FileWriter(filePath.toFile())) {
-            Gson gson = new Gson();
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
             gson.toJson(jsonObject, writer);
         } catch (IOException e) {
             logger.error("Error writing JSON to file.\npath: " + filePath + "\njsonObject: " + jsonObject, e);
