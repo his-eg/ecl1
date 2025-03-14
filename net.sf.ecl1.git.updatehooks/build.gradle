@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(':h1modules.utilities'))
+
+    implementation 'org.eclipse.jgit:org.eclipse.jgit:7.1.0.202411261347-r'
+    implementation 'org.eclipse.platform:org.eclipse.core.resources:3.22.0'
+    implementation 'org.eclipse.platform:org.eclipse.core.runtime:3.32.0'
+    implementation ('org.eclipse.platform:org.eclipse.ui.workbench:3.134.0'){
+        transitive = false
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
