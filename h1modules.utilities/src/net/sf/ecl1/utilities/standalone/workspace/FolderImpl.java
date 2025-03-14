@@ -69,6 +69,11 @@ public class FolderImpl implements IFolder {
     }
 
     @Override
+    public URI getLocationURI() {
+        return path.toUri();
+    }
+
+    @Override
     public IContainer getParent() {
         String workspace = new WorkspaceRootImpl().getLocation().toString();
         String parent = path.getParent().toString();
@@ -313,11 +318,6 @@ public class FolderImpl implements IFolder {
     @Override
     public long getLocalTimeStamp() {
         throw new UnsupportedOperationException("Unimplemented method 'getLocalTimeStamp()'");
-    }
-    
-    @Override
-    public URI getLocationURI() {
-        throw new UnsupportedOperationException("Unimplemented method 'getLocationURI()'");
     }
     
     @Override
