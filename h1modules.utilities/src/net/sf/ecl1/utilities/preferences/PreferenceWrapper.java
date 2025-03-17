@@ -44,7 +44,7 @@ public class PreferenceWrapper {
     public static final String DISPLAY_SUMMARY_OF_GIT_PULL = "displaySummaryOfGitPull";
 
     /** Eclipse default path for preference store */
-    private static final String ECLIPSE_STORE_PATH = ".metadata\\.plugins\\org.eclipse.core.runtime\\.settings\\net.sf.ecl1.utilities.prefs";
+    private static final String ECLIPSE_STORE_PATH = ".metadata/.plugins/org.eclipse.core.runtime/.settings/net.sf.ecl1.utilities.prefs";
 
     private static IPreferenceStore preferenceStore = null;
 
