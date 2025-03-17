@@ -7,6 +7,7 @@ import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
+import net.sf.ecl1.utilities.general.SwtUtil;
 import net.sf.ecl1.utilities.preferences.HISinOneExtensionsPreferencePage;
 import net.sf.ecl1.utilities.standalone.IconPaths;
 
@@ -16,10 +17,7 @@ public class PreferencesApp {
     private static void open() {
         PreferenceStore preferenceStore = StandalonePreferenceStore.getStore();
         Display display = new Display();
-        // Make Dialog blink in taskbar
-        display.asyncExec(() -> {  
-            display.getActiveShell().forceActive();
-        });
+        SwtUtil.bringShellToForeground(display);
         Image icon = new Image(display, IconPaths.getEcl1IconPath()); 
 
         PreferenceManager preferenceManager = new PreferenceManager();

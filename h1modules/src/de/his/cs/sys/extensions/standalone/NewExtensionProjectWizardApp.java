@@ -5,6 +5,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
 import de.his.cs.sys.extensions.wizards.NewExtensionProjectWizard;
+import net.sf.ecl1.utilities.general.SwtUtil;
 import net.sf.ecl1.utilities.standalone.IconPaths;
 
 
@@ -12,10 +13,7 @@ public class NewExtensionProjectWizardApp {
 
     private static void open(){
         Display display = new Display();
-        // Make Dialog blink in taskbar
-        display.asyncExec(() -> {  
-            display.getActiveShell().forceActive();
-        });
+        SwtUtil.bringShellToForeground(display);
         Image icon = new Image(display, IconPaths.getEcl1IconPath()); 
 
         NewExtensionProjectWizard wizard = new NewExtensionProjectWizard();

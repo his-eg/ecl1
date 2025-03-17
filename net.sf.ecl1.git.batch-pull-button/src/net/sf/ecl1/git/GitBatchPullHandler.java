@@ -30,6 +30,7 @@ import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 import net.sf.ecl1.utilities.standalone.IconPaths;
+import net.sf.ecl1.utilities.general.SwtUtil;
 import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
@@ -51,9 +52,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 			IStatus multiStatus = gitBatchPullJob(new NullProgressMonitor());
 			if (PreferenceWrapper.isDisplaySummaryOfGitPull()) {
 				Display display = new Display();
-				display.asyncExec(() -> {  
-					display.getActiveShell().forceActive();
-				});
+				SwtUtil.bringShellToForeground(display);
 				GitBatchPullSummaryErrorDialog errorDialog = new GitBatchPullSummaryErrorDialog(display.getActiveShell(), multiStatus);
 				Image icon = new Image(null, IconPaths.getEcl1IconPath());
 				GitBatchPullSummaryErrorDialog.setDefaultImage(icon);
