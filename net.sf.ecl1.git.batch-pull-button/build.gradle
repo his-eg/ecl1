@@ -9,24 +9,24 @@ repositories {
 
 dependencies {
     implementation(project(':h1modules.utilities'))
-    implementation 'org.eclipse.platform:org.eclipse.core.resources:3.22.0'
-    implementation 'org.eclipse.platform:org.eclipse.core.commands:3.11.100'
+    implementation libs.eclipse.core.resources
+    implementation libs.eclipse.core.commands
     if(System.getProperty("os.name").toLowerCase().contains("win")) {
-        implementation ('org.eclipse.platform:org.eclipse.swt.win32.win32.x86_64:3.128.0') {
+        implementation (libs.eclipse.swt.win32) {
             transitive = false
         }
     }else {
-        implementation ('org.eclipse.platform:org.eclipse.swt.gtk.linux.x86_64:3.128.0') {
+        implementation (libs.eclipse.swt.linux) {
             transitive = false
         }
     }
-    implementation ('org.eclipse.platform:org.eclipse.jface:3.35.100') {
+    implementation (libs.eclipse.jface) {
         transitive = false
     }
-    implementation ('org.eclipse.platform:org.eclipse.ui.workbench:3.134.0'){
+    implementation (libs.eclipse.ui.workbench) {
         transitive = false
     }
-    implementation 'org.eclipse.jgit:org.eclipse.jgit:7.1.0.202411261347-r'
+    implementation libs.eclipse.jgit
 }
 
 sourceSets {

@@ -8,32 +8,32 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.eclipse.jgit:org.eclipse.jgit:7.1.0.202411261347-r'
-    implementation 'org.eclipse.platform:org.eclipse.core.resources:3.22.0'
-    implementation 'org.eclipse.jdt:org.eclipse.jdt.core:3.40.0'
-    implementation 'org.eclipse.jdt:org.eclipse.jdt.launching:3.23.100'
+    implementation libs.eclipse.jgit
+    implementation libs.eclipse.core.resources
+    implementation libs.eclipse.jdt.core
+    implementation libs.eclipse.jdt.launching
     if(System.getProperty("os.name").toLowerCase().contains("win")) {
-        implementation ('org.eclipse.platform:org.eclipse.swt.win32.win32.x86_64:3.128.0') {
+        implementation (libs.eclipse.swt.win32) {
             transitive = false
         }
     }else {
-        implementation ('org.eclipse.platform:org.eclipse.swt.gtk.linux.x86_64:3.128.0') {
+        implementation (libs.eclipse.swt.linux) {
             transitive = false
         }
     }
-    implementation ('org.eclipse.platform:org.eclipse.jface:3.35.100') {
-      transitive = false
-    }
-    implementation ('org.eclipse.platform:org.eclipse.ui.workbench:3.134.0'){
-      transitive = false
-    }
-    implementation('org.eclipse.platform:org.eclipse.ui.console:3.14.200') {
+    implementation (libs.eclipse.jface) {
         transitive = false
     }
-    implementation 'com.google.code.gson:gson:2.12.1'
-    implementation 'com.google.guava:guava:33.4.0-jre'
-    implementation 'org.apache.httpcomponents:httpclient:4.5.14'
-    implementation 'commons-io:commons-io:2.18.0'
+    implementation (libs.eclipse.ui.workbench) {
+        transitive = false
+    }
+    implementation(libs.eclipse.ui.console) {
+        transitive = false
+    }
+    implementation libs.gson
+    implementation libs.guava
+    implementation libs.httpclient
+    implementation libs.commons.io
 }
 
 sourceSets {
