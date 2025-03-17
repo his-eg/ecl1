@@ -31,3 +31,7 @@ java {
         languageVersion = JavaLanguageVersion.of(17)
     }
 }
+
+application {
+    mainClass = 'net.sf.ecl1.git.auto.lfs.prune.standalone.AutoLfsPruneStarterApp'
+}
