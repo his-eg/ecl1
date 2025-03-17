@@ -80,7 +80,7 @@ tasks.register('copyVSCodeTasks', JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
-tasks.register('toggleEcl1Visibility', JavaExec) {
+tasks.register('toggleVSCodeEcl1Visibility', JavaExec) {
     description = "Toggle ecl1 visibility in VSCode workspace."
     group = "util"
     mainClass.set("net.sf.ecl1.utilities.standalone.vscode.ToggleEcl1VisibilityInWorkspace")
