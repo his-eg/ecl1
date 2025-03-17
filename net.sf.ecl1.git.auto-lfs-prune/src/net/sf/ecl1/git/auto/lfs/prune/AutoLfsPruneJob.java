@@ -10,7 +10,6 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -19,15 +18,17 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.util.FS;
-import org.eclipse.jgit.util.FS_Win32;
 import org.eclipse.jgit.util.FS.ExecutionResult;
+import org.eclipse.jgit.util.FS_Win32;
 
-import net.sf.ecl1.utilities.logging.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 public class AutoLfsPruneJob extends Job {
 	
-	private final static ConsoleLogger logger = new ConsoleLogger(AutoLfsPruneActivator.getDefault().getLog(), AutoLfsPruneActivator.PLUGIN_ID, AutoLfsPruneJob.class.getSimpleName());
-	
+    private static final ICommonLogger logger = LoggerFactory.getLogger(AutoLfsPruneJob.class.getSimpleName(), AutoLfsPruneActivator.PLUGIN_ID, AutoLfsPruneActivator.getDefault());
+    
 	/** git lfs version 2.13.3 fixed a bug (see: https://github.com/git-lfs/git-lfs/issues/4401) that prohibited
 	 *  running the command "git lfs prune" when stashes were present on windows machines...
 	 */
@@ -102,7 +103,7 @@ public class AutoLfsPruneJob extends Job {
 		boolean detectedLFSVersion = false;
 		String LFSVersion = "0";
 		
-		List<IProject> projects = Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects());
+		List<IProject> projects = Arrays.asList(WorkspaceFactory.getWorkspace().getRoot().getProjects());
 		logger.info("Found projects in Workspace: " + projects);
 		monitor.beginTask("Pruning", projects.size());
 		
