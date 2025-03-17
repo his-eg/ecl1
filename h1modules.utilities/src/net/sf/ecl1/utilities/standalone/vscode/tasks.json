@@ -122,6 +122,23 @@
       "problemMatcher": [
         "$gradle"
       ]
+    },
+    {
+      "label": "ecl1 autostart: Prune git lfs projects",
+      "type": "shell",
+      "command": "./gradlew",
+      "windows": {
+        "command": ".\\gradlew.bat"
+      },
+      "args": [
+        ":net.sf.ecl1.git.auto-lfs-prune:run"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/ecl1"
+      },
+      "problemMatcher": [
+        "$gradle"
+      ]
     }
   ]
 }
