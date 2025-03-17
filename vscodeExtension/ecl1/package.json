@@ -28,6 +28,22 @@
           "icon": "icon.svg"
         }
       ]
+    },
+    "commands": [
+      {
+        "command": "ecl1TasksTreeView.refreshTasks",
+        "title": "Refresh",
+        "icon": "$(extensions-refresh)"
+      }
+    ],
+    "menus": {
+    "view/title": [
+        {
+            "command": "ecl1TasksTreeView.refreshTasks",
+            "when": "view == ecl1TasksTreeView",
+            "group": "navigation"
+        }
+      ]
     }
   },
   "scripts": {

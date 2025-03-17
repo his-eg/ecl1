@@ -16,6 +16,12 @@ class Ecl1TaskTreeItem extends vscode.TreeItem {
 }
 
 class Ecl1TaskTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
+    private _onDidChangeTreeData: vscode.EventEmitter<Ecl1TaskTreeItem | undefined | null | void> = new vscode.EventEmitter<Ecl1TaskTreeItem | undefined | null | void>();
+    readonly onDidChangeTreeData: vscode.Event<Ecl1TaskTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
+  
+    refresh(): void {
+      this._onDidChangeTreeData.fire();
+    }
 
     getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
         return element;
@@ -46,6 +52,10 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.window.createTreeView('ecl1TasksTreeView', {
         treeDataProvider
     });
+    // Refresh icon in tree view navigation
+    vscode.commands.registerCommand('ecl1TasksTreeView.refreshTasks', () =>
+        treeDataProvider.refresh()
+    );
 
     // Command to run the task selected in the tree view
     let runTaskFromTree = vscode.commands.registerCommand('runTaskFromTree', (task: vscode.Task) => {
