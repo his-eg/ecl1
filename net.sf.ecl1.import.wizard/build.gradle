@@ -12,8 +12,6 @@ dependencies {
 
     implementation libs.eclipse.jgit
     implementation libs.eclipse.core.resources
-    implementation libs.eclipse.core.expressions
-    implementation libs.eclipse.core.runtime
     implementation (libs.eclipse.ui.workbench) {
         transitive = false
     }

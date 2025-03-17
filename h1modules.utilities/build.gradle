@@ -9,8 +9,6 @@ repositories {
 
 dependencies {
     implementation libs.eclipse.jgit
-    implementation libs.eclipse.core.resources
-    implementation libs.eclipse.jdt.core
     implementation libs.eclipse.jdt.launching
     if(System.getProperty("os.name").toLowerCase().contains("win")) {
         implementation (libs.eclipse.swt.win32) {
