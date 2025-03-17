@@ -30,6 +30,16 @@ class Ecl1TaskTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeIte
     }
 }
 
+async function startEcl1AutostartTasks() {
+    const tasks = await vscode.tasks.fetchTasks();
+    // Only use tasks that start with 'ecl1 autostart:'
+    const autostartTasks = tasks.filter(task => task.name.startsWith('ecl1 autostart:'));
+    if (autostartTasks.length > 0) {
+        vscode.window.showInformationMessage(`Starting ${autostartTasks.length} ecl1 autostart jobs.`);
+        autostartTasks.forEach(task => vscode.tasks.executeTask(task));
+    }
+}
+
 export function activate(context: vscode.ExtensionContext) {
     // Register tree view
     const treeDataProvider = new Ecl1TaskTreeDataProvider();
@@ -43,6 +53,8 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     context.subscriptions.push(runTaskFromTree);
+
+    startEcl1AutostartTasks();
 }
 
 export function deactivate() {}
