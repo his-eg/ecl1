@@ -1,6 +1,12 @@
 // The module 'vscode' contains the VS Code extensibility API
 import * as vscode from 'vscode';
 
+let tasks: vscode.Task[] = [];
+
+async function fetchTasks() {
+    tasks = await vscode.tasks.fetchTasks();
+}
+
 class Ecl1TaskTreeItem extends vscode.TreeItem {
 	
     constructor(public readonly task: vscode.Task) {
@@ -28,7 +34,8 @@ class Ecl1TaskTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeIte
     }
 
 	async getChildren(): Promise<vscode.TreeItem[]> {
-        const tasks = await vscode.tasks.fetchTasks();
+        // always update tasks
+        await fetchTasks();
         // Only use tasks that start with 'ecl1:'
         const filteredTasks = tasks.filter(task => task.name.startsWith('ecl1:'));
 
@@ -37,7 +44,9 @@ class Ecl1TaskTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeIte
 }
 
 async function startEcl1AutostartTasks() {
-    const tasks = await vscode.tasks.fetchTasks();
+    if (tasks.length === 0) {
+        await fetchTasks();
+    }
     // Only use tasks that start with 'ecl1 autostart:'
     const autostartTasks = tasks.filter(task => task.name.startsWith('ecl1 autostart:'));
     if (autostartTasks.length > 0) {
@@ -47,13 +56,16 @@ async function startEcl1AutostartTasks() {
 }
 
 
-
 export function activate(context: vscode.ExtensionContext) {
+    // Pre-fetch tasks to eliminate delay, especially when opening QuickPick
+    fetchTasks();
+
     // Register tree view
     const treeDataProvider = new Ecl1TaskTreeDataProvider();
     vscode.window.createTreeView('ecl1TasksTreeView', {
         treeDataProvider
     });
+
     // Refresh icon in tree view navigation
     vscode.commands.registerCommand('ecl1TasksTreeView.refreshTasks', () =>
         treeDataProvider.refresh()
@@ -66,7 +78,10 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Command to open QuickPick
     const runTaskInQuickPick = vscode.commands.registerCommand('ecl1.runTaskInQuickPick', async () => {
-        const tasks = await vscode.tasks.fetchTasks();
+        if (tasks.length === 0) {
+            await fetchTasks();
+        }
+
         // Only use tasks that start with 'ecl1:'
         const filteredTasks = tasks.filter(task => task.name.startsWith('ecl1:'));
 
