@@ -72,7 +72,7 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     // Command to run the task selected in the tree view
-    const runTaskFromTree = vscode.commands.registerCommand('runTaskFromTree', (task: vscode.Task) => {
+    const runTaskFromTree = vscode.commands.registerCommand('ecl1.runTaskFromTree', (task: vscode.Task) => {
         vscode.tasks.executeTask(task);
     });
 
