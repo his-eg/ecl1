@@ -34,6 +34,10 @@
         "command": "ecl1TasksTreeView.refreshTasks",
         "title": "Refresh",
         "icon": "$(extensions-refresh)"
+      },
+      {
+        "command": "ecl1.runTaskInQuickPick",
+        "title": "Ecl1: Run Task"
       }
     ],
     "menus": {

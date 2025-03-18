@@ -46,6 +46,8 @@ async function startEcl1AutostartTasks() {
     }
 }
 
+
+
 export function activate(context: vscode.ExtensionContext) {
     // Register tree view
     const treeDataProvider = new Ecl1TaskTreeDataProvider();
@@ -58,11 +60,31 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     // Command to run the task selected in the tree view
-    let runTaskFromTree = vscode.commands.registerCommand('runTaskFromTree', (task: vscode.Task) => {
+    const runTaskFromTree = vscode.commands.registerCommand('runTaskFromTree', (task: vscode.Task) => {
         vscode.tasks.executeTask(task);
     });
 
-    context.subscriptions.push(runTaskFromTree);
+    // Command to open QuickPick
+    const runTaskInQuickPick = vscode.commands.registerCommand('ecl1.runTaskInQuickPick', async () => {
+        const tasks = await vscode.tasks.fetchTasks();
+        // Only use tasks that start with 'ecl1:'
+        const filteredTasks = tasks.filter(task => task.name.startsWith('ecl1:'));
+
+        // Show the tasks in a QuickPick
+        const selected = await vscode.window.showQuickPick(
+            filteredTasks.map(task => ({
+                label: task.name,
+                task: task
+            })),
+            { placeHolder: "Select a task to run" }
+        );
+
+        if (selected) {
+            vscode.tasks.executeTask(selected.task);
+        }
+    });
+
+    context.subscriptions.push(runTaskFromTree, runTaskInQuickPick);
 
     startEcl1AutostartTasks();
 }
