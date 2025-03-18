@@ -102,7 +102,8 @@ export function activate(context: vscode.ExtensionContext) {
     // Listen for task changes and fetch changed tasks
     vscode.workspace.onDidChangeConfiguration(event => {
         if (event.affectsConfiguration("tasks")) {
-            fetchTasks();
+            // Updates ecl1TasksTreeView. Also calls fetchTasks() to update global tasks
+            treeDataProvider.refresh();
         }
     });
 
