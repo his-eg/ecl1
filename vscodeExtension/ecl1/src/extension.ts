@@ -44,6 +44,13 @@ class Ecl1TaskTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeIte
 }
 
 async function startEcl1AutostartTasks() {
+    const config = vscode.workspace.getConfiguration();
+    const isAutostartTasks = config.get<boolean>("ecl1.autostartTasks");
+
+    if (!isAutostartTasks) {
+        return;
+    }
+
     if (tasks.length === 0) {
         await fetchTasks();
     }

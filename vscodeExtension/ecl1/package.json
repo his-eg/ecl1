@@ -48,6 +48,16 @@
             "group": "navigation"
         }
       ]
+    },
+    "configuration": {
+      "title": "Ecl1 Settings",
+      "properties": {
+        "ecl1.autostartTasks": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable automatic start of ecl1 autostart tasks."
+        }
+      }
     }
   },
   "scripts": {
