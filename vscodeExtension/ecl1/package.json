@@ -49,6 +49,12 @@
         }
       ]
     },
+    "viewsWelcome": [
+      {
+        "view": "ecl1TasksTreeView",
+        "contents": "No ecl1 tasks found\nIs ecl1 in workspace?"
+      }
+    ],
     "configuration": {
       "title": "Ecl1 Settings",
       "properties": {
