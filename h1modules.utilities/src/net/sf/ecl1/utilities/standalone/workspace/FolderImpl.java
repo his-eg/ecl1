@@ -104,7 +104,7 @@ public class FolderImpl implements IFolder {
     }
 
     @Override
-    public IResource[] members() throws CoreException {
+    public IResource[] members() {
         File folder = path.toFile();
         List<IResource> children = new ArrayList<>();
         if (folder.exists() && folder.isDirectory()) {
