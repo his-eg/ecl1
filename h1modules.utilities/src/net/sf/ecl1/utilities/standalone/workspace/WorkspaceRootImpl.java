@@ -4,6 +4,8 @@ import java.io.File;
 import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.FileInfoMatcherDescription;
@@ -28,6 +30,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.QualifiedName;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
+import net.sf.ecl1.utilities.hisinone.HisConstants;
+
 public class WorkspaceRootImpl implements IWorkspaceRoot {
 
     private final Path path;
@@ -49,6 +53,14 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
     @Override
     public IProject getProject(String name) {
         IPath workspacePath = getLocation();
+        // check if it exists in workspace
+        if(path.resolve(name).toFile().exists()){
+            return new ProjectImpl(name, workspacePath);
+        // check if it exists in workspace-parent
+        }else if(path.getParent().resolve(name).toFile().exists()){
+            return new ProjectImpl(name, new PathImpl(path.getParent()));
+        }
+        // no projects exists yet, return default
         return new ProjectImpl(name, workspacePath);
     }
 
@@ -56,20 +68,42 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
     public IProject[] getProjects() {
         IPath workspacePath = getLocation();
         File parentFolder = workspacePath.toFile();
+        List<IProject> projects = new ArrayList<>();
         if (parentFolder.exists() && parentFolder.isDirectory()) {
             File[] subfolders = parentFolder.listFiles(File::isDirectory);
             if (subfolders != null) {
-                IProject[] projects = new IProject[subfolders.length];
-                for (int i = 0; i < subfolders.length; i++) {
-                    projects[i] = new ProjectImpl(subfolders[i].getName(), workspacePath);
+                for (File folder : subfolders) {
+                    projects.add(new ProjectImpl(folder.getName(), workspacePath));
                 }
-                return projects;
             }
         }
-        // No projects found 
-        return null;
+        projects.addAll(getParentFolderProjects());
+
+        return projects.toArray(new IProject[0]);
     }
 
+    // Get projects from workspace parent folder
+    private List<IProject> getParentFolderProjects() {
+        Path workspacePathParent = path.getParent();
+        File parentFolder = workspacePathParent.toFile();
+        if (!parentFolder.exists() || !parentFolder.isDirectory()){
+            return null;
+        }
+        File[] subfolders = parentFolder.listFiles(File::isDirectory);
+        List<IProject> projects = new ArrayList<>();
+        if (subfolders != null){
+            for (File folder : subfolders) {
+                // is extension project?
+                if (folder.toPath().resolve("extension.ant.properties").toFile().exists()) {
+                    projects.add(new ProjectImpl(folder.getName(), new PathImpl(workspacePathParent)));
+                // is webapps?
+                }else if (folder.toPath().resolve(HisConstants.EXTENSIONS_FOLDER).toFile().exists()) {
+                    projects.add(new ProjectImpl(folder.getName(), new PathImpl(workspacePathParent)));
+                }
+            }
+        }
+        return projects;
+    }
 
     @Override
     public IProject[] getProjects(int memberFlags) {
