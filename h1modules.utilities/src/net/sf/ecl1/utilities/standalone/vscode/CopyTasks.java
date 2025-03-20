@@ -31,7 +31,7 @@ public class CopyTasks {
     
     public static void main(String[] args) {
         Path sourcePath = Paths.get("src/net/sf/ecl1/utilities/standalone/vscode/tasks.json");
-        Path targetPath = WorkspaceFactory.getWorkspace().getRoot().getLocation().toPath().resolve(".vscode/tasks.json");
+        Path targetPath = WorkspaceFactory.getWorkspace().getRoot().getLocation().toPath().getParent().resolve(".vscode/tasks.json");
 
         // If tasks.json does not exist, create a copy from the source
         if(!targetPath.toFile().exists()){
