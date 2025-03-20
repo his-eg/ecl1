@@ -82,8 +82,11 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
         return projects.toArray(new IProject[0]);
     }
 
-    // Get projects from workspace parent folder
-    private List<IProject> getParentFolderProjects() {
+    /**
+     * Get projects from workspace parent folder
+     * @return list of IProject
+     */
+    public List<IProject> getParentFolderProjects() {
         Path workspacePathParent = path.getParent();
         File parentFolder = workspacePathParent.toFile();
         if (!parentFolder.exists() || !parentFolder.isDirectory()){
