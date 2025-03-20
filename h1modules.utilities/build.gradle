@@ -67,3 +67,10 @@ tasks.register('toggleVSCodeEcl1Visibility', JavaExec) {
     mainClass.set("net.sf.ecl1.utilities.standalone.vscode.ToggleEcl1VisibilityInWorkspace")
     classpath = sourceSets.main.runtimeClasspath
 }
+
+tasks.register('hideVSCodeNonProjects', JavaExec) {
+    description = "Hide non-Projects from workspace-parent in vscode workspace."
+    group = "util"
+    mainClass.set("net.sf.ecl1.utilities.standalone.vscode.HideNonProjectsInWorkspace")
+    classpath = sourceSets.main.runtimeClasspath
+}
