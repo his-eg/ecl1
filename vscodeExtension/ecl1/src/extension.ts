@@ -64,17 +64,20 @@ async function startEcl1AutostartTasks() {
 
 async function initWorkspace() {
     await fetchTasks();
-    if(!tasks.find(task => task.name.startsWith("ecl1"))){
-        vscode.window.showInformationMessage("Initializing ecl1 workspace...");
-        const terminal = vscode.window.createTerminal('Initialize VSCode workspace');
-        const gradleCommand = process.platform === "win32" ? ".\\gradlew.bat" : "./gradlew";
-        const workspaceFolder = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
-        terminal.sendText(`cd ${workspaceFolder}/eclipse-workspace/ecl1`);
-        terminal.sendText(`${gradleCommand} initVSCWorkspace`);
-        terminal.show();
-        // fetch updated tasks
-        await fetchTasks();
-    }
+    vscode.window.showInformationMessage("Initializing ecl1 workspace...");
+    const terminal = vscode.window.createTerminal('Initialize VSCode workspace');
+    const gradleCommand = process.platform === "win32" ? ".\\gradlew.bat" : "./gradlew";
+    const workspaceFolder = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
+    terminal.sendText(`cd ${workspaceFolder}/eclipse-workspace/ecl1`);
+    terminal.sendText(`${gradleCommand} initVSCWorkspace`);
+    terminal.show();
+    // Dispose the terminal after 1min
+    setTimeout(() => {
+        terminal.dispose();
+    }, 60000);
+    // fetch updated tasks
+    await fetchTasks();
+
     startEcl1AutostartTasks();
 }
 
