@@ -70,6 +70,28 @@ public class SettingsHelper {
         settings.add(property, jsonObject);
     }
 
+    public void setExclusion(String property, String value) {
+        JsonElement exclude = settings.get(property);
+        JsonObject jsonObject;
+        if (exclude == null) {
+            // Create property if it doesnt exist
+            jsonObject = new JsonObject();
+            jsonObject.addProperty(value, true);
+        } else {
+            jsonObject = exclude.getAsJsonObject();
+            jsonObject.addProperty(value, true);
+        }
+        settings.add(property, jsonObject);
+    }
+
+    public void removeExclusion(String property, String value) {
+        JsonElement exclude = settings.get(property);
+        if (exclude != null) {
+            JsonObject jsonObject = exclude.getAsJsonObject();
+            jsonObject.remove(value);
+        }
+    }
+
     public void save() {
         if(!SETTINGS_PATH.toFile().exists()){
             try {
