@@ -12,7 +12,7 @@
         ":net.sf.ecl1.commit.exporter:run"
       ],
       "options": {
-        "cwd": "${workspaceFolder}/ecl1"
+        "cwd": "${workspaceFolder}/eclipse-workspace/ecl1"
       },
       "problemMatcher": [
         "$gradle"
@@ -29,7 +29,7 @@
         ":net.sf.ecl1.git.batch-pull-button:run"
       ],
       "options": {
-        "cwd": "${workspaceFolder}/ecl1"
+        "cwd": "${workspaceFolder}/eclipse-workspace/ecl1"
       },
       "problemMatcher": [
         "$gradle"
@@ -46,7 +46,7 @@
         ":net.sf.ecl1.import.wizard:run"
       ],
       "options": {
-        "cwd": "${workspaceFolder}/ecl1"
+        "cwd": "${workspaceFolder}/eclipse-workspace/ecl1"
       },
       "problemMatcher": [
         "$gradle"
@@ -63,7 +63,7 @@
         ":h1modules:run"
       ],
       "options": {
-        "cwd": "${workspaceFolder}/ecl1"
+        "cwd": "${workspaceFolder}/eclipse-workspace/ecl1"
       },
       "problemMatcher": [
         "$gradle"
@@ -80,12 +80,12 @@
         ":h1modules.utilities:run"
       ],
       "options": {
-        "cwd": "${workspaceFolder}/ecl1"
+        "cwd": "${workspaceFolder}/eclipse-workspace/ecl1"
       },
       "problemMatcher": [
         "$gradle"
       ]
-    },
+    }, 
     {
       "label": "ecl1: Toggle ecl1 visibility",
       "type": "shell",
@@ -97,15 +97,12 @@
         "toggleEcl1Visibility"
       ],
       "options": {
-        "cwd": "${workspaceFolder}/ecl1"
+        "cwd": "${workspaceFolder}/eclipse-workspace/ecl1"
       },
       "problemMatcher": [
         "$gradle"
       ]
     },
-
-
-
     {
       "label": "ecl1 autostart: Update git hooks",
       "type": "shell",
@@ -117,7 +114,7 @@
         ":net.sf.ecl1.git.updatehooks:run"
       ],
       "options": {
-        "cwd": "${workspaceFolder}/ecl1"
+        "cwd": "${workspaceFolder}/eclipse-workspace/ecl1"
       },
       "problemMatcher": [
         "$gradle"
@@ -134,7 +131,7 @@
         ":net.sf.ecl1.git.auto-lfs-prune:run"
       ],
       "options": {
-        "cwd": "${workspaceFolder}/ecl1"
+        "cwd": "${workspaceFolder}/eclipse-workspace/ecl1"
       },
       "problemMatcher": [
         "$gradle"
