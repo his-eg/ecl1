@@ -34,6 +34,7 @@ public class SettingsHelper {
 
         if(!SETTINGS_PATH.toFile().exists()){
             this.settings = new JsonObject();
+            this.settings.addProperty("git.repositoryScanMaxDepth", 2);
         }else{
             readSettings();
         }
