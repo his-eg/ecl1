@@ -1,4 +1,4 @@
-
+/** ecl1-VSCodeExtension depends on this */
 tasks.register('initVSCWorkspace') {
     description = "Initialize VSCode workspace."
     group = "util"
