@@ -1,7 +1,8 @@
 
 tasks.register('initVSCWorkspace') {
-    description = "Create symlink to webapps and copy tasks.json into workspace."
+    description = "Initialize VSCode workspace."
     group = "util"
     dependsOn(":h1modules.utilities:copyVSCodeTasks")
-    dependsOn(":h1modules.utilities:addWebappsSymlink")
+    dependsOn(":h1modules.utilities:toggleVSCodeEcl1Visibility")
+    dependsOn(":h1modules.utilities:hideVSCodeNonProjects")
 }
