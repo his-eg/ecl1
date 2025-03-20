@@ -62,10 +62,26 @@ async function startEcl1AutostartTasks() {
     }
 }
 
+async function initWorkspace() {
+    await fetchTasks();
+    if(!tasks.find(task => task.name.startsWith("ecl1"))){
+        vscode.window.showInformationMessage("Initializing ecl1 workspace...");
+        const terminal = vscode.window.createTerminal('Initialize VSCode workspace');
+        const gradleCommand = process.platform === "win32" ? ".\\gradlew.bat" : "./gradlew";
+        const workspaceFolder = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
+        terminal.sendText(`cd ${workspaceFolder}/eclipse-workspace/ecl1`);
+        terminal.sendText(`${gradleCommand} initVSCWorkspace`);
+        terminal.show();
+        // fetch updated tasks
+        await fetchTasks();
+    }
+    startEcl1AutostartTasks();
+}
+
 
 export function activate(context: vscode.ExtensionContext) {
-    // Pre-fetch tasks to eliminate delay, especially when opening QuickPick
-    fetchTasks();
+    // Run init workspace task, pre-fetches tasks to eliminate delay, especially when opening QuickPick
+    initWorkspace();
 
     // Register tree view
     const treeDataProvider = new Ecl1TaskTreeDataProvider();
@@ -115,8 +131,6 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     context.subscriptions.push(runTaskFromTree, runTaskInQuickPick);
-
-    startEcl1AutostartTasks();
 }
 
 export function deactivate() {}
