@@ -3,6 +3,5 @@ tasks.register('initVSCWorkspace') {
     description = "Initialize VSCode workspace."
     group = "util"
     dependsOn(":h1modules.utilities:copyVSCodeTasks")
-    dependsOn(":h1modules.utilities:toggleVSCodeEcl1Visibility")
     dependsOn(":h1modules.utilities:hideVSCodeNonProjects")
 }
