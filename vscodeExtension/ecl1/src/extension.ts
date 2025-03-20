@@ -14,7 +14,7 @@ class Ecl1TaskTreeItem extends vscode.TreeItem {
         super(task.name.slice(6), vscode.TreeItemCollapsibleState.None);
         this.tooltip = 'Run task ' + task.name;
         this.command = {
-            command: 'runTaskFromTree',
+            command: 'ecl1.runTaskFromTree',
             title: 'Run Task',
             arguments: [task]
         };
