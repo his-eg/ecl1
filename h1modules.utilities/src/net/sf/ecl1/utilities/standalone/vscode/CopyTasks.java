@@ -1,5 +1,6 @@
 package net.sf.ecl1.utilities.standalone.vscode;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -110,6 +111,10 @@ public class CopyTasks {
     }
 
     private static void copyFile(Path sourcePath, Path targetPath){
+        File vscodeFolder = targetPath.getParent().toFile();
+        if(!vscodeFolder.exists()){
+            vscodeFolder.mkdir();
+        }
         try {
             Files.copy(sourcePath, targetPath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
