@@ -69,7 +69,7 @@ async function initWorkspace() {
     if (tasks.length === 0) {
         // only init workspace if ecl1 exists in workspace
         if (!existsSync(`${workspaceFolder}/eclipse-workspace/ecl1`)) {
-            return;
+            return false;
         }
     }
     vscode.window.showInformationMessage("Initializing ecl1 workspace...");
@@ -86,12 +86,16 @@ async function initWorkspace() {
     await fetchEcl1Tasks();
 
     startEcl1AutostartTasks();
+    return true;
 }
 
 
 export function activate(context: vscode.ExtensionContext) {
     // Run init workspace task, pre-fetches tasks to eliminate delay, especially when opening QuickPick
-    initWorkspace();
+    if(!initWorkspace()) {
+        // only activate if workspace can be initialized
+        return;
+    }
 
     // Register tree view
     const treeDataProvider = new Ecl1TaskTreeDataProvider();
