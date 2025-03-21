@@ -1,5 +1,5 @@
-// The module 'vscode' contains the VS Code extensibility API
 import * as vscode from 'vscode';
+import { existsSync } from 'fs';
 
 let tasks: vscode.Task[] = [];
 
@@ -65,10 +65,16 @@ async function startEcl1AutostartTasks() {
 
 async function initWorkspace() {
     await fetchEcl1Tasks();
+    const workspaceFolder = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
+    if (tasks.length === 0) {
+        // only init workspace if ecl1 exists in workspace
+        if (!existsSync(`${workspaceFolder}/eclipse-workspace/ecl1`)) {
+            return;
+        }
+    }
     vscode.window.showInformationMessage("Initializing ecl1 workspace...");
     const terminal = vscode.window.createTerminal('Initialize VSCode workspace');
     const gradleCommand = process.platform === "win32" ? ".\\gradlew.bat" : "./gradlew";
-    const workspaceFolder = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
     terminal.sendText(`cd ${workspaceFolder}/eclipse-workspace/ecl1`);
     terminal.sendText(`${gradleCommand} initVSCWorkspace`);
     terminal.show();
