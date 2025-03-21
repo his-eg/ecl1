@@ -42,6 +42,10 @@ class Ecl1TaskTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeIte
 
         return filteredTasks.map(task => new Ecl1TaskTreeItem(task));
     }
+
+    dispose(): void {
+        this._onDidChangeTreeData.dispose();
+    }
 }
 
 async function startEcl1AutostartTasks() {
@@ -104,7 +108,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     // Refresh icon in tree view navigation
-    vscode.commands.registerCommand('ecl1TasksTreeView.refreshTasks', () =>
+    const refreshTasks = vscode.commands.registerCommand('ecl1TasksTreeView.refreshTasks', () =>
         treeDataProvider.refresh()
     );
 
@@ -137,14 +141,14 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     // Listen for task changes and fetch changed tasks
-    vscode.workspace.onDidChangeConfiguration(event => {
+    const tasksChangeListener = vscode.workspace.onDidChangeConfiguration(event => {
         if (event.affectsConfiguration("tasks")) {
             // Updates ecl1TasksTreeView. Also calls fetchTasks() to update global tasks
             treeDataProvider.refresh();
         }
     });
 
-    context.subscriptions.push(runTaskFromTree, runTaskInQuickPick);
+    context.subscriptions.push(treeDataProvider, refreshTasks, runTaskFromTree, runTaskInQuickPick, tasksChangeListener);
 }
 
 export function deactivate() {}
