@@ -3,8 +3,9 @@ import * as vscode from 'vscode';
 
 let tasks: vscode.Task[] = [];
 
-async function fetchTasks() {
+async function fetchEcl1Tasks() {
     tasks = await vscode.tasks.fetchTasks();
+    tasks = tasks.filter(task => task.name.startsWith('ecl1'));
 }
 
 class Ecl1TaskTreeItem extends vscode.TreeItem {
@@ -35,7 +36,7 @@ class Ecl1TaskTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeIte
 
 	async getChildren(): Promise<vscode.TreeItem[]> {
         // always update tasks
-        await fetchTasks();
+        await fetchEcl1Tasks();
         // Only use tasks that start with 'ecl1:'
         const filteredTasks = tasks.filter(task => task.name.startsWith('ecl1:'));
 
@@ -52,7 +53,7 @@ async function startEcl1AutostartTasks() {
     }
 
     if (tasks.length === 0) {
-        await fetchTasks();
+        await fetchEcl1Tasks();
     }
     // Only use tasks that start with 'ecl1 autostart:'
     const autostartTasks = tasks.filter(task => task.name.startsWith('ecl1 autostart:'));
@@ -63,7 +64,7 @@ async function startEcl1AutostartTasks() {
 }
 
 async function initWorkspace() {
-    await fetchTasks();
+    await fetchEcl1Tasks();
     vscode.window.showInformationMessage("Initializing ecl1 workspace...");
     const terminal = vscode.window.createTerminal('Initialize VSCode workspace');
     const gradleCommand = process.platform === "win32" ? ".\\gradlew.bat" : "./gradlew";
@@ -76,7 +77,7 @@ async function initWorkspace() {
         terminal.dispose();
     }, 30000);
     // fetch updated tasks
-    await fetchTasks();
+    await fetchEcl1Tasks();
 
     startEcl1AutostartTasks();
 }
@@ -105,7 +106,7 @@ export function activate(context: vscode.ExtensionContext) {
     // Command to open QuickPick
     const runTaskInQuickPick = vscode.commands.registerCommand('ecl1.runTaskInQuickPick', async () => {
         if (tasks.length === 0) {
-            await fetchTasks();
+            await fetchEcl1Tasks();
         }
 
         // Only use tasks that start with 'ecl1:'
