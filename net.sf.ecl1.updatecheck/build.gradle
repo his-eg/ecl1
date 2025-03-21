@@ -12,6 +12,18 @@ dependencies {
 
     implementation libs.eclipse.jgit
     implementation libs.eclipse.core.resources
+    if(System.getProperty("os.name").toLowerCase().contains("win")) {
+        implementation (libs.eclipse.swt.win32) {
+            transitive = false
+        }
+    }else {
+        implementation (libs.eclipse.swt.linux) {
+            transitive = false
+        }
+    }
+    implementation (libs.eclipse.jface) {
+        transitive = false
+    }
 }
 
 sourceSets {
