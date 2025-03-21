@@ -74,7 +74,7 @@ async function initWorkspace() {
     // Dispose the terminal after 1min
     setTimeout(() => {
         terminal.dispose();
-    }, 60000);
+    }, 30000);
     // fetch updated tasks
     await fetchTasks();
 
