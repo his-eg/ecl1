@@ -48,7 +48,7 @@ public class ClasspathHandler {
         Document document = null;
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setIgnoringElementContentWhitespace(true);
+            factory.setValidating(true);
             DocumentBuilder builder = factory.newDocumentBuilder();
             document = builder.newDocument();
             Element rootElement = document.createElement("classpath");
@@ -86,6 +86,7 @@ public class ClasspathHandler {
     // Loads the XML document from the file
     private Document loadDocument() {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        factory.setValidating(true);
         DocumentBuilder builder;
         try {
             builder = factory.newDocumentBuilder();
