@@ -33,28 +33,30 @@ public class ClasspathHandler {
     private static final ICommonLogger logger = LoggerFactory.getLogger(ClasspathHandler.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
     private final Path classpathFilePath;
+    private Document doc;
 
     public ClasspathHandler(String classpathFilePath) {
         this.classpathFilePath = Paths.get(classpathFilePath).resolve(".classpath");
-        initClasspathFile();
+        if(Files.exists(this.classpathFilePath)){
+            this.doc = loadDocument();
+        }else{
+            this.doc = initClasspathFile();
+        }
     }
 
-    private void initClasspathFile() {
-        if (!Files.exists(classpathFilePath)) {
-            try {
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                factory.setIgnoringElementContentWhitespace(true);
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                Document doc = builder.newDocument();
-
-                Element rootElement = doc.createElement("classpath");
-                doc.appendChild(rootElement);
-
-                saveDocument(doc);
-            } catch (ParserConfigurationException e) {
-                logger.error("Error initializing classpath file: " + e.getMessage());
-            }
+    private Document initClasspathFile() {
+        Document document = null;
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setIgnoringElementContentWhitespace(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            document = builder.newDocument();
+            Element rootElement = document.createElement("classpath");
+            document.appendChild(rootElement);
+        } catch (ParserConfigurationException e) {
+            logger.error("Error initializing classpath file: " + e.getMessage());
         }
+        return document;
     }
 
     /**
@@ -64,7 +66,6 @@ public class ClasspathHandler {
      */
     public void addEntry(String kind, String path) {
         try {
-            Document doc = loadDocument();
             if(doc == null){
                 logger.error("Error loading classpath file: Entry could not be added");
                 return;
@@ -77,7 +78,6 @@ public class ClasspathHandler {
             newEntry.setAttribute("path", path);
 
             root.appendChild(newEntry);
-            saveDocument(doc);
         } catch (DOMException e) {
             logger.error("Error modifying classpath file: " + e.getMessage());
         }
@@ -96,8 +96,10 @@ public class ClasspathHandler {
         }
     }
 
-    // Saves the XML document back to the file
-    private void saveDocument(Document doc) {
+    /**
+     * Save classpath to file.
+     */
+    public void save() {
         doc.setXmlStandalone(true);
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         try {
