@@ -4,6 +4,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -91,6 +93,16 @@ public class SettingsHelper {
             JsonObject jsonObject = exclude.getAsJsonObject();
             jsonObject.remove(value);
         }
+    }
+
+    public List<String> getExclusions(String property){
+        JsonElement exclude = settings.get(property);
+        List<String> excludeNames = new ArrayList<>();
+        if (exclude != null) {
+            JsonObject jsonObject = exclude.getAsJsonObject();
+            excludeNames.addAll(jsonObject.keySet());
+        }
+        return excludeNames;
     }
 
     public void save() {
