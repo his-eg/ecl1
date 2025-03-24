@@ -96,6 +96,7 @@ public class ProjectSupport {
 		handler.addEntry("con", JRE_ENVIRONMENT);
 		// set output
 		handler.addEntry("output", "bin");
+		handler.save();
 	}
 
 	/**
