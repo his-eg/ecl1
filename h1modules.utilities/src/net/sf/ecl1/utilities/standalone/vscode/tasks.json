@@ -136,6 +136,23 @@
       "problemMatcher": [
         "$gradle"
       ]
+    },
+    {
+      "label": "ecl1 autostart: Run updatecheck",
+      "type": "shell",
+      "command": "./gradlew",
+      "windows": {
+        "command": ".\\gradlew.bat"
+      },
+      "args": [
+        ":net.sf.ecl1.updatecheck:run"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/eclipse-workspace/ecl1"
+      },
+      "problemMatcher": [
+        "$gradle"
+      ]
     }
   ]
 }
