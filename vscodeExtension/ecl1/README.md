@@ -1,71 +1,62 @@
-# ecl1 README
+# Ecl1 - Toolset for HISinOne Extensions
 
-Extension to make ecl1 plugins available in Visual Studio Code ui.
+Extension to support Ecl1 Plugins in Visual Studio Code.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### Start Plugins
 
-For example if there is an image subfolder under your extension project workspace:
+* Plugins can be started directly from the **ecl1 Sidebar**.
+* Alternatively, you can start plugins using the **QuickPick 'Ecl1: Run Task'** in the command palette (press `Ctrl+Shift+P` or `F1` to open the command palette).
 
-\!\[feature X\]\(images/feature-x.png\)
+### Auto Start Plugins
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+* Ecl1 Git Auto Lfs Prune
+    * Runs git lfs prune in every git versioned project in the workspace. Git lfs prune deletes local copies of LFS files that are old, thus freeing up disk space.
+
+* Ecl1 Update Git Hooks
+    * Installs a git hook script in every HISinOne-Extension in the current workspace. These git hook scripts try to enforce the rule that every commit message must include a ticket number (format: #123456).
+
+* Ecl1 Update Check
+    * Checks for ecl1 updates and pulls them automatically if any are found.
+
+
+### Manually Started Plugins
+
+* Preference Manager
+    * Manager to configure preferences for ecl1.
+
+* Create a new Extension
+    * Wizard to create a HISinOne-extension skeleton.
+
+* Import existing Extensions
+    * Wizard to import Extensions. The used build server can be configured in the **Preference Manager**.
+* Commit Exporter
+    * Wizard to create HIS specific hotfix XML snippets. Useful for creating hotfixes for HISinOne.
+
+* Git Batch Pull
+    * Command to execute git pull for all git versioned projects in the workspace.
+
+### Unsupported Ecl1 Plugins
+
+* Ecl1 Classpath Container
+
+* HIS Runtime Classpath Provider
+
+* HIS Extension Point Collector
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+For this extension to work the ecl1 project must be present at following location:
+
+* vscWorkspaceFolder/eclipse-workspace/ecl1
+
+[Ecl1 on GitHub](https://github.com/his-eg/ecl1)
+
 
 ## Extension Settings
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
 This extension contributes the following settings:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+* `ecl1.autostartTasks`: Enable or disable automatic start of ecl1 autostart tasks.
 
-## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
