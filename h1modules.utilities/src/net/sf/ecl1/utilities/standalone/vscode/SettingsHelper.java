@@ -42,7 +42,9 @@ public class SettingsHelper {
         }
     }
 
-
+    /**
+     * Reads the settings.json file.
+     */
     private void readSettings(){
         Gson gson = new Gson();
         try (JsonReader settingsReader = new JsonReader(new FileReader(SETTINGS_PATH.toFile()))) {
@@ -53,6 +55,12 @@ public class SettingsHelper {
         }
     }
 
+    /**
+     * Toggles the exclusion state of a given value under the specified property.
+     *
+     * @param property settings key
+     * @param value    value to toggle
+     */
     public void toggleExclusion(String property, String value) {
         JsonElement exclude = settings.get(property);
         JsonObject jsonObject;
@@ -73,6 +81,12 @@ public class SettingsHelper {
         settings.add(property, jsonObject);
     }
 
+    /**
+     * Adds an exclusion under the specified property.
+     *
+     * @param property settings key
+     * @param value    value to add
+     */
     public void setExclusion(String property, String value) {
         JsonElement exclude = settings.get(property);
         JsonObject jsonObject;
@@ -87,6 +101,12 @@ public class SettingsHelper {
         settings.add(property, jsonObject);
     }
 
+    /**
+     * Removes an exclusion from the specified property.
+     *
+     * @param property settings key
+     * @param value    value to remove
+     */
     public void removeExclusion(String property, String value) {
         JsonElement exclude = settings.get(property);
         if (exclude != null) {
@@ -95,6 +115,12 @@ public class SettingsHelper {
         }
     }
 
+    /**
+     * Retrieves all exclusions for the given property.
+     *
+     * @param property settings key
+     * @return list of excluded values
+     */
     public List<String> getExclusions(String property){
         JsonElement exclude = settings.get(property);
         List<String> excludeNames = new ArrayList<>();
@@ -105,6 +131,9 @@ public class SettingsHelper {
         return excludeNames;
     }
 
+    /**
+     * Saves the settings to settings.json.
+     */
     public void save() {
         if(!SETTINGS_PATH.toFile().exists()){
             try {
