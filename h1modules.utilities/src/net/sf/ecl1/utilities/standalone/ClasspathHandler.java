@@ -19,8 +19,6 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import net.sf.ecl1.utilities.Activator;
@@ -101,7 +99,6 @@ public class ClasspathHandler {
     // Saves the XML document back to the file
     private void saveDocument(Document doc) {
         doc.setXmlStandalone(true);
-        trimWhitespace(doc);
         TransformerFactory transformerFactory = TransformerFactory.newInstance();
         try {
             Transformer transformer = transformerFactory.newTransformer();
@@ -112,24 +109,6 @@ public class ClasspathHandler {
             transformer.transform(source, result);
         } catch (TransformerException e) {
             logger.error("Error saving classpath file: " + e.getMessage());
-        }
-    }
-
-    private static void trimWhitespace(Node node) {
-        NodeList children = node.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node child = children.item(i);
-            if (child.getNodeType() == Node.TEXT_NODE) {
-                String trimmedText = child.getTextContent().trim();
-                child.setTextContent(trimmedText);
-                // If the trimmed content is empty, remove the node
-                if (trimmedText.isEmpty()) {
-                    node.removeChild(child);
-                    i--; // Adjust index after removing
-                }
-            } else {
-                trimWhitespace(child);
-            }
         }
     }
 }
