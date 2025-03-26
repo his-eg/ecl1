@@ -59,4 +59,4 @@ For this extension to work the ecl1 project must be present at following locatio
 This extension contributes the following settings:
 
 * `ecl1.autostartTasks`: Enable or disable automatic start of ecl1 autostart tasks.
-
+* `ecl1.hideEcl1`: Enable to hide ecl1 folder in workspace.

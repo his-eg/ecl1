@@ -67,6 +67,30 @@ async function startEcl1AutostartTasks() {
     }
 }
 
+
+function setEcl1Visibility() {
+    const isHideEcl1 = vscode.workspace.getConfiguration().get<boolean>("ecl1.hideEcl1", true);
+    const filesConfiguration = vscode.workspace.getConfiguration('files');
+    const searchConfiguration = vscode.workspace.getConfiguration('search');
+
+    // Get the current settings or initialize them as empty objects
+    const filesExclude = filesConfiguration.get<Record<string, boolean>>('exclude') || {};
+    const searchExclude = searchConfiguration.get<Record<string, boolean>>('exclude') || {};
+    const filesWatcherExclude = filesConfiguration.get<Record<string, boolean>>('watcherExclude') || {};
+
+    const folderToExclude = '**/ecl1';
+
+    // Update the exclusions
+    filesExclude[folderToExclude] = isHideEcl1;
+    searchExclude[folderToExclude] = isHideEcl1;
+    filesWatcherExclude[folderToExclude] = isHideEcl1;
+
+    // Update the settings for workspace
+    filesConfiguration.update('exclude', filesExclude, vscode.ConfigurationTarget.Workspace);
+    searchConfiguration.update('exclude', searchExclude, vscode.ConfigurationTarget.Workspace);
+    filesConfiguration.update('watcherExclude', filesWatcherExclude, vscode.ConfigurationTarget.Workspace);
+}
+
 async function initWorkspace() {
     await fetchEcl1Tasks();
     const workspaceFolder = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
@@ -86,8 +110,12 @@ async function initWorkspace() {
     setTimeout(() => {
         terminal.dispose();
     }, 30000);
+
     // fetch updated tasks
     await fetchEcl1Tasks();
+
+    // Check if ecl1 folder should be hidden
+    setEcl1Visibility();
 
     startEcl1AutostartTasks();
     return true;
@@ -142,9 +170,11 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Listen for task changes and fetch changed tasks
     const tasksChangeListener = vscode.workspace.onDidChangeConfiguration(event => {
-        if (event.affectsConfiguration("tasks")) {
+        if (event.affectsConfiguration('tasks')) {
             // Updates ecl1TasksTreeView. Also calls fetchTasks() to update global tasks
             treeDataProvider.refresh();
+        }else if (event.affectsConfiguration('ecl1.hideEcl1')) {
+            setEcl1Visibility();
         }
     });
 
