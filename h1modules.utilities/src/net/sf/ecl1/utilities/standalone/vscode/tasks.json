@@ -87,23 +87,6 @@
       ]
     }, 
     {
-      "label": "ecl1: Toggle ecl1 visibility",
-      "type": "shell",
-      "command": "./gradlew",
-      "windows": {
-        "command": ".\\gradlew.bat"
-      },
-      "args": [
-        "toggleEcl1Visibility"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}/eclipse-workspace/ecl1"
-      },
-      "problemMatcher": [
-        "$gradle"
-      ]
-    },
-    {
       "label": "ecl1 autostart: Update git hooks",
       "type": "shell",
       "command": "./gradlew",
