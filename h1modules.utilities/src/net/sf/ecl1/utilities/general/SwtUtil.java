@@ -24,12 +24,18 @@ public class SwtUtil {
             logger.error("Error bringing Shell to foreground, Display is null");
             return;
         }
+        // If running from jar shell is already in foreground
+        boolean isJar = SwtUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(".jar");
+        if(isJar){
+            return;
+        }
+        
         display.asyncExec(() -> {
             if(display.getActiveShell() == null){
                 logger.warn("Could not bringing Shell to foreground, shell is null");
                 return;
             }
-            if (!display.getActiveShell().getMinimized()){
+            if(!display.getActiveShell().getMinimized()){
                 display.getActiveShell().setMinimized(true);
             }
             display.getActiveShell().setMinimized(false);
