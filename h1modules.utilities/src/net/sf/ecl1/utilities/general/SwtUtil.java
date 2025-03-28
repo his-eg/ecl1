@@ -25,6 +25,10 @@ public class SwtUtil {
             return;
         }
         display.asyncExec(() -> {
+            if(display.getActiveShell() == null){
+                logger.warn("Could not bringing Shell to foreground, shell is null");
+                return;
+            }
             if (!display.getActiveShell().getMinimized()){
                 display.getActiveShell().setMinimized(true);
             }
