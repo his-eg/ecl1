@@ -6,6 +6,7 @@ import org.eclipse.swt.widgets.Display;
 
 import net.sf.ecl1.importwizard.ExtensionImportWizard;
 import net.sf.ecl1.utilities.general.SwtUtil;
+import net.sf.ecl1.utilities.standalone.AppUtil;
 
 
 public class ImportWizardApp {
@@ -30,6 +31,7 @@ public class ImportWizardApp {
     }
  
     public static void main(String[] args) {
-        open();    
+        AppUtil.setCustomWorkspacePathIfExists(args);
+        open();
     }    
 }

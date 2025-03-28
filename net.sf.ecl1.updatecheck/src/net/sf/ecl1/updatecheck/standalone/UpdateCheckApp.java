@@ -19,6 +19,7 @@ import net.sf.ecl1.utilities.general.SwtUtil;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
+import net.sf.ecl1.utilities.standalone.AppUtil;
 
 /**
  * Class that handles checking for updates and applying updates to ecl1 standalone.
@@ -28,6 +29,7 @@ public class UpdateCheckApp{
     private static final ICommonLogger logger = LoggerFactory.getLogger(UpdateCheckApp.class.getSimpleName(), UpdateCheckActivator.PLUGIN_ID, UpdateCheckActivator.getDefault());
 
     public static void main(String[] args){
+		AppUtil.setCustomWorkspacePathIfExists(args);
         Path workspacePath = WorkspaceFactory.getWorkspace().getRoot().getLocation().toPath();
 		File ecl1Git = workspacePath.resolve("ecl1").resolve(".git").toFile();
 

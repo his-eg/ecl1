@@ -6,6 +6,7 @@ import org.eclipse.swt.widgets.Display;
 
 import net.sf.ecl1.commit.exporter.CommitExporterWizard;
 import net.sf.ecl1.utilities.general.SwtUtil;
+import net.sf.ecl1.utilities.standalone.AppUtil;
 
 
 public class CommitExporterWizardApp {
@@ -30,6 +31,7 @@ public class CommitExporterWizardApp {
     }
  
     public static void main(String[] args) {
+        AppUtil.setCustomWorkspacePathIfExists(args);
         open();    
     }    
 }

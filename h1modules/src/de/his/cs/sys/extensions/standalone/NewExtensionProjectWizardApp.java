@@ -6,6 +6,7 @@ import org.eclipse.swt.widgets.Display;
 
 import de.his.cs.sys.extensions.wizards.NewExtensionProjectWizard;
 import net.sf.ecl1.utilities.general.SwtUtil;
+import net.sf.ecl1.utilities.standalone.AppUtil;
 
 
 public class NewExtensionProjectWizardApp {
@@ -30,6 +31,7 @@ public class NewExtensionProjectWizardApp {
     }
 
     public static void main(String[] args) {
-       open();
+        AppUtil.setCustomWorkspacePathIfExists(args);
+        open();
     }
 }
