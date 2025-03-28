@@ -40,6 +40,11 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
         this.path = Paths.get(System.getProperty("user.dir")).getParent().getParent();
     }
 
+    /** Constructor to set custom root path */
+    public WorkspaceRootImpl(Path customWorkspacePath){
+        this.path = customWorkspacePath;
+    }
+
 	@Override
     public IPath getLocation() {
         return new PathImpl(path);

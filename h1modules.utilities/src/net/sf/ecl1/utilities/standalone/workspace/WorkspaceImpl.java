@@ -2,6 +2,7 @@ package net.sf.ecl1.utilities.standalone.workspace;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.Map;
 
 import org.eclipse.core.resources.IBuildConfiguration;
@@ -38,9 +39,24 @@ public class WorkspaceImpl implements IWorkspace {
     protected static final int TYPE_PROJECT = 0x4;
     protected static final int TYPE_ROOT = 0x8;
 
+  
+    private final Path customWorkspacePath;
+
+    public WorkspaceImpl(){
+        customWorkspacePath = null;
+    }
+
+    /** Constructor to set custom workspace path */
+    public WorkspaceImpl(Path path){
+        customWorkspacePath = path;
+    }
+
     @Override
     public IWorkspaceRoot getRoot() {
-        return new WorkspaceRootImpl();
+        if(customWorkspacePath == null){
+            return new WorkspaceRootImpl();
+        }
+        return new WorkspaceRootImpl(customWorkspacePath);
     }
 
     @Override
