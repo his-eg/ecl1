@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Display;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
-import net.sf.ecl1.utilities.standalone.IconPaths;
 import net.sf.ecl1.utilities.general.SwtUtil;
 import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
@@ -54,7 +53,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 				Display display = new Display();
 				SwtUtil.bringShellToForeground(display);
 				GitBatchPullSummaryErrorDialog errorDialog = new GitBatchPullSummaryErrorDialog(display.getActiveShell(), multiStatus);
-				Image icon = new Image(null, IconPaths.getEcl1IconPath());
+				Image icon = new Image(null, GitBatchPullHandler.class.getResourceAsStream("/ecl1_icon.png"));
 				GitBatchPullSummaryErrorDialog.setDefaultImage(icon);
 				errorDialog.open();
 			}

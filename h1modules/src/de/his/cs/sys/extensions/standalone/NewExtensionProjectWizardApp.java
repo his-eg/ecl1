@@ -6,7 +6,6 @@ import org.eclipse.swt.widgets.Display;
 
 import de.his.cs.sys.extensions.wizards.NewExtensionProjectWizard;
 import net.sf.ecl1.utilities.general.SwtUtil;
-import net.sf.ecl1.utilities.standalone.IconPaths;
 
 
 public class NewExtensionProjectWizardApp {
@@ -14,7 +13,7 @@ public class NewExtensionProjectWizardApp {
     private static void open(){
         Display display = new Display();
         SwtUtil.bringShellToForeground(display);
-        Image icon = new Image(display, IconPaths.getEcl1IconPath()); 
+        Image icon = new Image(display, NewExtensionProjectWizardApp.class.getResourceAsStream("/ecl1_icon.png"));
 
         NewExtensionProjectWizard wizard = new NewExtensionProjectWizard();
         WizardDialog.setDefaultImage(icon);

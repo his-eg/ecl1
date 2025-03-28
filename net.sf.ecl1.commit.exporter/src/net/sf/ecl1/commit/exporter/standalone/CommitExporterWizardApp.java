@@ -6,7 +6,6 @@ import org.eclipse.swt.widgets.Display;
 
 import net.sf.ecl1.commit.exporter.CommitExporterWizard;
 import net.sf.ecl1.utilities.general.SwtUtil;
-import net.sf.ecl1.utilities.standalone.IconPaths;
 
 
 public class CommitExporterWizardApp {
@@ -14,7 +13,7 @@ public class CommitExporterWizardApp {
     private static void open(){
         Display display = new Display();
         SwtUtil.bringShellToForeground(display);
-        Image icon = new Image(display, IconPaths.getEcl1IconPath()); 
+        Image icon = new Image(display, CommitExporterWizardApp.class.getResourceAsStream("/ecl1_icon.png"));
         
         CommitExporterWizard wizard = new CommitExporterWizard();
         WizardDialog.setDefaultImage(icon);

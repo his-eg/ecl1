@@ -6,7 +6,6 @@ import org.eclipse.swt.widgets.Display;
 
 import net.sf.ecl1.importwizard.ExtensionImportWizard;
 import net.sf.ecl1.utilities.general.SwtUtil;
-import net.sf.ecl1.utilities.standalone.IconPaths;
 
 
 public class ImportWizardApp {
@@ -14,7 +13,7 @@ public class ImportWizardApp {
     private static void open(){
         Display display = new Display();
         SwtUtil.bringShellToForeground(display);
-        Image icon = new Image(display, IconPaths.getEcl1IconPath()); 
+        Image icon = new Image(display, ImportWizardApp.class.getResourceAsStream("/ecl1_icon.png"));
 
         ExtensionImportWizard wizard = new ExtensionImportWizard();
         WizardDialog.setDefaultImage(icon);

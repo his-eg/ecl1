@@ -18,7 +18,6 @@ import net.sf.ecl1.updatecheck.UpdateCheckActivator;
 import net.sf.ecl1.utilities.general.SwtUtil;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
-import net.sf.ecl1.utilities.standalone.IconPaths;
 import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
@@ -81,8 +80,7 @@ public class UpdateCheckApp{
 	private static void showUpdateDialog(Path workspacePath, String vsix, boolean extensionUpdate) {
         Display display = new Display();
         SwtUtil.bringShellToForeground(display);
-        Image icon = new Image(display, IconPaths.getEcl1IconPath());
-
+		Image icon = new Image(display, UpdateCheckApp.class.getResourceAsStream("/ecl1_icon.png"));
 		String msg = "Latest ecl1 version pulled successfully.\n\n";
 		if(extensionUpdate){
 			msg += "New VSCode Extension available!\n\nManual installation required!\n\npath: " + workspacePath.resolve("ecl1/vscodeExtension/ecl1").resolve(vsix).toString();

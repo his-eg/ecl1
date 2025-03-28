@@ -9,7 +9,6 @@ import org.eclipse.swt.widgets.Display;
 
 import net.sf.ecl1.utilities.general.SwtUtil;
 import net.sf.ecl1.utilities.preferences.HISinOneExtensionsPreferencePage;
-import net.sf.ecl1.utilities.standalone.IconPaths;
 
 
 public class PreferencesApp {
@@ -18,7 +17,7 @@ public class PreferencesApp {
         PreferenceStore preferenceStore = StandalonePreferenceStore.getStore();
         Display display = new Display();
         SwtUtil.bringShellToForeground(display);
-        Image icon = new Image(display, IconPaths.getEcl1IconPath()); 
+        Image icon = new Image(display, PreferencesApp.class.getResourceAsStream("/ecl1_icon.png"));
 
         PreferenceManager preferenceManager = new PreferenceManager();
         preferenceManager.addToRoot(new PreferenceNode("general", new HISinOneExtensionsPreferencePage(preferenceStore)));
