@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'com.gradleup.shadow' version '9.0.0-beta11'
 }
 
 repositories {
@@ -67,3 +68,4 @@ tasks.register('hideVSCodeNonProjects', JavaExec) {
     mainClass.set("net.sf.ecl1.utilities.standalone.vscode.HideNonProjectsInWorkspace")
     classpath = sourceSets.main.runtimeClasspath
 }
+
