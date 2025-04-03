@@ -57,18 +57,3 @@ java {
 application {
     mainClass = 'net.sf.ecl1.utilities.preferences.standalone.PreferencesApp'
 }
-
-tasks.register('copyVSCodeTasks', JavaExec) {
-    description = "Copy tasks.json into VSCode workspace."
-    group = "util"
-    mainClass.set("net.sf.ecl1.utilities.standalone.vscode.CopyTasks")
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-tasks.register('hideVSCodeNonProjects', JavaExec) {
-    description = "Hide non-Projects from workspace-parent in vscode workspace."
-    group = "util"
-    mainClass.set("net.sf.ecl1.utilities.standalone.vscode.HideNonProjectsInWorkspace")
-    classpath = sourceSets.main.runtimeClasspath
-}
-
