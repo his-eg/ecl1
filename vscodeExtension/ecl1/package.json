@@ -1,7 +1,7 @@
 {
   "name": "ecl1",
   "displayName": "ecl1",
-  "description": "Extension to make ecl1 plugins available in Visual Studio Code ui.",
+  "description": "Extension to use ecl1 plugins in Visual Studio Code.",
   "version": "0.0.1",
   "repository": {
     "type": "git",
@@ -19,8 +19,8 @@
     "views": {
       "ecl1Sidebar": [
         {
-          "id": "ecl1TasksTreeView",
-          "name": "Tasks"
+          "id": "ecl1CommandsTreeView",
+          "name": "Commands"
         }
       ]
     },
@@ -35,28 +35,44 @@
     },
     "commands": [
       {
-        "command": "ecl1TasksTreeView.refreshTasks",
+        "command": "ecl1CommandsTreeView.refresh",
         "title": "Refresh",
         "icon": "$(extensions-refresh)"
       },
       {
-        "command": "ecl1.runTaskInQuickPick",
-        "title": "Ecl1: Run Task"
+        "command": "ecl1.runJar.import-wizard",
+        "title": "Ecl1: Import Wizard"
+      },
+      {
+        "command": "ecl1.runJar.commit-exporter",
+        "title": "Ecl1: Commit Exporter"
+      },
+      {
+        "command": "ecl1.runJar.open-preferences",
+        "title": "Ecl1: Open Preferences"
+      },
+      {
+        "command": "ecl1.runJar.new-extension-wizard",
+        "title": "Ecl1: New Extension Wizard"
+      },
+      {
+        "command": "ecl1.runJar.git-batch-pull",
+        "title": "Ecl1: Git Batch Pull"
       }
     ],
     "menus": {
     "view/title": [
         {
-            "command": "ecl1TasksTreeView.refreshTasks",
-            "when": "view == ecl1TasksTreeView",
+            "command": "ecl1CommandsTreeView.refresh",
+            "when": "view == ecl1CommandsTreeView",
             "group": "navigation"
         }
       ]
     },
     "viewsWelcome": [
       {
-        "view": "ecl1TasksTreeView",
-        "contents": "No ecl1 tasks found\nIs ecl1 in workspace?"
+        "view": "ecl1CommandsTreeView",
+        "contents": "Loading..."
       }
     ],
     "configuration": {

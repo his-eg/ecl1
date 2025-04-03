@@ -1,46 +1,34 @@
 import * as vscode from 'vscode';
-import { existsSync } from 'fs';
+import { spawn } from 'child_process';
+import path from 'path';
 
-let tasks: vscode.Task[] = [];
 
-async function fetchEcl1Tasks() {
-    tasks = await vscode.tasks.fetchTasks();
-    tasks = tasks.filter(task => task.name.startsWith('ecl1'));
-}
-
-class Ecl1TaskTreeItem extends vscode.TreeItem {
-	
-    constructor(public readonly task: vscode.Task) {
-		// Remove first 6 chars from task name - 'ecl1: Name' -> 'Name'
-        super(task.name.slice(6), vscode.TreeItemCollapsibleState.None);
-        this.tooltip = 'Run task ' + task.name;
+class Ecl1CommandTreeItem extends vscode.TreeItem {
+    constructor(public readonly name: string) {
+        super(name, vscode.TreeItemCollapsibleState.None);
+        const commandId = `ecl1.runJar.${getCommandIdFromName(name)}`;
+        this.tooltip = `Run ${name}`;
         this.command = {
-            command: 'ecl1.runTaskFromTree',
-            title: 'Run Task',
-            arguments: [task]
+            command: commandId,
+            title: `Run ${name}`
         };
     }
 }
 
-class Ecl1TaskTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
-    private _onDidChangeTreeData: vscode.EventEmitter<Ecl1TaskTreeItem | undefined | null | void> = new vscode.EventEmitter<Ecl1TaskTreeItem | undefined | null | void>();
-    readonly onDidChangeTreeData: vscode.Event<Ecl1TaskTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
-  
+class Ecl1CommandTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
+    private _onDidChangeTreeData: vscode.EventEmitter<Ecl1CommandTreeItem | undefined | null | void> = new vscode.EventEmitter();
+    readonly onDidChangeTreeData: vscode.Event<Ecl1CommandTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
+
     refresh(): void {
-      this._onDidChangeTreeData.fire();
+        this._onDidChangeTreeData.fire();
     }
 
     getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
         return element;
     }
 
-	async getChildren(): Promise<vscode.TreeItem[]> {
-        // always update tasks
-        await fetchEcl1Tasks();
-        // Only use tasks that start with 'ecl1:'
-        const filteredTasks = tasks.filter(task => task.name.startsWith('ecl1:'));
-
-        return filteredTasks.map(task => new Ecl1TaskTreeItem(task));
+    async getChildren(): Promise<vscode.TreeItem[]> {
+        return Object.keys(ecl1Jars).map(name => new Ecl1CommandTreeItem(name));
     }
 
     dispose(): void {
@@ -48,7 +36,7 @@ class Ecl1TaskTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeIte
     }
 }
 
-async function startEcl1AutostartTasks() {
+function startEcl1AutostartTasks(extensionPath: string) {
     const config = vscode.workspace.getConfiguration();
     const isAutostartTasks = config.get<boolean>("ecl1.autostartTasks");
 
@@ -56,129 +44,84 @@ async function startEcl1AutostartTasks() {
         return;
     }
 
-    if (tasks.length === 0) {
-        await fetchEcl1Tasks();
-    }
-    // Only use tasks that start with 'ecl1 autostart:'
-    const autostartTasks = tasks.filter(task => task.name.startsWith('ecl1 autostart:'));
-    if (autostartTasks.length > 0) {
-        vscode.window.showInformationMessage(`Starting ${autostartTasks.length} ecl1 autostart jobs.`);
-        autostartTasks.forEach(task => vscode.tasks.executeTask(task));
+    for(var key in ecl1JarsAutostart) {
+        const jarPath = ecl1JarsAutostart[key];
+        vscode.window.showInformationMessage(`Starting ecl1 autostart job ${key}...`);
+        runEcl1Jar(extensionPath, jarPath, path.join(workspaceFolder, 'eclipse-workspace'));
     }
 }
 
-
-function setEcl1Visibility() {
-    const isHideEcl1 = vscode.workspace.getConfiguration().get<boolean>("ecl1.hideEcl1", true);
-    const filesConfiguration = vscode.workspace.getConfiguration('files');
-    const searchConfiguration = vscode.workspace.getConfiguration('search');
-
-    // Get the current settings or initialize them as empty objects
-    const filesExclude = filesConfiguration.get<Record<string, boolean>>('exclude') || {};
-    const searchExclude = searchConfiguration.get<Record<string, boolean>>('exclude') || {};
-    const filesWatcherExclude = filesConfiguration.get<Record<string, boolean>>('watcherExclude') || {};
-
-    const folderToExclude = '**/ecl1';
-
-    // Update the exclusions
-    filesExclude[folderToExclude] = isHideEcl1;
-    searchExclude[folderToExclude] = isHideEcl1;
-    filesWatcherExclude[folderToExclude] = isHideEcl1;
-
-    // Update the settings for workspace
-    filesConfiguration.update('exclude', filesExclude, vscode.ConfigurationTarget.Workspace);
-    searchConfiguration.update('exclude', searchExclude, vscode.ConfigurationTarget.Workspace);
-    filesConfiguration.update('watcherExclude', filesWatcherExclude, vscode.ConfigurationTarget.Workspace);
+/** Replaces whitespace with '-' to get valid command name*/
+function getCommandIdFromName(name: string){
+    return name.replace(/\s+/g, '-').toLowerCase();
 }
 
-async function initWorkspace() {
-    await fetchEcl1Tasks();
-    const workspaceFolder = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
-    if (tasks.length === 0) {
-        // only init workspace if ecl1 exists in workspace
-        if (!existsSync(`${workspaceFolder}/eclipse-workspace/ecl1`)) {
-            return false;
-        }
-    }
-    vscode.window.showInformationMessage("Initializing ecl1 workspace...");
-    const terminal = vscode.window.createTerminal('Initialize VSCode workspace');
-    const gradleCommand = process.platform === "win32" ? ".\\gradlew.bat" : "./gradlew";
-    terminal.sendText(`cd ${workspaceFolder}/eclipse-workspace/ecl1`);
-    terminal.sendText(`${gradleCommand} initVSCWorkspace`);
-    terminal.show();
-    // Dispose the terminal after 1min
-    setTimeout(() => {
-        terminal.dispose();
-    }, 30000);
+const workspaceFolder = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
 
-    // fetch updated tasks
-    await fetchEcl1Tasks();
+const ecl1Jars: { [key: string]: string } = {
+    "Import Wizard": "jars/net.sf.ecl1.import.wizard-all.jar",
+    "Commit Exporter": "jars/net.sf.ecl1.commit.exporter-all.jar",
+    "Open Preferences": "jars/h1modules.utilities-all.jar",
+    "New Extension Wizard": "jars/h1modules-all.jar",
+    "Git Batch Pull": "jars/net.sf.ecl1.git.batch-pull-button-all.jar"
+};
 
-    // Check if ecl1 folder should be hidden
-    setEcl1Visibility();
-
-    startEcl1AutostartTasks();
-    return true;
-}
-
+const ecl1JarsAutostart: { [key: string]: string } = {
+    "Hook Updater": "jars/net.sf.ecl1.git.updatehooks-all.jar",
+    "LFS Prune": "jars/net.sf.ecl1.git.auto-lfs-prune-all.jar",
+};
 
 export function activate(context: vscode.ExtensionContext) {
-    // Run init workspace task, pre-fetches tasks to eliminate delay, especially when opening QuickPick
-    if(!initWorkspace()) {
-        // only activate if workspace can be initialized
-        return;
-    }
+
+    startEcl1AutostartTasks(context.extensionPath);
 
     // Register tree view
-    const treeDataProvider = new Ecl1TaskTreeDataProvider();
-    vscode.window.createTreeView('ecl1TasksTreeView', {
+    const treeDataProvider = new Ecl1CommandTreeDataProvider();
+    vscode.window.createTreeView('ecl1CommandsTreeView', {
         treeDataProvider
     });
 
     // Refresh icon in tree view navigation
-    const refreshTasks = vscode.commands.registerCommand('ecl1TasksTreeView.refreshTasks', () =>
+    const refreshCommands = vscode.commands.registerCommand('ecl1CommandsTreeView.refresh', () =>
         treeDataProvider.refresh()
     );
 
-    // Command to run the task selected in the tree view
-    const runTaskFromTree = vscode.commands.registerCommand('ecl1.runTaskFromTree', (task: vscode.Task) => {
-        vscode.tasks.executeTask(task);
+    // Register commands for ecl1 jars
+    for(const [name, jarPath] of Object.entries(ecl1Jars)) {
+        const commandId = `ecl1.runJar.${getCommandIdFromName(name)}`;
+
+        const command = vscode.commands.registerCommand(commandId, () => {
+            runEcl1Jar(context.extensionPath, jarPath, path.join(workspaceFolder, 'eclipse-workspace'));
+        });
+
+        context.subscriptions.push(command);
+    }
+
+    context.subscriptions.push(treeDataProvider, refreshCommands);
+}
+
+/**
+ * Runs an ecl1 jar.
+ * @param extensionPath this extension path
+ * @param jarPath path to jar
+ * @param workspaceFolder path to inner workspace folder (not vscode folder)
+ */
+function runEcl1Jar(extensionPath: string, jarPath: string, workspaceFolder: string) {
+    const fullJarPath = path.join(extensionPath, jarPath);
+    const args = ['-jar', fullJarPath, workspaceFolder];
+    const javaProcess = spawn('java', args, { stdio: 'pipe' });
+    
+    javaProcess.stdout.on('data', (data) => {
+        console.log(`${data}`);
     });
 
-    // Command to open QuickPick
-    const runTaskInQuickPick = vscode.commands.registerCommand('ecl1.runTaskInQuickPick', async () => {
-        if (tasks.length === 0) {
-            await fetchEcl1Tasks();
-        }
-
-        // Only use tasks that start with 'ecl1:'
-        const filteredTasks = tasks.filter(task => task.name.startsWith('ecl1:'));
-
-        // Show the tasks in a QuickPick
-        const selected = await vscode.window.showQuickPick(
-            filteredTasks.map(task => ({
-                label: task.name,
-                task: task
-            })),
-            { placeHolder: "Select a task to run" }
-        );
-
-        if (selected) {
-            vscode.tasks.executeTask(selected.task);
-        }
+    javaProcess.stderr.on('data', (data) => {
+        console.log(`${data}`);
     });
 
-    // Listen for task changes and fetch changed tasks
-    const tasksChangeListener = vscode.workspace.onDidChangeConfiguration(event => {
-        if (event.affectsConfiguration('tasks')) {
-            // Updates ecl1TasksTreeView. Also calls fetchTasks() to update global tasks
-            treeDataProvider.refresh();
-        }else if (event.affectsConfiguration('ecl1.hideEcl1')) {
-            setEcl1Visibility();
-        }
+    javaProcess.on('close', (code) => {
+        console.log(`Exit Code: ${code}`);
     });
-
-    context.subscriptions.push(treeDataProvider, refreshTasks, runTaskFromTree, runTaskInQuickPick, tasksChangeListener);
 }
 
 export function deactivate() {}
