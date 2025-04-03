@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import path from 'path';
-
+import { readdirSync, existsSync } from 'fs';
 
 class Ecl1CommandTreeItem extends vscode.TreeItem {
     constructor(public readonly name: string) {
@@ -51,11 +51,6 @@ function startEcl1AutostartTasks(extensionPath: string) {
     }
 }
 
-/** Replaces whitespace with '-' to get valid command name*/
-function getCommandIdFromName(name: string){
-    return name.replace(/\s+/g, '-').toLowerCase();
-}
-
 const workspaceFolder = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
 
 const ecl1Jars: { [key: string]: string } = {
@@ -72,9 +67,10 @@ const ecl1JarsAutostart: { [key: string]: string } = {
 };
 
 export function activate(context: vscode.ExtensionContext) {
-
+    hideNonProjectsInWs();
+    
     startEcl1AutostartTasks(context.extensionPath);
-
+    
     // Register tree view
     const treeDataProvider = new Ecl1CommandTreeDataProvider();
     vscode.window.createTreeView('ecl1CommandsTreeView', {
@@ -100,6 +96,74 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(treeDataProvider, refreshCommands);
 }
 
+export function deactivate() {}
+
+
+/** Replaces whitespace with '-' to get valid command name*/
+function getCommandIdFromName(name: string){
+    return name.replace(/\s+/g, '-').toLowerCase();
+}
+
+/** Returns an array of directory names in the workspace that are not projects */
+function getNonProjects() {
+    const WEBAPPS_EXTENSIONS_FOLDER = "qisserver/WEB-INF/extensions/";
+    const EXTENSION_PROJECT_FILE = "extension.ant.properties";
+    let wsDirs = readdirSync(workspaceFolder, {withFileTypes: true}).map(item => item.name);
+
+    // Filter out non projects
+    const nonProjects = wsDirs.filter(dir => {
+        const webapps = path.join(workspaceFolder, dir, WEBAPPS_EXTENSIONS_FOLDER);
+        const extensionProject = path.join(workspaceFolder, dir, EXTENSION_PROJECT_FILE);
+        return !existsSync(webapps) && !existsSync(extensionProject);
+    });
+
+    return nonProjects;
+}
+
+/** Hides non projects in workspace */
+function hideNonProjectsInWs() {
+    const configuration = vscode.workspace.getConfiguration();
+    const dirsToExclude = getNonProjects();
+    const dirsToKeep = ['.vscode', 'eclipse-workspace'];
+
+    // Clone the objects to avoid any issues with immutability
+    let filesExclude = { ...configuration.get<Record<string, boolean>>('files.exclude') || {} };
+    let searchExclude = { ...configuration.get<Record<string, boolean>>('search.exclude') || {} };
+    let filesWatcherExclude = { ...configuration.get<Record<string, boolean>>('files.watcherExclude') || {} };
+
+    // Exclude non projects
+    dirsToExclude.forEach((dir) => {
+        filesExclude[dir] = true;
+        searchExclude[dir] = true;
+        filesWatcherExclude[dir] = true;
+    });
+
+    // Remove folders to keep from exclusion
+    dirsToKeep.forEach((dir) => {
+        delete filesExclude[dir];
+        delete searchExclude[dir];
+        delete filesWatcherExclude[dir];
+    });
+
+    // Remove exclusions for folders that dont exist anymore
+    for(let name in filesExclude) {
+        if (name.startsWith('*')) {
+            continue;
+        }
+        const fullPath = path.join(workspaceFolder, name);
+        if (!existsSync(fullPath)) {
+            delete filesExclude[name];
+            delete searchExclude[name];
+            delete filesWatcherExclude[name];
+        }
+    }
+
+    // Update the settings
+    configuration.update('files.exclude', filesExclude, vscode.ConfigurationTarget.Workspace);
+    configuration.update('search.exclude', searchExclude, vscode.ConfigurationTarget.Workspace);
+    configuration.update('files.watcherExclude', filesWatcherExclude, vscode.ConfigurationTarget.Workspace);
+}
+
 /**
  * Runs an ecl1 jar.
  * @param extensionPath this extension path
@@ -123,5 +187,3 @@ function runEcl1Jar(extensionPath: string, jarPath: string, workspaceFolder: str
         console.log(`Exit Code: ${code}`);
     });
 }
-
-export function deactivate() {}
