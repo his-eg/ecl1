@@ -8,6 +8,7 @@ class Ecl1CommandTreeItem extends vscode.TreeItem {
         super(name, vscode.TreeItemCollapsibleState.None);
         const commandId = `ecl1.runJar.${getCommandIdFromName(name)}`;
         this.tooltip = `Run ${name}`;
+        this.iconPath = new vscode.ThemeIcon("run");
         this.command = {
             command: commandId,
             title: `Run ${name}`
