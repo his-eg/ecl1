@@ -68,7 +68,8 @@ const ecl1JarsAutostart: { [key: string]: string } = {
 
 export function activate(context: vscode.ExtensionContext) {
     hideNonProjectsInWs();
-    
+    setGitRepositoryScanMaxDepth();
+
     startEcl1AutostartTasks(context.extensionPath);
     
     // Register tree view
@@ -102,6 +103,12 @@ export function deactivate() {}
 /** Replaces whitespace with '-' to get valid command name*/
 function getCommandIdFromName(name: string){
     return name.replace(/\s+/g, '-').toLowerCase();
+}
+
+/** Sets git.repositoryScanMaxDepth to 2 */
+function setGitRepositoryScanMaxDepth(){
+    const configuration = vscode.workspace.getConfiguration();
+    configuration.update('git.repositoryScanMaxDepth', 2, vscode.ConfigurationTarget.Workspace);
 }
 
 /** Returns an array of directory names in the workspace that are not projects */
