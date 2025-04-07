@@ -112,27 +112,30 @@ function setGitRepositoryScanMaxDepth(){
     configuration.update('git.repositoryScanMaxDepth', 2, vscode.ConfigurationTarget.Workspace);
 }
 
-/** Returns an array of directory names in the workspace that are not projects */
-function getNonProjects() {
+/** Returns an array of directory names in the workspace that are hisinone projects */
+function getProjects() {
     const WEBAPPS_EXTENSIONS_FOLDER = "qisserver/WEB-INF/extensions/";
     const EXTENSION_PROJECT_FILE = "extension.ant.properties";
     let wsDirs = readdirSync(workspaceFolder, {withFileTypes: true}).map(item => item.name);
 
-    // Filter out non projects
-    const nonProjects = wsDirs.filter(dir => {
+    // Filter out projects
+    const projects = wsDirs.filter(dir => {
         const webapps = path.join(workspaceFolder, dir, WEBAPPS_EXTENSIONS_FOLDER);
         const extensionProject = path.join(workspaceFolder, dir, EXTENSION_PROJECT_FILE);
-        return !existsSync(webapps) && !existsSync(extensionProject);
+        return existsSync(webapps) || existsSync(extensionProject);
     });
 
-    return nonProjects;
+    return projects;
 }
 
 /** Hides non projects in workspace */
 function hideNonProjectsInWs() {
     const configuration = vscode.workspace.getConfiguration();
-    const dirsToExclude = getNonProjects();
     const dirsToKeep = ['.vscode', 'eclipse-workspace'];
+
+    const wsDirs = readdirSync(workspaceFolder, {withFileTypes: true}).map(item => item.name);
+    const projects = getProjects();
+    const dirsToExclude = wsDirs.filter(dir => !projects.includes(dir));
 
     // Clone the objects to avoid any issues with immutability
     let filesExclude = { ...configuration.get<Record<string, boolean>>('files.exclude') || {} };
