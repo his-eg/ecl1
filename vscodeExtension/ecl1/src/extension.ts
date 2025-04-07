@@ -93,14 +93,11 @@ export function activate(context: vscode.ExtensionContext) {
     // Register commands for ecl1 jars
     for(const [name, jarPath] of Object.entries(ecl1Jars)) {
         const commandId = `ecl1.runJar.${getCommandIdFromName(name)}`;
-
         const command = vscode.commands.registerCommand(commandId, () => {
             runEcl1Jar(context.extensionPath, jarPath, path.join(workspaceFolder, INNER_WORKSPACE_NAME));
         });
-
         context.subscriptions.push(command);
     }
-
     context.subscriptions.push(treeDataProvider, refreshCommands);
 }
 
