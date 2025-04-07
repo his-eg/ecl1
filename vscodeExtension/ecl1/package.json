@@ -72,7 +72,7 @@
     "viewsWelcome": [
       {
         "view": "ecl1CommandsTreeView",
-        "contents": "Loading..."
+        "contents": "No HisInOne workspace detected."
       }
     ],
     "configuration": {
