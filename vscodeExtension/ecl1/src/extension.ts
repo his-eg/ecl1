@@ -3,6 +3,8 @@ import { spawn } from 'child_process';
 import path from 'path';
 import { readdirSync, existsSync } from 'fs';
 
+const INNER_WORKSPACE_NAME = 'eclipse-workspace';
+
 class Ecl1CommandTreeItem extends vscode.TreeItem {
     constructor(public readonly name: string) {
         super(name, vscode.TreeItemCollapsibleState.None);
@@ -48,7 +50,7 @@ function startEcl1AutostartTasks(extensionPath: string) {
     for(var key in ecl1JarsAutostart) {
         const jarPath = ecl1JarsAutostart[key];
         vscode.window.showInformationMessage(`Starting ecl1 autostart job ${key}...`);
-        runEcl1Jar(extensionPath, jarPath, path.join(workspaceFolder, 'eclipse-workspace'));
+        runEcl1Jar(extensionPath, jarPath, path.join(workspaceFolder, INNER_WORKSPACE_NAME));
     }
 }
 
@@ -93,7 +95,7 @@ export function activate(context: vscode.ExtensionContext) {
         const commandId = `ecl1.runJar.${getCommandIdFromName(name)}`;
 
         const command = vscode.commands.registerCommand(commandId, () => {
-            runEcl1Jar(context.extensionPath, jarPath, path.join(workspaceFolder, 'eclipse-workspace'));
+            runEcl1Jar(context.extensionPath, jarPath, path.join(workspaceFolder, INNER_WORKSPACE_NAME));
         });
 
         context.subscriptions.push(command);
@@ -139,7 +141,7 @@ function getProjects() {
 /** Hides non projects in workspace */
 function hideNonProjectsInWs() {
     const configuration = vscode.workspace.getConfiguration();
-    const dirsToKeep = ['.vscode', 'eclipse-workspace'];
+    const dirsToKeep = ['.vscode', INNER_WORKSPACE_NAME];
 
     const wsDirs = readdirSync(workspaceFolder, {withFileTypes: true}).map(item => item.name);
     const projects = getProjects();
