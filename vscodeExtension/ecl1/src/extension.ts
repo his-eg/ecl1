@@ -68,6 +68,10 @@ const ecl1JarsAutostart: { [key: string]: string } = {
 };
 
 export function activate(context: vscode.ExtensionContext) {
+    // only activate in HisInOne workspace
+    if(!isHisInOneWorkspace()){
+        return;
+    }
     hideNonProjectsInWs();
     setGitRepositoryScanMaxDepth();
 
@@ -110,6 +114,10 @@ function getCommandIdFromName(name: string){
 function setGitRepositoryScanMaxDepth(){
     const configuration = vscode.workspace.getConfiguration();
     configuration.update('git.repositoryScanMaxDepth', 2, vscode.ConfigurationTarget.Workspace);
+}
+
+function isHisInOneWorkspace(){
+    return getProjects().length>0;
 }
 
 /** Returns an array of directory names in the workspace that are hisinone projects */
