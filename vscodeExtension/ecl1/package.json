@@ -21,6 +21,10 @@
         {
           "id": "ecl1CommandsTreeView",
           "name": "Commands"
+        },
+        {
+          "id": "ecl1SettingsTreeView",
+          "name": "Settings"
         }
       ]
     },
@@ -36,6 +40,11 @@
     "commands": [
       {
         "command": "ecl1CommandsTreeView.refresh",
+        "title": "Refresh",
+        "icon": "$(extensions-refresh)"
+      },
+      {
+        "command": "ecl1SettingsTreeView.refresh",
         "title": "Refresh",
         "icon": "$(extensions-refresh)"
       },
@@ -66,7 +75,12 @@
             "command": "ecl1CommandsTreeView.refresh",
             "when": "view == ecl1CommandsTreeView",
             "group": "navigation"
-        }
+        },
+        {
+          "command": "ecl1SettingsTreeView.refresh",
+          "when": "view == ecl1SettingsTreeView",
+          "group": "navigation"
+      }
       ]
     },
     "viewsWelcome": [

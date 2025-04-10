@@ -40,6 +40,42 @@ class Ecl1CommandTreeDataProvider implements vscode.TreeDataProvider<vscode.Tree
     }
 }
 
+class Ecl1SettingsTreeItem extends vscode.TreeItem {
+    constructor(public readonly settingName: string, public readonly value: boolean) {
+        super(settingName, vscode.TreeItemCollapsibleState.None);
+        this.tooltip = `Setting: ${settingName}`;
+        this.iconPath = new vscode.ThemeIcon(value ? 'check' : 'x');
+        this.command = {
+            command: 'ecl1.toggleSetting',
+            title: `Toggle ${settingName}`,
+            arguments: [settingName, value]
+        };
+    }
+}
+
+class Ecl1SettingsTreeDataProvider implements vscode.TreeDataProvider<vscode.TreeItem> {
+    private _onDidChangeTreeData: vscode.EventEmitter<Ecl1SettingsTreeItem | undefined | null | void> = new vscode.EventEmitter();
+    readonly onDidChangeTreeData: vscode.Event<Ecl1SettingsTreeItem | undefined | null | void> = this._onDidChangeTreeData.event;
+
+    getTreeItem(element: Ecl1SettingsTreeItem): vscode.TreeItem {
+        return element;
+    }
+
+    async getChildren(): Promise<Ecl1SettingsTreeItem[]> {
+        const settings = vscode.workspace.getConfiguration('ecl1');
+        const settingNames = Object.keys(settings).filter(name => typeof settings.get(name) === 'boolean');;
+        return settingNames.map(name => new Ecl1SettingsTreeItem(name, settings.get(name) as boolean));
+    }
+
+    refresh(): void {
+        this._onDidChangeTreeData.fire();
+    }
+
+    dispose(): void {
+        this._onDidChangeTreeData.dispose();
+    }
+}
+
 function startEcl1AutostartTasks(extensionPath: string) {
     const config = vscode.workspace.getConfiguration();
     const isAutostartTasks = config.get<boolean>("ecl1.autostartTasks");
@@ -97,7 +133,25 @@ export async function activate(context: vscode.ExtensionContext) {
     const refreshCommands = vscode.commands.registerCommand('ecl1CommandsTreeView.refresh', () =>
         commandTreeDataProvider.refresh()
     );
-   
+
+    // Register settings tree view
+    const settingsTreeDataProvider = new Ecl1SettingsTreeDataProvider();
+    vscode.window.createTreeView('ecl1SettingsTreeView', {
+        treeDataProvider: settingsTreeDataProvider
+    });
+    
+    // Refresh icon in settings tree view navigation
+    const refreshSettings = vscode.commands.registerCommand('ecl1SettingsTreeView.refresh', () =>
+        settingsTreeDataProvider.refresh()
+    );
+
+    // Regtister command to toggle settings when clicked
+    const toggleSetting = vscode.commands.registerCommand('ecl1.toggleSetting', (settingKey: string, currentValue: boolean) => {
+        const newValue = !currentValue;
+        vscode.workspace.getConfiguration('ecl1').update(settingKey, newValue, vscode.ConfigurationTarget.Workspace);
+        settingsTreeDataProvider.refresh();
+    });
+    
     // Register commands for ecl1 jars
     for(const [name, jarPath] of Object.entries(ecl1Jars)) {
         const commandId = `ecl1.runJar.${getCommandIdFromName(name)}`;
@@ -114,7 +168,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    context.subscriptions.push(commandTreeDataProvider, refreshCommands, configurationChangeListener);
+    context.subscriptions.push(commandTreeDataProvider, refreshCommands, settingsTreeDataProvider, refreshSettings, toggleSetting, configurationChangeListener);
 }
 
 export function deactivate() {}
