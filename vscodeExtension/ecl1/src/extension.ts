@@ -122,6 +122,7 @@ function setGitRepositoryScanMaxDepth(){
     configuration.update('git.repositoryScanMaxDepth', 2, vscode.ConfigurationTarget.Workspace);
 }
 
+/** Returns true if webapps or a HISinOne-Extension-Project is present in workspace */
 function isHisInOneWorkspace(){
     return getProjects().length>0;
 }
