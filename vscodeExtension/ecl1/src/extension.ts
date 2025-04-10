@@ -106,6 +106,14 @@ export async function activate(context: vscode.ExtensionContext) {
         });
         context.subscriptions.push(command);
     }
+
+    vscode.workspace.onDidChangeConfiguration((e) => {
+        // Update exclusions when the setting changes
+        if (e.affectsConfiguration('ecl1.hideNonProjects')) {
+            hideNonProjectsInWs();
+        }
+    });
+
     context.subscriptions.push(treeDataProvider, refreshCommands);
 }
 
