@@ -82,6 +82,11 @@
           "type": "boolean",
           "default": true,
           "description": "Enable or disable automatic start of ecl1 autostart tasks."
+        },
+        "ecl1.hideNonProjects": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable exclusion of non projects in workspace root folder."
         }
       }
     }

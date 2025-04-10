@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { spawn } from 'child_process';
 import path from 'path';
-import { readdirSync, existsSync } from 'fs';
+import { readdirSync, existsSync, mkdirSync,
+        writeFile, readFile, unlink } from 'fs';
 
 const INNER_WORKSPACE_NAME = 'eclipse-workspace';
 
@@ -146,6 +147,12 @@ function getProjects() {
 /** Hides non projects in workspace root*/
 function hideNonProjectsInWs() {
     const configuration = vscode.workspace.getConfiguration();
+    const isHideNonProjects = configuration.get<boolean>("ecl1.hideNonProjects");
+    if(!isHideNonProjects) {
+        removeExclusions();
+        return;
+    }
+
     const dirsToKeep = ['.vscode', INNER_WORKSPACE_NAME];
     const wsDirs = readdirSync(workspaceFolder, {withFileTypes: true}).map(item => item.name);
     const projects = getProjects();
@@ -180,6 +187,8 @@ function hideNonProjectsInWs() {
     configuration.update('files.exclude', filesExclude, vscode.ConfigurationTarget.Workspace);
     configuration.update('search.exclude', searchExclude, vscode.ConfigurationTarget.Workspace);
     configuration.update('files.watcherExclude', filesWatcherExclude, vscode.ConfigurationTarget.Workspace);
+
+    writeExclusionsToFile(dirsToExclude);
 }
 
 const outputChannels: { [name: string]: vscode.OutputChannel } = {};
@@ -233,5 +242,65 @@ function isJavaInstalled() {
                 resolve(true);
             }
         });
+    });
+}
+
+/** Removes file exclusions created by {@link hideNonProjectsInWs} */
+function removeExclusions() {
+    const filePath = path.join(workspaceFolder, '.vscode', 'excludedNames.txt');
+    if (!existsSync(filePath)) {
+        // do nothing no files are excluded
+        return;
+    }
+    const configuration = vscode.workspace.getConfiguration();
+    // Clone the objects to avoid any issues with immutability
+    let filesExclude = { ...configuration.get<Record<string, boolean>>('files.exclude') || {} };
+    let searchExclude = { ...configuration.get<Record<string, boolean>>('search.exclude') || {} };
+    let filesWatcherExclude = { ...configuration.get<Record<string, boolean>>('files.watcherExclude') || {} };
+
+    // Read the file content
+    readFile(filePath, 'utf8', (err, data) => {
+        if (err) {
+            vscode.window.showErrorMessage('Failed to read file excludedNames.txt: ' + err.message);
+        } else {
+            const fileNames = data.split('\n');
+            // Remove exclusions
+            fileNames.forEach((name) => {
+                delete filesExclude[name];
+                delete searchExclude[name];
+                delete filesWatcherExclude[name];
+            });
+            // Update the settings
+            configuration.update('files.exclude', filesExclude, vscode.ConfigurationTarget.Workspace);
+            configuration.update('search.exclude', searchExclude, vscode.ConfigurationTarget.Workspace);
+            configuration.update('files.watcherExclude', filesWatcherExclude, vscode.ConfigurationTarget.Workspace);
+
+            // Remove excludedNames.txt
+            unlink(filePath, (err) => {
+                if (err) {
+                    vscode.window.showErrorMessage('Error deleting file excludedNames.txt: ' + err.message);
+                }
+            });
+        }
+    });
+}
+
+/**
+ * Writes given file names to excludedNames.txt
+ * @param fileNames array of names
+ */
+function writeExclusionsToFile(fileNames: Array<string>) {
+    const vscodeFolderPath = path.join(workspaceFolder, '.vscode');
+    const filePath = path.join(vscodeFolderPath, 'excludedNames.txt');
+    // Ensure the .vscode folder exists
+    if (!existsSync(vscodeFolderPath)) {
+        mkdirSync(vscodeFolderPath); 
+    }
+    const fileContent = fileNames.join('\n');
+
+    writeFile(filePath, fileContent, 'utf8', (err) => {
+        if (err) {
+            vscode.window.showErrorMessage('Failed to write file excludedNames.txt: ' + err.message);
+        }
     });
 }
