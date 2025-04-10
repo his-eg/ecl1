@@ -87,17 +87,17 @@ export async function activate(context: vscode.ExtensionContext) {
 
     startEcl1AutostartTasks(context.extensionPath);
     
-    // Register tree view
-    const treeDataProvider = new Ecl1CommandTreeDataProvider();
+    // Register commands tree view
+    const commandTreeDataProvider = new Ecl1CommandTreeDataProvider();
     vscode.window.createTreeView('ecl1CommandsTreeView', {
-        treeDataProvider
+        treeDataProvider: commandTreeDataProvider
     });
 
-    // Refresh icon in tree view navigation
+    // Refresh icon in command tree view navigation
     const refreshCommands = vscode.commands.registerCommand('ecl1CommandsTreeView.refresh', () =>
-        treeDataProvider.refresh()
+        commandTreeDataProvider.refresh()
     );
-
+   
     // Register commands for ecl1 jars
     for(const [name, jarPath] of Object.entries(ecl1Jars)) {
         const commandId = `ecl1.runJar.${getCommandIdFromName(name)}`;
@@ -114,7 +114,7 @@ export async function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    context.subscriptions.push(treeDataProvider, refreshCommands);
+    context.subscriptions.push(commandTreeDataProvider, refreshCommands);
 }
 
 export function deactivate() {}
