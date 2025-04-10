@@ -107,14 +107,14 @@ export async function activate(context: vscode.ExtensionContext) {
         context.subscriptions.push(command);
     }
 
-    vscode.workspace.onDidChangeConfiguration((e) => {
+    const configurationChangeListener = vscode.workspace.onDidChangeConfiguration((e) => {
         // Update exclusions when the setting changes
         if (e.affectsConfiguration('ecl1.hideNonProjects')) {
             hideNonProjectsInWs();
         }
     });
 
-    context.subscriptions.push(commandTreeDataProvider, refreshCommands);
+    context.subscriptions.push(commandTreeDataProvider, refreshCommands, configurationChangeListener);
 }
 
 export function deactivate() {}
