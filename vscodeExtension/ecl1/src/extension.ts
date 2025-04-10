@@ -51,7 +51,7 @@ function startEcl1AutostartTasks(extensionPath: string) {
     for(var key in ecl1JarsAutostart) {
         const jarPath = ecl1JarsAutostart[key];
         vscode.window.showInformationMessage(`Starting ecl1 autostart job ${key}...`);
-        runEcl1Jar(extensionPath, jarPath, path.join(workspaceFolder, INNER_WORKSPACE_NAME), key);
+        runEcl1Jar(extensionPath, jarPath, key);
     }
 }
 
@@ -102,7 +102,7 @@ export async function activate(context: vscode.ExtensionContext) {
     for(const [name, jarPath] of Object.entries(ecl1Jars)) {
         const commandId = `ecl1.runJar.${getCommandIdFromName(name)}`;
         const command = vscode.commands.registerCommand(commandId, () => {
-            runEcl1Jar(context.extensionPath, jarPath, path.join(workspaceFolder, INNER_WORKSPACE_NAME), name);
+            runEcl1Jar(context.extensionPath, jarPath, name);
         });
         context.subscriptions.push(command);
     }
@@ -212,12 +212,12 @@ function getOutputChannelByName(name: string): vscode.OutputChannel {
  * Runs an ecl1 jar.
  * @param extensionPath this extension path
  * @param jarPath path to jar
- * @param workspaceFolder path to inner workspace folder (not vscode folder)
  * @param name name for displaying the output
  */
-function runEcl1Jar(extensionPath: string, jarPath: string, workspaceFolder: string, name: string) {
+function runEcl1Jar(extensionPath: string, jarPath: string, name: string) {
     const fullJarPath = path.join(extensionPath, jarPath);
-    const args = ['-jar', fullJarPath, workspaceFolder];
+    const innerWsPath = path.join(workspaceFolder, INNER_WORKSPACE_NAME);
+    const args = ['-jar', fullJarPath, innerWsPath];
     const javaProcess = spawn('java', args, { stdio: 'pipe' });
     
     const outputChannel = getOutputChannelByName('ecl1: ' + name);
