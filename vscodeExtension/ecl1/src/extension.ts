@@ -69,9 +69,16 @@ const ecl1JarsAutostart: { [key: string]: string } = {
     "LFS Prune": "jars/net.sf.ecl1.git.auto-lfs-prune-all.jar",
 };
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
     // only activate in HisInOne workspace
     if(!isHisInOneWorkspace()){
+        return;
+    }
+    // only activate if Java is installed
+    if(!await isJavaInstalled()){
+        vscode.window.showErrorMessage(
+            'Ecl1 requires a local Java installation! Please install Java and restart the workspace.'
+        );
         return;
     }
     hideNonProjectsInWs();
@@ -221,4 +228,17 @@ function runEcl1Jar(extensionPath: string, jarPath: string, workspaceFolder: str
 
 function stripAnsiColor(input: string) {
     return input.toString().replace(/\x1B\[[0-9;]*m/g, '');
+}
+
+function isJavaInstalled() {
+    return new Promise<boolean>((resolve) => {
+        const javaProcess = spawn('java', ['--version'], { stdio: 'pipe' });
+        javaProcess.on('close', (code) => {
+            if (code !== 0) {
+                resolve(false);
+            } else {
+                resolve(true);
+            }
+        });
+    });
 }
