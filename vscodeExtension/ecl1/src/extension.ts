@@ -50,7 +50,7 @@ function startEcl1AutostartTasks(extensionPath: string) {
     for(var key in ecl1JarsAutostart) {
         const jarPath = ecl1JarsAutostart[key];
         vscode.window.showInformationMessage(`Starting ecl1 autostart job ${key}...`);
-        runEcl1Jar(extensionPath, jarPath, path.join(workspaceFolder, INNER_WORKSPACE_NAME));
+        runEcl1Jar(extensionPath, jarPath, path.join(workspaceFolder, INNER_WORKSPACE_NAME), key);
     }
 }
 
@@ -94,7 +94,7 @@ export function activate(context: vscode.ExtensionContext) {
     for(const [name, jarPath] of Object.entries(ecl1Jars)) {
         const commandId = `ecl1.runJar.${getCommandIdFromName(name)}`;
         const command = vscode.commands.registerCommand(commandId, () => {
-            runEcl1Jar(context.extensionPath, jarPath, path.join(workspaceFolder, INNER_WORKSPACE_NAME));
+            runEcl1Jar(context.extensionPath, jarPath, path.join(workspaceFolder, INNER_WORKSPACE_NAME), name);
         });
         context.subscriptions.push(command);
     }
@@ -182,26 +182,43 @@ function hideNonProjectsInWs() {
     configuration.update('files.watcherExclude', filesWatcherExclude, vscode.ConfigurationTarget.Workspace);
 }
 
+const outputChannels: { [name: string]: vscode.OutputChannel } = {};
+
+function getOutputChannelByName(name: string): vscode.OutputChannel {
+    if (!outputChannels[name]) {
+        outputChannels[name] = vscode.window.createOutputChannel(name);
+    }
+    return outputChannels[name];
+}
+
 /**
  * Runs an ecl1 jar.
  * @param extensionPath this extension path
  * @param jarPath path to jar
  * @param workspaceFolder path to inner workspace folder (not vscode folder)
+ * @param name name for displaying the output
  */
-function runEcl1Jar(extensionPath: string, jarPath: string, workspaceFolder: string) {
+function runEcl1Jar(extensionPath: string, jarPath: string, workspaceFolder: string, name: string) {
     const fullJarPath = path.join(extensionPath, jarPath);
     const args = ['-jar', fullJarPath, workspaceFolder];
     const javaProcess = spawn('java', args, { stdio: 'pipe' });
     
+    const outputChannel = getOutputChannelByName('ecl1: ' + name);
+    outputChannel.show();
+
     javaProcess.stdout.on('data', (data) => {
-        console.log(`${data}`);
+        outputChannel.appendLine(stripAnsiColor(data));
     });
 
     javaProcess.stderr.on('data', (data) => {
-        console.log(`${data}`);
+        outputChannel.appendLine(stripAnsiColor(data));
     });
 
     javaProcess.on('close', (code) => {
-        console.log(`Exit Code: ${code}`);
+        outputChannel.appendLine(`Exit Code: ${code} \n\n`);
     });
+}
+
+function stripAnsiColor(input: string) {
+    return input.toString().replace(/\x1B\[[0-9;]*m/g, '');
 }
