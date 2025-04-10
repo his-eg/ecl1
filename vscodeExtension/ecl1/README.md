@@ -2,12 +2,30 @@
 
 Extension to support Ecl1 Plugins in Visual Studio Code.
 
+[GitHub](https://github.com/his-eg/ecl1),
+[Website](https://ecl1.sourceforge.net)
+
+## Requirements
+
+* **Java**: A local Java installation.
+* **Inner Workspace Folder**: The workspace must include an inner "workspace folder," which must currently be named `eclipse-workspace`.
+* **Extension Activation**:
+  - The workspace must contain either a `webapps` directory or a `HISinOne-Extension-Project` directory to activate the extension.
+
+## Extension Settings
+
+This extension contributes the following settings:
+
+* `ecl1.autostartTasks`: Enable or disable automatic start of ecl1 autostart tasks.
+* `ecl1.hideNonProjects`: Enable or disable exclusion of non projects in workspace root folder.
+
+
 ## Features
 
 ### Start Plugins
 
 * Plugins can be started directly from the **ecl1 Sidebar**.
-* Alternatively, you can start plugins using the **QuickPick 'Ecl1: Run Task'** in the command palette (press `Ctrl+Shift+P` or `F1` to open the command palette).
+* Alternatively, you can start plugins via the **command palette** (`Ctrl+Shift+P` or `F1`) and run commands prefixed with `ecl1`.
 
 ### Auto Start Plugins
 
@@ -16,9 +34,6 @@ Extension to support Ecl1 Plugins in Visual Studio Code.
 
 * Ecl1 Update Git Hooks
     * Installs a git hook script in every HISinOne-Extension in the current workspace. These git hook scripts try to enforce the rule that every commit message must include a ticket number (format: #123456).
-
-* Ecl1 Update Check
-    * Checks for ecl1 updates and pulls them automatically if any are found.
 
 
 ### Manually Started Plugins
@@ -45,18 +60,5 @@ Extension to support Ecl1 Plugins in Visual Studio Code.
 
 * HIS Extension Point Collector
 
-## Requirements
+* Ecl1 Update Check (not needed for this extension)
 
-For this extension to work the ecl1 project must be present at following location:
-
-* vscWorkspaceFolder/eclipse-workspace/ecl1
-
-[Ecl1 on GitHub](https://github.com/his-eg/ecl1)
-
-
-## Extension Settings
-
-This extension contributes the following settings:
-
-* `ecl1.autostartTasks`: Enable or disable automatic start of ecl1 autostart tasks.
-* `ecl1.hideEcl1`: Enable to hide ecl1 folder in workspace.
