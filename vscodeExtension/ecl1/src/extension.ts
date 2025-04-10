@@ -143,15 +143,14 @@ function getProjects() {
     return projects;
 }
 
-/** Hides non projects in workspace */
+/** Hides non projects in workspace root*/
 function hideNonProjectsInWs() {
     const configuration = vscode.workspace.getConfiguration();
     const dirsToKeep = ['.vscode', INNER_WORKSPACE_NAME];
-
     const wsDirs = readdirSync(workspaceFolder, {withFileTypes: true}).map(item => item.name);
     const projects = getProjects();
-    const dirsToExclude = wsDirs.filter(dir => !projects.includes(dir));
-
+    const dirsToExclude = wsDirs.filter(dir => !projects.includes(dir) && !dirsToKeep.includes(dir));
+    
     // Clone the objects to avoid any issues with immutability
     let filesExclude = { ...configuration.get<Record<string, boolean>>('files.exclude') || {} };
     let searchExclude = { ...configuration.get<Record<string, boolean>>('search.exclude') || {} };
@@ -162,13 +161,6 @@ function hideNonProjectsInWs() {
         filesExclude[dir] = true;
         searchExclude[dir] = true;
         filesWatcherExclude[dir] = true;
-    });
-
-    // Remove folders to keep from exclusion
-    dirsToKeep.forEach((dir) => {
-        delete filesExclude[dir];
-        delete searchExclude[dir];
-        delete filesWatcherExclude[dir];
     });
 
     // Remove exclusions for folders that dont exist anymore
