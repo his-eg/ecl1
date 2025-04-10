@@ -82,11 +82,6 @@
           "type": "boolean",
           "default": true,
           "description": "Enable or disable automatic start of ecl1 autostart tasks."
-        },
-        "ecl1.hideEcl1": {
-          "type": "boolean",
-          "default": true,
-          "description": "Enable to hide ecl1 folder in workspace."
         }
       }
     }
