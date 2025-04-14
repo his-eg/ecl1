@@ -18,8 +18,8 @@ import net.sf.ecl1.updatecheck.UpdateCheckActivator;
 import net.sf.ecl1.utilities.general.SwtUtil;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
-import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 import net.sf.ecl1.utilities.standalone.AppUtil;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
  * Class that handles checking for updates and applying updates to ecl1 standalone.
@@ -32,8 +32,6 @@ public class UpdateCheckApp{
 		AppUtil.setCustomWorkspacePathIfExists(args);
         Path workspacePath = WorkspaceFactory.getWorkspace().getRoot().getLocation().toPath();
 		File ecl1Git = workspacePath.resolve("ecl1").resolve(".git").toFile();
-
-		String vsixBefore = getExtensionVsix(workspacePath);
 
         try (Git git = Git.open(ecl1Git)){
 			Repository repo = git.getRepository();
@@ -49,17 +47,11 @@ public class UpdateCheckApp{
 				PullResult pullResult = git.pull().call();
 				if (pullResult.isSuccessful()) {
 					logger.info("Updated ecl1 successfully.");
-					String vsixAfter = getExtensionVsix(workspacePath);
-					if(!vsixBefore.equals(vsixAfter)){
-						logger.info("New VSCode Extension version available: " + vsixBefore + " -> " + vsixAfter);
-						showUpdateDialog(workspacePath, vsixBefore, true);
-					}else{
-						showUpdateDialog(workspacePath, vsixBefore, false);
-					}
+					showUpdateDialog();
 				} else {
 					logger.error("Failed to pull ecl1.");
 				}
-			} 
+			}
 
 		} catch (org.eclipse.jgit.errors.RepositoryNotFoundException e) {
 			logger.error("Ecl1 is not managed via Git?: " + e.getMessage());
@@ -68,25 +60,11 @@ public class UpdateCheckApp{
 		}
     }
 
-	private static String getExtensionVsix(Path workspacePath){
-		File vsixFolder = workspacePath.resolve("ecl1/vscodeExtension/ecl1").toFile();
-		String[] searchFiles = vsixFolder.list();
-		for(String file : searchFiles){
-			if(file.endsWith(".vsix")){
-				return file;
-			}
-		}
-		return "";
-	}
-
-	private static void showUpdateDialog(Path workspacePath, String vsix, boolean extensionUpdate) {
+	private static void showUpdateDialog() {
         Display display = new Display();
         SwtUtil.bringShellToForeground(display);
 		Image icon = new Image(display, UpdateCheckApp.class.getResourceAsStream("/ecl1_icon.png"));
 		String msg = "Latest ecl1 version pulled successfully.\n\n";
-		if(extensionUpdate){
-			msg += "New VSCode Extension available!\n\nManual installation required!\n\npath: " + workspacePath.resolve("ecl1/vscodeExtension/ecl1").resolve(vsix).toString();
-		}
 		MessageDialog dialog = new MessageDialog(display.getActiveShell(), "Ecl1 Update", icon, msg , MessageDialog.INFORMATION, new String[] { "OK" }, 0);
 
         dialog.open();
