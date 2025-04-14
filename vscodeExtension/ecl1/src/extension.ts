@@ -187,19 +187,23 @@ function setGitRepositoryScanMaxDepth(){
 
 /** Returns true if webapps or a HISinOne-Extension-Project is present in workspace */
 function isHisInOneWorkspace(){
-    return getProjects().length>0;
+    return getProjects(workspaceFolder).length>0;
 }
 
-/** Returns an array of directory names in the workspace that are hisinone projects */
-function getProjects() {
+/**
+ * Returns an array of directory names in the given folder that are HISinOne projects.
+ * @param folderPath folderPath
+ * @returns array of HISinOne project directory names
+ */
+function getProjects(folderPath: string) {
     const WEBAPPS_EXTENSIONS_FOLDER = "qisserver/WEB-INF/extensions/";
     const EXTENSION_PROJECT_FILE = "extension.ant.properties";
-    let wsDirs = readdirSync(workspaceFolder, {withFileTypes: true}).map(item => item.name);
+    const wsDirs = readdirSync(folderPath, {withFileTypes: true}).map(item => item.name);
 
     // Filter out projects
     const projects = wsDirs.filter(dir => {
-        const webapps = path.join(workspaceFolder, dir, WEBAPPS_EXTENSIONS_FOLDER);
-        const extensionProject = path.join(workspaceFolder, dir, EXTENSION_PROJECT_FILE);
+        const webapps = path.join(folderPath, dir, WEBAPPS_EXTENSIONS_FOLDER);
+        const extensionProject = path.join(folderPath, dir, EXTENSION_PROJECT_FILE);
         return existsSync(webapps) || existsSync(extensionProject);
     });
 
@@ -217,7 +221,7 @@ function hideNonProjectsInWs() {
 
     const dirsToKeep = ['.vscode', INNER_WORKSPACE_NAME];
     const wsDirs = readdirSync(workspaceFolder, {withFileTypes: true}).map(item => item.name);
-    const projects = getProjects();
+    const projects = getProjects(workspaceFolder);
     const dirsToExclude = wsDirs.filter(dir => !projects.includes(dir) && !dirsToKeep.includes(dir));
     
     // Clone the objects to avoid any issues with immutability
