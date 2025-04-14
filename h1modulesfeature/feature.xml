@@ -125,13 +125,6 @@ To apply the Apache License to your work, attach the following boilerplate notic
          unpack="false"/>
 
    <plugin
-         id="net.sf.ecl1.resource.setup"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="net.sf.ecl1.utilities"
          download-size="0"
          install-size="0"
