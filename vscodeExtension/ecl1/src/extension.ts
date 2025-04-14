@@ -185,9 +185,13 @@ function setGitRepositoryScanMaxDepth(){
     configuration.update('git.repositoryScanMaxDepth', 2, vscode.ConfigurationTarget.Workspace);
 }
 
-/** Returns true if webapps or a HISinOne-Extension-Project is present in workspace */
-function isHisInOneWorkspace(){
-    return getProjects(workspaceFolder).length>0;
+/** Returns true if {@link INNER_WORKSPACE_NAME} exists and webapps or a HISinOne-Extension-Project is present in workspace */
+function isHisInOneWorkspace() {
+    const innerWsPath = path.join(workspaceFolder, INNER_WORKSPACE_NAME);
+    if(!existsSync(workspaceFolder) || !existsSync(innerWsPath)){
+        return false;
+    }
+    return getProjects(workspaceFolder).length > 0 || getProjects(innerWsPath).length > 0;
 }
 
 /**
