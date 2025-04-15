@@ -105,7 +105,7 @@
         "ecl1.gitRepositoryScanMaxDepth": {
           "type": "boolean",
           "default": true,
-          "description": "Set git.RepositoryScanMaxDepth to 2."
+          "description": "Set git.RepositoryScanMaxDepth to 2 (requires window reload)."
         }
       }
     }

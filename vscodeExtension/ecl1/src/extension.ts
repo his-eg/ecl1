@@ -169,12 +169,19 @@ export async function activate(context: vscode.ExtensionContext) {
         }else if (e.affectsConfiguration('ecl1.gitRepositoryScanMaxDepth')) {
             const configuration = vscode.workspace.getConfiguration();
             const value = configuration.get<boolean>('ecl1.gitRepositoryScanMaxDepth');
-            console.log(value);console.log(value);console.log(value);console.log(value);console.log(value);
             if(value){
                 setGitRepositoryScanMaxDepth();
             }else{
                 configuration.update('git.repositoryScanMaxDepth', undefined, vscode.ConfigurationTarget.Workspace);
             }
+            vscode.window.showInformationMessage(
+                "Changes to repository scan depth will apply after a window reload.",
+                "Reload", "Later"
+              ).then(selection => {
+                if (selection === "Reload") {
+                  vscode.commands.executeCommand("workbench.action.reloadWindow");
+                }
+              });
         }
     });
 
