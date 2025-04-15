@@ -101,6 +101,11 @@
           "type": "boolean",
           "default": true,
           "description": "Enable or disable exclusion of non projects in workspace root folder."
+        },
+        "ecl1.gitRepositoryScanMaxDepth": {
+          "type": "boolean",
+          "default": true,
+          "description": "Set git.RepositoryScanMaxDepth to 2."
         }
       }
     }

@@ -165,6 +165,15 @@ export async function activate(context: vscode.ExtensionContext) {
         // Update exclusions when the setting changes
         if (e.affectsConfiguration('ecl1.hideNonProjects')) {
             hideNonProjectsInWs();
+        }else if (e.affectsConfiguration('ecl1.gitRepositoryScanMaxDepth')) {
+            const configuration = vscode.workspace.getConfiguration();
+            const value = configuration.get<boolean>('ecl1.gitRepositoryScanMaxDepth');
+            console.log(value);console.log(value);console.log(value);console.log(value);console.log(value);
+            if(value){
+                setGitRepositoryScanMaxDepth();
+            }else{
+                configuration.update('git.repositoryScanMaxDepth', undefined, vscode.ConfigurationTarget.Workspace);
+            }
         }
     });
 
@@ -182,7 +191,10 @@ function getCommandIdFromName(name: string){
 /** Sets git.repositoryScanMaxDepth to 2 */
 function setGitRepositoryScanMaxDepth(){
     const configuration = vscode.workspace.getConfiguration();
-    configuration.update('git.repositoryScanMaxDepth', 2, vscode.ConfigurationTarget.Workspace);
+    const isGitRepositoryScanMaxDepth = configuration.get<boolean>("ecl1.gitRepositoryScanMaxDepth");   
+    if(isGitRepositoryScanMaxDepth){
+        configuration.update('git.repositoryScanMaxDepth', 2, vscode.ConfigurationTarget.Workspace);
+    }
 }
 
 /** Returns true if {@link INNER_WORKSPACE_NAME} exists and webapps or a HISinOne-Extension-Project is present in workspace */
