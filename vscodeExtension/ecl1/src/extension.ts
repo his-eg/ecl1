@@ -4,6 +4,7 @@ import path from 'path';
 import { readdirSync, existsSync, mkdirSync,
         writeFile, readFile, unlink } from 'fs';
 
+/** Keep value in sync with activationEvents in package.json */
 const INNER_WORKSPACE_NAME = 'eclipse-workspace';
 
 class Ecl1CommandTreeItem extends vscode.TreeItem {

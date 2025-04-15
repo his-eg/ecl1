@@ -13,7 +13,7 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": ["onStartupFinished"],
+  "activationEvents": ["workspaceContains:eclipse-workspace/"],
   "main": "./out/extension.js",
   "contributes": {
     "views": {
