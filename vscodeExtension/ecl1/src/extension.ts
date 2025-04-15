@@ -185,6 +185,8 @@ export async function activate(context: vscode.ExtensionContext) {
                 }
               });
         }
+        // Refresh settings view after changes
+        settingsTreeDataProvider.refresh();
     });
 
     context.subscriptions.push(commandTreeDataProvider, refreshCommands, settingsTreeDataProvider, refreshSettings, toggleSetting, configurationChangeListener);
