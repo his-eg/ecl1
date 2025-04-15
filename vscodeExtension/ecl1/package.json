@@ -15,6 +15,7 @@
   ],
   "activationEvents": ["workspaceContains:eclipse-workspace/"],
   "main": "./out/extension.js",
+  "icon": "ecl1_icon.png",
   "contributes": {
     "views": {
       "ecl1Sidebar": [
