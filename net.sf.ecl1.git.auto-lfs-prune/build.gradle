@@ -15,6 +15,7 @@ dependencies {
         transitive = false
     }
     implementation libs.eclipse.jgit
+    implementation libs.slf4j.simple // standalone, provides a StaticLoggerBinder required by JGit
 }
 
 sourceSets {
