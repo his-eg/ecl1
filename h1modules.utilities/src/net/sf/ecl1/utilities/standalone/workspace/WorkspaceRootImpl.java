@@ -78,7 +78,9 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
             File[] subfolders = parentFolder.listFiles(File::isDirectory);
             if (subfolders != null) {
                 for (File folder : subfolders) {
-                    projects.add(new ProjectImpl(folder.getName(), workspacePath));
+                    if(!folder.getName().startsWith(".")){
+                        projects.add(new ProjectImpl(folder.getName(), workspacePath));
+                    }
                 }
             }
         }
