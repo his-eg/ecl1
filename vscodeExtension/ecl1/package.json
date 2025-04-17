@@ -98,7 +98,7 @@
           "default": true,
           "description": "Enable or disable automatic start of ecl1 Hook Updater."
         },
-        "ecl1.autostartLFSPrune": {
+        "ecl1.autostartLfsPrune": {
           "type": "boolean",
           "default": true,
           "description": "Enable or disable automatic start of ecl1 LFS Prune."

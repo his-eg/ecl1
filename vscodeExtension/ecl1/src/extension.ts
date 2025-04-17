@@ -105,9 +105,14 @@ function startEcl1AutostartTasks(extensionPath: string) {
     }
 }
 
+/**
+ * The keys should be used as camelCase setting names (prefixed with "autostart") in package.json.
+ * Avoid using acronyms (like LFS or API) in setting names because VS Code's Settings UI
+ * automatically formats camelCase to Title Case with spaces, which misformats acronyms.
+ */
 const ecl1JarsAutostart: { [key: string]: string } = {
     "Hook Updater": "jars/net.sf.ecl1.git.updatehooks-all.jar",
-    "LFS Prune": "jars/net.sf.ecl1.git.auto-lfs-prune-all.jar",
+    "Lfs Prune": "jars/net.sf.ecl1.git.auto-lfs-prune-all.jar",
 };
 
 const ecl1Jars: { [key: string]: string } = {
@@ -184,7 +189,7 @@ export async function activate(context: vscode.ExtensionContext) {
             runAutostartTask(context.extensionPath, 'Hook Updater');
         // Run Lfs Prune if set
         }else if (e.affectsConfiguration('ecl1.autostartLfsPrune')) {
-            runAutostartTask(context.extensionPath, 'LFS Prune');
+            runAutostartTask(context.extensionPath, 'Lfs Prune');
         // Update git repository scan depth
         }else if (e.affectsConfiguration('ecl1.gitRepositoryScanMaxDepth')) {
             if(configuration.get<boolean>('ecl1.gitRepositoryScanMaxDepth')) {
