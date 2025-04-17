@@ -46,12 +46,13 @@ class Ecl1CommandTreeDataProvider implements vscode.TreeDataProvider<vscode.Tree
 
 class Ecl1SettingsTreeItem extends vscode.TreeItem {
     constructor(public readonly settingName: string, public readonly value: boolean) {
-        super(settingName, vscode.TreeItemCollapsibleState.None);
-        this.tooltip = `Setting: ${settingName}`;
+        const displayName = formatCamelCaseToTitleCase(settingName);
+        super(displayName, vscode.TreeItemCollapsibleState.None);
+        this.tooltip = `Setting: ${displayName}`;
         this.iconPath = new vscode.ThemeIcon(value ? 'check' : 'x');
         this.command = {
             command: 'ecl1.toggleSetting',
-            title: `Toggle ${settingName}`,
+            title: `Toggle ${displayName}`,
             arguments: [settingName, value]
         };
     }
@@ -216,6 +217,18 @@ export async function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {}
 
+/**
+ * Formats a camelCase string into Title Case with spaces.
+ * (Analog to VS Code's Settings UI)
+ * @param camelCaseString string to format
+ * @returns A Title Case string with spaces.
+ */
+function formatCamelCaseToTitleCase(camelCaseString: string): string {
+    // Add space before each capital letter
+    const withSpaces = camelCaseString.replace(/([a-z])([A-Z])/g, '$1 $2');
+    // Capitalize the first letter
+    return withSpaces[0].toUpperCase() + withSpaces.slice(1);
+  }
 
 /** Replaces whitespace with '-' to get valid command name*/
 function getCommandIdFromName(name: string){
