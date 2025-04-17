@@ -1,7 +1,5 @@
 package net.sf.ecl1.git.updatehooks;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -37,7 +35,6 @@ public class UpdateHooks implements IStartup {
     
     private static final String HOOKS_DIR_ECLIPSE_PROJECTS = ".git/hooks/commit-msg";
     private static final String HOOKS_DIR_ECL1 = "/githooks/commit-msg";
-	private static final String HOOKS_DIR_ECL1_STANDALONE = "ecl1/net.sf.ecl1.git.updatehooks/src/githooks/commit-msg";
     
     private final FS fs = FS.detect();
     
@@ -154,15 +151,9 @@ public class UpdateHooks implements IStartup {
 
 	
     private InputStream getCommitMsgHook() {
-		Path hooks;
-		InputStream is = null;
+		InputStream is;
 		if(!net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
-			hooks = WorkspaceFactory.getWorkspace().getRoot().getLocation().toPath().resolve(HOOKS_DIR_ECL1_STANDALONE);
-			try {
-				is = new FileInputStream(hooks.toFile());
-			} catch (FileNotFoundException e) {
-				logger.error2("Error reading hooks file: " + hooks + "\n" + e.getMessage());
-			}
+			is = UpdateHooks.class.getResourceAsStream("/commit-msg");
 		}else{
 			is = this.getClass().getClassLoader().getResourceAsStream(HOOKS_DIR_ECL1);
 		}
