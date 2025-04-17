@@ -41,7 +41,11 @@ public class AutoLfsPruneJob extends Job {
 	@Override
 	protected IStatus run(IProgressMonitor monitor) {
 		List<IProject> projects = Arrays.asList(WorkspaceFactory.getWorkspace().getRoot().getProjects());
-		logger.info("Found projects in Workspace: " + projects);
+		String[] projectNames = new String[projects.size()];
+		for (int i = 0; i < projectNames.length; i++) {
+			projectNames[i] = projects.get(i).getName();
+		}
+		logger.info("Found " + projectNames.length + " projects in Workspace: " + Arrays.toString(projectNames));
 		monitor.beginTask("Pruning", projects.size());
 		
 		for (IProject p : projects) {

@@ -83,7 +83,11 @@ public class GitBatchPullHandler extends AbstractHandler {
 		//Unnecessary after finishing #267325. The problem definition for #250882 was flawed and therefore sort was 
 		//never really needed by the user. Even though it is pointless, it stays in, because it doesn't do any harm...
 		Collections.sort(projects, projectComparator);
-		logger.info("Found projects in Workspace: " + projects);
+		String[] projectNames = new String[projects.size()];
+		for (int i = 0; i < projectNames.length; i++) {
+			projectNames[i] = projects.get(i).getName();
+		}
+		logger.info("Found " + projectNames.length + " projects in Workspace: " + Arrays.toString(projectNames));
 		monitor.beginTask("Batch Git Pull", projects.size());
 		for (IProject p : projects) {
 			//Check, if user has requested a cancel
