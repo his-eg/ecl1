@@ -80,21 +80,35 @@ class Ecl1SettingsTreeDataProvider implements vscode.TreeDataProvider<vscode.Tre
     }
 }
 
+/**
+ * Runs an ecl1 autostart task, if it is enabled.
+ * @param extensionPath extensionPath
+ * @param name task name ({@link ecl1JarsAutostart})
+ */
+function runAutostartTask(extensionPath: string, name: string){
+    const config = vscode.workspace.getConfiguration('ecl1');
+    const settingName = name.replace(/\s+/g, "");
+    const isEnabled = config.get<boolean>(`autostart${settingName}`);
+    if(isEnabled){
+        vscode.window.showInformationMessage(`Starting ecl1 autostart job ${name}...`);
+        runEcl1Jar(extensionPath, ecl1JarsAutostart[name], name);
+    } 
+}
+
+/**
+ * Starts all enabled ecl1 autostart tasks.
+ * @param extensionPath extensionPath
+ */
 function startEcl1AutostartTasks(extensionPath: string) {
-    const config = vscode.workspace.getConfiguration();
-    const isAutostartTasks = config.get<boolean>("ecl1.autostartTasks");
-
-    if (!isAutostartTasks) {
-        return;
-    }
-
-    for(var key in ecl1JarsAutostart) {
-        const jarPath = ecl1JarsAutostart[key];
-        vscode.window.showInformationMessage(`Starting ecl1 autostart job ${key}...`);
-        runEcl1Jar(extensionPath, jarPath, key);
+    for(const name in ecl1JarsAutostart){
+        runAutostartTask(extensionPath, name);
     }
 }
 
+const ecl1JarsAutostart: { [key: string]: string } = {
+    "Hook Updater": "jars/net.sf.ecl1.git.updatehooks-all.jar",
+    "LFS Prune": "jars/net.sf.ecl1.git.auto-lfs-prune-all.jar",
+};
 
 const ecl1Jars: { [key: string]: string } = {
     "Import Wizard": "jars/net.sf.ecl1.import.wizard-all.jar",
@@ -104,10 +118,6 @@ const ecl1Jars: { [key: string]: string } = {
     "Git Batch Pull": "jars/net.sf.ecl1.git.batch-pull-button-all.jar"
 };
 
-const ecl1JarsAutostart: { [key: string]: string } = {
-    "Hook Updater": "jars/net.sf.ecl1.git.updatehooks-all.jar",
-    "LFS Prune": "jars/net.sf.ecl1.git.auto-lfs-prune-all.jar",
-};
 
 export async function activate(context: vscode.ExtensionContext) {
     // only activate in HisInOne workspace
@@ -165,15 +175,22 @@ export async function activate(context: vscode.ExtensionContext) {
     }
 
     const configurationChangeListener = vscode.workspace.onDidChangeConfiguration((e) => {
+        const configuration = vscode.workspace.getConfiguration();
         // Update exclusions when the setting changes
         if (e.affectsConfiguration('ecl1.hideNonProjects')) {
             hideNonProjectsInWs();
+        // Run Hook Updater if set
+        }else if (e.affectsConfiguration('ecl1.autostartHookUpdater')) {
+            runAutostartTask(context.extensionPath, 'Hook Updater');
+        // Run Lfs Prune if set
+        }else if (e.affectsConfiguration('ecl1.autostartLfsPrune')) {
+            runAutostartTask(context.extensionPath, 'LFS Prune');
+        // Update git repository scan depth
         }else if (e.affectsConfiguration('ecl1.gitRepositoryScanMaxDepth')) {
-            const configuration = vscode.workspace.getConfiguration();
-            const value = configuration.get<boolean>('ecl1.gitRepositoryScanMaxDepth');
-            if(value){
+            if(configuration.get<boolean>('ecl1.gitRepositoryScanMaxDepth')) {
                 setGitRepositoryScanMaxDepth();
             }else{
+                // unset setting
                 configuration.update('git.repositoryScanMaxDepth', undefined, vscode.ConfigurationTarget.Workspace);
             }
             vscode.window.showInformationMessage(

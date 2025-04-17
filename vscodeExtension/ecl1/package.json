@@ -93,10 +93,15 @@
     "configuration": {
       "title": "Ecl1 Settings",
       "properties": {
-        "ecl1.autostartTasks": {
+        "ecl1.autostartHookUpdater": {
           "type": "boolean",
           "default": true,
-          "description": "Enable or disable automatic start of ecl1 autostart tasks."
+          "description": "Enable or disable automatic start of ecl1 Hook Updater."
+        },
+        "ecl1.autostartLFSPrune": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable automatic start of ecl1 LFS Prune."
         },
         "ecl1.hideNonProjects": {
           "type": "boolean",
