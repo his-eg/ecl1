@@ -10,12 +10,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
-import org.eclipse.jgit.transport.SshSessionFactory;
-import org.eclipse.jgit.transport.sshd.JGitKeyCache;
-import org.eclipse.jgit.transport.sshd.SshdSessionFactory;
-import org.eclipse.jgit.transport.sshd.SshdSessionFactoryBuilder;
-import org.eclipse.jgit.util.FS;
 
+import net.sf.ecl1.utilities.general.GitUtil;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
@@ -70,7 +66,7 @@ public class ProjectFromGitImporter {
 
             boolean standalone = false;
             if(!net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
-                setupStandaloneSsh();
+                GitUtil.setupStandaloneSsh();
                 standalone = true;
             }
             
@@ -130,18 +126,5 @@ public class ProjectFromGitImporter {
 		}
 		// Create new URL according to https://hiszilla.his.de/hiszilla/show_bug.cgi?id=194146
 		return baseRepositoryPath + "h1/" + segment1 + "/" + segment2 + "/" + extensionToImport;
-    }
-
-    /**
-     * Sets up standalone SSH authentication for JGit.  
-     * In Eclipse, SSH authentication is handled automatically via preferences
-     */
-    private void setupStandaloneSsh(){
-        File sshDir = new File(FS.DETECTED.userHome(), ".ssh");
-		SshdSessionFactory sshdSessionFactory = new SshdSessionFactoryBuilder()
-				.setPreferredAuthentications("publickey")
-				.setHomeDirectory(FS.DETECTED.userHome())
-				.setSshDirectory(sshDir).build(new JGitKeyCache());
-		SshSessionFactory.setInstance(sshdSessionFactory);
     }
 }

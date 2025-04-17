@@ -33,6 +33,8 @@ dependencies {
     implementation libs.guava
     implementation libs.httpclient
     implementation libs.commons.io
+    // standalone
+    implementation libs.eclipse.jgit.ssh.apache
 }
 
 sourceSets {

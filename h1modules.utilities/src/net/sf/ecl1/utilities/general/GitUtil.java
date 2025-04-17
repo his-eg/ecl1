@@ -11,6 +11,11 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.transport.SshSessionFactory;
+import org.eclipse.jgit.transport.sshd.JGitKeyCache;
+import org.eclipse.jgit.transport.sshd.SshdSessionFactory;
+import org.eclipse.jgit.transport.sshd.SshdSessionFactoryBuilder;
+import org.eclipse.jgit.util.FS;
 
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
@@ -125,4 +130,16 @@ public class GitUtil {
 	        return UNKNOWN_BRANCH;
 		}
 
+    /**
+     * Sets up standalone SSH authentication for JGit.  
+     * In Eclipse, SSH authentication is handled automatically via preferences
+     */
+    public static void setupStandaloneSsh(){
+        File sshDir = new File(FS.DETECTED.userHome(), ".ssh");
+		SshdSessionFactory sshdSessionFactory = new SshdSessionFactoryBuilder()
+				.setPreferredAuthentications("publickey")
+				.setHomeDirectory(FS.DETECTED.userHome())
+				.setSshDirectory(sshDir).build(new JGitKeyCache());
+		SshSessionFactory.setInstance(sshdSessionFactory);
+    }
 }
