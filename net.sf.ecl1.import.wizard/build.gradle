@@ -12,7 +12,7 @@ dependencies {
     implementation(project(':h1modules.utilities'))
 
     implementation libs.eclipse.jgit
-    implementation libs.slf4j.simple // standalone, provides a StaticLoggerBinder required by JGit
+    implementation libs.slf4j.nop // standalone, provides a StaticLoggerBinder required by JGit
     implementation libs.eclipse.core.resources
     implementation (libs.eclipse.ui.workbench) {
         transitive = false

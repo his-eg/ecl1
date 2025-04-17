@@ -1,6 +1,6 @@
 [versions]
 eclipse-jgit = "[0,)"
-slf4j-simple = "[0,)"
+slf4j-nop = "[0,)"
 eclipse-core-resources = "[3.7.0,)"
 eclipse-core-commands = "[0,)"
 eclipse-ui-workbench = "[0,)"
@@ -17,7 +17,7 @@ httpclient = "[4.3.6,)"
 [libraries]
 eclipse-jgit = { group = "org.eclipse.jgit", name = "org.eclipse.jgit", version.ref = "eclipse-jgit" }
 eclipse-jgit-ssh-apache = { group = "org.eclipse.jgit", name = "org.eclipse.jgit.ssh.apache", version.ref = "eclipse-jgit" }
-slf4j-simple = { group = "org.slf4j", name = "slf4j-simple", version.ref = "slf4j-simple" }
+slf4j-nop = { group = "org.slf4j", name = "slf4j-nop", version.ref = "slf4j-nop" }
 eclipse-core-resources = { group = "org.eclipse.platform", name = "org.eclipse.core.resources", version.ref = "eclipse-core-resources" }
 eclipse-core-commands = { group = "org.eclipse.platform", name = "org.eclipse.core.commands", version.ref = "eclipse-core-commands" }
 eclipse-ui-workbench = { group = "org.eclipse.platform", name = "org.eclipse.ui.workbench", version.ref = "eclipse-ui-workbench" }

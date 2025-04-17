@@ -10,7 +10,7 @@ repositories {
 
 dependencies {
     implementation libs.eclipse.jgit
-    implementation libs.slf4j.simple // standalone, provides a StaticLoggerBinder required by JGit
+    implementation libs.slf4j.nop // standalone, provides a StaticLoggerBinder required by JGit
     implementation libs.eclipse.jdt.launching
     if(System.getProperty("os.name").toLowerCase().contains("win")) {
         implementation (libs.eclipse.swt.win32) {
