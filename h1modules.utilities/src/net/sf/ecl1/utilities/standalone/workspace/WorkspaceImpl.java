@@ -90,6 +90,7 @@ public class WorkspaceImpl implements IWorkspace {
     }
     
     @Override
+    @Deprecated
     public ISavedState addSaveParticipant(Plugin plugin, ISaveParticipant participant) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'addSaveParticipant(Plugin plugin, ISaveParticipant participant)'");
     }
@@ -116,6 +117,7 @@ public class WorkspaceImpl implements IWorkspace {
     }
     
     @Override
+    @Deprecated
     public IProject[][] computePrerequisiteOrder(IProject[] projects) {
         throw new UnsupportedOperationException("Unimplemented method 'computePrerequisiteOrder(IProject[] projects)'");
     }
@@ -235,6 +237,7 @@ public class WorkspaceImpl implements IWorkspace {
     }
     
     @Override
+    @Deprecated
     public void removeSaveParticipant(Plugin plugin) {
         throw new UnsupportedOperationException("Unimplemented method 'removeSaveParticipant(Plugin plugin)'");
     }

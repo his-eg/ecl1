@@ -45,6 +45,7 @@ public class PathImpl implements IPath {
     }
 
     @Override
+    @SuppressWarnings({ "CloneDeclaresCloneNotSupported", "CloneDoesntCallSuperClone" })
     public IPath clone() {
         return new PathImpl(path);
     }

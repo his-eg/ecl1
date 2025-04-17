@@ -304,6 +304,7 @@ public class FileImpl implements IFile{
     }
 
     @Override
+    @Deprecated
     public boolean isLocal(int depth) {
         throw new UnsupportedOperationException("Unimplemented method 'isLocal'");
     }
@@ -360,6 +361,7 @@ public class FileImpl implements IFile{
     }
 
     @Override
+    @Deprecated
     public void setDerived(boolean isDerived) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'setDerived'");
     }
@@ -375,6 +377,7 @@ public class FileImpl implements IFile{
     }
 
     @Override
+    @Deprecated
     public void setLocal(boolean flag, int depth, IProgressMonitor monitor) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'setLocal'");
     }
@@ -390,6 +393,7 @@ public class FileImpl implements IFile{
     }
 
     @Override
+    @Deprecated
     public void setReadOnly(boolean readOnly) {
         throw new UnsupportedOperationException("Unimplemented method 'setReadOnly'");
     }
@@ -486,6 +490,7 @@ public class FileImpl implements IFile{
     }
 
     @Override
+    @Deprecated
     public int getEncoding() throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'getEncoding'");
     }
@@ -501,6 +506,7 @@ public class FileImpl implements IFile{
     }
 
     @Override
+    @Deprecated
     public boolean isReadOnly() {
         throw new UnsupportedOperationException("Unimplemented method 'isReadOnly'");
     }
@@ -512,6 +518,7 @@ public class FileImpl implements IFile{
     }
 
     @Override
+    @Deprecated
     public void setCharset(String newCharset) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'setCharset'");
     }

@@ -197,6 +197,7 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
     }
     
     @Override
+    @Deprecated
     public void setDefaultCharset(String charset) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'setDefaultCharset(String charset)'");
     }
@@ -438,6 +439,7 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
     }
     
     @Override
+    @Deprecated
     public boolean isLocal(int depth) {
         throw new UnsupportedOperationException("Unimplemented method 'isLocal(int depth)'");
     }
@@ -448,6 +450,7 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
     }
   
     @Override
+    @Deprecated
     public boolean isReadOnly() {
         throw new UnsupportedOperationException("Unimplemented method 'isReadOnly'");
     }
@@ -498,6 +501,7 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
     }
     
     @Override
+    @Deprecated
     public void setDerived(boolean isDerived) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'setDerived(boolean isDerived)'");
     }
@@ -513,6 +517,7 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
     }
     
     @Override
+    @Deprecated
     public void setLocal(boolean flag, int depth, IProgressMonitor monitor) throws CoreException {
         throw new UnsupportedOperationException("Unimplemented method 'setLocal(boolean flag, int depth, IProgressMonitor monitor)'");
     }
@@ -528,6 +533,7 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
     }
     
     @Override
+    @Deprecated
     public void setReadOnly(boolean readOnly) {
         throw new UnsupportedOperationException("Unimplemented method 'setReadOnly(boolean readOnly)'");
     }
@@ -573,6 +579,7 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
     }
     
     @Override
+    @Deprecated
     public IContainer[] findContainersForLocation(IPath location) {
         throw new UnsupportedOperationException("Unimplemented method 'findContainersForLocation(IPath location)'");
     }
@@ -588,6 +595,7 @@ public class WorkspaceRootImpl implements IWorkspaceRoot {
     }
     
     @Override
+    @Deprecated
     public IFile[] findFilesForLocation(IPath location) {
         throw new UnsupportedOperationException("Unimplemented method 'findFilesForLocation(IPath location)'");
     }
