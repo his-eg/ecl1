@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
+import net.sf.ecl1.utilities.general.GitUtil;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
 import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
@@ -48,6 +49,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 
 		// standalone
 		if(!net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
+			GitUtil.setupStandaloneSsh();
 			IStatus multiStatus = gitBatchPullJob(new NullProgressMonitor());
 			if (PreferenceWrapper.isDisplaySummaryOfGitPull()) {
 				Display display = new Display();
