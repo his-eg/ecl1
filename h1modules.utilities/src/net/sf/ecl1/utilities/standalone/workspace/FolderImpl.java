@@ -75,7 +75,7 @@ public class FolderImpl implements IFolder {
 
     @Override
     public IContainer getParent() {
-        String workspace = new WorkspaceRootImpl().getLocation().toString();
+        String workspace = WorkspaceFactory.getWorkspace().getRoot().getLocation().toString();
         String parent = path.getParent().toString();
         if(!parent.equals(workspace)){
             return new FolderImpl(parent);
@@ -125,8 +125,7 @@ public class FolderImpl implements IFolder {
 
     @Override
     public int getType() {
-        // cant get type for project
-        if(path.toString().equals(new WorkspaceRootImpl().getLocation().toString())){
+        if(path.toString().equals(WorkspaceFactory.getWorkspace().getRoot().getLocation().toString())){
             return WorkspaceImpl.TYPE_ROOT;
         }
         File folder = path.toFile();

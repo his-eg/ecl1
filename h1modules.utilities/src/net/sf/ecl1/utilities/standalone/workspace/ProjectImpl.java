@@ -101,7 +101,7 @@ public class ProjectImpl implements IProject{
     }
 
     protected static IPath getFullPath(String path){
-        Path workspacePath = Paths.get(new WorkspaceRootImpl().getLocation().toString());
+        Path workspacePath = Paths.get(WorkspaceFactory.getWorkspace().getRoot().getLocation().toString());
         Path projectPath = Paths.get(path);
         // return path relative to workspace
         return new PathImpl(workspacePath.relativize(projectPath));
