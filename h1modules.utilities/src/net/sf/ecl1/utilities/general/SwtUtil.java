@@ -12,6 +12,7 @@ import net.sf.ecl1.utilities.logging.LoggerFactory;
 public class SwtUtil {
 
     private static final ICommonLogger logger = LoggerFactory.getLogger(Activator.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
+    private static final String SHADOW_JAR_SUFFIX = "-all.jar";
 
     /**
      * Brings the active shell to the foreground by minimizing and then maximizing it.
@@ -24,9 +25,9 @@ public class SwtUtil {
             logger.error("Error bringing Shell to foreground, Display is null");
             return;
         }
-        // If running from jar shell is already in foreground
-        boolean isJar = SwtUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(".jar");
-        if(isJar){
+        // If running from shadow jar (*-all.jar) shell is already in foreground
+        boolean isShadowJar = SwtUtil.class.getProtectionDomain().getCodeSource().getLocation().getPath().endsWith(SHADOW_JAR_SUFFIX);
+        if(isShadowJar){
             return;
         }
         
