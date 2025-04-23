@@ -21,11 +21,13 @@
       "ecl1Sidebar": [
         {
           "id": "ecl1CommandsTreeView",
-          "name": "Commands"
+          "name": "Commands",
+          "when": "ecl1ExtensionActivated"
         },
         {
           "id": "ecl1SettingsTreeView",
-          "name": "Settings"
+          "name": "Settings",
+          "when": "ecl1ExtensionActivated"
         }
       ]
     },

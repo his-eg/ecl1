@@ -126,17 +126,20 @@ const ecl1Jars: { [key: string]: string } = {
 
 
 export async function activate(context: vscode.ExtensionContext) {
-    // only activate in HisInOne workspace
+    // Only activate in HisInOne workspace
     if(!isHisInOneWorkspace()){
         return;
     }
-    // only activate if Java is installed
+    // Only activate if Java is installed
     if(!await isJavaInstalled()){
         vscode.window.showErrorMessage(
             'Ecl1 requires a local Java installation! Please install Java and restart the workspace.'
         );
         return;
     }
+    // Activate sidebar
+    vscode.commands.executeCommand('setContext', 'ecl1ExtensionActivated', true);
+
     hideNonProjectsInWs();
     setGitRepositoryScanMaxDepth();
 
@@ -215,7 +218,10 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(commandTreeDataProvider, refreshCommands, settingsTreeDataProvider, refreshSettings, toggleSetting, configurationChangeListener);
 }
 
-export function deactivate() {}
+export function deactivate() {
+    // Deactivate sidebar, reset context key
+    vscode.commands.executeCommand('setContext', 'ecl1ExtensionActivated', false);
+}
 
 /**
  * Formats a camelCase string into Title Case with spaces.
