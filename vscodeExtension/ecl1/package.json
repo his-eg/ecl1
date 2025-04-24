@@ -1,4 +1,5 @@
 {
+  "publisher": "HISeG",
   "name": "ecl1",
   "displayName": "ecl1",
   "description": "Extension to use ecl1 plugins in Visual Studio Code.",
