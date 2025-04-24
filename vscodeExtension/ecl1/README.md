@@ -2,21 +2,32 @@
 
 Extension to support Ecl1 Plugins in Visual Studio Code.
 
-[GitHub](https://github.com/his-eg/ecl1),
 [Website](https://ecl1.sourceforge.net)
 
-## Requirements
+## Requirements / Activation
 
 * **Java**: A local Java 1.8+ installation.
-* **Inner Workspace Folder**: The workspace must include an inner "workspace folder," which must currently be named `eclipse-workspace`.
-* **Extension Activation**:
-  - The workspace must contain either a `webapps` directory or a `HISinOne-Extension-Project` directory to activate the extension.
+* **Inner Workspace Folder**: The workspace must include an inner "workspace folder", which must currently be named `eclipse-workspace`.
+* **Extension-Project**: The workspace must contain either a `webapps` directory or a `HISinOne-Extension-Project` directory.
+- Folder structure:
+    ```
+    WorkspaceRoot/
+    ├── eclipse-workspace/
+    │   └── Extension-Project/
+    ├── webapps/
+    ├── Extension-Project/
+    ```
 
 ## Extension Settings
 
 This extension contributes the following settings:
 
-* `ecl1.autostartTasks`: Enable or disable automatic start of ecl1 autostart tasks.
+* `ecl1.autostartHookUpdater`: Enable or disable automatic start of ecl1 Hook Updater.
+
+* `ecl1.autostartLfsPrune`: Enable or disable automatic start of ecl1 LFS Prune.
+
+* `ecl1.gitRepositoryScanMaxDepth`: Set git.RepositoryScanMaxDepth to 2 (requires window reload).
+
 * `ecl1.hideNonProjects`: Enable or disable exclusion of non projects in workspace root folder.
 
 
