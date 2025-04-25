@@ -9,7 +9,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
-import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.BranchTrackingStatus;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -39,19 +39,30 @@ public class UpdateCheckApp{
 			// Fetch latest changes
 			git.fetch().call();
 
-            ObjectId localHead = repo.resolve("refs/heads/master^{commit}");
-			ObjectId remoteHead = repo.resolve("refs/remotes/origin/master^{commit}");
+            BranchTrackingStatus trackingStatus = BranchTrackingStatus.of(repo, "master");
 
-			// check for changes
-			if (!localHead.equals(remoteHead)) {
-				PullResult pullResult = git.pull().call();
-				if (pullResult.isSuccessful()) {
-					logger.info("Updated ecl1 successfully.");
-					showUpdateDialog();
-				} else {
-					logger.error("Failed to pull ecl1.");
-				}
-			}
+            if (trackingStatus != null) {
+                int aheadCount = trackingStatus.getAheadCount();
+                int behindCount = trackingStatus.getBehindCount();
+
+                if (aheadCount > 0 && behindCount == 0) {
+                    logger.warn("Local ecl1 is ahead of remote. Skipping pull to avoid overwriting local changes.");
+                }else if (aheadCount > 0 && behindCount > 0) {
+                    logger.warn("Local ecl1 and remote have diverged. Manual merge may be required.");
+                } else if (behindCount > 0) {
+                    PullResult pullResult = git.pull().call();
+                    if (pullResult.isSuccessful()) {
+                        logger.info("Updated ecl1 successfully.");
+                        showUpdateDialog();
+                    } else {
+                        logger.error("Failed to pull ecl1.");
+                    }
+                } else {
+                    logger.debug("No ecl1 update available.");
+                }
+            } else {
+                logger.warn("Git Tracking information for ecl1 master branch not found. Skipping pull.");
+            }
 
 		} catch (org.eclipse.jgit.errors.RepositoryNotFoundException e) {
 			logger.error("Ecl1 is not managed via Git?: " + e.getMessage());
