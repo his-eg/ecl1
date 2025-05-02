@@ -5,7 +5,7 @@ import { readdirSync, existsSync, mkdirSync,
         writeFile, readFile, unlink } from 'fs';
 
 /** Keep value in sync with activationEvents in package.json */
-const INNER_WORKSPACE_NAME = 'eclipse-workspace';
+const INNER_WORKSPACE_NAMES = ['eclipse-workspace','workspace'];
 
 const WORKSPACE_FOLDER = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
 
@@ -224,6 +224,22 @@ export function deactivate() {
 }
 
 /**
+ * Finds and returns the first existing inner workspace folder path ({@link INNER_WORKSPACE_NAMES}).
+ *
+ * @returns Full inner workspace path if found, else an empty string.
+ */
+function getInnerWorkspaceFolder() {
+    let innerWsPath;
+    for(const innerWs of INNER_WORKSPACE_NAMES) {
+        innerWsPath = path.join(WORKSPACE_FOLDER, innerWs);
+        if(existsSync(innerWsPath)){
+            return innerWsPath;
+        }
+    }
+    return '';
+}
+
+/**
  * Formats a camelCase string into Title Case with spaces.
  * (Analog to VS Code's Settings UI)
  * @param camelCaseString string to format
@@ -250,10 +266,10 @@ function setGitRepositoryScanMaxDepth(){
     }
 }
 
-/** Returns true if {@link INNER_WORKSPACE_NAME} exists and webapps or a HISinOne-Extension-Project is present in workspace */
+/** Returns true if {@link INNER_WORKSPACE_NAMES} exists and webapps or a HISinOne-Extension-Project is present in workspace */
 function isHisInOneWorkspace() {
-    const innerWsPath = path.join(WORKSPACE_FOLDER, INNER_WORKSPACE_NAME);
-    if(!existsSync(WORKSPACE_FOLDER) || !existsSync(innerWsPath)){
+    const innerWsPath = getInnerWorkspaceFolder();
+    if(!innerWsPath){
         return false;
     }
     return getProjects(WORKSPACE_FOLDER).length > 0 || getProjects(innerWsPath).length > 0;
@@ -288,7 +304,7 @@ function hideNonProjectsInWs() {
         return;
     }
 
-    const dirsToKeep = ['.vscode', INNER_WORKSPACE_NAME];
+    const dirsToKeep = ['.vscode', ...INNER_WORKSPACE_NAMES];
     const wsDirs = readdirSync(WORKSPACE_FOLDER, {withFileTypes: true}).map(item => item.name);
     const projects = getProjects(WORKSPACE_FOLDER);
     const dirsToExclude = wsDirs.filter(dir => !projects.includes(dir) && !dirsToKeep.includes(dir));
@@ -343,7 +359,7 @@ function getOutputChannelByName(name: string): vscode.OutputChannel {
  */
 function runEcl1Jar(extensionPath: string, jarPath: string, name: string) {
     const fullJarPath = path.join(extensionPath, jarPath);
-    const innerWsPath = path.join(WORKSPACE_FOLDER, INNER_WORKSPACE_NAME);
+    const innerWsPath = getInnerWorkspaceFolder();
     const args = ['-jar', fullJarPath, innerWsPath];
     const javaProcess = spawn('java', args, { stdio: 'pipe' });
     
