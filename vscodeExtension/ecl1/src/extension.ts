@@ -221,6 +221,10 @@ export async function activate(context: vscode.ExtensionContext) {
 export function deactivate() {
     // Deactivate sidebar, reset context key
     vscode.commands.executeCommand('setContext', 'ecl1ExtensionActivated', false);
+    // Dispose output channels
+    for (const name in outputChannels) {
+        outputChannels[name].dispose();
+    }
 }
 
 /**
