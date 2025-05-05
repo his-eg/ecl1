@@ -15,7 +15,7 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": ["workspaceContains:eclipse-workspace/", "workspaceContains:workspace/"],
+  "activationEvents": ["onStartupFinished"],
   "main": "./out/extension.js",
   "icon": "ecl1_icon.png",
   "contributes": {

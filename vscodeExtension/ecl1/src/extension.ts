@@ -229,11 +229,32 @@ export function deactivate() {
  * @returns Full inner workspace path if found, else an empty string.
  */
 function getInnerWorkspaceFolder() {
-    let innerWsPath;
-    for(const innerWs of INNER_WORKSPACE_NAMES) {
-        innerWsPath = path.join(WORKSPACE_FOLDER, innerWs);
-        if(existsSync(innerWsPath)){
-            return innerWsPath;
+    return findInnerWorkspace(WORKSPACE_FOLDER);
+}
+
+/**
+ * Recursively searches for a directory matching one of the inner workspace names ({@link INNER_WORKSPACE_NAMES}).
+ * @param dir Directory path to start the search from.
+ * @returns Full inner workspace path if found, else an empty string.
+ */
+function findInnerWorkspace(dir: string, depth: number = 0): string {
+    const MAX_DEPTH = 5;
+    if (depth > MAX_DEPTH) {
+        return '';
+    }
+    const subDirs = readdirSync(dir, { withFileTypes: true })
+        .filter(entry => entry.isDirectory()).map(entry => entry.name);;
+
+    for (const subDirName of subDirs) {
+        const fullPath = path.join(dir, subDirName);
+
+        if (INNER_WORKSPACE_NAMES.includes(subDirName)) {
+            return fullPath;
+        }
+
+        const found = findInnerWorkspace(fullPath, depth + 1);
+        if (found) {
+            return found;
         }
     }
     return '';
@@ -304,7 +325,11 @@ function hideNonProjectsInWs() {
         return;
     }
 
-    const dirsToKeep = ['.vscode', ...INNER_WORKSPACE_NAMES];
+    const innerWsPath = getInnerWorkspaceFolder();
+    const relativePath = path.relative(WORKSPACE_FOLDER, innerWsPath);
+    const innerWsRoot = relativePath.split(path.sep)[0];
+    
+    const dirsToKeep = ['.vscode', innerWsRoot];
     const wsDirs = readdirSync(WORKSPACE_FOLDER, {withFileTypes: true}).map(item => item.name);
     const projects = getProjects(WORKSPACE_FOLDER);
     const dirsToExclude = wsDirs.filter(dir => !projects.includes(dir) && !dirsToKeep.includes(dir));

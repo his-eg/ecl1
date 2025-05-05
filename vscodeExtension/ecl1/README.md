@@ -7,16 +7,34 @@ Extension to support Ecl1 Plugins in Visual Studio Code.
 ## Requirements / Activation
 
 * **Java**: A local Java 1.8+ installation.
-* **Inner Workspace Folder**: The workspace must include an inner "workspace folder", which must currently be named `eclipse-workspace` or `workspace`.
+* **Inner Workspace Folder**: The workspace must include an inner "workspace folder" (up to 5 levels deep), which must currently be named `eclipse-workspace` or `workspace`.
 * **Extension-Project**: The workspace must contain either a `webapps` directory or a `HISinOne-Extension-Project` directory.
-- Folder structure:
-    ```
-    WorkspaceRoot/
-    ├── eclipse-workspace/ or workspace/
-    │   └── Extension-Project/
-    ├── webapps/
-    ├── Extension-Project/
-    ```
+* **Project recognition**: Only projects in the `Inner-Workspace-Folder` and the directory above it (`../Inner-Workspace-Folder`) are recognized.
+- Folder structure examples:
+<table>
+  <tr>
+    <td>
+      <pre>
+      WorkspaceRoot/
+      ├── eclipse-workspace/ or workspace/
+      │   └── Extension-Project/
+      ├── webapps/
+      ├── Extension-Project/
+      </pre>
+    </td>
+    <td>
+      <pre>
+      WorkspaceRoot/
+      ├── Folder/ (max depth 5)
+      │ ├── eclipse-workspace/ or workspace/
+      │ │   └── Extension-Project/
+      │ ├── webapps/
+      │ └── Extension-Project/
+      </pre>
+    </td>
+  </tr>
+</table>
+
 
 ## Extension Settings
 
