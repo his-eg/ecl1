@@ -126,7 +126,8 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "postinstall": "cd ../../ && sh ./update_vsc_extension_jars.sh"
   },
   "devDependencies": {
     "@types/vscode": "^1.97.2",
