@@ -1,0 +1,10 @@
+rootProject.name = 'ecl1'
+
+include 'h1modules'
+include 'h1modules.utilities'
+include 'net.sf.ecl1.import.wizard'
+include 'net.sf.ecl1.commit.exporter'
+include 'net.sf.ecl1.git.batch-pull-button'
+include 'net.sf.ecl1.git.updatehooks'
+include 'net.sf.ecl1.git.auto-lfs-prune'
+include 'net.sf.ecl1.updatecheck'

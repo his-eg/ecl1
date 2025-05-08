@@ -1,0 +1,43 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.gradleup.shadow' version '9.0.0-beta11'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation(project(':h1modules.utilities'))
+
+    implementation libs.eclipse.jgit
+    implementation libs.slf4j.nop // standalone, provides a StaticLoggerBinder required by JGit
+    implementation libs.eclipse.core.resources
+    implementation (libs.eclipse.ui.workbench) {
+        transitive = false
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+        resources {
+            srcDir 'src/githooks'
+        }
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+application {
+    mainClass = 'net.sf.ecl1.git.updatehooks.standalone.UpdateHooksApp'
+}

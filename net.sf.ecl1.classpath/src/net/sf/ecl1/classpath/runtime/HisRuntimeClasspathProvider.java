@@ -9,11 +9,11 @@ import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.IRuntimeClasspathProvider;
 
 import net.sf.ecl1.classpath.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.ProjectUtil;
 import net.sf.ecl1.utilities.general.RuntimeClasspathUtil;
 import net.sf.ecl1.utilities.hisinone.ExtensionUtil;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 /**
  * A custom runtime classpath provider. Currently only used for JUnit launch configurations.

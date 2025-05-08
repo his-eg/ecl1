@@ -8,11 +8,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 public class VariableReplacer {
 	
-	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, VariableReplacer.class.getSimpleName());
+    private static final ICommonLogger logger = LoggerFactory.getLogger(VariableReplacer.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 	
 	private final Map<String, String> variables;
 

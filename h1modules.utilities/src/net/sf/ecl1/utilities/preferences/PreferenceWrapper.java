@@ -1,10 +1,18 @@
 package net.sf.ecl1.utilities.preferences;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.preference.PreferenceStore;
+
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.general.GitUtil;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
+import net.sf.ecl1.utilities.preferences.standalone.StandalonePreferenceStore;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
  * Encapsulate access to Eclipse preferences.
@@ -12,6 +20,8 @@ import net.sf.ecl1.utilities.general.GitUtil;
  */
 public class PreferenceWrapper {
     
+    private static final ICommonLogger logger = LoggerFactory.getLogger(PreferenceWrapper.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
+
     /** Preference for URI to git server */
     public static final String GIT_SERVER_PREFERENCE_KEY = "gitServer";
 
@@ -33,19 +43,35 @@ public class PreferenceWrapper {
     /** Stores if the summary of the git batch pull should be displayed in a dialog to the user */
     public static final String DISPLAY_SUMMARY_OF_GIT_PULL = "displaySummaryOfGitPull";
 
-    
+    /** Eclipse default path for preference store */
+    private static final String ECLIPSE_STORE_PATH = ".metadata/.plugins/org.eclipse.core.runtime/.settings/net.sf.ecl1.utilities.prefs";
+
+    private static IPreferenceStore preferenceStore = null;
+
+
+    private static IPreferenceStore getStore(){
+        if (preferenceStore == null) {
+            if(Activator.isRunningInEclipse()){
+                preferenceStore = Activator.getPreferences();
+            }else{
+                preferenceStore = StandalonePreferenceStore.getStore();
+            }
+        }
+        return preferenceStore;
+    }
+
     /**
      * @return git repository server URL
      */
 	public static String getGitServer() {
-		return Activator.getPreferences().getString(GIT_SERVER_PREFERENCE_KEY);
+		return getStore().getString(GIT_SERVER_PREFERENCE_KEY);
 	}
 	
 	/**
 	 * @return build server base URL, e.g. "http://build.his.de/build/"
 	 */
 	public static String getBuildServer() {
-        return Activator.getPreferences().getString(BUILD_SERVER_PREFERENCE_KEY);
+        return getStore().getString(BUILD_SERVER_PREFERENCE_KEY);
 	}
 	
     /**
@@ -53,17 +79,18 @@ public class PreferenceWrapper {
      * like "HEAD" or "HISinOne_VERSION_07_RELEASE_01".
      */
     public static String getBuildServerView() {
-    	if(Activator.getPreferences().getBoolean(DETECT_BRANCH_AUTOMATICALLY)) {
-    		Activator.getPreferences().setValue(BUILD_SERVER_VIEW_PREFERENCE_KEY, GitUtil.getCheckedOutBranchOfWebapps());
+        IPreferenceStore store = getStore();
+    	if(store.getBoolean(DETECT_BRANCH_AUTOMATICALLY)) {
+    		store.setValue(BUILD_SERVER_VIEW_PREFERENCE_KEY, GitUtil.getCheckedOutBranchOfWebapps());
     	}
-        return Activator.getPreferences().getString(BUILD_SERVER_VIEW_PREFERENCE_KEY);
+        return store.getString(BUILD_SERVER_VIEW_PREFERENCE_KEY);
     }
     
     /**
      * @return a list of URLs from where extension template files may be fetched.
      */
     public static List<String> getTemplateRootUrls() {
-        String templateRootUrlsStr = Activator.getPreferences().getString(TEMPLATE_ROOT_URLS_PREFERENCE_KEY);
+        String templateRootUrlsStr = getStore().getString(TEMPLATE_ROOT_URLS_PREFERENCE_KEY);
         return Arrays.asList(templateRootUrlsStr.split(","));
     }
     
@@ -71,18 +98,36 @@ public class PreferenceWrapper {
      * @return the users log level preference
      */
     public static String getLogLevel() {
-    	return Activator.getPreferences().getString(LOG_LEVEL_PREFERENCE_KEY);
+    	return getStore().getString(LOG_LEVEL_PREFERENCE_KEY);
     }
 
 	public static boolean isDetectBranchAutomatically() {
-		return Activator.getPreferences().getBoolean(DETECT_BRANCH_AUTOMATICALLY);
+		return getStore().getBoolean(DETECT_BRANCH_AUTOMATICALLY);
 	}
 	
 	public static boolean isDisplaySummaryOfGitPull() {
-		return Activator.getPreferences().getBoolean(DISPLAY_SUMMARY_OF_GIT_PULL);
+		return getStore().getBoolean(DISPLAY_SUMMARY_OF_GIT_PULL);
 	}
 	
 	public static void setDisplaySummaryOfGitPull(boolean v) {
-		Activator.getPreferences().setValue(DISPLAY_SUMMARY_OF_GIT_PULL, v);
+        getStore().setValue(DISPLAY_SUMMARY_OF_GIT_PULL, v);
+        saveStore();
 	}
+
+    public static String getEclipseStorePath(){
+        return WorkspaceFactory.getWorkspace().getRoot().getLocation().toPath().resolve(ECLIPSE_STORE_PATH).toString();
+    }
+
+    /*
+     * Ensures that changes to the standalone preference store are persisted.
+     */
+    private static void saveStore(){
+        if(getStore().needsSaving()){
+            try {
+                ((PreferenceStore) getStore()).save();
+            } catch (IOException e) {
+                logger.error("Error while saving to preference store", e);
+            }
+        }
+    }
 }

@@ -27,9 +27,10 @@ import org.xml.sax.SAXException;
 import com.google.common.collect.Sets;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.FileUtil;
 import net.sf.ecl1.utilities.general.GitUtil;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 /**
  * Utilities for management of release.xml files
@@ -38,8 +39,8 @@ import net.sf.ecl1.utilities.general.GitUtil;
  */
 public class ReleaseXmlUtil {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ReleaseXmlUtil.class.getSimpleName());
-
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ReleaseXmlUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
+	
 	private static final String RELEASE_XML_FOLDER = "qisserver/WEB-INF/conf/service/patches/hisinone";
 	
 	private static final String HOTFIX_PREFIX = "Hotfix ";

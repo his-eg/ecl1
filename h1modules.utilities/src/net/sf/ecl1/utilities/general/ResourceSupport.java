@@ -13,9 +13,13 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
+import net.sf.ecl1.utilities.standalone.workspace.FileImpl;
 import net.sf.ecl1.utilities.templates.TemplateFetcher;
 import net.sf.ecl1.utilities.templates.TemplateManager;
 import net.sf.ecl1.utilities.templates.VariableReplacer;
@@ -27,7 +31,7 @@ import net.sf.ecl1.utilities.templates.VariableReplacer;
  */
 public class ResourceSupport {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ResourceSupport.class.getSimpleName());
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ResourceSupport.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
     private static final String TEMPLATE_FOLDER_IN_WEBAPPS = "qisserver/WEB-INF/internal/extensionTemplates/current";
     
@@ -132,11 +136,15 @@ public class ResourceSupport {
 			for(IResource child : ((IFolder)resource).members()) {
 				copyResourceToNewExtensionProject(child, segmentsOfBaseFolder);
 			}
-			
 		}
-		
+
 		if(resource.getType() == IResource.FILE) {
-			IFile file = (IFile)resource;
+			IFile file;
+            if(Activator.isRunningInEclipse()){
+                file = (IFile)resource;
+            }else{
+                file = (FileImpl)resource;
+            }
 			String fileContentAsString = variableReplacer.replaceVariables(file.getContents());
 			ByteArrayInputStream fileContentAsStream = new ByteArrayInputStream(fileContentAsString.getBytes());
 			

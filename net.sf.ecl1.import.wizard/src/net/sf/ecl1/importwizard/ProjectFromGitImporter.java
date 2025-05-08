@@ -1,20 +1,21 @@
 package net.sf.ecl1.importwizard;
 
-import net.sf.ecl1.utilities.general.ConsoleLogger;
-import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
-
 import java.io.File;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
-import org.eclipse.core.resources.IWorkspaceDescription;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+
+import net.sf.ecl1.utilities.general.GitUtil;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
+import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
  * Imports projects from a git repo into local workspace
@@ -23,8 +24,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
  */
 public class ProjectFromGitImporter {
 	
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ProjectFromGitImporter.class.getSimpleName());
-	
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ProjectFromGitImporter.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
+
     // base path of the source repo configured in preferences, e.g. "ssh://git@git.his.de/"
     private final String baseRepositoryPath;
 
@@ -52,19 +53,23 @@ public class ProjectFromGitImporter {
      * @throws CoreException
      */
     public void importProject(String extensionToImport) throws CoreException {
-    	
-//        disableAutoBuild();
         
         // Compute full repository URL depending on configuration
         String fullRepositoryPath = getFullRepositoryPath(extensionToImport);
     	logger.debug("Extension " + extensionToImport + ": fullRepositoryPath = " + fullRepositoryPath);
     	if (fullRepositoryPath != null) {
-            IWorkspace workspace = ResourcesPlugin.getWorkspace();
+            IWorkspace workspace = WorkspaceFactory.getWorkspace();
             IPath workspacePath = workspace.getRoot().getLocation();
             IPath extensionPath = workspacePath.append(extensionToImport);
             File extensionFolder = extensionPath.toFile();
             String branch = PreferenceWrapper.getBuildServerView();
 
+            boolean standalone = false;
+            if(!net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
+                GitUtil.setupStandaloneSsh();
+                standalone = true;
+            }
+            
             try {
                 try {
                     CloneCommand clone = Git.cloneRepository();
@@ -76,13 +81,17 @@ public class ProjectFromGitImporter {
                 } catch (GitAPIException e) {
             		logger.error2(e.getMessage(), e);
                 }
+                
+                if(standalone){
+                    // skip eclipse specific code
+                    return;
+                }
 
                 IProject extensionProject = workspace.getRoot().getProject(extensionToImport);
                 IProjectDescription description = extensionProject.getWorkspace().newProjectDescription(extensionProject.getName());
 
                 extensionProject.create(description, null);
 
-                
                 if (openProjectOnCreation) {
                     extensionProject.open(null);
                 }
@@ -93,7 +102,6 @@ public class ProjectFromGitImporter {
                 if (extensionFolder.exists()) {
                     extensionFolder.delete();
                 }
-//                enableAutoBuild();
             }
     	}
     }
@@ -118,20 +126,5 @@ public class ProjectFromGitImporter {
 		}
 		// Create new URL according to https://hiszilla.his.de/hiszilla/show_bug.cgi?id=194146
 		return baseRepositoryPath + "h1/" + segment1 + "/" + segment2 + "/" + extensionToImport;
-    }
-    
-    private void enableAutoBuild() throws CoreException {
-        setWorkspaceAutoBuild(true);
-    }
-
-    private void disableAutoBuild() throws CoreException {
-        setWorkspaceAutoBuild(false);
-    }
-
-    private void setWorkspaceAutoBuild(boolean flag) throws CoreException {
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        final IWorkspaceDescription description = workspace.getDescription();
-        description.setAutoBuilding(flag);
-        workspace.setDescription(description);
     }
 }

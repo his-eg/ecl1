@@ -2,13 +2,16 @@ package net.sf.ecl1.utilities.general;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.TreeSet;
 
-import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
-
 import org.apache.commons.io.IOUtils;
+
+import net.sf.ecl1.utilities.Activator;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
+import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
 /**
  * Read remote projects from a jenkins view.
@@ -18,7 +21,7 @@ import org.apache.commons.io.IOUtils;
  */
 public class RemoteProjectSearchSupport {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, RemoteProjectSearchSupport.class.getSimpleName());
+    private static final ICommonLogger logger = LoggerFactory.getLogger(RemoteProjectSearchSupport.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
     private class BuildJob {
         private String name;
@@ -54,7 +57,7 @@ public class RemoteProjectSearchSupport {
         TreeSet<String> result = new TreeSet<String>();
         String buildServer = PreferenceWrapper.getBuildServer(); // z.B. "http://build.his.de/build/"
         String buildServerView = PreferenceWrapper.getBuildServerView(); // branch
-        if (buildServerView == GitUtil.UNKNOWN_BRANCH) {
+        if (buildServerView.equals(GitUtil.UNKNOWN_BRANCH)) {
         	//Since we are locally on an unknown branch, we can abort here before contacting the remote
         	return result;
         }
@@ -97,7 +100,7 @@ public class RemoteProjectSearchSupport {
     	}
     	String fileContent = null;
     	try {
-    		fileContent = IOUtils.toString(inStream);
+    		fileContent = IOUtils.toString(inStream, StandardCharsets.UTF_8);
     	} catch (IOException e) {
     		logger.error2("IOException reading remote file: " + e.getMessage(), e);
     	}

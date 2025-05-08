@@ -1,2 +1,20 @@
 bin
 *~
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+
+# Ignore Visual Studio Code workspace-specific settings and configurations
+.vscode
+
+# Ignore Node.js dependencies
+node_modules
+
+# Ignore build output directory for VSCode extension
+out
+
+# Ignore ecl1 jars in VSCode extension
+vscodeExtension/ecl1/jars/*

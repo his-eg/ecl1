@@ -14,6 +14,8 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
 import net.sf.ecl1.utilities.Activator;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 /**
  * simple util for calling rest services
@@ -23,7 +25,7 @@ import net.sf.ecl1.utilities.Activator;
  */
 public class RestUtil {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, RestUtil.class.getSimpleName());
+    private static final ICommonLogger logger = LoggerFactory.getLogger(RestUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
     /**
      * Create a JSON input stream for the given target URL.

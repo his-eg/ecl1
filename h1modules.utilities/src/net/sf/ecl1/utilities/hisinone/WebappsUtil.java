@@ -7,15 +7,16 @@ import java.util.List;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 public class WebappsUtil {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, WebappsUtil.class.getSimpleName());
+    private static final ICommonLogger logger = LoggerFactory.getLogger(WebappsUtil.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
     /**
      * Find the webapps project in the workspace.
@@ -25,13 +26,15 @@ public class WebappsUtil {
      * @return the project serving as core webapps
      */
     public static IProject findWebappsProject() {
-        List<IProject> projects = Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects(IWorkspaceRoot.INCLUDE_HIDDEN));
+        List<IProject> projects;
+        projects = Arrays.asList(WorkspaceFactory.getWorkspace().getRoot().getProjects(IWorkspaceRoot.INCLUDE_HIDDEN));
+
         IProject webapps = null;
         List<IProject> webappsCandidates = new ArrayList<>();
     	List<String> candidateNames = new ArrayList<>();
         for (IProject project : projects) {
         	// the extension folder distinguishes hisinone and qis projects
-            IFolder extensionsFolder = project.getFolder(HisConstants.EXTENSIONS_FOLDER);           
+            IFolder extensionsFolder = project.getFolder(HisConstants.EXTENSIONS_FOLDER);
             if (extensionsFolder != null && extensionsFolder.exists()) {
             	// We found a hisinone project.
             	webappsCandidates.add(project);

@@ -1,22 +1,24 @@
 package net.sf.ecl1.utilities.preferences;
 
-import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.general.GitUtil;
-import net.sf.ecl1.utilities.general.NetUtil;
-
 import java.util.Collection;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.jface.preference.PreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
-import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+
+import net.sf.ecl1.utilities.Activator;
+import net.sf.ecl1.utilities.general.GitUtil;
+import net.sf.ecl1.utilities.general.NetUtil;
 
 /**
  * HISinOne-Extension-Tools preferences page
@@ -35,23 +37,28 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
         setPreferenceStore(Activator.getPreferences());
         setDescription("Preferences for HISinOne-Extension-Tools");
     }
+
+    public HISinOneExtensionsPreferencePage(PreferenceStore store) {
+        super(GRID);
+        setPreferenceStore(store);
+        setTitle("HISinOne-Extensions Preferences");
+        setDescription("Preferences for HISinOne-Extension-Tools");
+    }
     
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-    	
-    	//Enable/disable manual setting of branch
-    	if(event.getSource().equals(automaticBranchDetection)) {
-    		boolean newValue = ((Boolean) event.getNewValue()).booleanValue();
-    		buildServerView.setEnabled(!newValue, getFieldEditorParent());
-    		
-    		//Update branch immediately if automatic detection is set to true by user
-    		if(newValue) {
-    			getPreferenceStore().setValue(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, GitUtil.getCheckedOutBranchOfWebapps());
-    			buildServerView.load();
-    		}
-    	}
-    	
-    	super.propertyChange(event);
+        //Enable/disable manual setting of branch
+        if(event.getSource().equals(automaticBranchDetection)) {
+            boolean newValue = ((Boolean) event.getNewValue()).booleanValue();
+            buildServerView.setEnabled(!newValue, getFieldEditorParent());
+            
+            //Update branch immediately if automatic detection is set to true by user
+            if(newValue) {
+                getPreferenceStore().setValue(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, GitUtil.getCheckedOutBranchOfWebapps());
+                buildServerView.load();
+            }
+        }
+        super.propertyChange(event);
     }
 
     /**
@@ -76,12 +83,19 @@ public class HISinOneExtensionsPreferencePage extends FieldEditorPreferencePage 
         addField(templateRootUrls);
         addField(displaySummaryOfGitPull);
         // Loglevel Combobox
-		final String[][] logLevels = new String[4][2];
-		logLevels[0][0] = logLevels[0][1] = "DEBUG";
-		logLevels[1][0] = logLevels[1][1] = "INFO";
-		logLevels[2][0] = logLevels[2][1] = "WARN";
-		logLevels[3][0] = logLevels[3][1] = "ERROR";
-		addField(new ComboFieldEditor(PreferenceWrapper.LOG_LEVEL_PREFERENCE_KEY, "Log-Level", logLevels, getFieldEditorParent()));
+        final String[][] logLevels = new String[4][2];
+        logLevels[0][0] = logLevels[0][1] = "DEBUG";
+        logLevels[1][0] = logLevels[1][1] = "INFO";
+        logLevels[2][0] = logLevels[2][1] = "WARN";
+        logLevels[3][0] = logLevels[3][1] = "ERROR";
+        addField(new ComboFieldEditor(PreferenceWrapper.LOG_LEVEL_PREFERENCE_KEY, "Log-Level", logLevels, getFieldEditorParent()));
+
+        String storePath = PreferenceWrapper.getEclipseStorePath();
+
+        Label storePathLabel = new Label(getFieldEditorParent(), SWT.NONE);
+        storePathLabel.setText("Store Path: ");
+        Label storePathText = new Label(getFieldEditorParent(), SWT.NONE);
+        storePathText.setText(storePath);
     }
 
     /* (non-Javadoc)

@@ -15,15 +15,17 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
-import net.sf.ecl1.classpath.container.ExtensionClasspathContainerPage;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+
 import net.sf.ecl1.utilities.general.RemoteProjectSearchSupport;
+import net.sf.ecl1.utilities.hisinone.HisConstants;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 
 public class ClasspathFile {
 
-	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ClasspathFile.class.getSimpleName());
-	
-	public static final String ECL1_CLASSPATH_CONTAINER = ExtensionClasspathContainerPage.NET_SF_ECL1_ECL1_CONTAINER_ID + "/";
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ClasspathFile.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
+
+	public static final String ECL1_CLASSPATH_CONTAINER = HisConstants.NET_SF_ECL1_ECL1_CONTAINER_ID + "/";
 	public static final String JENKINS_WEBAPPS_NAME = "/webapps";
 	
 	private Collection<String> regularDependencies = new ArrayList<>();

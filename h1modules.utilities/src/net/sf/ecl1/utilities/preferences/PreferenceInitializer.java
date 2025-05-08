@@ -1,11 +1,10 @@
 package net.sf.ecl1.utilities.preferences;
 
-import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
-import net.sf.ecl1.utilities.general.GitUtil;
-
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
+
+import net.sf.ecl1.utilities.Activator;
+import net.sf.ecl1.utilities.general.GitUtil;
 
 /**
  * Class used to initialize default preference values.
@@ -22,6 +21,14 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     @Override
     public void initializeDefaultPreferences() {
         IPreferenceStore store = Activator.getPreferences();
+        setDefaults(store);
+    }
+
+    public void initializeDefaultPreferencesStandalone(IPreferenceStore store){
+        setDefaults(store);
+    }
+
+    private void setDefaults(IPreferenceStore store){
         store.setDefault(PreferenceWrapper.BUILD_SERVER_PREFERENCE_KEY, "http://build.his.de/build/");
         store.setDefault(PreferenceWrapper.BUILD_SERVER_VIEW_PREFERENCE_KEY, GitUtil.getCheckedOutBranchOfWebapps());
         store.setDefault(PreferenceWrapper.TEMPLATE_ROOT_URLS_PREFERENCE_KEY, "http://devtools.his.de/ecl1/templates,http://ecl1.sourceforge.net/templates");

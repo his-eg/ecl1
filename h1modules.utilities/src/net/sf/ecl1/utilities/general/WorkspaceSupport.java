@@ -15,11 +15,11 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
 import net.sf.ecl1.utilities.hisinone.HisConstants;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
  * @author keunecke
@@ -34,7 +34,7 @@ public class WorkspaceSupport {
      */
     public List<String> getPossibleProjectsToReference() {
         List<String> result = new ArrayList<String>();
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        IWorkspace workspace = WorkspaceFactory.getWorkspace();
         IWorkspaceRoot root = workspace.getRoot();
         IProject[] projects = root.getProjects();
         for (IProject iProject : projects) {

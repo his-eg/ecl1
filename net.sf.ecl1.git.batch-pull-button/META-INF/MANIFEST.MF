@@ -13,7 +13,9 @@ Require-Bundle: org.eclipse.core.commands,
  net.sf.ecl1.utilities
 Import-Package: org.eclipse.core.runtime,
  org.eclipse.jface.dialogs,
+ org.eclipse.jface.window,
  org.eclipse.swt,
  org.eclipse.swt.events,
+ org.eclipse.swt.graphics,
  org.eclipse.swt.layout,
  org.eclipse.swt.widgets

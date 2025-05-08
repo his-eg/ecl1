@@ -13,11 +13,12 @@ import java.util.regex.Pattern;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 
-import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.general.RemoteProjectSearchSupport;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
  * The data model of the Extension Import Wizard.
@@ -25,7 +26,7 @@ import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
  */
 public class ExtensionImportWizardModel {
     
-	private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, ExtensionImportWizardModel.class.getSimpleName());
+    private static final ICommonLogger logger = LoggerFactory.getLogger(ExtensionImportWizardModel.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
 
 	public static final String JENKINS_WEBAPPS_NAME = "/webapps";
 	
@@ -148,7 +149,7 @@ public class ExtensionImportWizardModel {
      */
     private void initExtensionsInWorkspace() {
     	extensionsInWorkspace = new TreeSet<String>();
-        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        IWorkspace workspace = WorkspaceFactory.getWorkspace();
         IWorkspaceRoot root = workspace.getRoot();
         IProject[] projects = root.getProjects();
         for (IProject iProject : projects) {

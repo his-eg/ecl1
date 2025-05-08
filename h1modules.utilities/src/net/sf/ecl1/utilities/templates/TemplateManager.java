@@ -1,18 +1,16 @@
 package net.sf.ecl1.utilities.templates;
 
 import net.sf.ecl1.utilities.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ICommonLogger;
+import net.sf.ecl1.utilities.logging.LoggerFactory;
 import net.sf.ecl1.utilities.preferences.PreferenceWrapper;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -32,8 +30,8 @@ import com.google.common.collect.Maps;
  */
 public class TemplateManager {
 
-    private static final ConsoleLogger logger = new ConsoleLogger(Activator.getDefault().getLog(), Activator.PLUGIN_ID, TemplateManager.class.getSimpleName());
-
+    private static final ICommonLogger logger = LoggerFactory.getLogger(TemplateManager.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
+	
     private static final Map<String, String> nameReplacements = Maps.newHashMap();
     static {
         nameReplacements.put("settings", ".settings");

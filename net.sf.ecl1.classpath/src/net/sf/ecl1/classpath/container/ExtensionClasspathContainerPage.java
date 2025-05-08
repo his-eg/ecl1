@@ -23,17 +23,13 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 
 import net.sf.ecl1.utilities.hisinone.ExtensionUtil;
+import net.sf.ecl1.utilities.hisinone.HisConstants;
 
 /**
  * The ecl1 classpath container edit page.
  * @author keunecke
  */
 public class ExtensionClasspathContainerPage extends WizardPage implements IClasspathContainerPage {
-
-    /**
-     * ClasspathContainer ID
-     */
-    public static final String NET_SF_ECL1_ECL1_CONTAINER_ID = "net.sf.ecl1.ECL1_CONTAINER";
 
     private static final String ECL1_CLASSPATH_CONTAINER = "ecl1 Classpath Container";
 
@@ -50,7 +46,7 @@ public class ExtensionClasspathContainerPage extends WizardPage implements IClas
         super(ECL1_CLASSPATH_CONTAINER, ECL1_CLASSPATH_CONTAINER , null);
         setDescription(ECL1_CLASSPATH_CONTAINER);
         setPageComplete(true);
-        this.selection = new Path(NET_SF_ECL1_ECL1_CONTAINER_ID);
+        this.selection = new Path(HisConstants.NET_SF_ECL1_ECL1_CONTAINER_ID);
     }
 
     @Override
@@ -99,7 +95,7 @@ public class ExtensionClasspathContainerPage extends WizardPage implements IClas
 
     @Override
     public IClasspathEntry getSelection() {
-        IPath path = new Path(NET_SF_ECL1_ECL1_CONTAINER_ID);
+        IPath path = new Path(HisConstants.NET_SF_ECL1_ECL1_CONTAINER_ID);
         Collection<String> extensionsSelected = getSelectedExtensions();
         if (!extensionsSelected.isEmpty()) {
             path = path.append(Joiner.on(",").join(extensionsSelected));

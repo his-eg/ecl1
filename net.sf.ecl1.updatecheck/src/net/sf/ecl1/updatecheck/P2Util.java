@@ -22,7 +22,7 @@ import org.eclipse.equinox.p2.query.QueryUtil;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
-import net.sf.ecl1.utilities.general.ConsoleLogger;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 /**
  * Provisioning platform util.

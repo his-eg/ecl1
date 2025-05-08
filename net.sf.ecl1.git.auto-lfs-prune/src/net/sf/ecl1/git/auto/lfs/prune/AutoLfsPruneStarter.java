@@ -3,6 +3,8 @@ package net.sf.ecl1.git.auto.lfs.prune;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.ui.IStartup;
 
 public class AutoLfsPruneStarter implements IStartup {
@@ -12,14 +14,23 @@ public class AutoLfsPruneStarter implements IStartup {
 	@Override
 	public void earlyStartup() {	
 		
-		AutoLfsPruneJob pruneJob = AutoLfsPruneActivator.getDefault().getPruneJob();
+		AutoLfsPruneJob pruneJob;
+		if(net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
+			pruneJob = AutoLfsPruneActivator.getDefault().getPruneJob();
+		}else{
+			pruneJob = new AutoLfsPruneJob();
+		}
 		
 		// Schedules a new auto lfs prune job for immediate execution when run
 		Runnable autoLfsPruneJobScheduler = new Runnable() {
 			
 			@Override
 			public void run() {
-				pruneJob.schedule();
+				if(net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
+					pruneJob.schedule();
+				}else{
+					pruneJob.run(new NullProgressMonitor());
+				}
 			}
 		};
 		

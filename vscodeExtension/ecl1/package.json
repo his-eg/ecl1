@@ -1,0 +1,143 @@
+{
+  "publisher": "HISeG",
+  "name": "ecl1",
+  "displayName": "ecl1",
+  "description": "Extension to use ecl1 plugins in Visual Studio Code.",
+  "version": "0.0.2",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/his-eg/ecl1"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "vscode": "^1.97.2"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+  "icon": "ecl1_icon.png",
+  "contributes": {
+    "views": {
+      "ecl1Sidebar": [
+        {
+          "id": "ecl1CommandsTreeView",
+          "name": "Commands",
+          "when": "ecl1ExtensionActivated"
+        },
+        {
+          "id": "ecl1SettingsTreeView",
+          "name": "Settings",
+          "when": "ecl1ExtensionActivated"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ecl1Sidebar",
+          "title": "Ecl1",
+          "icon": "ecl1_sidebar_icon.svg"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "ecl1CommandsTreeView.refresh",
+        "title": "Refresh",
+        "icon": "$(extensions-refresh)"
+      },
+      {
+        "command": "ecl1SettingsTreeView.refresh",
+        "title": "Refresh",
+        "icon": "$(extensions-refresh)"
+      },
+      {
+        "command": "ecl1.runJar.import-wizard",
+        "title": "Ecl1: Import Wizard"
+      },
+      {
+        "command": "ecl1.runJar.commit-exporter",
+        "title": "Ecl1: Commit Exporter"
+      },
+      {
+        "command": "ecl1.runJar.open-preferences",
+        "title": "Ecl1: Open Preferences"
+      },
+      {
+        "command": "ecl1.runJar.new-extension-wizard",
+        "title": "Ecl1: New Extension Wizard"
+      },
+      {
+        "command": "ecl1.runJar.git-batch-pull",
+        "title": "Ecl1: Git Batch Pull"
+      }
+    ],
+    "menus": {
+    "view/title": [
+        {
+            "command": "ecl1CommandsTreeView.refresh",
+            "when": "view == ecl1CommandsTreeView",
+            "group": "navigation"
+        },
+        {
+          "command": "ecl1SettingsTreeView.refresh",
+          "when": "view == ecl1SettingsTreeView",
+          "group": "navigation"
+      }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "ecl1CommandsTreeView",
+        "contents": "No HisInOne workspace detected."
+      }
+    ],
+    "configuration": {
+      "title": "Ecl1 Settings",
+      "properties": {
+        "ecl1.autostartHookUpdater": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable automatic start of ecl1 Hook Updater."
+        },
+        "ecl1.autostartLfsPrune": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable automatic start of ecl1 LFS Prune."
+        },
+        "ecl1.hideNonProjects": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable or disable exclusion of non projects in workspace root folder."
+        },
+        "ecl1.gitRepositoryScanMaxDepth": {
+          "type": "boolean",
+          "default": true,
+          "description": "Set git.RepositoryScanMaxDepth to 2 (requires window reload)."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test",
+    "postinstall": "cd ../../ && sh ./update_vsc_extension_jars.sh"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.97.2",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@typescript-eslint/eslint-plugin": "^8.25.0",
+    "@typescript-eslint/parser": "^8.25.0",
+    "eslint": "^9.21.0",
+    "typescript": "^5.7.3",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.4.1"
+  }
+}

@@ -25,10 +25,10 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Collections2;
 
 import net.sf.ecl1.classpath.Activator;
-import net.sf.ecl1.utilities.general.ConsoleLogger;
 import net.sf.ecl1.utilities.hisinone.ExtensionUtil;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
+import net.sf.ecl1.utilities.logging.ConsoleLogger;
 
 /**
  * Initializes the ecl1 classpath container with HISinOne-Extension projects

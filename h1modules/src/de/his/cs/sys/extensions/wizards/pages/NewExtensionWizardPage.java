@@ -1,9 +1,12 @@
 package de.his.cs.sys.extensions.wizards.pages;
 
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -12,8 +15,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.List;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
-import org.eclipse.ui.internal.ide.IDEWorkbenchMessages;
 
 import de.his.cs.sys.extensions.wizards.pages.packages.HISinOneStrategy;
 import de.his.cs.sys.extensions.wizards.pages.packages.PackageStructureStrategy;
@@ -21,6 +22,7 @@ import net.sf.ecl1.utilities.general.InitialProjectConfigurationChoices;
 import net.sf.ecl1.utilities.general.WorkspaceSupport;
 import net.sf.ecl1.utilities.hisinone.HisConstants;
 import net.sf.ecl1.utilities.hisinone.WebappsUtil;
+import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 
 /**
  * Extended New Project Wizard Page asking for additional information on extensions
@@ -28,13 +30,13 @@ import net.sf.ecl1.utilities.hisinone.WebappsUtil;
  * @company HIS eG
  * @author keunecke
  */
-public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
+public class NewExtensionWizardPage extends WizardPage {
 
 	private List projectList;
-	
 	private Text versionInputTextField;
+	private Text projectNameText;
+	private final PackageStructureStrategy strategy = new HISinOneStrategy();
 	
-	private PackageStructureStrategy strategy = new HISinOneStrategy();
 	
 	/**
 	 * @param pageName
@@ -45,21 +47,27 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 
 	@Override
 	public void createControl(Composite parent) {
-		super.createControl(parent);
-		Composite control = (Composite) getControl();
-		
-		Composite composite = new Composite(control, SWT.LEFT);
+		Composite composite = new Composite(parent, SWT.LEFT);
 		//Every component with this griddata grabs excess vertical and horizontal space
 		GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true); 
 		GridLayout gl = new GridLayout(2, false);
 		composite.setLayout(gl);
 		composite.setLayoutData(gridData);
+
+		// Project name 
+		Label pojectNameLabel = new Label(composite, SWT.NONE);
+		pojectNameLabel.setText("Project name:");
+		projectNameText = new Text(composite, SWT.BORDER);
+		projectNameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+		// Version
 		Label versionInputLabel = new Label(composite, SWT.LEFT);
 		versionInputLabel.setText("Initial Extension Version");
 		versionInputTextField = new Text(composite, SWT.LEFT );
 		versionInputTextField.setText("0.0.1");
 		versionInputTextField.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false)); //Grab excess horizontal space
 		
+		// Projects
 		Label projectChoiceLabel = new Label(composite, SWT.TOP);
 		projectChoiceLabel.setText("Referenced Projects");
 		projectList = new List(composite, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
@@ -73,6 +81,20 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 			}
 		}
 		projectList.select(index);
+
+		// Project name listener
+		projectNameText.addModifyListener(event -> {
+			if(projectNameText.getText().contains("_")) {
+				setMessage("HISInOne Extension must not contain the character \"_\" in its name.", WizardPage.ERROR);
+				setPageComplete(false);
+			}else if(references.contains(projectNameText.getText())){
+				setMessage("A project with that name already exists in the workspace.", WizardPage.ERROR);
+				setPageComplete(false);
+			}else{
+				setMessage(null);
+				setPageComplete(true);
+			}
+		});
 		
 		Label warnAboutOldTemplatesLabel = new Label(composite, SWT.TOP);
 		warnAboutOldTemplatesLabel.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true , false , 2, 1)); //Spans over two columns
@@ -84,10 +106,18 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 					+ "Falling back to templates from ecl1 that are likely outdated.");
 		}
 
- 
-
+		setControl(composite);
 	}
 	
+	/**
+	 * Get project location as URI
+	 * 
+	 * @return location - URI
+	 */
+	public URI getLocationURI(){
+		return WorkspaceFactory.getWorkspace().getRoot().getLocationURI();
+	}
+
 	/**
 	 * Get the initial version of the new extension
 	 * 
@@ -101,11 +131,9 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 	 * @return collection of project names to reference by the new extension project
 	 */
 	private Collection<String> getProjectsToReference() {
-		Collection<String> result = new ArrayList<String>();
+		Collection<String> result = new ArrayList<>();
 		String[] selection = projectList.getSelection();
-		for (String project : selection) {
-			result.add(project);
-		}
+        result.addAll(Arrays.asList(selection));
 		return result;
 	}
 	
@@ -120,24 +148,6 @@ public class NewExtensionWizardPage extends WizardNewProjectCreationPage {
 	 * @return get the initial choices done by the user
 	 */
 	public InitialProjectConfigurationChoices getInitialConfiguration() {
-		return new InitialProjectConfigurationChoices(getProjectsToReference(), getProjectName(), getInitialVersion());
-	}
-	
-	@Override
-	protected boolean validatePage() {
-		if (super.validatePage() == false ) {
-			return false;
-		}
-		
-		String projectName = getProjectName();
-		if(projectName.contains("_")) {
-			setErrorMessage(null);
-			setMessage("HISInOne Extension must not contain the character \"_\" in its name.");
-			return false;
-		}
-
-		setErrorMessage(null);
-		setMessage(null);
-		return true;
+		return new InitialProjectConfigurationChoices(getProjectsToReference(), projectNameText.getText(), getInitialVersion());
 	}
 }
