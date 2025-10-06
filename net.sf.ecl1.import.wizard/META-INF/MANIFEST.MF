@@ -13,3 +13,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .
 Bundle-Activator: net.sf.ecl1.importwizard.Activator
 Bundle-ActivationPolicy: lazy
+Import-Package: com.google.gson;version="[2.13.0,3.0.0)"
