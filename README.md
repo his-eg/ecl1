@@ -1,0 +1,1 @@
+The release.sh-file helps you to create a new release. 

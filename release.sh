@@ -1,49 +1,41 @@
+#!/bin/bash
+
 ###############################################################################
-#									      
-# Release script for ecl1
-#
-# Prerequisites: 
-# - Prebuilt Update Site
-# - build.ant-private.properties
-# - README.md up to date
-# - No uncommitted changes
-#
-# Parameters: 1. Version identificator (required)                          
-#									      
-###############################################################################
-VERSION=$1
+# Parameters:
+# 1. Yubikey Pin (mandatory)
 ###############################################################################
 
-# Update site
-# Sign update site artifacts
-cd h1updatesite
-ant sign
-git commit -am "Signed update site artifacts for version ${VERSION}"
-cd ..
+# Parse command line arguments
+if [ $# -lt 1 ]; then
+    echo "PIN for Yubikey missing. Exiting script. Usage:"
+    echo "$0 <YUBIKEY_PIN>"
+    exit 1
+fi
 
-# Website
-# Update version number
-cd net.sf.ecl1.website
-cat index.html.template | sed "s|ECL1VERSION|$VERSION|" > index.html.tmp
-mv index.html.tmp index.html
-cd ..
+YUBIKEY_PIN=$1
 
-# Tag version
-git tag -a v$VERSION -m "Release tag for version ${VERSION}"
+# Increase version number
+source ./increase_version_number.sh
 
-# Website
-# Upload website
-cd net.sf.ecl1.website
-./update.sh
-cd ..
+# Delete old jars and create new jars
+./create_new_jars.sh
 
-# push tags to sf.net
-git push --tags
-git push
+# Sign new jars
+./sign_jars.sh $YUBIKEY_PIN
 
-# upload update site and update site archive
-cd h1updatesite
-ant upload
-# Remove update site archive
-rm updatesite*.zip
-cd ..
+# Create zip file
+./create_zip_file.sh
+
+# Create git commit and git tag
+./git_commit.sh $NEW_VERSION
+
+# Inform the user what manual steps still need to be done:
+echo "############################"
+echo "Script completed. The following manual steps are needed:"
+echo "1. Please manually add an entry for the new version in the following file: ./h1updatesite/README.md"
+echo "2. Push your changes: "
+echo "2.1 git push #push commits"
+echo "2.2 git push --tags #push new tag"
+echo "3. Update the update sites"
+echo "3.1 https://devtools.his.de/ecl1/"
+echo "3.2 https://sourceforge.net/projects/ecl1/files/"
