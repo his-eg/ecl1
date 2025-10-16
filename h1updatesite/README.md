@@ -3,6 +3,11 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.9.3.2025-10-16##
+* Refactored all plugins to enable the creation of a standalone version of ecl1 and a vscode version of ecl1. Eclipse user should not be affected be the refactoring. 
+* Bugfix: Ecl1 Extension Importer can import extensions from branches from build.his.de that use pipeline jobs
+
+
 ##Version 1.9.2.2023-11-07##
 * Bugfix: Batch Git Pull Button is again able to pull other branches than "master"
 
