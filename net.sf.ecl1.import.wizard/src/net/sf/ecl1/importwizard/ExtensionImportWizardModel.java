@@ -247,6 +247,13 @@ public class ExtensionImportWizardModel {
      */
     private Collection<String> getDirectDependencies(String extension) {
 		Collection<String> directDependencies = new ArrayList<>();
+
+		// Webapps depends on api-extensions that are referenced in the ecl1 classpath container.
+		// When importing extensions, we don't want to import the api-extensions as projects and thus we skip webapps
+		if ("webapps".equals(extension)) {
+			return directDependencies;
+		}
+
 		if(extensionsJSON != null) {
 			JsonArray upstreamDependenciesAsJsonArray = extensionsJSON.get(extension).getAsJsonObject().get("vorgelagerteExtensions").getAsJsonArray();
 
