@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Extension Import Wizard
 Bundle-SymbolicName: net.sf.ecl1.import.wizard;singleton:=true
-Bundle-Version: 1.9.4.2025-10-17
+Bundle-Version: 1.9.5.2025-12-02
 Bundle-Vendor: HIS eG
 Require-Bundle: org.eclipse.ui,
  net.sf.ecl1.utilities,

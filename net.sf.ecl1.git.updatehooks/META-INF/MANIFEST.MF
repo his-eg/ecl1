@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ecl1 Update Git Hooks
 Bundle-SymbolicName: net.sf.ecl1.git.updatehooks;singleton:=true
-Bundle-Version: 1.9.4.2025-10-17
+Bundle-Version: 1.9.5.2025-12-02
 Bundle-Activator: net.sf.ecl1.git.updatehooks.UpdateHooksActivator
 Bundle-Vendor: HIS eG
 Require-Bundle: org.eclipse.ui,
