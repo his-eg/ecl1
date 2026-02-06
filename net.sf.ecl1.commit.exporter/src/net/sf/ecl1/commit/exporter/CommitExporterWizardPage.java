@@ -16,6 +16,8 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
@@ -171,22 +173,28 @@ public class CommitExporterWizardPage extends WizardPage {
     	IProject webappsProject = WebappsUtil.findWebappsProject();
         if (webappsProject == null) {
             setErrorMessage("Could not find webapps project in workspace! Commit Exporter will not work! Please add (exactly) one webapps project to your workspace.");
-        } else {
-            String webappsPath = webappsProject.getLocation().toString() + File.separator + ".git";
-            File gitFolder = new File(webappsPath);
-            if (gitFolder.isFile()) {
-            	setErrorMessage("This project is managed by git, but you are currently in a linked work tree. Commit Exporter will not work in a linked work tree.");
-            	return;
-            }
-            try {
-				git = Git.open(new File(webappsPath));
-                logger.info("Found git-repo at: " + git.getRepository().getDirectory().toString());
-			} catch (IOException e) {
-				setErrorMessage("Found a webapps project, but no git repository. Commit Exporter will not work! Please make sure this version of webapps has a git repository.");
-			}
+            return;
         }
+        String webappsPath = webappsProject.getLocation().toString() + File.separator + ".git";
+        File gitFolder = new File(webappsPath);
+        if (gitFolder.isFile()) {
+        	logger.info("Trying to read git repository as worktree");
+        }else {
+        	logger.info("Trying to read git repository");
+        }
+		try {
+			Repository repository = new FileRepositoryBuilder()
+					.setWorkTree(gitFolder)
+					.readEnvironment()
+					.findGitDir(gitFolder)
+					.build();
+			git = new Git(repository);
+			logger.info("Found git-repo at: " + git.getRepository().getDirectory().toString());
+		} catch (IOException e) {
+			setErrorMessage("Found a webapps project, but no git repository. Commit Exporter will not work! Please make sure this version of webapps has a git repository.");
+		}
     }
-
+    
     void createHotfix() {
         if (validUserInput()) {
 
