@@ -1,5 +1,6 @@
 package net.sf.ecl1.git.updatehooks;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -17,6 +18,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.FS_POSIX;
 import org.eclipse.jgit.util.FS_Win32;
@@ -33,7 +37,7 @@ public class UpdateHooks implements IStartup {
     
     private static final ICommonLogger logger = LoggerFactory.getLogger(UpdateHooks.class.getSimpleName(), UpdateHooksActivator.PLUGIN_ID, UpdateHooksActivator.getDefault());
     
-    private static final String HOOKS_DIR_ECLIPSE_PROJECTS = ".git/hooks/commit-msg";
+    private static final String HOOKS_DIR_ECLIPSE_PROJECTS = "hooks/commit-msg";
     private static final String HOOKS_DIR_ECL1 = "/githooks/commit-msg";
     
     private final FS fs = FS.detect();
@@ -95,24 +99,24 @@ public class UpdateHooks implements IStartup {
 		monitor.beginTask("Updating git hooks", totalAmountOfWork);
 		
 		
+		
+
+
 		/* -----------------------------------
 		 * Update git hook of webapps project
 		 * -----------------------------------
 		 */
 		if(webapps != null) {
 			monitor.subTask("webapps");
-			if(webapps.getLocation().append(".git").toFile().isFile()) {
-				logger.info("Current project is managed by git, but you are currently in a linked work tree. Updating the git hooks will not work in a linked work tree. Skipping...");
-			} else {
-				try {
-					
-					Path hooksDirWebapps = Paths.get(webapps.getFolder(HOOKS_DIR_ECLIPSE_PROJECTS).getLocationURI());
-					copyHookToDestination(getCommitMsgHook(), hooksDirWebapps);
-
-					logger.info("Successfully updated the git hooks of the webapps project.");
-				} catch (IOException e) {
-					logger.error2("Failed to update the git hooks of the webapps project. Exception: " + e.getMessage(), e);
-				}
+			
+			Path webappsGitPath = getGitDirectoryPath(webapps);
+			Path hooksDirWebapps = webappsGitPath.resolve(HOOKS_DIR_ECLIPSE_PROJECTS);
+			try {
+				copyHookToDestination(getCommitMsgHook(), hooksDirWebapps);
+				
+				logger.info("Successfully updated the git hooks of the webapps project.");
+			} catch (IOException e) {
+				logger.error2("Failed to update the git hooks of the webapps project. Exception: " + e.getMessage(), e);
 			}
 			monitor.worked(1);
 		} else {
@@ -132,22 +136,52 @@ public class UpdateHooks implements IStartup {
 			
 			IProject extensionProject = root.getProject(e.getValue());
 			
+			Path extensionProjectGitPath = getGitDirectoryPath(extensionProject);
+			Path hooksDirExtensionProject = extensionProjectGitPath.resolve(HOOKS_DIR_ECLIPSE_PROJECTS);
 			try {
-				Path hooksDirExtension = Paths.get(extensionProject.getFolder(HOOKS_DIR_ECLIPSE_PROJECTS).getLocationURI());
-				copyHookToDestination(getCommitMsgHook(), hooksDirExtension);
+				copyHookToDestination(getCommitMsgHook(), hooksDirExtensionProject);
 	
 				logger.info("Successfully updated the git hooks of the following extensions project: " + extensionProject.getName());
 			} catch (IOException e1) {
 				logger.error2("Failed to update the git hooks of the folloing extensions project: " + extensionProject.getName() + 
 						"\nException: " + e1.getMessage(), e1);
 			}
-
 			monitor.worked(1);
 		}
 		
 		
 		return Status.OK_STATUS;
 	}
+	
+	/**
+	 * Returns the path to the repository's Git directory.
+	 * For standard repositories, this is the project's <code>.git</code> directory.
+	 * For worktrees, this method returns the shared (common) Git directory
+	 * of the main repository.
+	 *
+	 * @param project the project whose Git directory should be resolved
+	 * @return the path to the effective Git directory
+	 */
+	private Path getGitDirectoryPath(IProject project) {
+		if(project.getLocation().append(".git").toFile().isFile()) {
+			logger.info("Trying to read git base repository from worktree");
+		} else {
+			logger.info("Trying to read git repository");
+		}
+		File projectRoot = project.getLocation().toFile();
+	    try {
+	    	Repository repository = new FileRepositoryBuilder()
+	            .setWorkTree(projectRoot)
+	            .readEnvironment()
+	            .findGitDir(projectRoot)
+	            .build();
+	        return repository.getCommonDirectory().toPath();
+	    } catch (IOException e) {
+	        logger.error("Failed to resolve Git directory for project " + project.getName()+"\nException: " + e.getMessage(), e);
+	        return null;
+	    }
+	}
+
 
 	
     private InputStream getCommitMsgHook() {
