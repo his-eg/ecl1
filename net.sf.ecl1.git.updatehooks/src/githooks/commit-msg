@@ -1,17 +1,39 @@
 #!/bin/sh
 #The Line endings must be LF. Otherwise sh won't interpret this script (this holds true both for Linux _and_ Windows). Please take care when editing this script on a Windows machine, that you don't accidentally change the line endings to CRLF...
 
-test "" = "$(grep -E '#[[:digit:]]{6}' "$1")" && {
-   echo "Every commit message must include a Hiszilla ticket No." >&2 
-   echo "Expected format: #123456" >&2 
-   exit 1
+
+# Determine commit message file
+if [ -n "$1" ] && [ -f "$1" ]; then
+    MSG_FILE="$1"
+else
+    # Worktree-safe fallback
+    MSG_FILE=$(git rev-parse --git-path COMMIT_EDITMSG)
+fi
+
+
+# Fail if commit message file cannot be found
+if [ ! -f "$MSG_FILE" ]; then
+    echo "ERROR: Commit message file not found: $MSG_FILE" >&2
+    exit 1
+fi
+
+
+# First line of commit message
+FIRST_LINE=$(head -n 1 "$MSG_FILE")
+
+
+# Check ticket number exists (#123456)
+test "" = "$(echo "$FIRST_LINE" | grep -E '#[[:digit:]]{6}')" && {
+    echo "Every commit message must include a Hiszilla ticket No." >&2
+    echo "Expected format: #123456" >&2
+    exit 1
 }
 
-#If grep finds something it returns exit code 0.
-grep -Eq '#[[:digit:]]{6}[[:alnum:]_]' $1
-test $? -eq 0 && {
-   echo "Hiszilla ticket No. must not be followed by an alphanumeric character or an underscore [0-9A-Za-z_]" >&2 
-   exit 1
+
+# Fail if ticket number is followed immediately by alnum or underscore
+echo "$FIRST_LINE" | grep -E '#[0-9]{6}[A-Za-z0-9_]' && {
+    echo "Hiszilla ticket No. must not be immediately followed by an alphanumeric character or underscore [0-9A-Za-z_]" >&2
+    exit 1
 }
 
 exit 0
