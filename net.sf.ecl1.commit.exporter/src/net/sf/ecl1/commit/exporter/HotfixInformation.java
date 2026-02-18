@@ -23,7 +23,7 @@ public class HotfixInformation {
 
     private static final String PATCH_END = "</patch>";
 
-    private static final String INDENT = "    ";
+    private static final String INDENT = "\t";
 
     private static final String NEW_LINE = "\n";
 
