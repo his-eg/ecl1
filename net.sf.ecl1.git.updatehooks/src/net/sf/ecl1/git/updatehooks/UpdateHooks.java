@@ -97,9 +97,6 @@ public class UpdateHooks implements IStartup {
 		ExtensionUtil.getInstance().scanForExtensionProjects(extensions);
 		totalAmountOfWork += extensions.entrySet().size();
 		monitor.beginTask("Updating git hooks", totalAmountOfWork);
-		
-		
-		
 
 
 		/* -----------------------------------
@@ -107,22 +104,25 @@ public class UpdateHooks implements IStartup {
 		 * -----------------------------------
 		 */
 		if(webapps != null) {
-			monitor.subTask("webapps");
-			
 			Path webappsGitPath = getGitDirectoryPath(webapps);
-			Path hooksDirWebapps = webappsGitPath.resolve(HOOKS_DIR_ECLIPSE_PROJECTS);
-			try {
-				copyHookToDestination(getCommitMsgHook(), hooksDirWebapps);
-				
-				logger.info("Successfully updated the git hooks of the webapps project.");
-			} catch (IOException e) {
-				logger.error2("Failed to update the git hooks of the webapps project. Exception: " + e.getMessage(), e);
+			if(webappsGitPath != null) {
+				monitor.subTask("webapps");
+				Path hooksDirWebapps = webappsGitPath.resolve(HOOKS_DIR_ECLIPSE_PROJECTS);
+				try {
+					copyHookToDestination(getCommitMsgHook(), hooksDirWebapps);
+					
+					logger.info("Successfully updated the git hooks of the webapps project.");
+				} catch (IOException e) {
+					logger.error2("Failed to update the git hooks of the webapps project. Exception: " + e.getMessage(), e);
+				}
+				monitor.worked(1);
+			} else {
+				logger.warn("No git repository found for webapps project.");
 			}
-			monitor.worked(1);
 		} else {
 			logger.info("No webapps project found in your workspace.");
 		}
-		
+
 		
 		/* ------------------------------------------
 		 * Update git hook of all extension projects
@@ -137,18 +137,22 @@ public class UpdateHooks implements IStartup {
 			IProject extensionProject = root.getProject(e.getValue());
 			
 			Path extensionProjectGitPath = getGitDirectoryPath(extensionProject);
+
+			if(extensionProjectGitPath == null) {
+				logger.warn("No git repository found for extension project: " + extensionProject.getName());
+				continue;
+			}
 			Path hooksDirExtensionProject = extensionProjectGitPath.resolve(HOOKS_DIR_ECLIPSE_PROJECTS);
 			try {
 				copyHookToDestination(getCommitMsgHook(), hooksDirExtensionProject);
 	
-				logger.info("Successfully updated the git hooks of the following extensions project: " + extensionProject.getName());
+				logger.info("Successfully updated the git hooks of the following extension project: " + extensionProject.getName());
 			} catch (IOException e1) {
-				logger.error2("Failed to update the git hooks of the folloing extensions project: " + extensionProject.getName() + 
+				logger.error2("Failed to update the git hooks of the following extension project: " + extensionProject.getName() + 
 						"\nException: " + e1.getMessage(), e1);
 			}
 			monitor.worked(1);
 		}
-		
 		
 		return Status.OK_STATUS;
 	}
@@ -163,10 +167,14 @@ public class UpdateHooks implements IStartup {
 	 * @return the path to the effective Git directory
 	 */
 	private Path getGitDirectoryPath(IProject project) {
-		if(project.getLocation().append(".git").toFile().isFile()) {
-			logger.info("Trying to read git base repository from worktree");
+		File gitFile = project.getLocation().append(".git").toFile();
+		if(!gitFile.exists()) {
+			return null;
+		}
+		if(gitFile.isFile()) {
+			logger.info("Trying to read git base repository from worktree for project "+ project.getName());
 		} else {
-			logger.info("Trying to read git repository");
+			logger.info("Trying to read git repository for project "+ project.getName());
 		}
 		File projectRoot = project.getLocation().toFile();
 	    try {
@@ -177,13 +185,12 @@ public class UpdateHooks implements IStartup {
 	            .build();
 	        return repository.getCommonDirectory().toPath();
 	    } catch (IOException e) {
-	        logger.error("Failed to resolve Git directory for project " + project.getName()+"\nException: " + e.getMessage(), e);
+	        logger.error("Failed to resolve Git directory for project " + project.getName()+"\n" + e.getMessage());
 	        return null;
 	    }
 	}
 
 
-	
     private InputStream getCommitMsgHook() {
 		InputStream is;
 		if(!net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
