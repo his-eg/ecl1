@@ -7,10 +7,10 @@ Bundle-Vendor: HIS eG
 Require-Bundle: org.eclipse.ui,
  net.sf.ecl1.utilities,
  org.eclipse.jgit,
- com.google.guava;bundle-version="15.0.0",
- org.apache.commons.io;bundle-version="2.2.0"
+ com.google.guava;bundle-version="15.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .
 Bundle-Activator: net.sf.ecl1.importwizard.Activator
 Bundle-ActivationPolicy: lazy
-Import-Package: com.google.gson;version="[2.13.0,3.0.0)"
+Import-Package: org.apache.commons.io,
+ com.google.gson;version="[2.13.0,3.0.0)"
