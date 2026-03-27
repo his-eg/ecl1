@@ -66,6 +66,15 @@ public class PullRequestHandler extends AbstractHandler {
             return null;
         }
 
+        // Validate that the current branch is a dedicated feature branch
+        String currentBranch = localRepo.getBranch();
+        if (currentBranch == null || java.util.regex.Pattern.compile(config.getBranches()).matcher(currentBranch).find()) {
+            MessageDialog.openError(shell, "Create Merge Request",
+                    "Please create a dedicated branch for your merge request.\n"
+                            + "Current branch is: " + currentBranch);
+            return null;
+        }
+
         // Auto-detect target branch
         String detectedTargetBranch = null;
         try {

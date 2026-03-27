@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -73,23 +72,14 @@ public class PullRequestCreator {
             String username = config.getUsername();
             String repo = localRepo.getRepo();
 
-            monitor.beginTask("Creating Merge Request", 5);
+            monitor.beginTask("Creating Merge Request", 4);
 
-            // Step 1: Validate branch
-            monitor.subTask("Checking current branch...");
-            String branch = localRepo.getBranch();
-            if (branch == null || Pattern.compile(config.getBranches()).matcher(branch).find()) {
-                return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                        "Please create a dedicated branch for your merge request. Current branch is: " + branch);
-            }
-            monitor.worked(1);
-
-            // Step 2: Create fork if it does not exist
+            // Step 1: Create fork if it does not exist
             monitor.subTask("Checking fork...");
             createForkIfNeeded(username, repo);
             monitor.worked(1);
 
-            // Step 3: Determine target branch
+            // Step 2: Determine target branch
             monitor.subTask("Determining target branch...");
             String resolvedTargetBranch = targetBranch;
             if (resolvedTargetBranch == null || resolvedTargetBranch.isEmpty()) {
@@ -97,7 +87,7 @@ public class PullRequestCreator {
             }
             monitor.worked(1);
 
-            // Step 4: Sync fork if LFS or forced
+            // Step 3: Sync fork if LFS or forced
             if (localRepo.hasLFS() || forceSync) {
                 monitor.subTask("Syncing fork...");
                 syncFork(username, repo, "master", forceSync);
@@ -107,7 +97,7 @@ public class PullRequestCreator {
             }
             monitor.worked(1);
 
-            // Step 5: Push and create merge request
+            // Step 4: Push and create merge request
             monitor.subTask("Pushing and creating merge request...");
             pushWithMergeRequest(username, resolvedTargetBranch);
             monitor.worked(1);
