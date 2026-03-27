@@ -116,8 +116,8 @@ public class PullRequestHandler extends AbstractHandler {
                 Display.getDefault().asyncExec(() -> {
                     Shell activeShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
                     if (status.isOK()) {
-                        MessageDialog.openInformation(activeShell, "Create Merge Request",
-                                "Merge request created successfully.");
+                        String mergeRequestUrl = status.getMessage();
+                        new MergeRequestSuccessDialog(activeShell, mergeRequestUrl).open();
                     } else if (status.getSeverity() == IStatus.ERROR) {
                         MessageDialog.openError(activeShell, "Create Merge Request",
                                 status.getMessage());

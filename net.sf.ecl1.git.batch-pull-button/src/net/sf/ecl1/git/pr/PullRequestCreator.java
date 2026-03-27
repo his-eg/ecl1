@@ -5,6 +5,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -99,12 +101,13 @@ public class PullRequestCreator {
 
             // Step 4: Push and create merge request
             monitor.subTask("Pushing and creating merge request...");
-            pushWithMergeRequest(username, resolvedTargetBranch);
+            String mergeRequestUrl = pushWithMergeRequest(username, resolvedTargetBranch);
             monitor.worked(1);
 
             monitor.done();
 
-            return new Status(IStatus.OK, Activator.PLUGIN_ID, "Merge request created successfully.");
+            return new Status(IStatus.OK, Activator.PLUGIN_ID,
+                    mergeRequestUrl != null ? mergeRequestUrl : "");
 
         } catch (IOException e) {
             return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
@@ -183,10 +186,11 @@ public class PullRequestCreator {
     /**
      * Pushes and creates the merge request using JGit push with push options.
      *
+     * @return the merge request URL extracted from the server response, or null
      * @throws GitAPIException on JGit errors
      * @throws IOException on other errors
      */
-    private void pushWithMergeRequest(String username, String resolvedTargetBranch) throws GitAPIException, IOException {
+    private String pushWithMergeRequest(String username, String resolvedTargetBranch) throws GitAPIException, IOException {
         List<String> pushOptions = new ArrayList<>();
         pushOptions.add("merge_request.create");
         pushOptions.add("merge_request.remove_source_branch");
@@ -207,7 +211,10 @@ public class PullRequestCreator {
                 .setPushOptions(pushOptions)
                 .call();
 
-        // Check for errors in push results
+        // Check for errors in push results and extract the MR URL
+        String mergeRequestUrl = null;
+        Pattern urlPattern = Pattern.compile("(https?://\\S+/merge_requests/\\S+)");
+
         for (PushResult result : results) {
             Collection<RemoteRefUpdate> updates = result.getRemoteUpdates();
             for (RemoteRefUpdate update : updates) {
@@ -218,6 +225,17 @@ public class PullRequestCreator {
                             + ": " + status + (update.getMessage() != null ? " - " + update.getMessage() : ""));
                 }
             }
+
+            // Parse server messages for the merge request URL
+            String messages = result.getMessages();
+            if (messages != null) {
+                Matcher m = urlPattern.matcher(messages);
+                if (m.find()) {
+                    mergeRequestUrl = m.group(1);
+                }
+            }
         }
+
+        return mergeRequestUrl;
     }
 }
