@@ -41,14 +41,19 @@ public class GitlabConfig {
 
         if (!configFile.exists()) {
             throw new IOException("Configuration file does not exist: " + configFile.getAbsolutePath()
-                    + "\n\n" + getConfigExample(configFile.getAbsolutePath()));
+                    + "\n" + getConfigExample(configFile.getAbsolutePath()));
         }
 
         String fileContent = new String(Files.readAllBytes(configFile.toPath()), StandardCharsets.UTF_8);
         // Remove single-line and multi-line comments
         String withoutComments = fileContent.replaceAll("//.*", "").replaceAll("/\\*[\\s\\S]*?\\*/", "");
 
-        allConfig = JsonParser.parseString(withoutComments).getAsJsonObject();
+        try {
+			allConfig = JsonParser.parseString(withoutComments).getAsJsonObject();
+		} catch (Exception e) {
+			throw new IOException("Failed to parse configuration file: " + configFile.getAbsolutePath()
+					+ "\n" + e.getLocalizedMessage());
+		}
     }
 
     /**
@@ -60,7 +65,7 @@ public class GitlabConfig {
     public void activateSection(String section) {
         JsonElement sectionElement = allConfig.get(section);
         if (sectionElement == null || !sectionElement.isJsonObject()) {
-            throw new IllegalArgumentException("No section '" + section + "' in configuration file.\n\n"
+            throw new IllegalArgumentException("No section '" + section + "' in configuration file.\n"
                     + getConfigExample(System.getProperty("user.home") + "/.config/gitlab.json"));
         }
 
@@ -77,7 +82,7 @@ public class GitlabConfig {
         if (this.branches == null || this.username == null || this.token == null) {
             throw new IllegalArgumentException(
                     "At least one of the parameters \"branches\", \"username\" or \"token\" "
-                            + "is missing in the configuration file in section \"" + section + "\".\n\n"
+                            + "is missing in the configuration file in section \"" + section + "\".\n"
                             + getConfigExample(System.getProperty("user.home") + "/.config/gitlab.json"));
         }
     }
@@ -91,15 +96,21 @@ public class GitlabConfig {
     }
 
     private String getConfigExample(String path) {
-        return "Please create or check the configuration file " + path + "\n\n"
-                + "{\n"
+        return "Please create or check the configuration file " + path;
+    }
+
+    /**
+     * Returns the example JSON configuration that can be copied by the user.
+     */
+    public static String getConfigExampleJson() {
+        return "{\n"
                 + "    // Servername of the Gitlab server\n"
                 + "    \"gitlab.his.de\": {\n"
                 + "\n"
                 + "        // Your Gitlab username.\n"
                 + "        \"username\": \"myusername\",\n"
                 + "\n"
-                + "        // In Gitlab: Avatar -> Settings -> Access Token\n"
+                + "        // In Gitlab: Avatar -> Preferences -> Personal access token\n"
                 + "        // Enable the scope \"API\".\n"
                 + "        \"token\": \"glpat-...\",\n"
                 + "\n"

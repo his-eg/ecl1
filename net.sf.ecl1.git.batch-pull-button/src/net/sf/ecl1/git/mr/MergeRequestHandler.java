@@ -10,7 +10,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
@@ -20,8 +19,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
-
-import net.sf.ecl1.git.Activator;
 
 /**
  * Eclipse command handler for creating a Gitlab merge request.
@@ -45,8 +42,7 @@ public class MergeRequestHandler extends AbstractHandler {
         File projectDir = getProjectDirectory(event);
         if (projectDir == null) {
             MessageDialog.openError(shell, "Create Merge Request",
-                    "Cannot determine the project directory.\n"
-                            + "Please select a project in the Package Explorer or Project Explorer.");
+                    "Please select a project in the Package Explorer or Project Explorer.");
             return null;
         }
 
@@ -58,11 +54,10 @@ public class MergeRequestHandler extends AbstractHandler {
             localRepo = new LocalRepository(projectDir);
             config.activateSection(localRepo.getServer());
         } catch (IOException e) {
-            MessageDialog.openError(shell, "Create Merge Request",
-                    "Error reading configuration or repository:\n" + e.getMessage());
+            new ConfigErrorDialog(shell, e.getMessage()).open();
             return null;
         } catch (IllegalArgumentException e) {
-            MessageDialog.openError(shell, "Create Merge Request", e.getMessage());
+            new ConfigErrorDialog(shell, e.getMessage()).open();
             return null;
         }
 
@@ -186,4 +181,5 @@ public class MergeRequestHandler extends AbstractHandler {
 
         return null;
     }
+
 }
