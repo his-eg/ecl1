@@ -1,4 +1,4 @@
-package net.sf.ecl1.git.pr;
+package net.sf.ecl1.git.mr;
 
 import java.net.URL;
 

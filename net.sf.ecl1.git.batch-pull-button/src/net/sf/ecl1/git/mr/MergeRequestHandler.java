@@ -1,4 +1,4 @@
-package net.sf.ecl1.git.pr;
+package net.sf.ecl1.git.mr;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import net.sf.ecl1.git.Activator;
  *   <li>Runs the merge request creation in a background job</li>
  * </ol>
  */
-public class PullRequestHandler extends AbstractHandler {
+public class MergeRequestHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -113,18 +113,18 @@ public class PullRequestHandler extends AbstractHandler {
 
         // Show dialog for merge request parameters
         GitlabApi gitlabApi = new GitlabApi(config);
-        PullRequestDialog dialog = new PullRequestDialog(shell, localRepo.getBranch(), detectedTargetBranch, lastCommitMessage, localRepo.hasLFS(), gitlabApi);
+        MergeRequestDialog dialog = new MergeRequestDialog(shell, localRepo.getBranch(), detectedTargetBranch, lastCommitMessage, localRepo.hasLFS(), gitlabApi);
         if (dialog.open() != Window.OK) {
             return null;
         }
 
-        PullRequestCreator.Params params = dialog.getParams();
+        MergeRequestCreator.Params params = dialog.getParams();
 
         // Run the merge request creation in a background job
         Job job = new Job("ecl1: Creating Gitlab Merge Request") {
             @Override
             protected IStatus run(IProgressMonitor monitor) {
-                PullRequestCreator creator = new PullRequestCreator(config, localRepo, params);
+                MergeRequestCreator creator = new MergeRequestCreator(config, localRepo, params);
                 IStatus status = creator.execute(monitor);
 
                 // Show result in UI thread

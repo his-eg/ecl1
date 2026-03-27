@@ -1,4 +1,4 @@
-package net.sf.ecl1.git.pr;
+package net.sf.ecl1.git.mr;
 
 import java.util.List;
 
@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Text;
  * Dialog to collect merge request parameters from the user.
  * Fields: merge request title, target branch, assignee (with autocomplete), and force sync option.
  */
-public class PullRequestDialog extends TitleAreaDialog {
+public class MergeRequestDialog extends TitleAreaDialog {
 
     private Text messageText;
     private Text targetBranchText;
@@ -58,7 +58,7 @@ public class PullRequestDialog extends TitleAreaDialog {
     private boolean suppressModify = false;
 
     /**
-     * Creates a new PullRequestDialog.
+     * Creates a new MergeRequestDialog.
      *
      * @param parentShell the parent shell
      * @param currentBranch the current git branch name
@@ -67,7 +67,7 @@ public class PullRequestDialog extends TitleAreaDialog {
      * @param hasLfs whether the repository has LFS objects
      * @param gitlabApi the Gitlab API instance for user search
      */
-    public PullRequestDialog(Shell parentShell, String currentBranch, String detectedTargetBranch, String message, boolean hasLfs, GitlabApi gitlabApi) {
+    public MergeRequestDialog(Shell parentShell, String currentBranch, String detectedTargetBranch, String message, boolean hasLfs, GitlabApi gitlabApi) {
         super(parentShell);
         this.currentBranch = currentBranch;
         this.detectedTargetBranch = detectedTargetBranch;
@@ -337,10 +337,10 @@ public class PullRequestDialog extends TitleAreaDialog {
     }
 
     /**
-     * Returns the collected parameters as a {@link PullRequestCreator.Params} object.
+     * Returns the collected parameters as a {@link MergeRequestCreator.Params} object.
      */
-    public PullRequestCreator.Params getParams() {
-        PullRequestCreator.Params params = new PullRequestCreator.Params();
+    public MergeRequestCreator.Params getParams() {
+        MergeRequestCreator.Params params = new MergeRequestCreator.Params();
         params.message = message;
         params.targetBranch = targetBranch;
         params.assignTo = assignTo;

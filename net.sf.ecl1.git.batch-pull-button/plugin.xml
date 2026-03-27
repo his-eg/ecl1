@@ -7,7 +7,7 @@
              id="net.sf.ecl1.git.batch-pull-button.command"
              name="Batch Git Pull Command" />
 	      <command
-             id="net.sf.ecl1.git.pr.command"
+             id="net.sf.ecl1.git.mr.command"
              name="Create Merge Request" />
 	</extension>
 	<extension
@@ -16,8 +16,8 @@
           	commandId="net.sf.ecl1.git.batch-pull-button.command"
           	class="net.sf.ecl1.git.GitBatchPullHandler" />
     	<handler
-          	commandId="net.sf.ecl1.git.pr.command"
-          	class="net.sf.ecl1.git.pr.PullRequestHandler" />
+          	commandId="net.sf.ecl1.git.mr.command"
+          	class="net.sf.ecl1.git.mr.MergeRequestHandler" />
 	</extension>
 	<extension
 	      point="org.eclipse.ui.menus">
@@ -33,7 +33,7 @@
                    style="push">
              </command>
              <command
-                   commandId="net.sf.ecl1.git.pr.command"
+                   commandId="net.sf.ecl1.git.mr.command"
                    icon="icons/pr.gif"
                    label="Create Merge Request"
                    style="push"

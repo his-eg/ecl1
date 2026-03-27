@@ -1,4 +1,4 @@
-package net.sf.ecl1.git.pr;
+package net.sf.ecl1.git.mr;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -20,13 +20,13 @@ import org.eclipse.jgit.transport.URIish;
 import net.sf.ecl1.git.Activator;
 
 /**
- * Orchestrates the creation of a Gitlab pull/merge request.
+ * Orchestrates the creation of a Gitlab merge request.
  * <p>
  * This is a port of the functionality in pr.py (Node.js) to Java.
  * It creates a fork if needed, syncs LFS objects, and pushes with merge request options.
  * All git operations use JGit internally instead of spawning external git processes.
  */
-public class PullRequestCreator {
+public class MergeRequestCreator {
 
     private final GitlabConfig config;
     private final GitlabApi api;
@@ -37,7 +37,7 @@ public class PullRequestCreator {
     private final boolean forceSync;
 
     /**
-     * Parameters for a pull request.
+     * Parameters for a merge request.
      */
     public static class Params {
         public String message;
@@ -47,13 +47,13 @@ public class PullRequestCreator {
     }
 
     /**
-     * Constructs a PullRequestCreator.
+     * Constructs a MergeRequestCreator.
      *
      * @param config the Gitlab configuration
      * @param localRepo the local repository
      * @param params the merge request parameters
      */
-    public PullRequestCreator(GitlabConfig config, LocalRepository localRepo, Params params) {
+    public MergeRequestCreator(GitlabConfig config, LocalRepository localRepo, Params params) {
         this.config = config;
         this.api = new GitlabApi(config);
         this.localRepo = localRepo;
@@ -64,7 +64,7 @@ public class PullRequestCreator {
     }
 
     /**
-     * Executes the pull request creation workflow.
+     * Executes the merge request creation workflow.
      *
      * @param monitor progress monitor
      * @return status of the operation
