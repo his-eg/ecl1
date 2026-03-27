@@ -75,15 +75,30 @@ public class PullRequestHandler extends AbstractHandler {
             return null;
         }
 
+        // Auto-detect target branch
         String detectedTargetBranch = null;
         try {
-	        // Auto-detect target branch
-	        detectedTargetBranch = localRepo.findTargetBranch(config.getBranches());
+            detectedTargetBranch = localRepo.findTargetBranch(config.getBranches());
         } catch (IOException e) {
             MessageDialog.openError(shell, "Create Merge Request",
                     "Cannot detect target branch for merge request.\n"
                             + "Please check your configuration and repository state.");
             return null;
+        }
+
+        // Validate that there are unpushed commits compared to the target branch
+        try {
+            String baseRef = detectedTargetBranch != null ? detectedTargetBranch : "master";
+            if (!localRepo.hasUnpushedCommits(baseRef)) {
+                MessageDialog.openError(shell, "Create Merge Request",
+                        "There are no unpushed commits on branch '" + currentBranch + "'\n"
+                                + "compared to '" + baseRef + "'.\n"
+                                + "Please commit your changes before creating a merge request.");
+                return null;
+            }
+        } catch (IOException e) {
+        	MessageDialog.openError(shell, "Create Merge Request", e.getMessage());
+        	return null;
         }
 
         String lastCommitMessage = null;

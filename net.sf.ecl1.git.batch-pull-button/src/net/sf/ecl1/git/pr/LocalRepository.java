@@ -268,4 +268,55 @@ public class LocalRepository {
         }
         return null;
     }
+
+    /**
+     * Checks whether the current branch has commits that are not reachable
+     * from the given base ref. This is used to detect whether there is
+     * anything to push / create a merge request for.
+     * <p>
+     * Resolves the base ref in the following order:
+     * <ol>
+     *   <li>{@code refs/remotes/origin/<baseRef>}</li>
+     *   <li>{@code refs/heads/<baseRef>}</li>
+     *   <li>{@code <baseRef>} literally</li>
+     * </ol>
+     *
+     * @param baseRef the branch name to compare against (e.g. "master")
+     * @return {@code true} if HEAD has commits not in baseRef
+     * @throws IOException on repository errors
+     */
+    public boolean hasUnpushedCommits(String baseRef) throws IOException {
+        org.eclipse.jgit.lib.ObjectId headId = repository.resolve("HEAD");
+        if (headId == null) {
+            return false;
+        }
+
+        // Resolve the base ref
+        org.eclipse.jgit.lib.ObjectId baseId = null;
+        if (baseRef != null) {
+            baseId = repository.resolve("refs/remotes/origin/" + baseRef);
+            if (baseId == null) {
+                baseId = repository.resolve("refs/heads/" + baseRef);
+            }
+            if (baseId == null) {
+                baseId = repository.resolve(baseRef);
+            }
+        }
+
+        if (baseId == null) {
+            // Cannot resolve base ref — assume there are unpushed commits
+            return true;
+        }
+
+        if (headId.equals(baseId)) {
+            return false;
+        }
+
+        // Count commits reachable from HEAD but not from the base ref
+        try (org.eclipse.jgit.revwalk.RevWalk walk = new org.eclipse.jgit.revwalk.RevWalk(repository)) {
+            walk.markStart(walk.parseCommit(headId));
+            walk.markUninteresting(walk.parseCommit(baseId));
+            return walk.iterator().hasNext();
+        }
+    }
 }
