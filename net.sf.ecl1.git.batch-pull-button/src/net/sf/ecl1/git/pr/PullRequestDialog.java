@@ -40,10 +40,11 @@ public class PullRequestDialog extends TitleAreaDialog {
      * @param detectedTargetBranch the auto-detected target branch (may be null)
      * @param hasLfs whether the repository has LFS objects
      */
-    public PullRequestDialog(Shell parentShell, String currentBranch, String detectedTargetBranch, boolean hasLfs) {
+    public PullRequestDialog(Shell parentShell, String currentBranch, String detectedTargetBranch, String message, boolean hasLfs) {
         super(parentShell);
         this.currentBranch = currentBranch;
         this.detectedTargetBranch = detectedTargetBranch;
+        this.message = message;
         this.hasLfs = hasLfs;
     }
 
@@ -71,6 +72,9 @@ public class PullRequestDialog extends TitleAreaDialog {
         messageLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 
         messageText = new Text(container, SWT.BORDER);
+        if (message != null) {
+			messageText.setText(message);
+		}
         messageText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
         messageText.setToolTipText("Title of the merge request and commit message for the merge commit.\n"
                 + "If empty, Gitlab will use the branch name or single commit message.");

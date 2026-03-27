@@ -75,17 +75,29 @@ public class PullRequestHandler extends AbstractHandler {
             return null;
         }
 
-        // Auto-detect target branch
         String detectedTargetBranch = null;
         try {
-            detectedTargetBranch = localRepo.findTargetBranch(config.getBranches());
+	        // Auto-detect target branch
+	        detectedTargetBranch = localRepo.findTargetBranch(config.getBranches());
         } catch (IOException e) {
-            // non-fatal, user can enter it manually
+            MessageDialog.openError(shell, "Create Merge Request",
+                    "Cannot detect target branch for merge request.\n"
+                            + "Please check your configuration and repository state.");
+            return null;
+        }
+
+        String lastCommitMessage = null;
+        try {
+        	lastCommitMessage = localRepo.getLastCommitMessage();
+        } catch (IOException e) {
+            MessageDialog.openError(shell, "Create Merge Request",
+                    "Cannot detect last commit.\n"
+                            + "Please check your configuration and repository state.");
+            return null;
         }
 
         // Show dialog for merge request parameters
-        PullRequestDialog dialog = new PullRequestDialog(
-                shell, localRepo.getBranch(), detectedTargetBranch, localRepo.hasLFS());
+        PullRequestDialog dialog = new PullRequestDialog(shell, localRepo.getBranch(), detectedTargetBranch, lastCommitMessage, localRepo.hasLFS());
         if (dialog.open() != Window.OK) {
             return null;
         }

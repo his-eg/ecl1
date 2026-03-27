@@ -251,4 +251,21 @@ public class LocalRepository {
     public Set<String> getKnownRemotes() {
         return knownRemotes;
     }
+
+    /**
+     * Returns the short message of the last commit on the current branch.
+     *
+     * @return the commit message, or null if it cannot be determined
+     * @throws IOException 
+     */
+    public String getLastCommitMessage() throws IOException {
+        try {
+            for (RevCommit commit : git.log().setMaxCount(1).call()) {
+                return commit.getShortMessage();
+            }
+        } catch (GitAPIException e) {
+        	throw new IOException("Failed to read git log: " + e.getMessage(), e);
+        }
+        return null;
+    }
 }
