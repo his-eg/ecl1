@@ -34,7 +34,7 @@
              </command>
              <command
                    commandId="net.sf.ecl1.git.pr.command"
-                   icon="icons/pull-all.gif"
+                   icon="icons/pr.gif"
                    label="Create Merge Request"
                    style="push"
                    tooltip="Create a Gitlab Merge Request for the selected project">
