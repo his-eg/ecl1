@@ -1,14 +1,20 @@
 package net.sf.ecl1.git.pr;
 
-import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.PushResult;
+import org.eclipse.jgit.transport.RemoteRefUpdate;
+import org.eclipse.jgit.transport.URIish;
 
 import net.sf.ecl1.git.Activator;
 
@@ -17,6 +23,7 @@ import net.sf.ecl1.git.Activator;
  * <p>
  * This is a port of the functionality in pr.py (Node.js) to Java.
  * It creates a fork if needed, syncs LFS objects, and pushes with merge request options.
+ * All git operations use JGit internally instead of spawning external git processes.
  */
 public class PullRequestCreator {
 
@@ -102,15 +109,10 @@ public class PullRequestCreator {
 
             // Step 5: Push and create merge request
             monitor.subTask("Pushing and creating merge request...");
-            int exitCode = pushWithMergeRequest(username, resolvedTargetBranch);
+            pushWithMergeRequest(username, resolvedTargetBranch);
             monitor.worked(1);
 
             monitor.done();
-
-            if (exitCode != 0) {
-                return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                        "Git push failed with exit code " + exitCode);
-            }
 
             return new Status(IStatus.OK, Activator.PLUGIN_ID, "Merge request created successfully.");
 
@@ -120,13 +122,19 @@ public class PullRequestCreator {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return new Status(IStatus.CANCEL, Activator.PLUGIN_ID, "Operation was cancelled.");
+        } catch (GitAPIException e) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    "Git operation failed: " + e.getMessage(), e);
+        } catch (URISyntaxException e) {
+            return new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    "Invalid remote URI: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Creates a fork if it doesn't exist and adds the remote.
+     * Creates a fork if it doesn't exist and adds the remote using JGit.
      */
-    private void createForkIfNeeded(String username, String repo) throws IOException, InterruptedException {
+    private void createForkIfNeeded(String username, String repo) throws IOException, InterruptedException, GitAPIException, URISyntaxException {
         GitlabApi.ForkDetails details = api.getForkDetails(username, repo);
 
         if (details == null) {
@@ -149,15 +157,18 @@ public class PullRequestCreator {
 
         // Add remote if not known
         if (!localRepo.getKnownRemotes().contains(username)) {
-            runGitCommand("remote", "add", username,
-                    "git@" + config.getServer() + ":" + username + "/" + repo);
+            Git git = localRepo.getGit();
+            git.remoteAdd()
+                    .setName(username)
+                    .setUri(new URIish("git@" + config.getServer() + ":" + username + "/" + repo))
+                    .call();
         }
     }
 
     /**
-     * Syncs a fork branch and fetches updates.
+     * Syncs a fork branch via the Gitlab API and fetches updates using JGit.
      */
-    private void syncFork(String username, String repo, String syncBranch, boolean forced) throws IOException, InterruptedException {
+    private void syncFork(String username, String repo, String syncBranch, boolean forced) throws IOException, InterruptedException, GitAPIException {
         api.syncFork(username, repo, syncBranch);
 
         // Wait for sync to complete
@@ -172,56 +183,51 @@ public class PullRequestCreator {
             Thread.sleep(1000);
         }
 
-        // Fetch from fork
-        runGitCommand("fetch", config.getUsername());
+        // Fetch from fork using JGit
+        Git git = localRepo.getGit();
+        git.fetch()
+                .setRemote(config.getUsername())
+                .call();
     }
 
     /**
-     * Pushes and creates the merge request using git push options.
+     * Pushes and creates the merge request using JGit push with push options.
      *
-     * @return the exit code of the git push command
+     * @throws GitAPIException on JGit errors
+     * @throws IOException on other errors
      */
-    private int pushWithMergeRequest(String username, String resolvedTargetBranch) throws IOException, InterruptedException {
-        List<String> args = new ArrayList<>();
-        args.add("push");
-        args.add(username);
-        args.add("-o");
-        args.add("merge_request.create");
-        args.add("-o");
-        args.add("merge_request.remove_source_branch");
+    private void pushWithMergeRequest(String username, String resolvedTargetBranch) throws GitAPIException, IOException {
+        List<String> pushOptions = new ArrayList<>();
+        pushOptions.add("merge_request.create");
+        pushOptions.add("merge_request.remove_source_branch");
 
         if (assignTo != null && !assignTo.isEmpty()) {
-            args.add("-o");
-            args.add("merge_request.assign=" + assignTo);
+            pushOptions.add("merge_request.assign=" + assignTo);
         }
         if (resolvedTargetBranch != null && !resolvedTargetBranch.isEmpty()) {
-            args.add("-o");
-            args.add("merge_request.target=" + resolvedTargetBranch);
+            pushOptions.add("merge_request.target=" + resolvedTargetBranch);
         }
         if (message != null && !message.isEmpty()) {
-            args.add("-o");
-            args.add("merge_request.title=" + message);
+            pushOptions.add("merge_request.title=" + message);
         }
 
-        return runGitCommand(args.toArray(new String[0]));
-    }
+        Git git = localRepo.getGit();
+        Iterable<PushResult> results = git.push()
+                .setRemote(username)
+                .setPushOptions(pushOptions)
+                .call();
 
-    /**
-     * Runs a git command in the repository root directory.
-     *
-     * @return exit code
-     */
-    private int runGitCommand(String... args) throws IOException, InterruptedException {
-        List<String> command = new ArrayList<>();
-        command.add("git");
-        for (String arg : args) {
-            command.add(arg);
+        // Check for errors in push results
+        for (PushResult result : results) {
+            Collection<RemoteRefUpdate> updates = result.getRemoteUpdates();
+            for (RemoteRefUpdate update : updates) {
+                RemoteRefUpdate.Status status = update.getStatus();
+                if (status != RemoteRefUpdate.Status.OK
+                        && status != RemoteRefUpdate.Status.UP_TO_DATE) {
+                    throw new IOException("Git push failed for ref " + update.getRemoteName()
+                            + ": " + status + (update.getMessage() != null ? " - " + update.getMessage() : ""));
+                }
+            }
         }
-
-        ProcessBuilder pb = new ProcessBuilder(command);
-        pb.directory(localRepo.getRepositoryRoot());
-        pb.inheritIO();
-        Process process = pb.start();
-        return process.waitFor();
     }
 }

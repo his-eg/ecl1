@@ -1,22 +1,29 @@
 package net.sf.ecl1.git.pr;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LogCommand;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.lib.Ref;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
+import org.eclipse.jgit.transport.RemoteConfig;
+
 /**
  * Information about a local Git repository.
- * Reads the .git/config, detects the current branch, LFS objects, server, and repo path.
+ * Uses JGit to read the repository configuration, current branch, LFS objects, and remote URLs.
  */
 public class LocalRepository {
 
+    private final Git git;
+    private final Repository repository;
     private final File repositoryRoot;
     private final String repo;
     private final boolean lfs;
@@ -26,32 +33,23 @@ public class LocalRepository {
     private final Set<String> knownRemotes;
 
     /**
-     * Constructs a LocalRepository by scanning upward from the given directory.
+     * Constructs a LocalRepository by opening the git repository at or above the given directory.
      *
      * @param startDirectory the directory to start searching from
      * @throws IOException if the repository cannot be found or read
      */
     public LocalRepository(File startDirectory) throws IOException {
-        this.repositoryRoot = findRepositoryRootDirectory(startDirectory);
+        this.git = Git.open(startDirectory);
+        this.repository = git.getRepository();
+        this.repositoryRoot = repository.getWorkTree();
         this.repo = repositoryRoot.getName();
         this.lfs = detectLFSObjects();
         this.knownRemotes = new HashSet<>();
 
-        String[] originInfo = readGitConfig();
+        String[] originInfo = readOriginUrl();
         this.server = originInfo[0];
         this.repoPath = originInfo[1];
-        this.branch = readCurrentBranch();
-    }
-
-    private File findRepositoryRootDirectory(File startDir) throws IOException {
-        File current = startDir;
-        while (current != null) {
-            if (new File(current, ".git").exists()) {
-                return current;
-            }
-            current = current.getParentFile();
-        }
-        throw new IOException("Directory is not inside a git repository: " + startDir.getAbsolutePath());
+        this.branch = repository.getBranch();
     }
 
     private boolean detectLFSObjects() {
@@ -64,33 +62,25 @@ public class LocalRepository {
     }
 
     /**
-     * Reads .git/config to extract origin URL info and known remotes.
+     * Reads the origin remote URL from the JGit StoredConfig and collects known remotes.
      * @return String[] with [0] = server, [1] = repoPath
      */
-    private String[] readGitConfig() throws IOException {
-        File configFile = new File(repositoryRoot, ".git/config");
-        String fileContent = new String(Files.readAllBytes(configFile.toPath()), StandardCharsets.UTF_8);
-        String[] lines = fileContent.split("\\r?\\n");
-
-        boolean inOrigin = false;
+    private String[] readOriginUrl() throws IOException {
         String originUrl = null;
 
-        for (String rawLine : lines) {
-            String line = rawLine.trim();
-            if (line.equals("[remote \"origin\"]")) {
-                inOrigin = true;
-            } else if (line.startsWith("[remote \"")) {
-                // extract remote name
-                Matcher m = Pattern.compile("\\[remote \"(.*)\"\\]").matcher(line);
-                if (m.matches()) {
-                    knownRemotes.add(m.group(1));
+        try {
+            for (RemoteConfig remote : RemoteConfig.getAllRemoteConfigs(repository.getConfig())) {
+                String name = remote.getName();
+                if ("origin".equals(name)) {
+                    if (!remote.getURIs().isEmpty()) {
+                        originUrl = remote.getURIs().get(0).toString();
+                    }
+                } else {
+                    knownRemotes.add(name);
                 }
-                inOrigin = false;
-            } else if (line.startsWith("[")) {
-                inOrigin = false;
-            } else if (inOrigin && line.startsWith("url")) {
-                originUrl = line;
             }
+        } catch (Exception e) {
+            throw new IOException("Failed to read remote configs: " + e.getMessage(), e);
         }
 
         if (originUrl == null) {
@@ -103,20 +93,13 @@ public class LocalRepository {
     }
 
     /**
-     * Extracts the server name from a git URL line.
+     * Extracts the server name from a git URL.
      * Handles:
-     * - url = git@gitlab.his.de:h1/webapps
-     * - url = ssh://git@gitlab.his.de/h1/webapps
-     * - url = https://gitlab.his.de/h1/webapps
+     * - git@gitlab.his.de:h1/webapps
+     * - ssh://git@gitlab.his.de/h1/webapps
+     * - https://gitlab.his.de/h1/webapps
      */
-    private String extractServerName(String urlLine) throws IOException {
-        // find the actual URL part after '='
-        int eqIndex = urlLine.indexOf('=');
-        if (eqIndex < 0) {
-            throw new IOException("Unparseable url entry in .git/config: " + urlLine);
-        }
-        String url = urlLine.substring(eqIndex + 1).trim();
-
+    private String extractServerName(String url) throws IOException {
         int atIndex = url.indexOf('@');
         if (atIndex >= 0) {
             String afterAt = url.substring(atIndex + 1);
@@ -128,7 +111,7 @@ public class LocalRepository {
             } else if (slashIndex >= 0) {
                 endIndex = slashIndex;
             } else {
-                throw new IOException("Unparseable url entry in .git/config: " + urlLine);
+                throw new IOException("Unparseable git URL: " + url);
             }
             return afterAt.substring(0, endIndex).toLowerCase();
         }
@@ -143,59 +126,102 @@ public class LocalRepository {
             }
         }
 
-        throw new IOException("Unparseable url entry in .git/config: " + urlLine);
+        throw new IOException("Unparseable git URL: " + url);
     }
 
     /**
-     * Extracts the repo path (e.g. "group/reponame") from a git URL line.
+     * Extracts the repo path (e.g. "group/reponame") from a git URL.
      */
-    private String extractRepoPath(String urlLine, String serverName) {
-        String lower = urlLine.toLowerCase();
+    private String extractRepoPath(String url, String serverName) {
+        String lower = url.toLowerCase();
         int pos = lower.indexOf(serverName) + serverName.length();
-        String temp = urlLine.substring(pos + 1).trim();
+        String temp = url.substring(pos + 1).trim();
         if (temp.endsWith(".git")) {
             temp = temp.substring(0, temp.length() - 4);
         }
         return temp;
     }
 
-    private String readCurrentBranch() throws IOException {
-        File headFile = new File(repositoryRoot, ".git/HEAD");
-        String content = new String(Files.readAllBytes(headFile.toPath()), StandardCharsets.UTF_8).trim();
-        if (content.startsWith("ref: refs/heads/")) {
-            return content.substring(16);
-        }
-        return null; // detached HEAD
-    }
-
     /**
      * Finds the target branch by examining the git log for branch references.
-     * Uses the "git log" command and matches against the branches pattern.
+     * Uses JGit LogCommand and walks commits from HEAD, checking which refs
+     * (branches) point to each commit — similar to {@code git log --pretty=format:%d}.
+     * <p>
+     * The ref names are formatted like {@code git log} decorations, e.g.
+     * {@code origin/master}, {@code origin/RELEASE_2025_12}, so that the
+     * branches regex from the configuration can match them.
      *
      * @param branchesPattern the regex pattern to match branch names
      * @return the matched target branch, or null if not found
-     * @throws IOException on process errors
+     * @throws IOException on repository errors
      */
     public String findTargetBranch(String branchesPattern) throws IOException {
-        ProcessBuilder pb = new ProcessBuilder("git", "log", "--pretty=format:%d");
-        pb.directory(repositoryRoot);
-        pb.redirectErrorStream(true);
-        Process process = pb.start();
-
         Pattern pattern = Pattern.compile(branchesPattern);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream(), StandardCharsets.UTF_8))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (!line.isEmpty()) {
-                    Matcher m = pattern.matcher(line);
-                    if (m.find()) {
-                        process.destroy();
-                        return m.group(1);
+
+        // Build a reverse map: commit ObjectId (hex) -> list of short ref names
+        // Use getRefsByPrefix to get all refs under refs/heads/ and refs/remotes/
+        java.util.HashMap<String, java.util.List<String>> commitRefMap = new java.util.HashMap<>();
+
+        List<Ref> allRefs = new java.util.ArrayList<>();
+        allRefs.addAll(repository.getRefDatabase().getRefsByPrefix("refs/heads/"));
+        allRefs.addAll(repository.getRefDatabase().getRefsByPrefix("refs/remotes/"));
+
+        for (Ref ref : allRefs) {
+            Ref peeled = repository.getRefDatabase().peel(ref);
+            org.eclipse.jgit.lib.ObjectId objectId = peeled.getPeeledObjectId();
+            if (objectId == null) {
+                objectId = ref.getObjectId();
+            }
+            if (objectId != null) {
+                String id = objectId.getName();
+                // Format the ref name like git log decorations:
+                //   refs/heads/master        -> master
+                //   refs/remotes/origin/master -> origin/master
+                String refName = ref.getName();
+                if (refName.startsWith("refs/heads/")) {
+                    refName = refName.substring("refs/heads/".length());
+                } else if (refName.startsWith("refs/remotes/")) {
+                    refName = refName.substring("refs/remotes/".length());
+                }
+                commitRefMap.computeIfAbsent(id, k -> new java.util.ArrayList<>()).add(refName);
+            }
+        }
+
+        // Walk commits from HEAD (same as git log) and check decorations
+        try {
+            LogCommand logCmd = git.log();
+            Iterable<RevCommit> commits = logCmd.call();
+            for (RevCommit commit : commits) {
+                String commitId = commit.getId().getName();
+                java.util.List<String> refNames = commitRefMap.get(commitId);
+                if (refNames != null) {
+                    for (String refName : refNames) {
+                        Matcher m = pattern.matcher(refName);
+                        if (m.find()) {
+                            return m.group(1);
+                        }
                     }
                 }
             }
+        } catch (GitAPIException e) {
+            throw new IOException("Failed to read git log: " + e.getMessage(), e);
         }
+
         return null;
+    }
+
+    /**
+     * Returns the underlying JGit Git instance for use in commands.
+     */
+    public Git getGit() {
+        return git;
+    }
+
+    /**
+     * Returns the underlying JGit Repository.
+     */
+    public Repository getRepository() {
+        return repository;
     }
 
     public File getRepositoryRoot() {
