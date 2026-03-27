@@ -97,7 +97,8 @@ public class PullRequestHandler extends AbstractHandler {
         }
 
         // Show dialog for merge request parameters
-        PullRequestDialog dialog = new PullRequestDialog(shell, localRepo.getBranch(), detectedTargetBranch, lastCommitMessage, localRepo.hasLFS());
+        GitlabApi gitlabApi = new GitlabApi(config);
+        PullRequestDialog dialog = new PullRequestDialog(shell, localRepo.getBranch(), detectedTargetBranch, lastCommitMessage, localRepo.hasLFS(), gitlabApi);
         if (dialog.open() != Window.OK) {
             return null;
         }

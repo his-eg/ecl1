@@ -2,14 +2,18 @@ package net.sf.ecl1.git.pr;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -165,6 +169,41 @@ public class GitlabApi {
                 }
             }
         }
+    }
+
+    /**
+     * Searches for Gitlab users matching the given query string.
+     *
+     * @param query the search term (matched against username and name)
+     * @return list of usernames, empty list if no matches or on error
+     */
+    public List<String> searchUsers(String query) {
+        List<String> usernames = new ArrayList<>();
+        try {
+            String url = "https://" + server + "/api/v4/users?search="
+                    + java.net.URLEncoder.encode(query, "UTF-8") + "&per_page=10";
+
+            try (CloseableHttpClient client = HttpClientBuilder.create().build()) {
+                HttpGet get = new HttpGet(url);
+                get.setHeader("Authorization", "Bearer " + token);
+
+                try (CloseableHttpResponse response = client.execute(get)) {
+                    int status = response.getStatusLine().getStatusCode();
+                    if (status >= 200 && status < 300) {
+                        String body = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
+                        JsonArray users = JsonParser.parseString(body).getAsJsonArray();
+                        for (JsonElement element : users) {
+                            JsonObject user = element.getAsJsonObject();
+                            String username = user.get("username").getAsString();
+                            usernames.add(username);
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            // non-fatal, return empty list
+        }
+        return usernames;
     }
 
     /**
