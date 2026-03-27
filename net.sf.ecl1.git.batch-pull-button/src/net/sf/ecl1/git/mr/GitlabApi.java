@@ -97,11 +97,23 @@ public class GitlabApi {
         }
 
         JsonObject forkDetails = forkElement.getAsJsonObject();
+
+        // Gitlab may return forkDetails with null values while computing;
+        // treat this as "not ready yet" (same as no fork details)
+        JsonElement aheadEl = forkDetails.get("ahead");
+        JsonElement behindEl = forkDetails.get("behind");
+        if (aheadEl == null || aheadEl.isJsonNull() || behindEl == null || behindEl.isJsonNull()) {
+            return null;
+        }
+
+        JsonElement isSyncingEl = forkDetails.get("isSyncing");
+        JsonElement hasConflictsEl = forkDetails.get("hasConflicts");
+
         return new ForkDetails(
-                forkDetails.get("ahead").getAsInt(),
-                forkDetails.get("behind").getAsInt(),
-                forkDetails.get("isSyncing").getAsBoolean(),
-                forkDetails.get("hasConflicts").getAsBoolean());
+                aheadEl.getAsInt(),
+                behindEl.getAsInt(),
+                isSyncingEl != null && !isSyncingEl.isJsonNull() && isSyncingEl.getAsBoolean(),
+                hasConflictsEl != null && !hasConflictsEl.isJsonNull() && hasConflictsEl.getAsBoolean());
     }
 
     /**
