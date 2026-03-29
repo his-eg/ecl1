@@ -128,7 +128,13 @@ public class MergeRequestHandler extends AbstractHandler {
                     Shell activeShell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
                     if (status.isOK()) {
                         String mergeRequestUrl = status.getMessage();
-                        new MergeRequestSuccessDialog(activeShell, mergeRequestUrl).open();
+                        if (mergeRequestUrl != null && !mergeRequestUrl.isEmpty()) {
+                            new MergeRequestSuccessDialog(activeShell, mergeRequestUrl).open();
+                        } else {
+                            MessageDialog.openInformation(activeShell, "Create Merge Request",
+                                    "There were no new commits to push.\n"
+                                            + "No merge request was created.");
+                        }
                     } else if (status.getSeverity() == IStatus.ERROR) {
                         MessageDialog.openError(activeShell, "Create Merge Request",
                                 status.getMessage());
