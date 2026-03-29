@@ -61,12 +61,12 @@ public class MergeRequestDialog extends TitleAreaDialog {
     private Shell popupShell;
     /** Table widget inside the popup */
     private Table suggestionTable;
-    /** Tracks the scheduled debounce runnable to cancel previous ones */
-    private Runnable pendingQuery;
-    /** Delay in ms before querying the API after a keystroke */
-    private static final int DEBOUNCE_DELAY_MS = 300;
     /** Minimum characters before triggering a search */
     private static final int MIN_QUERY_LENGTH = 2;
+    /** Whether an API request is currently in flight */
+    private boolean queryInFlight = false;
+    /** Whether a new query should be sent as soon as the current one completes */
+    private boolean queryPending = false;
     /** Flag to suppress modify events when we programmatically set text */
     private boolean suppressModify = false;
     /** Avatar size in pixels */
@@ -195,55 +195,19 @@ public class MergeRequestDialog extends TitleAreaDialog {
                 }
                 String query = textWidget.getText().trim();
 
-                // Cancel any previously scheduled query
-                if (pendingQuery != null) {
-                    display.timerExec(-1, pendingQuery);
-                    pendingQuery = null;
-                }
-
                 if (query.length() < MIN_QUERY_LENGTH) {
                     hidePopup();
                     return;
                 }
 
-                // Schedule a debounced query
-                pendingQuery = new Runnable() {
-                    @Override
-                    public void run() {
-                        if (textWidget.isDisposed()) {
-                            return;
-                        }
-                        final String currentQuery = textWidget.getText().trim();
-                        if (currentQuery.length() < MIN_QUERY_LENGTH) {
-                            hidePopup();
-                            return;
-                        }
+                if (queryInFlight) {
+                    // A request is already running; it will check for changes when it completes
+                    queryPending = true;
+                    return;
+                }
 
-                        // Run the API call in a background thread to keep the UI responsive
-                        Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                final List<GitlabApi.UserInfo> results = gitlabApi.searchUsers(currentQuery);
-                                if (!textWidget.isDisposed()) {
-                                    display.asyncExec(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            if (textWidget.isDisposed()) {
-                                                return;
-                                            }
-                                            if (currentQuery.equals(textWidget.getText().trim())) {
-                                                showSuggestions(textWidget, results);
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                        }, "GitlabUserSearch");
-                        thread.setDaemon(true);
-                        thread.start();
-                    }
-                };
-                display.timerExec(DEBOUNCE_DELAY_MS, pendingQuery);
+                // Send request immediately
+                sendQuery(textWidget, query);
             }
         });
 
@@ -293,6 +257,55 @@ public class MergeRequestDialog extends TitleAreaDialog {
                 });
             }
         });
+    }
+
+    /**
+     * Sends a user search query to the API in a background thread.
+     * When the response arrives, if the text has changed meanwhile, a new request
+     * is sent immediately. Otherwise the results are displayed.
+     */
+    private void sendQuery(final Text textWidget, final String query) {
+        final Display display = textWidget.getDisplay();
+        queryInFlight = true;
+        queryPending = false;
+
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final List<GitlabApi.UserInfo> results = gitlabApi.searchUsers(query);
+                if (!textWidget.isDisposed()) {
+                    display.asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (textWidget.isDisposed()) {
+                                queryInFlight = false;
+                                return;
+                            }
+                            queryInFlight = false;
+                            String currentText = textWidget.getText().trim();
+
+                            if (currentText.length() < MIN_QUERY_LENGTH) {
+                                hidePopup();
+                                return;
+                            }
+
+                            if (queryPending || !query.equals(currentText)) {
+                                // Input changed while the request was in flight; send a new request immediately
+                                queryPending = false;
+                                sendQuery(textWidget, currentText);
+                            } else {
+                                // Input is still the same; show the results
+                                showSuggestions(textWidget, results);
+                            }
+                        }
+                    });
+                } else {
+                    queryInFlight = false;
+                }
+            }
+        }, "GitlabUserSearch");
+        thread.setDaemon(true);
+        thread.start();
     }
 
     /**
