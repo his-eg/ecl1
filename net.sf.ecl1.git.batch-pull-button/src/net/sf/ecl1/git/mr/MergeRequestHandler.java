@@ -82,6 +82,7 @@ public class MergeRequestHandler extends AbstractHandler {
         }
 
         // Validate that there are unpushed commits compared to the target branch
+        /* this does not work reliably
         try {
             String baseRef = detectedTargetBranch != null ? detectedTargetBranch : "master";
             if (!localRepo.hasUnpushedCommits(baseRef)) {
@@ -94,7 +95,7 @@ public class MergeRequestHandler extends AbstractHandler {
         } catch (IOException e) {
         	MessageDialog.openError(shell, "Create Merge Request", e.getMessage());
         	return null;
-        }
+        }*/
 
         String lastCommitMessage = null;
         try {
