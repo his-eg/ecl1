@@ -184,13 +184,28 @@ public class GitlabApi {
     }
 
     /**
+     * Data class for user search results.
+     */
+    public static class UserInfo {
+        public final String username;
+        public final String name;
+        public final String avatarUrl;
+
+        public UserInfo(String username, String name, String avatarUrl) {
+            this.username = username;
+            this.name = name;
+            this.avatarUrl = avatarUrl;
+        }
+    }
+
+    /**
      * Searches for Gitlab users matching the given query string.
      *
      * @param query the search term (matched against username and name)
-     * @return list of usernames, empty list if no matches or on error
+     * @return list of matching users, empty list if no matches or on error
      */
-    public List<String> searchUsers(String query) {
-        List<String> usernames = new ArrayList<>();
+    public List<UserInfo> searchUsers(String query) {
+        List<UserInfo> users = new ArrayList<>();
         try {
             String url = "https://" + server + "/api/v4/users?search="
                     + java.net.URLEncoder.encode(query, "UTF-8") + "&per_page=10";
@@ -203,11 +218,15 @@ public class GitlabApi {
                     int status = response.getStatusLine().getStatusCode();
                     if (status >= 200 && status < 300) {
                         String body = EntityUtils.toString(response.getEntity(), StandardCharsets.UTF_8);
-                        JsonArray users = JsonParser.parseString(body).getAsJsonArray();
-                        for (JsonElement element : users) {
+                        JsonArray usersArray = JsonParser.parseString(body).getAsJsonArray();
+                        for (JsonElement element : usersArray) {
                             JsonObject user = element.getAsJsonObject();
                             String username = user.get("username").getAsString();
-                            usernames.add(username);
+                            String name = user.has("name") && !user.get("name").isJsonNull()
+                                    ? user.get("name").getAsString() : "";
+                            String avatarUrl = user.has("avatar_url") && !user.get("avatar_url").isJsonNull()
+                                    ? user.get("avatar_url").getAsString() : null;
+                            users.add(new UserInfo(username, name, avatarUrl));
                         }
                     }
                 }
@@ -215,7 +234,7 @@ public class GitlabApi {
         } catch (IOException e) {
             // non-fatal, return empty list
         }
-        return usernames;
+        return users;
     }
 
     /**

@@ -1,5 +1,8 @@
 package net.sf.ecl1.git.mr;
 
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -11,6 +14,12 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -19,8 +28,12 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -46,8 +59,8 @@ public class MergeRequestDialog extends TitleAreaDialog {
 
     /** Popup shell for autocomplete suggestions */
     private Shell popupShell;
-    /** List widget inside the popup */
-    private org.eclipse.swt.widgets.List suggestionList;
+    /** Table widget inside the popup */
+    private Table suggestionTable;
     /** Tracks the scheduled debounce runnable to cancel previous ones */
     private Runnable pendingQuery;
     /** Delay in ms before querying the API after a keystroke */
@@ -56,6 +69,16 @@ public class MergeRequestDialog extends TitleAreaDialog {
     private static final int MIN_QUERY_LENGTH = 2;
     /** Flag to suppress modify events when we programmatically set text */
     private boolean suppressModify = false;
+    /** Avatar size in pixels */
+    private static final int AVATAR_SIZE = 32;
+    /** Row height for the suggestion table (avatar + padding for two text lines) */
+    private static final int ROW_HEIGHT = 44;
+    /** Cached avatar images that need to be disposed */
+    private final List<Image> cachedImages = new ArrayList<>();
+    /** Bold font for the full name line */
+    private Font boldFont;
+    /** Color for the @username line */
+    private Color usernameColor;
 
     /**
      * Creates a new MergeRequestDialog.
@@ -93,6 +116,15 @@ public class MergeRequestDialog extends TitleAreaDialog {
         layout.marginWidth = 10;
         layout.marginHeight = 10;
         container.setLayout(layout);
+
+        // Create bold font and username color
+        Font defaultFont = parent.getFont();
+        FontData[] fontData = defaultFont.getFontData();
+        for (FontData fd : fontData) {
+            fd.setStyle(fd.getStyle() | SWT.BOLD);
+        }
+        boldFont = new Font(parent.getDisplay(), fontData);
+        usernameColor = new Color(parent.getDisplay(), 100, 100, 100);
 
         // Message / Title
         Label messageLabel = new Label(container, SWT.NONE);
@@ -151,8 +183,6 @@ public class MergeRequestDialog extends TitleAreaDialog {
 
     /**
      * Sets up autocomplete behaviour on the given text widget.
-     * A popup with suggestions appears after the user types at least
-     * {@link #MIN_QUERY_LENGTH} characters, queried with a debounce delay.
      */
     private void setupAutocomplete(Text textWidget) {
         Display display = textWidget.getDisplay();
@@ -193,7 +223,7 @@ public class MergeRequestDialog extends TitleAreaDialog {
                         Thread thread = new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                final List<String> results = gitlabApi.searchUsers(currentQuery);
+                                final List<GitlabApi.UserInfo> results = gitlabApi.searchUsers(currentQuery);
                                 if (!textWidget.isDisposed()) {
                                     display.asyncExec(new Runnable() {
                                         @Override
@@ -201,7 +231,6 @@ public class MergeRequestDialog extends TitleAreaDialog {
                                             if (textWidget.isDisposed()) {
                                                 return;
                                             }
-                                            // Only show if the text hasn't changed since the query
                                             if (currentQuery.equals(textWidget.getText().trim())) {
                                                 showSuggestions(textWidget, results);
                                             }
@@ -218,8 +247,41 @@ public class MergeRequestDialog extends TitleAreaDialog {
             }
         });
 
-        // Hide popup when the text field loses focus (with a small delay so clicks on
-        // the popup list are processed first)
+        // Forward Up/Down/Enter keys from the text widget to the suggestion table
+        textWidget.addListener(SWT.KeyDown, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                if (popupShell == null || !popupShell.isVisible() || suggestionTable == null || suggestionTable.isDisposed()) {
+                    return;
+                }
+                int count = suggestionTable.getItemCount();
+                if (count == 0) {
+                    return;
+                }
+                int index = suggestionTable.getSelectionIndex();
+
+                if (event.keyCode == SWT.ARROW_DOWN) {
+                    int next = (index < count - 1) ? index + 1 : 0;
+                    suggestionTable.setSelection(next);
+                    suggestionTable.redraw();
+                    event.doit = false;
+                } else if (event.keyCode == SWT.ARROW_UP) {
+                    int prev = (index > 0) ? index - 1 : count - 1;
+                    suggestionTable.setSelection(prev);
+                    suggestionTable.redraw();
+                    event.doit = false;
+                } else if (event.character == SWT.CR || event.character == SWT.LF) {
+                    if (index >= 0) {
+                        selectSuggestion(textWidget, index);
+                        event.doit = false;
+                    }
+                } else if (event.character == SWT.ESC) {
+                    hidePopup();
+                    event.doit = false;
+                }
+            }
+        });
+
         textWidget.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -234,66 +296,212 @@ public class MergeRequestDialog extends TitleAreaDialog {
     }
 
     /**
-     * Shows the autocomplete popup with the given suggestions below the text widget.
+     * Selects the item at the given index and fills the text widget with the username.
      */
-    private void showSuggestions(Text textWidget, List<String> suggestions) {
+    private void selectSuggestion(Text textWidget, int index) {
+        if (index < 0 || suggestionTable == null || index >= suggestionTable.getItemCount()) {
+            return;
+        }
+        String username = (String) suggestionTable.getItem(index).getData("username");
+        if (username != null) {
+            suppressModify = true;
+            textWidget.setText(username);
+            textWidget.setSelection(textWidget.getText().length());
+            suppressModify = false;
+            hidePopup();
+            textWidget.setFocus();
+        }
+    }
+
+    /**
+     * Shows the autocomplete popup with user suggestions below the text widget.
+     * Each row displays: [avatar] bold full name / @username (Gitlab-style).
+     */
+    private void showSuggestions(Text textWidget, List<GitlabApi.UserInfo> users) {
         if (textWidget.isDisposed()) {
             return;
         }
 
-        if (suggestions == null || suggestions.isEmpty()) {
+        if (users == null || users.isEmpty()) {
             hidePopup();
             return;
         }
 
         Shell parentShell = textWidget.getShell();
+        Display display = textWidget.getDisplay();
 
         if (popupShell == null || popupShell.isDisposed()) {
             popupShell = new Shell(parentShell, SWT.ON_TOP | SWT.TOOL);
-            popupShell.setLayout(new GridLayout(1, false));
-            suggestionList = new org.eclipse.swt.widgets.List(popupShell, SWT.SINGLE | SWT.V_SCROLL);
-            suggestionList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+            GridLayout popupLayout = new GridLayout(1, false);
+            popupLayout.marginWidth = 0;
+            popupLayout.marginHeight = 0;
+            popupShell.setLayout(popupLayout);
 
-            // When the user clicks a suggestion, fill the text field
-            suggestionList.addListener(SWT.Selection, event -> {
-                int index = suggestionList.getSelectionIndex();
-                if (index >= 0) {
-                    suppressModify = true;
-                    textWidget.setText(suggestionList.getItem(index));
-                    textWidget.setSelection(textWidget.getText().length());
-                    suppressModify = false;
-                    hidePopup();
-                    textWidget.setFocus();
+            suggestionTable = new Table(popupShell, SWT.SINGLE | SWT.FULL_SELECTION | SWT.V_SCROLL);
+            suggestionTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+            suggestionTable.setHeaderVisible(false);
+            suggestionTable.setLinesVisible(false);
+
+            // Owner-draw: set row height
+            suggestionTable.addListener(SWT.MeasureItem, new Listener() {
+                @Override
+                public void handleEvent(Event event) {
+                    event.height = ROW_HEIGHT;
                 }
             });
 
-            // Also accept Enter key on the list
-            suggestionList.addListener(SWT.KeyDown, event -> {
-                if (event.character == SWT.CR || event.character == SWT.LF) {
-                    int index = suggestionList.getSelectionIndex();
-                    if (index >= 0) {
-                        suppressModify = true;
-                        textWidget.setText(suggestionList.getItem(index));
-                        textWidget.setSelection(textWidget.getText().length());
-                        suppressModify = false;
-                        hidePopup();
-                        textWidget.setFocus();
+            // Owner-draw: render avatar, bold name, and @username
+            suggestionTable.addListener(SWT.PaintItem, new Listener() {
+                @Override
+                public void handleEvent(Event event) {
+                    TableItem item = (TableItem) event.item;
+                    GC gc = event.gc;
+                    int x = event.x + 6;
+                    int y = event.y;
+
+                    // Draw avatar
+                    Image avatar = (Image) item.getData("avatar");
+                    if (avatar != null && !avatar.isDisposed()) {
+                        gc.drawImage(avatar, x, y + (ROW_HEIGHT - AVATAR_SIZE) / 2);
+                    }
+                    x += AVATAR_SIZE + 10;
+
+                    String name = (String) item.getData("name");
+                    String username = (String) item.getData("username");
+
+                    // Draw full name in bold on the first line
+                    Font previousFont = gc.getFont();
+                    Color previousFg = gc.getForeground();
+
+                    String nameText = (name != null && !name.isEmpty()) ? name : username;
+                    gc.setFont(boldFont);
+                    Point nameExtent = gc.textExtent(nameText);
+                    int textY = y + 4;
+                    gc.drawText(nameText, x, textY, true);
+
+                    // Draw @username below in grey
+                    gc.setFont(previousFont);
+                    gc.setForeground(usernameColor);
+                    gc.drawText("@" + username, x, textY + nameExtent.y + 1, true);
+
+                    gc.setForeground(previousFg);
+                }
+            });
+
+            // EraseItem to prevent default text drawing
+            suggestionTable.addListener(SWT.EraseItem, new Listener() {
+                @Override
+                public void handleEvent(Event event) {
+                    event.detail &= ~SWT.FOREGROUND;
+                }
+            });
+
+            // On double-click, select the user
+            suggestionTable.addListener(SWT.DefaultSelection, new Listener() {
+                @Override
+                public void handleEvent(Event event) {
+                    selectSuggestion(textWidget, suggestionTable.getSelectionIndex());
+                }
+            });
+
+            // On single mouse click, select the user
+            suggestionTable.addListener(SWT.MouseUp, new Listener() {
+                @Override
+                public void handleEvent(Event event) {
+                    selectSuggestion(textWidget, suggestionTable.getSelectionIndex());
+                }
+            });
+
+            // On Enter key in the table itself
+            suggestionTable.addListener(SWT.KeyDown, new Listener() {
+                @Override
+                public void handleEvent(Event event) {
+                    if (event.character == SWT.CR || event.character == SWT.LF) {
+                        selectSuggestion(textWidget, suggestionTable.getSelectionIndex());
                     }
                 }
             });
         }
 
-        // Update items
-        suggestionList.removeAll();
-        for (String s : suggestions) {
-            suggestionList.add(s);
+        // Dispose previous avatars and clear
+        disposeCachedImages();
+        suggestionTable.removeAll();
+
+        // Populate table items
+        for (GitlabApi.UserInfo user : users) {
+            TableItem item = new TableItem(suggestionTable, SWT.NONE);
+            item.setData("username", user.username);
+            item.setData("name", user.name);
+            item.setText(""); // text drawn via owner-draw
+
+            // Load avatar asynchronously
+            if (user.avatarUrl != null && !user.avatarUrl.isEmpty()) {
+                final String avatarUrl = user.avatarUrl;
+                final TableItem tableItem = item;
+                Thread avatarThread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Image img = downloadAvatar(display, avatarUrl);
+                        if (img != null && !display.isDisposed()) {
+                            display.asyncExec(new Runnable() {
+                                @Override
+                                public void run() {
+                                    if (!tableItem.isDisposed()) {
+                                        tableItem.setData("avatar", img);
+                                        cachedImages.add(img);
+                                        if (suggestionTable != null && !suggestionTable.isDisposed()) {
+                                            suggestionTable.redraw();
+                                        }
+                                    } else {
+                                        img.dispose();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }, "AvatarDownload");
+                avatarThread.setDaemon(true);
+                avatarThread.start();
+            }
         }
 
         // Position popup below the text widget
         Point textLocation = textWidget.toDisplay(0, textWidget.getBounds().height);
         Rectangle textBounds = textWidget.getBounds();
-        popupShell.setBounds(textLocation.x, textLocation.y, textBounds.width, Math.min(suggestions.size() * 20 + 10, 150));
+        int visibleRows = Math.min(users.size(), 6);
+        int height = visibleRows * ROW_HEIGHT + suggestionTable.getBorderWidth() * 2 + 2;
+        popupShell.setBounds(textLocation.x, textLocation.y, textBounds.width, height);
         popupShell.setVisible(true);
+    }
+
+    /**
+     * Downloads an avatar image from the given URL and scales it to {@link #AVATAR_SIZE}.
+     *
+     * @return the scaled Image, or null on error
+     */
+    private Image downloadAvatar(Display display, String avatarUrl) {
+        try {
+            URL url = new URL(avatarUrl);
+            try (InputStream is = url.openStream()) {
+                ImageData original = new ImageData(is);
+                ImageData scaled = original.scaledTo(AVATAR_SIZE, AVATAR_SIZE);
+                return new Image(display, scaled);
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Disposes all cached avatar images.
+     */
+    private void disposeCachedImages() {
+        for (Image img : cachedImages) {
+            if (!img.isDisposed()) {
+                img.dispose();
+            }
+        }
+        cachedImages.clear();
     }
 
     /**
@@ -332,6 +540,13 @@ public class MergeRequestDialog extends TitleAreaDialog {
     public boolean close() {
         if (popupShell != null && !popupShell.isDisposed()) {
             popupShell.dispose();
+        }
+        disposeCachedImages();
+        if (boldFont != null && !boldFont.isDisposed()) {
+            boldFont.dispose();
+        }
+        if (usernameColor != null && !usernameColor.isDisposed()) {
+            usernameColor.dispose();
         }
         return super.close();
     }
