@@ -1,5 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
+Automatic-Module-Name: net.sf.ecl1.updatecheck
 Bundle-Name: Ecl1 Update Check
 Bundle-SymbolicName: net.sf.ecl1.updatecheck;singleton:=true
 Bundle-Version: 1.9.6.2026-05-06
@@ -8,7 +9,7 @@ Bundle-Vendor: HIS eG
 Require-Bundle: org.eclipse.ui,
  net.sf.ecl1.utilities,
  org.eclipse.jgit
-Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Import-Package: org.eclipse.equinox.p2.core,
  org.eclipse.equinox.p2.engine;version="2.2.0",
