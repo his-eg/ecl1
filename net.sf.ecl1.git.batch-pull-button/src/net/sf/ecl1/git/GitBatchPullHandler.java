@@ -82,9 +82,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 		Status status;
 
 		List<IProject> projects = Arrays.asList(WorkspaceFactory.getWorkspace().getRoot().getProjects());
-		//Unnecessary after finishing #267325. The problem definition for #250882 was flawed and therefore sort was 
-		//never really needed by the user. Even though it is pointless, it stays in, because it doesn't do any harm...
-		Collections.sort(projects, projectComparator);
+
 		String[] projectNames = new String[projects.size()];
 		for (int i = 0; i < projectNames.length; i++) {
 			projectNames[i] = projects.get(i).getName();
@@ -175,68 +173,5 @@ public class GitBatchPullHandler extends AbstractHandler {
 		});
 		return result;
 	}
-	
-	/**
-	 * 
-	 * Sorts the projects according to the following order: 
-	 *  
-	 * 1. *.api
-     * 2. webapps
-     * 3. cs.* ohne *.dbschema.*, ohne *.frontend
-     * 4. cm.*, fs.*, rm.* jeweils ohne *.frontend
-     * 5. *.frontend
-     * 6. *.dbschema.*
-     * 7. rest
-	 * 
-	 * Sorting the projects in this order speeds up the build-process. 
-	 * 
-	 */
-	Comparator<IProject> projectComparator = new Comparator<IProject>() {
-		
-		private int getPriority(IProject p) {
-			final String api = ".api";
-			final String webapps = "webapps";
-			final String cs = "cs.";
-			final String frontend = ".frontend";
-			final String cm = "cm.";
-			final String fs = "fs.";
-			final String rm = "rm.";
-			final String dbschema = ".dbschema.";
-			
-			String pName = p.getName();
-			if(pName.endsWith(api)) {
-				return 0;
-			}
-			
-			if(pName.matches(webapps)) {
-				return 1;
-			}
-			
-			if(pName.startsWith(cs) && !(pName.contains(dbschema) || pName.endsWith(frontend))) {
-				return 2;
-			}
-			
-			if( (pName.startsWith(cm) || pName.startsWith(fs) || pName.startsWith(rm)) && !pName.endsWith(frontend)) {
-				return 3;
-			}
-			
-			if(pName.endsWith(frontend)) {
-				return 4;
-			}  
-			
-			if(pName.contains(dbschema)) {
-				return 5;
-			}
-			
-			return 6;
-		}
-		
-		
-		@Override
-		public int compare(IProject p1, IProject p2) {
-			return getPriority(p1) - getPriority(p2);
-		}		
-		
-	};
-	
+
 }
