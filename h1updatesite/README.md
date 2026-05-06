@@ -3,6 +3,9 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.9.6.2025-05-06##
+* Added GitLab Merge Request Button
+
 ##Version 1.9.5.2025-12-02##
 * HIS-extension are now added to the runtime even if no ecl1 classpath container is present
 
