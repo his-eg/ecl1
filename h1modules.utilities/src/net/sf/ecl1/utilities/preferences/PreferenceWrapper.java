@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceStore;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import net.sf.ecl1.utilities.Activator;
 import net.sf.ecl1.utilities.general.GitUtil;
@@ -121,13 +122,23 @@ public class PreferenceWrapper {
     /*
      * Ensures that changes to the standalone preference store are persisted.
      */
-    private static void saveStore(){
-        if(getStore().needsSaving()){
-            try {
-                ((PreferenceStore) getStore()).save();
-            } catch (IOException e) {
-                logger.error("Error while saving to preference store", e);
-            }
-        }
-    }
+	private static void saveStore() {
+		if (Activator.isRunningInEclipse()) {
+			if (getStore().needsSaving()) {
+				try {
+					((ScopedPreferenceStore) getStore()).save();
+				} catch (IOException e) {
+					logger.error("Error while saving to preference store", e);
+				}
+			}
+		} else {
+			if (getStore().needsSaving()) {
+				try {
+					((PreferenceStore) getStore()).save();
+				} catch (IOException e) {
+					logger.error("Error while saving to preference store", e);
+				}
+			}
+		}
+	}
 }
