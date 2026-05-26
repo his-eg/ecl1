@@ -1,5 +1,8 @@
 package net.sf.ecl1.git;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
@@ -18,8 +21,14 @@ public class Activator extends AbstractUIPlugin {
 	
 	private Job gitBatchPullJob;
 	
+	private List<Job> pullJobs = new ArrayList<>();
+	
 	public void setGitBatchPullJob(Job job) {
 		gitBatchPullJob = job;
+	}
+	
+	public void appendPullJob(Job job) {
+		pullJobs.add(job);
 	}
 	
 	/**
@@ -42,6 +51,14 @@ public class Activator extends AbstractUIPlugin {
 	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
 	public void stop(BundleContext context) throws Exception {
+		//inner jobs
+		for (Job job: pullJobs) {
+			if ( job != null ) {
+				job.cancel();
+				job.join();
+			}
+		}
+		//main job
 		if ( gitBatchPullJob != null ) {
 			gitBatchPullJob.cancel();
 			gitBatchPullJob.join();
