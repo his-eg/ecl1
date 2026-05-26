@@ -109,26 +109,35 @@ public class GitUtil {
 	/** The local master branch is called HEAD on the remote jenkins server */
 	public static final String REMOTE_ALIAS_FOR_LOCAL_MASTER_BRANCH = "HEAD";
 
+	
 	public static String getCheckedOutBranchOfWebapps() {
-	        IProject webappsProject = WebappsUtil.findWebappsProject();
-	        if(webappsProject != null) {
-	        	String webappsPath = webappsProject.getLocation().toString();
-	            try (Git git = Git.open(new File(webappsPath))){
-					String branch = git.getRepository().getFullBranch();
-					//Remove "refs/heads/" from branch name
-					branch = branch.substring(branch.lastIndexOf("/")+1);
-					if(branch.equals(MASTER)) {
-						branch = REMOTE_ALIAS_FOR_LOCAL_MASTER_BRANCH;
-					}
-					return branch;
-				} catch (IOException e) {
-					logger.info("Could not open git repository. Therefore I could not determine the branch of the repository.\n "
-							+ "Exception was: " + e.getMessage());
-			        return UNKNOWN_BRANCH;
+        IProject webappsProject = WebappsUtil.findWebappsProject();
+        if(webappsProject != null) {
+        	File webappsPath = webappsProject.getLocation().toFile();
+            try {
+            	Repository repository = new FileRepositoryBuilder()
+                    .setWorkTree(webappsPath)
+                    .readEnvironment()
+                    .findGitDir(webappsPath)
+                    .build();
+            	
+				String branch = repository.getFullBranch();
+				//Remove "refs/heads/" from branch name
+				branch = branch.substring(branch.lastIndexOf("/")+1);
+				if(branch.equals(MASTER)) {
+					branch = REMOTE_ALIAS_FOR_LOCAL_MASTER_BRANCH;
 				}
-	        }
-	        return UNKNOWN_BRANCH;
-		}
+            	
+				return branch;
+			} catch (IOException e) {
+				logger.info("Could not open git repository. Therefore I could not determine the branch of the repository.\n "
+						+ "Exception was: " + e.getMessage());
+		        return UNKNOWN_BRANCH;
+			}
+        }
+        return UNKNOWN_BRANCH;
+	}
+
 
     /**
      * Sets up standalone SSH authentication for JGit.  
