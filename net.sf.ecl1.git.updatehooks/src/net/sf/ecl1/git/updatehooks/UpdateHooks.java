@@ -172,9 +172,9 @@ public class UpdateHooks implements IStartup {
 			return null;
 		}
 		if(gitFile.isFile()) {
-			logger.info("Trying to read git base repository from worktree for project "+ project.getName());
+			logger.info("Reading git base repository from worktree for project "+ project.getName());
 		} else {
-			logger.info("Trying to read git repository for project "+ project.getName());
+			logger.info("Reading git repository for project "+ project.getName());
 		}
 		File projectRoot = project.getLocation().toFile();
 	    try {
@@ -183,7 +183,23 @@ public class UpdateHooks implements IStartup {
 	            .readEnvironment()
 	            .findGitDir(projectRoot)
 	            .build();
-	        return repository.getCommonDirectory().toPath();
+
+	    	File gitDir = repository.getDirectory();
+	    	// worktree
+	    	if(gitFile.isFile()) {
+		    	// Compatibility workaround for JGit < 7 (used by Eclipse versions before 2024-12),
+		    	// where Repository#getCommonDirectory() is not yet available.
+		    	File commonDirFile = new File(gitDir, "commondir");
+		    	if (commonDirFile.exists()) {
+		    	    String relative = Files.readString(commonDirFile.toPath()).trim();
+		    	    File commonDir = new File(gitDir, relative).getCanonicalFile();
+		    	    return commonDir.toPath();
+		    	}
+				return null;
+	    	}else {
+	    		return gitDir.toPath();
+	    	}
+
 	    } catch (IOException e) {
 	        logger.error("Failed to resolve Git directory for project " + project.getName()+"\n" + e.getMessage());
 	        return null;
