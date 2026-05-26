@@ -13,6 +13,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.jgit.util.FS;
 import org.eclipse.jgit.util.FS.ExecutionResult;
 
@@ -58,25 +59,27 @@ public class AutoLfsPruneJob extends Job {
 
 			String name = p.getName();
 			monitor.subTask(name);
-			File projectLocationFile = p.getLocation().append(".git").toFile();
-			logger.info(name + " with location " + projectLocationFile.getAbsolutePath());
-
-			/*
-			 * Detect if this work tree is a linked work tree --> Gracefully abort if a linked work tree is detected
-			 */
-			if(projectLocationFile.isFile()) {
-				logger.info(name + " is managed by git, but you are currently in a linked work tree. Auto lfs pruning will not work in a linked work tree. Skipping...");
-				monitor.worked(1);
-				continue;
+			File gitFile = p.getLocation().append(".git").toFile();
+			File projectRoot = p.getLocation().toFile();
+			
+			if (gitFile.isDirectory()) {
+				logger.info(name + " with location " + projectRoot.getAbsolutePath());
+			}else {
+				logger.info(name + "(worktree) with location " + projectRoot.getAbsolutePath());
 			}
-
+			
 			/*
 			 * Try to open git-repo of this project
 			 */
-			try (Git git = Git.open(projectLocationFile);
-				Repository repo = git.getRepository();) {
+		    try {
+		    	Repository repository = new FileRepositoryBuilder()
+		            .setWorkTree(projectRoot)
+		            .readEnvironment()
+		            .findGitDir(projectRoot)
+		            .build();
+		    	
 				try {
-					ExecutionResult er = runCommandInRepo("git lfs prune", repo);
+					ExecutionResult er = runCommandInRepo("git lfs prune", repository);
 					
 					if (er.getRc() != 0) {
 						logger.error2("Command: \"git lfs prune\" returned an error code! Prune attempt was not successful...");
