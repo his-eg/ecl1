@@ -29,6 +29,8 @@ dependencies {
     }
     implementation libs.eclipse.jgit
     implementation libs.slf4j.nop // standalone, provides a StaticLoggerBinder required by JGit
+    implementation libs.gson
+    implementation libs.httpclient
 }
 
 sourceSets {
