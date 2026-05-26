@@ -18,3 +18,5 @@ out
 
 # Ignore ecl1 jars in VSCode extension
 vscodeExtension/ecl1/jars/*
+
+/.metadata/
