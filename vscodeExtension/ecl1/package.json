@@ -15,7 +15,9 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": ["onStartupFinished"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./out/extension.js",
   "icon": "ecl1_icon.png",
   "contributes": {
@@ -75,17 +77,17 @@
       }
     ],
     "menus": {
-    "view/title": [
+      "view/title": [
         {
-            "command": "ecl1CommandsTreeView.refresh",
-            "when": "view == ecl1CommandsTreeView",
-            "group": "navigation"
+          "command": "ecl1CommandsTreeView.refresh",
+          "when": "view == ecl1CommandsTreeView",
+          "group": "navigation"
         },
         {
           "command": "ecl1SettingsTreeView.refresh",
           "when": "view == ecl1SettingsTreeView",
           "group": "navigation"
-      }
+        }
       ]
     },
     "viewsWelcome": [
@@ -109,7 +111,7 @@
         },
         "ecl1.hideNonProjects": {
           "type": "boolean",
-          "default": true,
+          "default": false,
           "description": "Enable or disable exclusion of non projects in workspace root folder."
         },
         "ecl1.gitRepositoryScanMaxDepth": {
@@ -137,7 +139,13 @@
     "@typescript-eslint/parser": "^8.25.0",
     "eslint": "^9.21.0",
     "typescript": "^5.7.3",
-    "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1"
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  },
+  "overrides": {
+    "mocha": {
+      "serialize-javascript": "^7.0.5",
+      "diff": "^8.0.3"
+    }
   }
 }
