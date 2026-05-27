@@ -1,5 +1,5 @@
 import * as vscode from 'vscode';
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import path from 'path';
 import { readdirSync, existsSync, mkdirSync,
         writeFile, readFile, unlink } from 'fs';
@@ -387,13 +387,29 @@ function getOutputChannelByName(name: string): vscode.OutputChannel {
  * @param name name for displaying the output
  */
 function runEcl1Jar(extensionPath: string, jarPath: string, name: string) {
+    const outputChannel = getOutputChannelByName('ecl1: ' + name);
+    outputChannel.show();
+
+    const javaPath = findJava21();
+
+    if (!javaPath) {
+        vscode.window.showErrorMessage(
+            'Java 21 or newer is required to run this extension.'
+        );
+
+        outputChannel.appendLine('Java 21+ not found.');
+        return;
+    }
+
     const fullJarPath = path.join(extensionPath, jarPath);
     const innerWsPath = getInnerWorkspaceFolder();
     const args = ['-jar', fullJarPath, innerWsPath];
-    const javaProcess = spawn('java', args, { stdio: 'pipe' });
-    
-    const outputChannel = getOutputChannelByName('ecl1: ' + name);
-    outputChannel.show();
+
+    outputChannel.appendLine(`Using Java: ${javaPath}`);
+
+    const javaProcess = spawn(javaPath, args, {
+        stdio: 'pipe'
+    });
 
     javaProcess.stdout.on('data', (data) => {
         outputChannel.appendLine(stripAnsiColor(data));
@@ -483,4 +499,49 @@ function writeExclusionsToFile(fileNames: Array<string>) {
             vscode.window.showErrorMessage('Failed to write file excludedNames.txt: ' + err.message);
         }
     });
+}
+
+
+function findJava21(): string | null {
+    const candidates: string[] = [
+        'java',
+
+        // Windows
+        'C:\\Program Files\\OpenJDK\\Java 21\\bin\\java.exe',
+
+        // Linux
+        '/usr/lib/jvm/java-21-openjdk/bin/java',
+        '/usr/lib/jvm/java-21-openjdk-amd64/bin/java',
+        '/usr/lib/jvm/jdk-21/bin/java'
+    ];
+
+    for (const javaPath of candidates) {
+        if (javaPath !== 'java' && !existsSync(javaPath)) {
+            continue;
+        }
+
+        const version = getJavaMajorVersion(javaPath);
+
+        if (version !== null && version >= 21) {
+            return javaPath;
+        }
+    }
+
+    return null;
+}
+
+function getJavaMajorVersion(javaPath: string): number | null {
+    const result = spawnSync(javaPath, ['-version'], {
+        encoding: 'utf8',
+        shell: false
+    });
+
+    if (result.error || result.status === null) {
+        return null;
+    }
+
+    const text = (result.stderr || result.stdout || '').toString();
+
+    const match = text.match(/version "(\d+)/);
+    return match ? Number(match[1]) : null;
 }
