@@ -19,6 +19,8 @@ import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -71,28 +73,6 @@ public class GitBatchPullHandler extends AbstractHandler {
 			}
 		};
 		
-		
-		
-		
-		
-		/*
-		es kommt zu filelock wenn ich webapps und angualbase gemeinsame pulle macht webaops dichtf
-		es kommt zu filelock wenn ich webapps und angualbase gemeinsame pulle macht webaops dichtf
-		es kommt zu filelock wenn ich webapps und angualbase gemeinsame pulle macht webaops dichtf
-		
-		
-		es kommt zu filelock wenn ich webapps und angualbase gemeinsame pulle macht webaops dichtf
-		
-		
-		schon behoen? -scheint so
-		*/
-		
-		
-		
-		
-
-		
-		
 		//Registering the job enables the activator to properly shutdown the job when eclipse shuts down
 		Activator.getDefault().setGitBatchPullJob(job);
 		job.schedule();
@@ -133,20 +113,19 @@ public class GitBatchPullHandler extends AbstractHandler {
 			}
 			
 			String name = p.getName();
-			File projectLocationFile = p.getLocation().append(".git").toFile();
-			//TODO worktree
-			if(projectLocationFile.isFile()) {
-				multiStatus.add(new Status(IStatus.INFO, Activator.PLUGIN_ID, name + " is managed by git, but you are currently in a linked work tree. Git Batch Pull will not work in a linked work tree. Skipping..."));
-				batchMonitor.worked(1);
-				continue;
-			}
+			File projectRoot = p.getLocation().toFile();
+			boolean isWorktree = p.getLocation().append(".git").toFile().isFile();
 
 			Job pullJob = new WorkspaceJob("ecl1: Executing \"git pull\" for "+ name) {
 				@Override
 				public IStatus runInWorkspace(IProgressMonitor innerMonitor) {
-					logger.info("Processing " + name + " with location " + projectLocationFile.getAbsolutePath());
+					if(isWorktree) {
+						logger.info("Processing " + name + "(worktree) with location " + projectRoot.getAbsolutePath());
+					}else {
+						logger.info("Processing " + name + " with location " + projectRoot.getAbsolutePath());
+					}
 					innerMonitor.beginTask("Pulling " + name, IProgressMonitor.UNKNOWN);
-					gitPull(innerMonitor, multiStatus, projectLocationFile, name);
+					gitPull(innerMonitor, multiStatus, projectRoot, name);
 					innerMonitor.done();
 					logger.info("Finished Processing " + name);
 					batchMonitor.worked(1);
@@ -170,18 +149,26 @@ public class GitBatchPullHandler extends AbstractHandler {
 	}
 	
 	
-	private void gitPull(IProgressMonitor monitor, MultiStatus multiStatus, File projectLocationFile, String name) {
+	private void gitPull(IProgressMonitor monitor, MultiStatus multiStatus, File projectRoot, String name) {
 		if(monitor.isCanceled()) {
 			multiStatus.add(Status.CANCEL_STATUS);
 			return;
 		}
-		try (Git git = Git.open(projectLocationFile)){
-			try {
-				PullCommand pull = git.pull();
-				PullResult pullResult = pull.call();
-				parsePullResult(name, pullResult, multiStatus);
-			} catch (GitAPIException | JGitInternalException e) {
-				multiStatus.add(new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": " + e.getMessage() + ". Skipping and proceeding."));
+		try{
+	    	Repository repository = new FileRepositoryBuilder()
+		            .setWorkTree(projectRoot)
+		            .readEnvironment()
+		            .findGitDir(projectRoot)
+		            .build();
+
+	    	try (Git git = new Git(repository)) {
+				try {
+					PullCommand pull = git.pull();
+					PullResult pullResult = pull.call();
+					parsePullResult(name, pullResult, multiStatus);
+				} catch (GitAPIException | JGitInternalException e) {
+					multiStatus.add(new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": " + e.getMessage() + ". Skipping and proceeding."));
+				}
 			}
 		} catch (org.eclipse.jgit.errors.RepositoryNotFoundException rnfe) {
 			// ignore
