@@ -118,6 +118,11 @@
           "type": "boolean",
           "default": true,
           "description": "Set git.RepositoryScanMaxDepth to 2 (requires window reload)."
+        },
+        "ecl1.javaPath": {
+          "type": "String",
+          "default": "",
+          "description": "Custom path to Java bin directory."
         }
       }
     }

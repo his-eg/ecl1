@@ -503,17 +503,34 @@ function writeExclusionsToFile(fileNames: Array<string>) {
 
 
 function findJava21(): string | null {
-    const candidates: string[] = [
-        'java',
+    const config = vscode.workspace.getConfiguration();
+    const configuredBinPath = config.get<string>('ecl1.javaPath');
 
-        // Windows
-        'C:\\Program Files\\OpenJDK\\Java 21\\bin\\java.exe',
+    const candidates: string[] = [];
 
-        // Linux
+    // User configured path
+    if (configuredBinPath) {
+        candidates.push(
+            path.join(
+                configuredBinPath,
+                process.platform === 'win32' ? 'java.exe' : 'java'
+            )
+        );
+    }
+    // PATH fallback
+    candidates.push('java');
+
+    // Windows fallback
+    candidates.push(
+        'C:\\Program Files\\OpenJDK\\Java 21\\bin\\java.exe'
+    );
+
+    // Linux fallbacks
+    candidates.push(
         '/usr/lib/jvm/java-21-openjdk/bin/java',
         '/usr/lib/jvm/java-21-openjdk-amd64/bin/java',
         '/usr/lib/jvm/jdk-21/bin/java'
-    ];
+    );
 
     for (const javaPath of candidates) {
         if (javaPath !== 'java' && !existsSync(javaPath)) {
