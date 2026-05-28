@@ -13,6 +13,7 @@ if [ -z "$NEW_VERSION" ]; then
     NEW_PATCH=$(($PATCH + 1))
     NEW_DATE=$(date +%F)
     NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH.$NEW_DATE"
+    VSCODE_VERSION="$MAJOR.$MINOR.$NEW_PATCH-$NEW_DATE"
     echo "New version: $NEW_VERSION"
 fi
 
@@ -37,4 +38,4 @@ sed -i --binary "s/$OLD_VERSION/$NEW_VERSION/g" ./h1updatesite/site.xml
 
 ## Update vscode extension package
 echo "Updating version in ./vscodeExtension/ecl1/package.json"
-sed -i --binary 's/"version": "[^"]*"/"version": "'$NEW_VERSION'"/' ./vscodeExtension/ecl1/package.json
+sed -i --binary 's/"version": "[^"]*"/"version": "'$VSCODE_VERSION'"/' ./vscodeExtension/ecl1/package.json
