@@ -26,7 +26,6 @@ dependencies {
             transitive = false
         }
     }
-    implementation libs.eclipse.swt.svg
     implementation (libs.eclipse.jface) {
         transitive = false
     }
