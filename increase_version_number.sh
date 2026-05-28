@@ -13,7 +13,7 @@ if [ -z "$NEW_VERSION" ]; then
     NEW_PATCH=$(($PATCH + 1))
     NEW_DATE=$(date +%F)
     NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH.$NEW_DATE"
-    VSCODE_VERSION="$MAJOR.$MINOR.$NEW_PATCH-$NEW_DATE"
+    VSCODE_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
     echo "New version: $NEW_VERSION"
 fi
 
