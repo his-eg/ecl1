@@ -1,5 +1,24 @@
 #!/bin/bash
 
+
+# Remind the user to update README and CHANGELOG:
+echo "############################"
+echo "Before running this script:"
+echo "1. Please manually add an entry for the new version in the following files:"
+echo "./h1updatesite/README.md"
+echo "./vscodeExtension/ecl1/CHANGELOG.md"
+# Ask user
+read -p "Do you really want to continue? [Y/n] " answer
+
+# Convert answer to lowercase to make it case-insensitive
+answer="${answer,,}"
+
+if [[ "$answer" == "n" || "$answer" == "no" ]]; then
+    echo "Aborting..."
+    exit 1
+fi
+
+
 ###############################################################################
 # Parameters:
 # 1. Yubikey Pin (mandatory)
@@ -32,10 +51,9 @@ source ./increase_version_number.sh
 # Inform the user what manual steps still need to be done:
 echo "############################"
 echo "Script completed. The following manual steps are needed:"
-echo "1. Please manually add an entry for the new version in the following file: ./h1updatesite/README.md"
-echo "2. Push your changes: "
-echo "2.1 git push #push commits"
-echo "2.2 git push --tags #push new tag"
-echo "3. Update the update sites"
-echo "3.1 https://devtools.his.de/ecl1/"
-echo "3.2 https://sourceforge.net/projects/ecl1/files/"
+echo "1. Push your changes: "
+echo "1.1 git push #push commits"
+echo "1.2 git push --tags #push new tag"
+echo "2. Update the update sites"
+echo "2.1 https://devtools.his.de/ecl1/"
+echo "2.2 https://sourceforge.net/projects/ecl1/files/"
