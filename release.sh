@@ -57,3 +57,6 @@ echo "1.2 git push --tags #push new tag"
 echo "2. Update the update sites"
 echo "2.1 https://devtools.his.de/ecl1/"
 echo "2.2 https://sourceforge.net/projects/ecl1/files/"
+
+echo "3. Publish the VSCode extension"
+echo "3.1 ./publish_vsc_extension.sh"
