@@ -1,5 +1,5 @@
 [versions]
-eclipse-jgit = "[0,)"
+eclipse-jgit = "6.10.0.202406032230-r"
 slf4j-nop = "[0,)"
 eclipse-core-resources = "3.20.200"
 eclipse-core-commands = "3.12.300"
