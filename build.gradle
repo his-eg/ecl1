@@ -1,8 +1,139 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+plugins {
+    id 'com.gradleup.shadow' version '9.2.0'
+}
+
+
+configurations {
+    swtWindowsRuntime {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+    swtLinuxRuntime {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    swtWindowsRuntime(libs.eclipse.swt.win32){
+        transitive = false
+    }
+    swtLinuxRuntime(libs.eclipse.swt.linux){
+        transitive = false
+    }
+}
+
+def osName = System.getProperty("os.name").toLowerCase()
+def currentSwtRuntime
+if (osName.contains("win")) {
+    currentSwtRuntime = configurations.swtWindowsRuntime
+} else if (osName.contains("linux")) {
+    currentSwtRuntime = configurations.swtLinuxRuntime
+} else {
+    throw new GradleException("Unsupported operating system")
+}
+
 subprojects {
     plugins.withType(JavaPlugin) {
         java {
             toolchain {
                 languageVersion = JavaLanguageVersion.of(21)
+            }
+        }
+    }
+}
+
+
+
+/*
+ * Configure tasksfor executable Shadow projects.
+ *   - shadowJarWindows
+ *   - shadowJarLinux
+ */
+subprojects {
+    plugins.withId('application') {
+        plugins.withId('com.gradleup.shadow') {
+            def applicationExtension = extensions.getByType(
+                org.gradle.api.plugins.JavaApplication
+            )
+
+            def shadowJarWindows = tasks.register('shadowJarWindows', ShadowJar) {
+                group = 'build'
+                description = 'Creates the Windows x86_64 fat JAR'
+
+                archiveClassifier = 'win32-x64'
+
+                from sourceSets.main.output
+
+                configurations = [
+                    project.configurations.runtimeClasspath,
+                    rootProject.configurations.swtWindowsRuntime
+                ]
+
+                exclude 'META-INF/*.SF'
+                exclude 'META-INF/*.RSA'
+
+                /*
+                 * Custom Shadow tasks do not automatically inherit the
+                 * manifest of the default shadowJar task.
+                 */
+                manifest {
+                    attributes(
+                        'Main-Class': applicationExtension.mainClass.get()
+                    )
+                }
+            }
+
+            def shadowJarLinux = tasks.register('shadowJarLinux', ShadowJar) {
+                group = 'build'
+                description = 'Creates the linux-x64 fat JAR'
+
+                archiveClassifier = 'linux-x64'
+
+                from sourceSets.main.output
+
+                configurations = [
+                    project.configurations.runtimeClasspath,
+                    rootProject.configurations.swtLinuxRuntime
+                ]
+
+                exclude 'META-INF/*.SF'
+                exclude 'META-INF/*.RSA'
+
+                manifest {
+                    attributes(
+                        'Main-Class': applicationExtension.mainClass.get()
+                    )
+                }
+            }
+
+            /*
+             * The ordinary shadowJar would contain no SWT runtime.
+             * Disable it to avoid accidentally distributing a broken JAR.
+             */
+            tasks.named('shadowJar', ShadowJar).configure {
+                enabled = false
+            }
+
+            /*
+             * Build both platform variants with the regular assemble task.
+             */
+            tasks.named('assemble') {
+                dependsOn shadowJarWindows
+                dependsOn shadowJarLinux
+            }
+
+            /*
+             * Keep local Gradle execution working:
+             * ./gradlew :project:run
+             */
+            tasks.named('run', JavaExec) {
+                classpath += currentSwtRuntime
             }
         }
     }
