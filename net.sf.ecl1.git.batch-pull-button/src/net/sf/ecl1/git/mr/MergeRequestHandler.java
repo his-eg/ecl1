@@ -11,6 +11,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -169,7 +170,13 @@ public class MergeRequestHandler extends AbstractHandler {
                 if (project.getLocation() != null) {
                     return project.getLocation().toFile();
                 }
-            }
+            } else if (element instanceof IJavaProject) {
+				IJavaProject javaProject = (IJavaProject) element;
+				IProject project = javaProject.getProject();
+				if (project != null && project.getLocation() != null) {
+					return project.getLocation().toFile();
+				}
+			}
         }
 
         // Fallback: try to get from active editor
