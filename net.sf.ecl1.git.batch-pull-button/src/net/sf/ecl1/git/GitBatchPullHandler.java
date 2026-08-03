@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IProject;
@@ -14,6 +15,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobGroup;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -21,11 +24,13 @@ import org.eclipse.jgit.api.errors.JGitInternalException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.HandlerUtil;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 import net.sf.ecl1.utilities.general.GitUtil;
 import net.sf.ecl1.utilities.logging.ICommonLogger;
@@ -43,21 +48,32 @@ public class GitBatchPullHandler extends AbstractHandler {
 		
     private static final ICommonLogger logger = LoggerFactory.getLogger(GitBatchPullHandler.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
     private static final int MAX_PARALLEL_PULLS = 10;
+    private static final String WEBAPPS = "webapps";
     /**
      * Pull large projects first.
      * List order defines pull order.
     */
-    private static final List<String> PRIORITY_PROJECTS = List.of("webapps", "cs.sys.dbschema.hisinone");
+    private static final List<String> PRIORITY_PROJECTS = List.of(WEBAPPS, "cs.sys.dbschema.hisinone");
+    /** If tomcat is running, warn before pulling webapps */
+    private enum TomcatPullDecision {
+    	PULL, SKIP, CANCEL
+    }
     
 	@Override
 	public Object execute(ExecutionEvent event) {
-		
 		logger.info("Starting ecl1GitBatchPull");
+		
+		TomcatPullDecision decision = getTomcatPullDecision(event);
+		if(decision == TomcatPullDecision.CANCEL) {
+			logger.info("ecl1GitBatchPull canceled by user");
+			return null;
+		}
+		boolean skipWebapps = decision == TomcatPullDecision.SKIP;
 
 		// standalone
 		if(!net.sf.ecl1.utilities.Activator.isRunningInEclipse()){
 			GitUtil.setupStandaloneSsh();
-			IStatus multiStatus = schedulePullJobs(new NullProgressMonitor());
+			IStatus multiStatus = schedulePullJobs(new NullProgressMonitor(), skipWebapps);
 			if (PreferenceWrapper.isDisplaySummaryOfGitPull()) {
 				Display display = new Display();
 				SwtUtil.bringShellToForeground(display);
@@ -72,7 +88,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 		Job job = new WorkspaceJob("ecl1: Executing \"git pull\" for all git versioned projects in the workspace.") {
 			@Override
 			public IStatus runInWorkspace(IProgressMonitor monitor) {
-				IStatus multiStatus = schedulePullJobs(monitor);
+				IStatus multiStatus = schedulePullJobs(monitor, skipWebapps);
 				return displayResultStatus(multiStatus);
 			}
 		};
@@ -81,6 +97,92 @@ public class GitBatchPullHandler extends AbstractHandler {
 		Activator.getDefault().setGitBatchPullJob(job);
 		job.schedule();
 		return null;
+	}
+	
+	private	TomcatPullDecision getTomcatPullDecision(ExecutionEvent event) {
+		boolean webappsAvailable = WorkspaceFactory.getWorkspace().getRoot().getProject(WEBAPPS).isAccessible();
+		
+		if(!webappsAvailable || !isTomcatRunning()) {
+			return TomcatPullDecision.PULL;
+		}
+		
+		// standalone
+		if(!net.sf.ecl1.utilities.Activator.isRunningInEclipse()) {
+			Display display = new Display();
+			try {
+				return openTomcatDialog(display.getActiveShell());
+			} finally {
+				display.dispose();
+			}
+			
+		} else {
+			return openTomcatDialog(HandlerUtil.getActiveShell(event));
+		}
+	}
+	
+	private TomcatPullDecision openTomcatDialog(Shell parentShell) {
+		MessageDialog dialog = new MessageDialog(parentShell, "Tomcat is running", null,
+				"Pulling webapps while tomcat is running may fail to update locked files and leave the repository in an inconsistent state!"
+						+ "\n\n How would you like to proceed?",
+				MessageDialog.WARNING, 2, "Pull anyway", "Skip "+ WEBAPPS, IDialogConstants.CANCEL_LABEL);
+		
+		return switch (dialog.open()) {
+			case 0 -> TomcatPullDecision.PULL;
+			case 1 -> TomcatPullDecision.SKIP;
+			default -> TomcatPullDecision.CANCEL;
+		};
+	}
+
+	private boolean isTomcatRunning() {
+		String osName = System.getProperty("os.name").toLowerCase();
+		ProcessBuilder processBuilder;
+		int notRunningExitCode;
+		
+		if (osName.startsWith("win")) {
+			// Exit code 0 Tomcat running, 10 Tomcat not running
+			String powershellCommand = "$tomcat = Get-CimInstance Win32_Process "
+					+ "| Where-Object { "
+					+ "($_.Name -eq 'java.exe' -or $_.Name -eq 'javaw.exe') "
+					+ "-and $_.CommandLine -like '*-Dcatalina.base=*' } "
+					+ "| Select-Object -First 1; "
+					+ "if ($tomcat) { exit 0 } else { exit 10 }";
+
+			processBuilder = new ProcessBuilder(
+					"powershell.exe",
+					"-NoProfile",
+					"-NonInteractive",
+					"-Command",
+					powershellCommand);
+			notRunningExitCode = 10;
+		} else if (osName.startsWith("linux")) {
+			processBuilder = new ProcessBuilder(
+					"pgrep",
+					"f",
+					"--",
+					"-D[c]atalina\\.base=");
+			notRunningExitCode = 1;
+		} else {
+			logger.warn("Tomcat detection not supported on "+ osName);
+			return true;
+		}
+		
+		try {
+			int exitCode = processBuilder.start().waitFor();
+			if (exitCode == 0) {
+				return true;
+			}
+			if (exitCode == notRunningExitCode) {
+				return false;
+			}
+			logger.warn("Could not check wheter Tomcat is running. Exit code: " + exitCode);
+			return true;
+		} catch (IOException e) {
+			logger.warn("Could not check wheter Tomcat is running.", e);
+			return true;
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			return true;
+		}
 	}
 	
 	/**
@@ -138,12 +240,17 @@ public class GitBatchPullHandler extends AbstractHandler {
 	/**
 	 * Schedules and collects all pull jobs.
 	 */
-	private MultiStatus schedulePullJobs(IProgressMonitor batchMonitor) {
+	private MultiStatus schedulePullJobs(IProgressMonitor batchMonitor, boolean skipWebapps) {
 		MultiStatus multiStatus = new MultiStatus(Activator.PLUGIN_ID, 0,
 				"Problems occurred during \"Batch Git Pull Command\"");
 	
 		List<IProject> projects = getProjectsForPull();
 		List<String> projectNames = new ArrayList<>();
+		
+		if (skipWebapps) {
+			projects.removeIf(project -> WEBAPPS.equals(project.getName()));
+			logger.info("Skipping pull for "+WEBAPPS);
+		}
 	
 		for (IProject project : projects) {
 			projectNames.add(project.getName());
