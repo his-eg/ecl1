@@ -3,9 +3,8 @@ package net.sf.ecl1.git;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
-
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IProject;
@@ -14,8 +13,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobGroup;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.JGitInternalException;
@@ -24,6 +23,7 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
@@ -42,8 +42,12 @@ import net.sf.ecl1.utilities.standalone.workspace.WorkspaceFactory;
 public class GitBatchPullHandler extends AbstractHandler {
 		
     private static final ICommonLogger logger = LoggerFactory.getLogger(GitBatchPullHandler.class.getSimpleName(), Activator.PLUGIN_ID, Activator.getDefault());
-    private static final Status dummyStatus = new Status(IStatus.OK, Activator.PLUGIN_ID, "Dummy Status for inner Jobs that share a Multistatus");
-    
+    private static final int MAX_PARALLEL_PULLS = 10;
+    /**
+     * Pull large projects first.
+     * List order defines pull order.
+    */
+    private static final List<String> PRIORITY_PROJECTS = List.of("webapps", "cs.sys.dbschema.hisinone");
     
 	@Override
 	public Object execute(ExecutionEvent event) {
@@ -79,128 +83,241 @@ public class GitBatchPullHandler extends AbstractHandler {
 		return null;
 	}
 	
-	private MultiStatus schedulePullJobs(IProgressMonitor batchMonitor) {
-		/** Stores the result of all scheduled jobs */
-		MultiStatus multiStatus = new MultiStatus(Activator.PLUGIN_ID, 0, "Problems occured during \"Batch Git Pull Command\"");
-		
-		List<IProject> projects = Arrays.asList(WorkspaceFactory.getWorkspace().getRoot().getProjects());
-		List<Job> jobList = new ArrayList<>();
-
-		String[] projectNames = new String[projects.size()];
-		for (int i = 0; i < projectNames.length; i++) {
-			projectNames[i] = projects.get(i).getName();
+	/**
+	 * Returns the order in which the project should be pulled.
+	 * Projects configured in {@link #PRIORITY_PROJECTS} are pulled first.
+	 * @param project
+	 * @return configured priority or the lowest priority for normal projects
+	 */
+	private int getPullOrder(IProject project) {
+		int prioIndex = PRIORITY_PROJECTS.indexOf(project.getName());
+		if(prioIndex >= 0) {
+			return prioIndex;
 		}
-		
-		logger.info("Found " + projectNames.length + " projects in Workspace: " + Arrays.toString(projectNames));
-		batchMonitor.beginTask("Batch Git Pull", projects.size());
-		
-		for (IProject p : projects) {
-			//Check, if user has requested a cancel
-			if(batchMonitor.isCanceled()) {
-				multiStatus.add(Status.CANCEL_STATUS);
-				batchMonitor.done();
-				for (Job job: jobList) {
-					if ( job != null ) {
-						job.cancel();
-						try {
-							job.join();
-						} catch (InterruptedException e) {
-							logger.error("Interrupted while waiting for git batch pull job to cancel");
-						}
-					}
-				}
-				return multiStatus;
-			}
-			
-			String name = p.getName();
-			File projectRoot = p.getLocation().toFile();
-			boolean isWorktree = p.getLocation().append(".git").toFile().isFile();
-
-			Job pullJob = new WorkspaceJob("ecl1: Executing \"git pull\" for "+ name) {
-				@Override
-				public IStatus runInWorkspace(IProgressMonitor innerMonitor) {
-					if(isWorktree) {
-						logger.info("Processing " + name + "(worktree) with location " + projectRoot.getAbsolutePath());
-					}else {
-						logger.info("Processing " + name + " with location " + projectRoot.getAbsolutePath());
-					}
-					innerMonitor.beginTask("Pulling " + name, IProgressMonitor.UNKNOWN);
-					gitPull(innerMonitor, multiStatus, projectRoot, name);
-					innerMonitor.done();
-					logger.info("Finished Processing " + name);
-					batchMonitor.worked(1);
-					return dummyStatus;
-				}
-			};
-			jobList.add(pullJob);
-			Activator.getDefault().appendPullJob(pullJob);
-			pullJob.schedule();
-		}
-		
-		for(Job job : jobList) {
-			try {
-				job.join();
-			} catch (InterruptedException e) {
-				logger.error("Interrupted while running git batch pull job");
+		// Normal projects without configured priority
+		return Integer.MAX_VALUE;
+	}
+	
+	/**
+	 * Returns accessible projects in pull order.
+	 */
+	private List<IProject> getProjectsForPull() {
+		List<IProject> projects = new ArrayList<>();
+		for (IProject project : WorkspaceFactory.getWorkspace().getRoot().getProjects()) {
+			if (project.isAccessible() && project.getLocation() != null) {
+				projects.add(project);
 			}
 		}
-		batchMonitor.done();
-		return multiStatus;
+		// Pull priority projects first and sort remaining alphabetically
+		projects.sort(Comparator.comparingInt(this::getPullOrder).thenComparing(IProject::getName));
+		return projects;
+	}
+	
+	/**
+	 * Creates the throttled pull job group.
+	 */
+	private JobGroup createPullJobGroup(int jobCount) {
+		return new JobGroup(
+				"ecl1: Git Batch Pull",
+				MAX_PARALLEL_PULLS,
+				jobCount) {
+
+			@Override
+			protected boolean shouldCancel(
+					IStatus lastCompletedJobResult,
+					int numberOfFailedJobs,
+					int numberOfCanceledJobs) {
+
+				// A failed pull must not cancel the remaining pulls.
+				return false;
+			}
+		};
 	}
 	
 	
-	private void gitPull(IProgressMonitor monitor, MultiStatus multiStatus, File projectRoot, String name) {
-		if(monitor.isCanceled()) {
-			multiStatus.add(Status.CANCEL_STATUS);
-			return;
+	/**
+	 * Schedules and collects all pull jobs.
+	 */
+	private MultiStatus schedulePullJobs(IProgressMonitor batchMonitor) {
+		MultiStatus multiStatus = new MultiStatus(Activator.PLUGIN_ID, 0,
+				"Problems occurred during \"Batch Git Pull Command\"");
+	
+		List<IProject> projects = getProjectsForPull();
+		List<String> projectNames = new ArrayList<>();
+	
+		for (IProject project : projects) {
+			projectNames.add(project.getName());
 		}
-		try{
-	    	Repository repository = new FileRepositoryBuilder()
-		            .setWorkTree(projectRoot)
-		            .readEnvironment()
-		            .findGitDir(projectRoot)
-		            .build();
+	
+		logger.info("Found " + projects.size() + " projects in Workspace: " + projectNames);
+	
+		batchMonitor.beginTask("Batch Git Pull", projects.size());
+	
+		if (projects.isEmpty()) {
+			batchMonitor.done();
+			return multiStatus;
+		}
+	
+		if (batchMonitor.isCanceled()) {
+			multiStatus.add(Status.CANCEL_STATUS);
+			batchMonitor.done();
+			return multiStatus;
+		}
+	
+		JobGroup pullJobGroup = createPullJobGroup(projects.size());
+	
+		for (IProject project : projects) {
+			Job pullJob = createPullJob(project);
+			pullJob.setJobGroup(pullJobGroup);	
+			Activator.getDefault().appendPullJob(pullJob);
+			pullJob.schedule();
+		}
+	
+		try {
+			pullJobGroup.join(0, batchMonitor);
+		} catch (OperationCanceledException e) {
+			pullJobGroup.cancel();
+			waitForPullJobs(pullJobGroup);
+			multiStatus.add(Status.CANCEL_STATUS);
+		} catch (InterruptedException e) {
+			pullJobGroup.cancel();
+			waitForPullJobs(pullJobGroup);
+	
+			multiStatus.add(new Status(IStatus.CANCEL, Activator.PLUGIN_ID,
+					"Interrupted while running git batch pull jobs.", e));
+	
+			Thread.currentThread().interrupt();
+		} finally {
+			batchMonitor.done();
+		}
+	
+		MultiStatus pullResult = pullJobGroup.getResult();
+	
+		if (pullResult != null) {
+			multiStatus.merge(pullResult);
+		}
+	
+		return multiStatus;
+	}
 
-	    	try (Git git = new Git(repository)) {
+
+	/**
+	 * Creates a pull job for one project.
+	 */
+	private Job createPullJob(IProject project) {
+		String name = project.getName();
+		File projectRoot = project.getLocation().toFile();
+	
+		boolean isWorktree = project.getLocation().append(".git").toFile().isFile();
+	
+		return new WorkspaceJob(
+				"ecl1: Executing \"git pull\" for " + name) {
+	
+			@Override
+			public IStatus runInWorkspace(IProgressMonitor monitor) {
+				if (isWorktree) {
+					logger.info("Processing " + name + " (worktree) with location "
+									+ projectRoot.getAbsolutePath());
+				} else {
+					logger.info("Processing " + name + " with location "
+									+ projectRoot.getAbsolutePath());
+				}
+	
+				monitor.beginTask("Pulling " + name, IProgressMonitor.UNKNOWN);
+	
 				try {
-					PullCommand pull = git.pull();
-					PullResult pullResult = pull.call();
-					parsePullResult(name, pullResult, multiStatus);
-				} catch (GitAPIException | JGitInternalException e) {
-					multiStatus.add(new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": " + e.getMessage() + ". Skipping and proceeding."));
+					return gitPull(monitor, projectRoot, name);
+				} finally {
+					monitor.done();
+					logger.info("Finished Processing " + name);
 				}
 			}
-		} catch (org.eclipse.jgit.errors.RepositoryNotFoundException rnfe) {
-			// ignore
-			logger.info(name + " is not managed via Git: " + rnfe.getMessage());
-		} catch (IOException e) {
-			logger.info(name + " failed: " + e.getMessage());
-			multiStatus.add(new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": " + e.getMessage()));
+		};
+	}
+
+	/**
+	 * Waits until all canceled pull jobs have finished.
+	 */
+	private void waitForPullJobs(JobGroup pullJobGroup) {
+		try {
+			pullJobGroup.join(0, null);
+		} catch (InterruptedException e) {
+			logger.error("Interrupted while waiting for git pull jobs to finish");
+			Thread.currentThread().interrupt();
 		}
 	}
 
 
 	/**
-	 * Parse the pullResult and write the result into the multiStatus
-	 * 
-	 * @param projectName
-	 * @param pullResult
-	 * @param multiStatus
+	 * Pulls one Git repository.
 	 */
-	private void parsePullResult(String projectName, PullResult pullResult, MultiStatus multiStatus) {
-		Status status;
-		if(!pullResult.isSuccessful()) {
-			if (pullResult.getMergeResult() != null && !pullResult.getMergeResult().getMergeStatus().isSuccessful()) {
-				status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Pull from " + projectName + " was not successful, because the merge failed.");
-				multiStatus.add(status);
-			}
-			if(pullResult.getRebaseResult() != null && !pullResult.getRebaseResult().getStatus().isSuccessful()) {
-				status = new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Pull from " + projectName + " was not successful, because the rebase failed.");
-				multiStatus.add(status);
-			}
+	private IStatus gitPull(IProgressMonitor monitor,File projectRoot, String name) {
+
+		if (monitor.isCanceled()) {
+			return Status.CANCEL_STATUS;
+		}
+
+		try (Repository repository = new FileRepositoryBuilder()
+						.setWorkTree(projectRoot)
+						.readEnvironment()
+						.findGitDir(projectRoot)
+						.build();
+				Git git = new Git(repository)) {
+
+			PullResult pullResult = git.pull().call();
+			return parsePullResult(name, pullResult);
+
+		} catch (org.eclipse.jgit.errors.RepositoryNotFoundException e) {
+			logger.info(name + " is not managed via Git: " + e.getMessage());
+			return Status.OK_STATUS;
+		} catch (GitAPIException | JGitInternalException e) {
+			return new Status(IStatus.WARNING, Activator.PLUGIN_ID,
+					"Failed to pull " + name + ": " + e.getMessage() + ". Skipping and proceeding.", e);
+		} catch (IOException e) {
+			logger.info(name + " failed: " + e.getMessage());
+			return new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Failed to pull " + name + ": " + e.getMessage(), e);
 		}
 	}
 
+
+	/**
+	 * Creates the status for a pull result.
+	 */
+	private IStatus parsePullResult(
+			String projectName,
+			PullResult pullResult) {
+
+		if (pullResult.isSuccessful()) {
+			return Status.OK_STATUS;
+		}
+
+		MultiStatus result = new MultiStatus(Activator.PLUGIN_ID, 0, "Pull from " + projectName + " was not successful.");
+
+		boolean reasonFound = false;
+
+		if (pullResult.getMergeResult() != null
+				&& !pullResult.getMergeResult().getMergeStatus().isSuccessful()) {
+
+			result.add(new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Pull from " + projectName + " was not successful because the merge failed."));
+			reasonFound = true;
+		}
+
+		if (pullResult.getRebaseResult() != null
+				&& !pullResult.getRebaseResult()
+						.getStatus()
+						.isSuccessful()) {
+
+			result.add(new Status(IStatus.WARNING, Activator.PLUGIN_ID, "Pull from " + projectName + " was not successful because the rebase failed."));
+			reasonFound = true;
+		}
+
+		if (!reasonFound) {
+			result.add(new Status(IStatus.WARNING, Activator.PLUGIN_ID," Pull from " + projectName + " was not successful."));
+		}
+
+		return result;
+	}
+	
 	/**
 	 * Creates a dialog that summarizes the result of the git batch pull
 	 * 
@@ -221,5 +338,4 @@ public class GitBatchPullHandler extends AbstractHandler {
 		});
 		return result;
 	}
-
 }
