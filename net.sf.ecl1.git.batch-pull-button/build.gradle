@@ -10,6 +10,7 @@ repositories {
 
 dependencies {
     implementation(project(':h1modules.utilities'))
+    implementation libs.eclipse.jdt.core
     implementation libs.eclipse.core.resources
     implementation libs.eclipse.core.commands
     compileOnly (libs.eclipse.swt.win32) {

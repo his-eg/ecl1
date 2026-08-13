@@ -8,6 +8,7 @@ eclipse-ui-console = "3.14.400"
 eclipse-swt = "3.128.0"
 eclipse-jface = "3.35.0"
 eclipse-jdt-launching = "3.23.400"
+eclipse-jdt-core = "3.35.0"
 commons-io = "[2.2.0,)"
 guava = "[15.0.0,)"
 gson = "[2.2.4,)"
@@ -27,6 +28,7 @@ eclipse-swt-linux = { group = "org.eclipse.platform", name = "org.eclipse.swt.gt
 eclipse-swt-svg = { group = "org.eclipse.platform", name = "org.eclipse.swt.svg", version.ref = "eclipse-swt" }
 eclipse-jface = { group = "org.eclipse.platform", name = "org.eclipse.jface", version.ref = "eclipse-jface" }
 eclipse-jdt-launching = { group = "org.eclipse.jdt", name = "org.eclipse.jdt.launching", version.ref = "eclipse-jdt-launching" }
+eclipse-jdt-core = { group = "org.eclipse.jdt", name = "org.eclipse.jdt.core", version.ref = "eclipse-jdt-core" }
 commons-io = { group = "commons-io", name = "commons-io", version.ref = "commons-io" }
 guava = { group = "com.google.guava", name = "guava", version.ref = "guava" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
