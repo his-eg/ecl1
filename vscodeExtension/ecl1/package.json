@@ -3,7 +3,7 @@
   "name": "ecl1",
   "displayName": "ecl1",
   "description": "Extension to use ecl1 plugins in Visual Studio Code.",
-  "version": "1.9.7",
+  "version": "1.9.8",
   "repository": {
     "type": "git",
     "url": "https://github.com/his-eg/ecl1"
@@ -144,7 +144,7 @@
     "@typescript-eslint/parser": "^8.25.0",
     "eslint": "^9.21.0",
     "typescript": "^5.7.3",
-    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-cli": "^0.0.15",
     "@vscode/test-electron": "^2.5.2"
   },
   "overrides": {
