@@ -1,5 +1,9 @@
 # Change Log
 
+## Version 1.9.8.2026-08-19 ##
+- Git Batch Pull: Limit concurrent pulls to 10
+- Git Batch Pull: Warn when pulling webapps while Tomcat is running.
+
 ## 0.0.3 / Version 1.9.7.2026-05-27##
 - Git Batch Pull: Improved performance by pulling repositories in parallel
 - CommitExporter: Use Tabs as indent

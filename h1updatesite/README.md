@@ -4,6 +4,10 @@
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
 ##Version 1.9.7.2026-05-27##
+* Git Batch Pull: Limit concurrent pulls to 10
+* Git Batch Pull: Warn when pulling webapps while Tomcat is running.
+
+##Version 1.9.7.2026-05-27##
 * Git Batch Pull: Improved performance by pulling repositories in parallel
 * CommitExporter: Use Tabs as indent
 * Added Support for git worktrees
