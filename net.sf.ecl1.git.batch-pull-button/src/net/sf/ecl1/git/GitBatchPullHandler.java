@@ -157,7 +157,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 		} else if (osName.startsWith("linux")) {
 			processBuilder = new ProcessBuilder(
 					"pgrep",
-					"f",
+					"-f",
 					"--",
 					"-D[c]atalina\\.base=");
 			notRunningExitCode = 1;
@@ -174,10 +174,10 @@ public class GitBatchPullHandler extends AbstractHandler {
 			if (exitCode == notRunningExitCode) {
 				return false;
 			}
-			logger.warn("Could not check wheter Tomcat is running. Exit code: " + exitCode);
+			logger.warn("Could not check whether Tomcat is running. Exit code: " + exitCode);
 			return true;
 		} catch (IOException e) {
-			logger.warn("Could not check wheter Tomcat is running.", e);
+			logger.warn("Could not check whether Tomcat is running.", e);
 			return true;
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
