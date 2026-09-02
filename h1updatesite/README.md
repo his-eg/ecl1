@@ -3,6 +3,9 @@
 * Release Notes starting with version 0.1.0.2014-08-11
 * Missing version numbers between 0.4.7 and 0.4.20 inclusive indicate intermediate testing releases
 
+##Version 1.9.9.2026-09-02##
+* Bugfix: Fixed Tomcat detection for Git Batch Pull on Linux
+
 ##Version 1.9.8.2026-08-19##
 * Git Batch Pull: Limit concurrent pulls to 10
 * Git Batch Pull: Warn when pulling webapps while Tomcat is running.
