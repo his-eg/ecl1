@@ -1,10 +1,14 @@
 package net.sf.ecl1.git;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
@@ -102,7 +106,7 @@ public class GitBatchPullHandler extends AbstractHandler {
 	private	TomcatPullDecision getTomcatPullDecision(ExecutionEvent event) {
 		boolean webappsAvailable = WorkspaceFactory.getWorkspace().getRoot().getProject(WEBAPPS).isAccessible();
 		
-		if(!webappsAvailable || !isTomcatRunning()) {
+		if(!webappsAvailable || !isWorkspaceTomcatRunning()) {
 			return TomcatPullDecision.PULL;
 		}
 		
@@ -133,56 +137,145 @@ public class GitBatchPullHandler extends AbstractHandler {
 		};
 	}
 
-	private boolean isTomcatRunning() {
-		String osName = System.getProperty("os.name").toLowerCase();
-		ProcessBuilder processBuilder;
-		int notRunningExitCode;
-		
-		if (osName.startsWith("win")) {
-			// Exit code 0 Tomcat running, 10 Tomcat not running
-			String powershellCommand = "$tomcat = Get-CimInstance Win32_Process "
-					+ "| Where-Object { "
-					+ "($_.Name -eq 'java.exe' -or $_.Name -eq 'javaw.exe') "
-					+ "-and $_.CommandLine -like '*-Dcatalina.base=*' } "
-					+ "| Select-Object -First 1; "
-					+ "if ($tomcat) { exit 0 } else { exit 10 }";
+	private boolean isWorkspaceTomcatRunning() {
+	    String osName = System.getProperty("os.name").toLowerCase();
+	    ProcessBuilder processBuilder;
+	    int notRunningExitCode;
 
-			processBuilder = new ProcessBuilder(
-					"powershell.exe",
-					"-NoProfile",
-					"-NonInteractive",
-					"-Command",
-					powershellCommand);
-			notRunningExitCode = 10;
-		} else if (osName.startsWith("linux")) {
-			processBuilder = new ProcessBuilder(
-					"pgrep",
-					"-f",
-					"--",
-					"-D[c]atalina\\.base=");
-			notRunningExitCode = 1;
-		} else {
-			logger.warn("Tomcat detection not supported on "+ osName);
-			return true;
-		}
-		
-		try {
-			int exitCode = processBuilder.start().waitFor();
-			if (exitCode == 0) {
-				return true;
-			}
-			if (exitCode == notRunningExitCode) {
-				return false;
-			}
-			logger.warn("Could not check whether Tomcat is running. Exit code: " + exitCode);
-			return true;
-		} catch (IOException e) {
-			logger.warn("Could not check whether Tomcat is running.", e);
-			return true;
-		} catch (InterruptedException e) {
-			Thread.currentThread().interrupt();
-			return true;
-		}
+	    if (osName.startsWith("win")) {
+	        // Get command lines of all running Tomcat processes
+	        String powershellCommand = "$tomcats = Get-CimInstance Win32_Process "
+	                + "| Where-Object { "
+	                + "($_.Name -eq 'java.exe' -or $_.Name -eq 'javaw.exe') "
+	                + "-and $_.CommandLine -like '*-Dcatalina.base=*' }; "
+	                + "if ($tomcats) { "
+	                + "$tomcats | Select-Object -ExpandProperty CommandLine; "
+	                + "exit 0 "
+	                + "} else { "
+	                + "exit 10 "
+	                + "}";
+
+	        processBuilder = new ProcessBuilder(
+	                "powershell.exe",
+	                "-NoProfile",
+	                "-NonInteractive",
+	                "-Command",
+	                powershellCommand);
+
+	        notRunningExitCode = 10;
+
+	    } else if (osName.startsWith("linux")) {
+	        // -af to return the full command line
+	        processBuilder = new ProcessBuilder(
+	                "pgrep",
+	                "-af",
+	                "--",
+	                "-D[c]atalina\\.base=");
+
+	        notRunningExitCode = 1;
+
+	    } else {
+	        logger.warn("Tomcat detection not supported on " + osName);
+	        return true;
+	    }
+
+	    try {
+	        Process process = processBuilder.start();
+
+	        String output;
+	        try (BufferedReader reader = process.inputReader()) {
+	            output = reader.lines().collect(Collectors.joining("\n"));
+	        }
+
+	        int exitCode = process.waitFor();
+
+	        if (exitCode == notRunningExitCode) {
+	            return false;
+	        }
+
+	        if (exitCode != 0) {
+	            logger.warn("Could not check whether Tomcat is running. Exit code: " + exitCode);
+	            return true;
+	        }
+
+	        Path workspaceTomcatPath = WorkspaceFactory.getWorkspace().getRoot().getLocation().toFile()
+	                .getParentFile()
+	                .toPath()
+	                .toAbsolutePath()
+	                .normalize();
+
+	        return containsWorkspaceTomcat(output, workspaceTomcatPath);
+
+	    } catch (IOException e) {
+	        logger.warn("Could not check whether Tomcat is running.", e);
+	        return true;
+	    } catch (InterruptedException e) {
+	        Thread.currentThread().interrupt();
+	        return true;
+	    }
+	}
+
+	private boolean containsWorkspaceTomcat(String output, Path workspaceTomcatPath) {
+		// Split output into process cmd lines (\R handles any line ending)
+	    for (String commandLine : output.split("\\R")) {
+	        Path catalinaBase = extractCatalinaBase(commandLine);
+
+	        // Only consider Tomcats belonging to the current workspace
+	        if (catalinaBase != null && catalinaBase.equals(workspaceTomcatPath)) {
+	            return true;
+	        }
+	    }
+
+	    return false;
+	}
+
+	private Path extractCatalinaBase(String commandLine) {
+	    String prefix = "-Dcatalina.base=";
+	    int start = commandLine.indexOf(prefix);
+
+	    if (start < 0) {
+	        return null;
+	    }
+
+	    start += prefix.length();
+
+	    if (start >= commandLine.length()) {
+	        return null;
+	    }
+
+	    // Handle quoted paths containing spaces
+	    boolean quotedValue = commandLine.charAt(start) == '"';
+	    boolean quotedArgument = start > prefix.length()
+	            && commandLine.charAt(start - prefix.length() - 1) == '"';
+
+	    if (quotedValue) {
+	        start++;
+	    }
+
+	    int end;
+	    if (quotedValue || quotedArgument) {
+	        end = commandLine.indexOf('"', start);
+	    } else {
+	        end = start;
+	        while (end < commandLine.length()
+	                && !Character.isWhitespace(commandLine.charAt(end))) {
+	            end++;
+	        }
+	    }
+
+	    if (end < 0) {
+	        end = commandLine.length();
+	    }
+
+	    String catalinaBase = commandLine.substring(start, end);
+
+	    if (catalinaBase.isBlank()) {
+	        return null;
+	    }
+
+	    return Paths.get(catalinaBase)
+	            .toAbsolutePath()
+	            .normalize();
 	}
 	
 	/**
