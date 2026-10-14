@@ -297,8 +297,9 @@ function isHisInOneWorkspace() {
     if(!innerWsPath){
         return false;
     }
+    const parentFolder = path.dirname(innerWsPath);
 
-    return getProjects(WORKSPACE_FOLDER_VSC).length > 0 || getProjects(innerWsPath).length > 0;
+    return getProjects(parentFolder).length > 0 || getProjects(innerWsPath).length > 0;
 }
 
 /**
