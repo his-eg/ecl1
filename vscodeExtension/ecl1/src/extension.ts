@@ -7,7 +7,7 @@ import { readdirSync, existsSync, mkdirSync,
 /** Keep value in sync with activationEvents in package.json */
 const INNER_WORKSPACE_NAMES = ['eclipse-workspace','workspace'];
 
-const WORKSPACE_FOLDER = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
+const WORKSPACE_FOLDER_VSC = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : '';
 
 
 class Ecl1CommandTreeItem extends vscode.TreeItem {
@@ -233,7 +233,7 @@ export function deactivate() {
  * @returns Full inner workspace path if found, else an empty string.
  */
 function getInnerWorkspaceFolder() {
-    return findInnerWorkspace(WORKSPACE_FOLDER);
+    return findInnerWorkspace(WORKSPACE_FOLDER_VSC);
 }
 
 /**
@@ -297,7 +297,8 @@ function isHisInOneWorkspace() {
     if(!innerWsPath){
         return false;
     }
-    return getProjects(WORKSPACE_FOLDER).length > 0 || getProjects(innerWsPath).length > 0;
+
+    return getProjects(WORKSPACE_FOLDER_VSC).length > 0 || getProjects(innerWsPath).length > 0;
 }
 
 /**
@@ -330,12 +331,12 @@ function hideNonProjectsInWs() {
     }
 
     const innerWsPath = getInnerWorkspaceFolder();
-    const relativePath = path.relative(WORKSPACE_FOLDER, innerWsPath);
+    const relativePath = path.relative(WORKSPACE_FOLDER_VSC, innerWsPath);
     const innerWsRoot = relativePath.split(path.sep)[0];
     
     const dirsToKeep = ['.vscode', innerWsRoot];
-    const wsDirs = readdirSync(WORKSPACE_FOLDER, {withFileTypes: true}).map(item => item.name);
-    const projects = getProjects(WORKSPACE_FOLDER);
+    const wsDirs = readdirSync(WORKSPACE_FOLDER_VSC, {withFileTypes: true}).map(item => item.name);
+    const projects = getProjects(WORKSPACE_FOLDER_VSC);
     const dirsToExclude = wsDirs.filter(dir => !projects.includes(dir) && !dirsToKeep.includes(dir));
     
     // Clone the objects to avoid any issues with immutability
@@ -355,7 +356,7 @@ function hideNonProjectsInWs() {
         if (name.startsWith('*')) {
             continue;
         }
-        const fullPath = path.join(WORKSPACE_FOLDER, name);
+        const fullPath = path.join(WORKSPACE_FOLDER_VSC, name);
         if (!existsSync(fullPath)) {
             delete filesExclude[name];
             delete searchExclude[name];
@@ -443,7 +444,7 @@ function isJavaInstalled() {
 
 /** Removes file exclusions created by {@link hideNonProjectsInWs} */
 function removeExclusions() {
-    const filePath = path.join(WORKSPACE_FOLDER, '.vscode', 'excludedNames.txt');
+    const filePath = path.join(WORKSPACE_FOLDER_VSC, '.vscode', 'excludedNames.txt');
     if (!existsSync(filePath)) {
         // do nothing no files are excluded
         return;
@@ -486,7 +487,7 @@ function removeExclusions() {
  * @param fileNames array of names
  */
 function writeExclusionsToFile(fileNames: Array<string>) {
-    const vscodeFolderPath = path.join(WORKSPACE_FOLDER, '.vscode');
+    const vscodeFolderPath = path.join(WORKSPACE_FOLDER_VSC, '.vscode');
     const filePath = path.join(vscodeFolderPath, 'excludedNames.txt');
     // Ensure the .vscode folder exists
     if (!existsSync(vscodeFolderPath)) {
