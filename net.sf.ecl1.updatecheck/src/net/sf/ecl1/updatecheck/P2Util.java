@@ -1,5 +1,6 @@
 package net.sf.ecl1.updatecheck;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.equinox.p2.core.IProvisioningAgent;
 import org.eclipse.equinox.p2.engine.IProfile;
 import org.eclipse.equinox.p2.engine.IProfileRegistry;
+import org.eclipse.equinox.p2.engine.ProvisioningContext;
 import org.eclipse.equinox.p2.metadata.IInstallableUnit;
 import org.eclipse.equinox.p2.operations.ProvisioningJob;
 import org.eclipse.equinox.p2.operations.ProvisioningSession;
@@ -33,6 +35,8 @@ public class P2Util {
     private static final ConsoleLogger logger = new ConsoleLogger(UpdateCheckActivator.getDefault().getLog(), UpdateCheckActivator.PLUGIN_ID, P2Util.class.getSimpleName());
 
     private static final String ECL1_UPDATE_ID = "h1modulesfeature.feature.group";
+    private static final String ECL1_UPDATESIE_DEVTOOLS = "https://devtools.his.de/ecl1/updatesite";
+    private static final String ECL1_UPDATESIE_SF = "https://ecl1.sourceforge.net/";
     
 	static void doCheckForUpdates(IProgressMonitor monitor) {
 		BundleContext bundleContext = UpdateCheckActivator.getDefault().getBundle().getBundleContext();
@@ -74,6 +78,20 @@ public class P2Util {
 		logger.debug("Installable Units for update: " + unitsForUpdate);
 		
 		UpdateOperation operation = new UpdateOperation(session, unitsForUpdate);
+		
+		// Restrict update to the ecl1 update sites.
+		URI updateSite1 = URI.create(ECL1_UPDATESIE_DEVTOOLS);
+		URI updateSite2 = URI.create(ECL1_UPDATESIE_SF);
+		
+		ProvisioningContext context = new ProvisioningContext(agent);
+		context.setArtifactRepositories(updateSite1, updateSite2);
+		context.setMetadataRepositories(updateSite1, updateSite2);
+		
+		// Prevent p2 from following references to other update sites.
+		context.setProperty(ProvisioningContext.FOLLOW_ARTIFACT_REPOSITORY_REFERENCES, "false");
+		context.setProperty(ProvisioningContext.FOLLOW_REPOSITORY_REFERENCES, "false");
+		
+		operation.setProvisioningContext(context);
 		
 		// Check if updates for ecl1 are available
 		SubMonitor sub = SubMonitor.convert(monitor, "Checking for application updates...", 200);
