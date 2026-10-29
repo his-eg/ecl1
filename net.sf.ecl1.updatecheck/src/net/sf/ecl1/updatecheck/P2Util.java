@@ -1,6 +1,7 @@
 package net.sf.ecl1.updatecheck;
 
 import java.net.URI;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Set;
 
@@ -80,12 +81,21 @@ public class P2Util {
 		UpdateOperation operation = new UpdateOperation(session, unitsForUpdate);
 		
 		// Restrict update to the ecl1 update sites.
-		URI updateSite1 = URI.create(ECL1_UPDATESIE_DEVTOOLS);
-		URI updateSite2 = URI.create(ECL1_UPDATESIE_SF);
+		URI[] updateSites = {
+			URI.create(ECL1_UPDATESIE_DEVTOOLS),
+			URI.create(ECL1_UPDATESIE_SF)
+		};
+
+		// Allow overriding the update sites for local testing
+		// Set -Decl1.updatesite=path/to/site in eclipse.ini or as vm arg in debugger
+		String localUpdateSite = System.getProperty("ecl1.updatesite");
+		if (localUpdateSite != null && !localUpdateSite.isBlank()) {
+			updateSites = new URI[] { Path.of(localUpdateSite).toUri()};
+		}
 		
 		ProvisioningContext context = new ProvisioningContext(agent);
-		context.setArtifactRepositories(updateSite1, updateSite2);
-		context.setMetadataRepositories(updateSite1, updateSite2);
+		context.setArtifactRepositories(updateSites);
+		context.setMetadataRepositories(updateSites);
 		
 		// Prevent p2 from following references to other update sites.
 		context.setProperty(ProvisioningContext.FOLLOW_ARTIFACT_REPOSITORY_REFERENCES, "false");
